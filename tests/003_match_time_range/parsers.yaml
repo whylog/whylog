@@ -1,0 +1,10 @@
+---
+name: cause
+regex: ^(\d+) root cause
+params:
+    - {type: time, format: '%s'}
+---
+name: effect
+regex: ^(\d+) visible effect$
+params:
+    - {type: time, format: '%s'}

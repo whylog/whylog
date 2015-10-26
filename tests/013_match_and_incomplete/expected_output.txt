@@ -1,0 +1,9 @@
+--- investigated item [node_1.log line 3]:
+visible effect
+
+--- could have been triggered by the following causes:
+--- 1/3 cause1 [node_1.log line 1]:
+root cause1
+--- 2/3 cause2 [node_1.log line 2]:
+root cause2
+--- 3/3 MISSING cause3 (^root cause3)

@@ -1,0 +1,10 @@
+--- investigated item [node_1.log line 2]:
+visible effect
+
+--- has been caused by an anomalous entries "entry" which divided nodes into 2 groups by "entry type":
+--- group 1 (of 2), item 1 of 1 in [node_3.log line 1]:
+different entry
+--- group 2 (of 2), item 1 of 2 in [node_2.log line 1]:
+normal entry
+--- group 2 (of 2), item 2 of 2 in [node_1.log line 1]:
+normal entry

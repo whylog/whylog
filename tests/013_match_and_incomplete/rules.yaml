@@ -1,0 +1,4 @@
+---
+causes: [cause1, cause2, cause3]
+effect: effect
+type: and

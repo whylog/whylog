@@ -1,0 +1,9 @@
+---
+name: cause1
+regex: ^root cause1
+---
+name: cause2
+regex: ^root cause2
+---
+name: effect
+regex: ^visible effect$

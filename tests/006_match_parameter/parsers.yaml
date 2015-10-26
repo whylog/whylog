@@ -1,0 +1,10 @@
+---
+name: cause
+regex: ^root cause of (\w)$
+params:
+    - {type: data, name: item}
+---
+name: effect
+regex: ^visible effect on (\w)$
+params:
+    - {type: data, name: item}

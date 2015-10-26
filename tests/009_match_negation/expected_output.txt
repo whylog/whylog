@@ -1,0 +1,4 @@
+--- investigated item [node_1.log line 1]:
+visible effect
+
+--- has been caused by a missing "cause" (^root cause)

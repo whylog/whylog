@@ -1,0 +1,8 @@
+---
+name: entry
+regex: ^(\w+) entry$
+params:
+    - {type: data, name: entry type}
+---
+name: effect
+regex: ^visible effect$

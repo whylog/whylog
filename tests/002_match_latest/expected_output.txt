@@ -1,0 +1,5 @@
+--- investigated item [node_1.log line 3]:
+3 visible effect
+
+--- has been caused by [node_1.log line 2]:
+2 root cause

@@ -1,0 +1,8 @@
+--- investigated item [node_1.log line 4]:
+4 visible effect
+
+--- has been caused by [node_1.log line 3]:
+3 intermediate effect
+
+--- which has been caused by [node_1.log line 2]:
+2 root cause B

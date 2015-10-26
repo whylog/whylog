@@ -1,0 +1,8 @@
+--- investigated item [node_1.log line 3]:
+visible effect
+
+--- has been triggered by 2 causes:
+--- 1/2 cause1 [node_1.log line 1]:
+root cause1
+--- 2/2 cause2 [node_1.log line 2]:
+root cause2

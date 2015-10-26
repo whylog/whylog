@@ -1,0 +1,5 @@
+---
+cause: cause
+effect: effect
+constraints:
+    - {type: time, range: -1}
