@@ -1,0 +1,65 @@
+@startuml
+
+Vim: Default vim screen.
+Vim: User can move to selected line and press <F4>.
+Vim: This operation will open new window 'insert' if wasn't opened before
+Vim: and add this line to this window.
+
+state "insert lines" as InsertLines
+InsertLines: This state is related to insert lines window.
+InsertLines: It contain inserted lines.
+InsertLines: In this state user can skip to Vim state and add more lines or
+InsertLines: go to manage rule state, where can define dependences between
+InsertLines: inserted lines.
+
+state "manage rule" as ManageRule {
+    state "add dependences between lines" as AddDependences
+
+    AddDependences --> AddDependences: <F4>
+    AddDependences: In this state the user can see for every line:
+    AddDependences: - the line content
+    AddDependences: - the origin file name
+    AddDependences: - number & byte of the origin file
+    AddDependences: - new regex used by rule
+    AddDependences: - number of the manage rules (optional)
+    AddDependences:
+    AddDependences: User can add dependences between all of this sources of lines
+    AddDependences: # TODO split add dependences state
+}
+
+ManageRule: In this state user is definig dependences between states
+ManageRule: User can go back to insert lines state by pressing <F4>
+ManageRule: User can also test your defined rule on the main line.
+
+state "preview" as Preview
+Preview: In this state user can open any file and run new defined but
+Preview: not saved yet rule on any line he want.
+Preview:
+Preview: When uesr is not satified of rule that he defined, he can
+Preview: move back to manage rule state and then to insert lines state,
+Preview: where he can fix his new rule.
+
+state "accept rule" as AcceptRule
+AcceptRule: In this state user is asking: "Are you sure that you want to add new rule?"
+AcceptRule: and he see the rule description.
+
+state "added rule" as AddedRule
+AddedRule: In this state the teacher is saving a new defined rule.
+AddedRule: Unfortunately the first version of whylog teacher can't
+AddedRule: delete defined rules.
+AddedRule: User should remove rule in yaml files by his self.
+
+[*] --> Vim
+Vim --> InsertLines: <F4>
+InsertLines --> InsertLines: <F4>
+InsertLines --> ManageRule: <F3>
+ManageRule --> Preview: <F3>
+Preview --> ManageRule: :q
+Preview --> AcceptRule: <F4>
+AcceptRule --> ManageRule: <F3>
+AcceptRule --> ManageRule: :q
+AcceptRule --> ManageRule: :n
+AcceptRule --> AddedRule: :y
+
+
+@enduml
