@@ -27,7 +27,8 @@ class TestBasic(TestCase):
             '013_match_and_incomplete',
     )
     def test_one(self, test_name):
-        path = path_join(*path_test_files, test_name)
+        prefix_path = path_join(*path_test_files)
+        path = path_join(prefix_path, test_name)
         parsers_path = path_join(path, 'parsers.yaml')
         rules_path = path_join(path, 'rules.yaml')
         input_path = path_join(path, 'input.txt')
