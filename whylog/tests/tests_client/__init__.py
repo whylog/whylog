@@ -40,7 +40,7 @@ class TestBasic(TestCase):
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
-        whylog_client = WhylogClient(base=whylog_base, open_path=path)
+        whylog_client = WhylogClient(rulesbase=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
             vim_line = f.read()
@@ -53,4 +53,4 @@ class TestBasic(TestCase):
             # assert result == f.read()
 
     def test_imports_correctness(self):
-        client = WhylogClient()
+        client = WhylogClient(rulesbase=WhylogBase(), open_path="/foo/bar")
