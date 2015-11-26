@@ -48,4 +48,9 @@ class TestBasic(TestCase):
 
         raise SkipTest('Not implemented yet')
         with open(output_path, 'r') as f:
-            assert result == f.read()
+            pass
+            # remove this comment after implement whylog client and base
+            # assert result == f.read()
+
+    def test_imports_correctness(self):
+        client = WhylogClient()
