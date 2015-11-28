@@ -1,65 +1,202 @@
 @startuml
 
-Vim: Default vim screen.
-Vim: User can move to selected line and press <F4>.
-Vim: This operation will open new window 'insert' if wasn't opened before
-Vim: and add this line to this window.
+Vim: Główny ekran vima
+Vim: Kiedy użytkownik najedzie na daną linie i wciśie <F4> uruchamia nauczyciela
+Vim: regułek. Uzytkownik przechodzi do stanu dodaj przyczynę czyli 'add cause'.
+Vim: Zaznaczona przez niego linia jest domyślnie linią skutku.
 
-state "insert lines" as InsertLines
-InsertLines: This state is related to insert lines window.
-InsertLines: It contain inserted lines.
-InsertLines: In this state user can skip to Vim state and add more lines or
-InsertLines: go to manage rule state, where can define dependences between
-InsertLines: inserted lines.
+state "add cause" as AddCause
+AddCause: Po wejściu w ten stan użytkownikowi pojawia się nowe okienko vimowe
+AddCause: na którym wyświetla się napis:
+AddCause:
+AddCause: Używasz programu whylog w wersji <wersja>.
+AddCause: Jesteś w trybie uczenia programu nowej regułki.
+AddCause: Zaznaczyles linie
+AddCause: Skutek: Nazwa pliku pochodzenia i numer linni:
+AddCause: Skutek: <linia>
+AddCause: jako skutek regułki, której chcesz nauczyć program.
+AddCause:
+AddCause:
+AddCause: Helper:
+AddCause: Przejdź spowrotem do pliku z logami za pomocą :w + w lub :w + k.
+AddCause: Następnie przejdź do lini, którą uważasz za przyczynę i wciśnij <F4>.
+AddCause: Jeśli chcesz wyjść z nauczyciela wciśnij :q znajdując sie kursorem
+AddCause: na tym oknie.
+AddCause:
+AddCause: Po przejściu do okna vimowego i wciśnij <F4> na jakiejś lini
+AddCause: użytkownik przechodzi do stanu akceptuj linie czyli 'accept lines'.
 
-state "manage rule" as ManageRule {
-    state "add dependences between lines" as AddDependences
+state "accept lines" as AcceptLines
+AcceptLines: Poprzednie okienko Vimowe wyświetlające się na dole zamienia się w
+AcceptLines: okno z napisem:
+AcceptLines:
+AcceptLines: Używasz programu whylog w wersji <wersja>.
+AcceptLines: Jesteś w trybie uczenia programu nowej regułki.
+AcceptLines: Zaznaczyles linie:
+AcceptLines:
+AcceptLines: Przyczyna: nazwa pliku pochodzenia i numer lini:
+AcceptLines: Przyczyna: <linia_przyczyny>
+AcceptLines: Skutek: nazwa pliku pochodzenia i numer lini:
+AcceptLines: Skutek: <linia_skutek>
+AcceptLines:
+AcceptLines: Sprawdź czy aby na pewno wprowadzona przez Ciebie przyczyna jest
+AcceptLines: właściwą linią.
+AcceptLines:
+AcceptLines:
+AcceptLines:
+AcceptLines: Helper:
+AcceptLines: Jeśli chcesz zamienic linie przyczyny wciśnij <F3>.
+AcceptLines: Jesli chcesz przejść ekranu dodawania zależności pomiędzy liniami
+AcceptLines: wciśnij <F4>.
+AcceptLines: Jeśli chcesz wyjść z nauczyciela programu lub wprowadzić nowy skutek
+AcceptLines: wciśnij :q znajdując się na tym oknie.
 
-    AddDependences --> AddDependences: <F4>
-    AddDependences: In this state the user can see for every line:
-    AddDependences: - the line content
-    AddDependences: - the origin file name
-    AddDependences: - number & byte of the origin file
-    AddDependences: - new regex used by rule
-    AddDependences: - number of the manage rules (optional)
-    AddDependences:
-    AddDependences: User can add dependences between all of this sources of lines
-    AddDependences: # TODO split add dependences state
+
+state "dependences" as Dependences {
+
 }
+Dependences: Poprzednie okno vima z plikiem z logami zostaje chwilowo zawieszone
+Dependences: Cały ekran zajmuje teraz nowe okno na którym pojawia sie napis:
+Dependences:
+Dependences: Używasz programu whylog w wersji <wersja>.
+Dependences: Jesteś w trybie uczenia programu nowej regułki.
+Dependences: Dodaj zależności pomiędzy wprowadzonymi przez Ciebie liniami:
+Dependences:
+Dependences: Przyczyna: nazwa pliku pochodzenia i numer lini:
+Dependences: Przyczyna: <linia_przyczyny>
+Dependences: Przyczyna: <zdefiniowany_przez_użytkownika_regex_przyczyny>
+Dependences:
+Dependences: Skutek: nazwa pliku pochodzenia i numer lini:
+Dependences: Skutek: <linia_skutek>
+Dependences: Skutek: <zdefiniowany_przez_użytkownika_regex_skuteku>
+Dependences: // Przykład zmiennej w regexie (?P<numer_id> \d+)
+Dependences:
+Dependences:
+Dependences: Lista zmiennych:
+Dependences: Zmienna1
+Dependences: Zmienna2
+Dependences: Zmienna3 etc.
+Dependences:
+Dependences:
+Dependences: Zależności pomiędzy zmiennymi:
+Dependences:
+Dependences: Zmienna1 >= Zmienna2 + 10000  //Tylko dla zmiennych cyfrowych
+Dependences: Zmienna3 == Zmienna2
+Dependences: CauseFileName == 'napis'
+Dependences: CauseFileName == EffectFileName
+Dependences: CauseLineNumber >= EffectLineNumber + 100
+Dependences:
+Dependences: [Nowa_Zależność]
+Dependences:
+Dependences:
+Dependences: // Dodatkowe regułki:
+Dependences: // Coś tu można wstawić
+Dependences:
+Dependences:
+Dependences: Komentarze do regułki:
+Dependences: Ta regułka jest po to aby określi tą i tą sytuację.
+Dependences:
+Dependences: [Nowy_Komentarz]
+Dependences:
+Dependences:
+Dependences: Helper:
+Dependences: Jeśli chcesz wyjść z nauczyciela programu wciśnij :q.
+Dependences: Aby przejść do trybu sprawdzenia regułki 'check rule' wciśnij <F3>.
+Dependences: Aby zaakceptować regułke wciśnij <F4> 'accept rule'.
+Dependences:
+Dependences: Regex zmienia kolor na czerwony jeśli wprowadzona przez użytkownika
+Dependences: Linia nie matchuje sie z regexem.
+Dependences:
+Dependences:
+Dependences: Aby dodać zależności pomiędzy zmiennymi lub komentarz należy wejść
+Dependences: kursorem na napis [Nowa_Zależność] i wcisnąć 'i'.
+Dependences: Po wciśnięciu przycisku kursor powinien się przemieścić do miejsca,
+Dependences: gdzie powinna się znajdować nowa zależność.
+Dependences: Program jest w trybie edycji jednak nie można przechodzić między
+Dependences: liniami.
+Dependences: Aby wyjść z trybu edycji należy wcisnąć <ESC>.
+Dependences: Aby edytować zależności należny najechać na nie i nacisnąć 'i'.
+Dependences: Tak samo jeśli chcesz edytować regexy.
+Dependences: Format zmiennej: (?P <nazwa_zmiennej> <treść_regexa>)
+Dependences: Po edycji regexa, program automatycznie dodaje zmienną do listy.
+Dependences:
+Dependences:
 
-ManageRule: In this state user is definig dependences between states
-ManageRule: User can go back to insert lines state by pressing <F4>
-ManageRule: User can also test your defined rule on the main line.
+state "check rule" as CheckRule {
+}
+CheckRule: Program przechodzi do pliku o w którym znajduje się linia Effect.
+CheckRule: Na dole ekranu znajduje sie drugie okienko z napisem:
+CheckRule:
+CheckRule: Helper:
+CheckRule:
+CheckRule: Aby wrócić do dodawania zależności wciśnij :q.
+CheckRule: Aby sprawdzić działanie regułki najedź na linie dla której chcesz
+CheckRule: sprawdzić działanie regułki i wciśnij <F3>.
+CheckRule: Aby zaakceptować regułke wciśnij <F4>.
+CheckRule:
 
-state "preview" as Preview
-Preview: In this state user can open any file and run new defined but
-Preview: not saved yet rule on any line he want.
-Preview:
-Preview: When uesr is not satified of rule that he defined, he can
-Preview: move back to manage rule state and then to insert lines state,
-Preview: where he can fix his new rule.
+state "accept rule" as AcceptRule {
+}
+AcceptRule:
+AcceptRule: Na nowym oknie pojawia się napis:
+AcceptRule: czy na pewno chcesz zaakceptować regułke:
+AcceptRule:
+AcceptRule:
+AcceptRule: Przyczyna: nazwa pliku pochodzenia i numer lini:
+AcceptRule: Przyczyna: <linia_przyczyny>
+AcceptRule: Przyczyna: <zdefiniowany_przez_użytkownika_regex_przyczyny>
+AcceptRule:
+AcceptRule: Skutek: nazwa pliku pochodzenia i numer lini:
+AcceptRule: Skutek: <linia_skutek>
+AcceptRule: Skutek: <zdefiniowany_przez_użytkownika_regex_skuteku>
+AcceptRule:
+AcceptRule:
+AcceptRule: Lista zmiennych:
+AcceptRule: Zmienna1
+AcceptRule: Zmienna2
+AcceptRule: Zmienna3 etc.
+AcceptRule:
+AcceptRule:
+AcceptRule: Zależności pomiędzy zmiennymi:
+AcceptRule:
+AcceptRule: Zmienna1 >= Zmienna2 + 10000  //Tylko dla zmiennych cyfrowych
+AcceptRule: Zmienna3 == Zmienna2
+AcceptRule: CauseFileName == 'napis'
+AcceptRule: CauseFileName == EffectFileName
+AcceptRule: CauseLineNumber >= EffectLineNumber + 100
+AcceptRule:
+AcceptRule:
+AcceptRule: Dodatkowe regułki:
+AcceptRule: // Coś tu można wstawić
+AcceptRule:
+AcceptRule:
+AcceptRule: Komentarze do regułki:
+AcceptRule: Ta regułka jest po to aby określi tą i tą sytuację.
+AcceptRule:
+AcceptRule:
+AcceptRule: Helper:
+AcceptRule: Jeśli tak wciśnij y, jeśli nie wciśnij n i powróć do trybu dodawania
+AcceptRule: zależności.
 
-state "accept rule" as AcceptRule
-AcceptRule: In this state user is asking: "Are you sure that you want to add new rule?"
-AcceptRule: and he see the rule description.
+state "rule added" as RuleAdded
+RuleAdded: Brawo dodałeś właśnie regułke.
 
-state "added rule" as AddedRule
-AddedRule: In this state the teacher is saving a new defined rule.
-AddedRule: Unfortunately the first version of whylog teacher can't
-AddedRule: delete defined rules.
-AddedRule: User should remove rule in yaml files by his self.
 
 [*] --> Vim
-Vim --> InsertLines: <F4>
-InsertLines --> InsertLines: <F4>
-InsertLines --> ManageRule: <F3>
-ManageRule --> Preview: <F3>
-Preview --> ManageRule: :q
-Preview --> AcceptRule: <F4>
-AcceptRule --> ManageRule: <F3>
-AcceptRule --> ManageRule: :q
-AcceptRule --> ManageRule: :n
-AcceptRule --> AddedRule: :y
+Vim --> AddCause: <F4>
+AddCause --> AcceptLines: <F4>
+AddCause --> Vim: :q
+AcceptLines --> AddCause: <F3>
+AcceptLines --> Vim: :q
+AcceptLines --> Dependences: <F4>
+Dependences --> Vim: :q
+Dependences --> CheckRule: <F3>
+Dependences --> AcceptRule: <F4>
+CheckRule --> AcceptRule: <F4>
+CheckRule --> Dependences: :q
+AcceptRule --> Dependences: n
+AcceptRule --> Dependences: :q
+AcceptRule --> RuleAdded: y
 
 
 @enduml
