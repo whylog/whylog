@@ -57,3 +57,13 @@ class TestBasic(TestCase):
 
     def test_imports_correctness(self):
         client = WhylogClient(rulesbase=WhylogBase(), open_path="/foo/bar")
+
+    def test_001(self):
+        offset = 10
+        client_tests_path = "/".join(path_test_files)
+        open_path = "%s/001_most_basic/node_1.log" % client_tests_path
+
+        client = WhylogClient(rulesbase=WhylogBase(), open_path=open_path)
+        cause = client.get_cause(offset, vim_line="visible effect")
+
+        assert cause == "root cause"
