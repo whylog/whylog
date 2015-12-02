@@ -52,5 +52,6 @@ class WhylogClient(AbstractClient):
 						yield lines[index]
 			yield truncated
 		
-	def get_cause(self, vim_line):
-		pass
+	def get_cause(self, offset, vim_line):
+		for line in self.reverse_from_offset(offset):
+			pass

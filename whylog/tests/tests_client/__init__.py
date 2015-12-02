@@ -40,11 +40,14 @@ class TestBasic(TestCase):
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
-        whylog_client = WhylogClient(rulesbase=whylog_base, open_path=path)
+
+        whylog_base = WhylogBase(parser=parsers_path, rules=rules_path)
+        # whylog_client = WhylogClient(rulesbase=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
             vim_line = f.read()
-        result = whylog_client.get_cause(vim_line)
+        # TODO call get_cause with sens...
+        # result = whylog_client.get_cause(1, vim_line)
 
         raise SkipTest('Not implemented yet')
         with open(output_path, 'r') as f:
