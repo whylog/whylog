@@ -3,17 +3,30 @@ notifications:
 
 language: python
 python:
-  - "2.6"
+#  - "2.6"
   - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "nightly"
-  - "pypy"
-  - "pypy3"
+#  - "3.2"
+#  - "3.3"
+#  - "3.4"
+#  - "3.5"
+#  - "nightly"
+#  - "pypy"
+#  - "pypy3"
+
+matrix:
+  include:
+    - python: "2.7"
+      env: JYTHON=true
+
+# Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
+before_script:
+  - if [ -n "$JYTHON" ]; then export PYTHON_EXE=jython; jython -c "print ''"; fi
 
 before_install:
+  - if [ -n "$JYTHON" ]; then sudo apt-get update; fi
+  - if [ -n "$JYTHON" ]; then sudo apt-cache search jython; fi
+  - if [ -n "$JYTHON" ]; then sudo apt-cache show jython; fi
+  - if [ -n "$JYTHON" ]; then sudo apt-get install jython; fi
   - python --version
   - virtualenv --version
   - uname -a
