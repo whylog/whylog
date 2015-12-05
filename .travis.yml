@@ -9,9 +9,18 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "nightly"
+  - "pypy"
+  - "pypy3"
 
+before_install:
+  - python --version
+  - virtualenv --version
+  - uname -a
+  - lsb_release -a
 install:
-    - pip install -r requirements.txt
-    - pip install -r requirements-test.txt
-    - python setup.py develop
+  - pip --version
+  - pip install -r requirements.txt
+  - pip install -r requirements-test.txt
+  - python setup.py develop
 script: nosetests
