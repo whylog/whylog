@@ -1,5 +1,8 @@
 # whylog
 
+### License:
+BSD 3-clause
+
 #### Command for installing:
 ```sh
 $ pip install -r requirements.txt

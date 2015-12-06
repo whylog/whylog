@@ -21,7 +21,7 @@ setup(
     author_email="",
     description="whylog v0.1",
     # Space to fill by Ewa
-    license="",
+    license="BSD 3-clause",
     test_require=required_test,
     install_requires=required,
     url="https://github.com/9livesdata/whylog",
