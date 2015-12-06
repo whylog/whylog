@@ -18,22 +18,32 @@ matrix:
     - python: "2.7"
       env: JYTHON=true
 
-# Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
-before_script:
-  - if [ -n "$JYTHON" ]; then export PYTHON_EXE=jython; jython -c "print ''"; fi
-
 before_install:
-  - if [ -n "$JYTHON" ]; then sudo apt-get update; fi
-  - if [ -n "$JYTHON" ]; then sudo apt-cache search jython; fi
-  - if [ -n "$JYTHON" ]; then sudo apt-cache show jython; fi
-  - if [ -n "$JYTHON" ]; then sudo apt-get install jython; fi
-  - python --version
-  - virtualenv --version
   - uname -a
   - lsb_release -a
+  - virtualenv --version
+  # get jython
+  - if [ -n "$JYTHON" ]; then wget http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar -O jython-installer-2.7.0.jar; fi
+  - if [ -n "$JYTHON" ]; then java -jar jython-installer-2.7.0.jar --silent --directory $HOME/jython; fi
+  # create jython virtualenv
+  - if [ -n "$JYTHON" ]; then virtualenv --system-site-packages -p $HOME/jython/bin/jython $HOME/.virtualenv/jython; fi
+  - if [ -n "$JYTHON" ]; then source $HOME/.virtualenv/jython/bin/activate; fi
+  # easy install works on jython (pip does not seem to, jip violates .virtualenv sandbox...)
+  - if [ -n "$JYTHON" ]; then wget http://peak.telecommunity.com/dist/ez_setup.py; fi
+  - if [ -n "$JYTHON" ]; then python ez_setup.py ; fi
+  - python --version
+
 install:
-  - pip --version
-  - pip install -r requirements.txt
-  - pip install -r requirements-test.txt
+  - if [ -n "$JYTHON" ]; then easy_install nose; fi
+  - if [ -n "$JYTHON" ]; then easy_install test-generator; fi
+  - if [ -z "$JYTHON" ]; then pip --version; fi
+  - if [ -z "$JYTHON" ]; then pip install -r requirements.txt; fi
+  - if [ -z "$JYTHON" ]; then pip install -r requirements-test.txt; fi
   - python setup.py develop
-script: nosetests
+
+before_script:
+  # Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
+  - if [ -n "$JYTHON" ]; then python -c "print ''"; fi
+
+script:
+  - python setup.py nosetests
