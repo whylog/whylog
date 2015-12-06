@@ -1,6 +1,6 @@
 # whylog
 
-### License:
+#### License:
 BSD 3-clause
 
 #### Command for installing:
