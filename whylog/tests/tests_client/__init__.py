@@ -75,4 +75,5 @@ class TestBasic(TestCase):
         lines_reversed = [line for line in backtracker._reverse_from_offset(offset)]
 
         assert len(lines_reversed) == len(lines)
-        assert (i == j for i,j in zip(lines_reversed, reversed(lines)))
+        for i,j in zip(lines_reversed, reversed(lines)):
+            assert i == j
