@@ -4,8 +4,9 @@ from unittest import TestCase
 from generator import generate, generator
 from nose.plugins.skip import SkipTest
 
-from whylog.client import WhylogClient
 from whylog.config import YamlConfig
+from whylog.client import WhylogClient, searchers
+
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
 
@@ -40,8 +41,6 @@ class TestBasic(TestCase):
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
-
-        whylog_base = WhylogBase(parser=parsers_path, rules=rules_path)
         # whylog_client = WhylogClient(rulesbase=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
@@ -56,7 +55,10 @@ class TestBasic(TestCase):
             # assert result == f.read()
 
     def test_imports_correctness(self):
-        client = WhylogClient(rulesbase=WhylogBase(), open_path="/foo/bar")
+        FOO_BAR = "/foo/bar"
+        client = WhylogClient(rulesbase=WhylogBase(), open_path=FOO_BAR)
+        bts = searchers.BacktrackSearcher(file_path=FOO_BAR)
+        assert bts._file_path == FOO_BAR
 
     def test_001(self):
         offset = 10
