@@ -60,12 +60,19 @@ class TestBasic(TestCase):
         bts = searchers.BacktrackSearcher(file_path=FOO_BAR)
         assert bts._file_path == FOO_BAR
 
-    def test_001(self):
-        offset = 10
+    def test_reverse_from_offset_basic(self):
         client_tests_path = "/".join(path_test_files)
-        open_path = "%s/001_most_basic/node_1.log" % client_tests_path
+        log_file_path = "%s/a_few_lines.log" % client_tests_path
 
-        client = WhylogClient(rulesbase=WhylogBase())
-        cause = client.get_cause(offset, vim_line="visible effect")
+        how_many_lines = 7
+        line_length = 10
+        offset = how_many_lines * line_length
 
-        assert cause == "root cause"
+        backtracker = searchers.BacktrackSearcher(log_file_path)
+
+        with open(log_file_path) as f:
+            lines = f.read().splitlines()[:how_many_lines]
+        lines_reversed = [line for line in backtracker._reverse_from_offset(offset)]
+
+        assert len(lines_reversed) == len(lines)
+        assert (i == j for i,j in zip(lines_reversed, reversed(lines)))
