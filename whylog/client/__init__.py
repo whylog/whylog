@@ -18,9 +18,8 @@ class WhylogClient(AbstractClient):
 	first naive client implementation
 	"""
 
-	def __init__(self, rulesbase, open_path):
+	def __init__(self, rulesbase):
 		self.rulesbase = rulesbase
-		self.open_path = open_path
 		
 	def get_cause(self, offset, vim_line):
 		pass

@@ -56,7 +56,7 @@ class TestBasic(TestCase):
 
     def test_imports_correctness(self):
         FOO_BAR = "/foo/bar"
-        client = WhylogClient(rulesbase=WhylogBase(), open_path=FOO_BAR)
+        client = WhylogClient(rulesbase=WhylogBase())
         bts = searchers.BacktrackSearcher(file_path=FOO_BAR)
         assert bts._file_path == FOO_BAR
 
@@ -65,7 +65,7 @@ class TestBasic(TestCase):
         client_tests_path = "/".join(path_test_files)
         open_path = "%s/001_most_basic/node_1.log" % client_tests_path
 
-        client = WhylogClient(rulesbase=WhylogBase(), open_path=open_path)
+        client = WhylogClient(rulesbase=WhylogBase())
         cause = client.get_cause(offset, vim_line="visible effect")
 
         assert cause == "root cause"
