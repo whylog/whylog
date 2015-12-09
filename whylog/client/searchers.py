@@ -28,11 +28,11 @@ class BacktrackSearcher(Searcher):
 			while remaining_size > 0:
 				reverse_offset = min(total_size, reverse_offset + buf_size)
 				fh.seek(total_size-reverse_offset, 0)
-				buffer = fh.read(min(remaining_size, buf_size))
-				lines = buffer.split('\n')
+				buffer_ = fh.read(min(remaining_size, buf_size))
+				lines = buffer_.split('\n')
 				remaining_size -= buf_size
 				if truncated is not None:
-					if buffer[-1] is not '\n':
+					if buffer_[-1] is not '\n':
 						lines[-1] += truncated
 					else:
 						yield truncated
