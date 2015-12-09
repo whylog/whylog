@@ -28,18 +28,15 @@ class WhylogClient(AbstractClient):
 		beginning with the specified offset
 		"""
 		with open(self.open_path) as fh:
-			truncated = None
 			fh.seek(offset)
-			reverse_offset = 0
 			total_size = remaining_size = fh.tell()
-			start_line_suffix = fh.readline()
+			reverse_offset = 0
+			truncated = None
 			while remaining_size > 0:
 				reverse_offset = min(total_size, reverse_offset + buf_size)
 				fh.seek(total_size-reverse_offset, 0)
 				buffer = fh.read(min(remaining_size, buf_size))
 				lines = buffer.split('\n')
-				if remaining_size == total_size:
-					lines[-1] += start_line_suffix.strip('\n')
 				remaining_size -= buf_size
 				if truncated is not None:
 					if buffer[-1] is not '\n':
