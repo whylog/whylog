@@ -17,6 +17,10 @@ matrix:
   include:
     - python: "2.7"
       env: JYTHON=true
+    - python: "2.7"
+      env: YAPF=true
+    - python: "3.5"
+      env: YAPF=true
 
 before_install:
   - uname -a
@@ -36,14 +40,15 @@ before_install:
 install:
   - if [ -n "$JYTHON" ]; then easy_install nose; fi
   - if [ -n "$JYTHON" ]; then easy_install test-generator; fi
-  - if [ -z "$JYTHON" ]; then pip --version; fi
-  - if [ -z "$JYTHON" ]; then pip install -r requirements.txt; fi
-  - if [ -z "$JYTHON" ]; then pip install -r requirements-test.txt; fi
-  - python setup.py develop
+  - if [ ! -n "$JYTHON" ]; then pip --version; fi
+  - if [ ! -n "$JYTHON" ]; then pip install -r requirements.txt; fi
+  - if [ ! -n "$JYTHON" ]; then pip install -r requirements-test.txt; fi
+  - if [ -n "$YAPF" ]; then python setup.py develop; fi
 
 before_script:
   # Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
   - if [ -n "$JYTHON" ]; then python -c "print ''"; fi
 
 script:
+  - if [ -n "$YAPF" ]; then yapf --diff --recursive .; exit; fi
   - python setup.py nosetests
