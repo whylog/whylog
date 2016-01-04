@@ -62,6 +62,10 @@ class TestBacktrackSearcher(TestCase):
         bts = searchers.BacktrackSearcher(file_path=FOO_BAR)
         assert bts._file_path == FOO_BAR
 
+    def _get_log_file_path(self):
+        client_tests_path = "/".join(path_test_files)
+        return "%s/a_few_lines.log" % client_tests_path
+
     def _reverse_from_offset_wrapper(self, backtracker, offset, buf_size=None):
         if buf_size == None:
             return [line for line in backtracker._reverse_from_offset(offset)]
@@ -71,8 +75,7 @@ class TestBacktrackSearcher(TestCase):
         self._with_specified_bufsize(None)
 
     def _with_specified_bufsize(self, bufsize):
-        client_tests_path = "/".join(path_test_files)
-        log_file_path = "%s/a_few_lines.log" % client_tests_path
+        log_file_path = self._get_log_file_path()
 
         how_many_lines = 7
         line_length = 10
