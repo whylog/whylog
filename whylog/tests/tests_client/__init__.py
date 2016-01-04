@@ -90,6 +90,9 @@ class TestBacktrackSearcher(TestCase):
             assert i == j, "error when bufsize == %s" % bufsize
 
     def test_basic(self):
+        self._sample_call()
+
+    def _sample_call(self):
         self._sample_call_with_specified_bufsize(None)
 
     def _sample_call_with_specified_bufsize(self, bufsize):
