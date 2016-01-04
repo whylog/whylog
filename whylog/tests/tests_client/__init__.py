@@ -54,6 +54,8 @@ class TestBasic(TestCase):
             # remove this comment after implement whylog client and base
             # assert result == f.read()
 
+class TestBacktrackSearcher(TestCase):
+
     def test_imports_correctness(self):
         FOO_BAR = "/foo/bar"
         client = WhylogClient(rulesbase=WhylogBase())
