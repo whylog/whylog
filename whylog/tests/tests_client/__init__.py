@@ -66,33 +66,64 @@ class TestBacktrackSearcher(TestCase):
         client_tests_path = "/".join(path_test_files)
         return "%s/a_few_lines.log" % client_tests_path
 
+    def _get_sample_offset(self, line_num):
+        """
+        Returns the correct offset of line 'line_num'
+        referring to the file a_few_lines.log construction.
+        Be careful when modifying a_few_lines.log.
+        """
+        line_length = 10
+        return line_num * line_length
+
     def _reverse_from_offset_wrapper(self, backtracker, offset, buf_size=None):
         if buf_size == None:
             return [line for line in backtracker._reverse_from_offset(offset)]
         return [line for line in backtracker._reverse_from_offset(offset, buf_size)]
 
-    def test_basic(self):
-        self._with_specified_bufsize(None)
+    def _read_all_lines_from_file(self, file_path):
+        with open(file_path) as f:
+            return f.read().splitlines()
 
-    def _with_specified_bufsize(self, bufsize):
+    def _check_lines(self, lines_normally, lines_reversed):
+        assert len(lines_reversed) == len(lines_normally)
+        for i,j in zip(lines_reversed, reversed(lines_normally)):
+            assert i == j, "error when bufsize == %s" % bufsize
+
+    def test_basic(self):
+        self._sample_call_with_specified_bufsize(None)
+
+    def _sample_call_with_specified_bufsize(self, bufsize):
         log_file_path = self._get_log_file_path()
 
         how_many_lines = 7
-        line_length = 10
-        offset = how_many_lines * line_length
+        offset = self._get_sample_offset(how_many_lines)
 
         backtracker = searchers.BacktrackSearcher(log_file_path)
 
-        with open(log_file_path) as f:
-            lines = f.read().splitlines()[:how_many_lines]
+        lines = self._read_all_lines_from_file(log_file_path)[:how_many_lines]
         lines_reversed = self._reverse_from_offset_wrapper(backtracker, offset, bufsize)
 
-        assert len(lines_reversed) == len(lines)
-        for i,j in zip(lines_reversed, reversed(lines)):
-            assert i == j, "error when bufsize == %s" % bufsize
+        self._check_lines(lines_reversed, lines)
 
     def test_very_small_bufsize(self):
-        self._with_specified_bufsize(4)
-        self._with_specified_bufsize(3)
-        self._with_specified_bufsize(2)
-        self._with_specified_bufsize(1)
+        self._sample_call_with_specified_bufsize(4)
+        self._sample_call_with_specified_bufsize(3)
+        self._sample_call_with_specified_bufsize(2)
+        self._sample_call_with_specified_bufsize(1)
+
+    def _get_file_size(self, file_path):
+        with open(file_path) as f:
+            f.seek(0, 2)
+            return f.tell()
+
+    def test_file_size_as_offset(self):
+        log_file_path = self._get_log_file_path()
+
+        file_size_as_offset = self._get_file_size(log_file_path)
+
+        backtracker = searchers.BacktrackSearcher(log_file_path)
+
+        lines = self._read_all_lines_from_file(log_file_path)
+        lines_reversed = self._reverse_from_offset_wrapper(backtracker, file_size_as_offset)
+
+        self._check_lines(lines_reversed, lines)
