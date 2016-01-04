@@ -87,7 +87,7 @@ class TestBacktrackSearcher(TestCase):
     def _check_lines(self, lines_normally, lines_reversed):
         assert len(lines_reversed) == len(lines_normally)
         for i,j in zip(lines_reversed, reversed(lines_normally)):
-            assert i == j, "error when bufsize == %s" % bufsize
+            assert i == j
 
     def test_basic(self):
         self._sample_call()
