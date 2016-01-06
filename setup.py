@@ -1,10 +1,8 @@
 import os.path
 from setuptools import setup
 
-
 with open('requirements.txt') as f:
     required = f.read().splitlines()
-
 
 with open('requirements-test.txt') as f:
     required_test = f.read().splitlines()
