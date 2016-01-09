@@ -4,18 +4,9 @@ class Interval(object):
     """
 
     def __init__(self, start_offset, length, abstract_line):
-        self._start_offset = start_offset
-        self._length = length
-        self._abstract_line = abstract_line
-
-    def get_start_offset(self):
-        return self._start_offset
-
-    def get_length(self):
-        return self._length
-
-    def get_location(self):
-        return self._abstract_line
+        self.start_offset = start_offset
+        self.length = length
+        self.abstract_line = abstract_line
 
 
 class Rule(object):
@@ -23,15 +14,10 @@ class Rule(object):
     Represents rule entering by user.
     """
 
-    def __index__(self, effect):
-        self._effect = effect
-        self._causes = set()
-
-    def add_cause(self, cause):
-        self._causes.add()
-
-    def remove_cause(self, cause):
-        self.causes.remove(cause)
+    def __init__(self, effect):
+        self.effect = effect
+        self.causes = set()
+        self.constraints = set()
 
 
 class Teacher(object):
@@ -41,37 +27,31 @@ class Teacher(object):
 
     def __init__(self, effect, causes=None):
         self._rule = Rule(effect)
-        for cause in causes:
-            self._rule.add_cause(cause)
+        if causes is not None:
+            self._rule.causes.update(causes)
 
     def add_cause(self, cause):
-        self._rule.add_cause(cause)
+        self._rule.causes.add(cause)
 
     def remove_cause(self, cause):
-        self._rule.remove_cause(cause)
+        self._rule.causes.remove(cause)
 
-    def set_equals(self, interval_list):
-        pass
-
-    def set_different(self, interval_list):
-        pass
-
-    def set_const(self, interval_list):
-        pass
-
-    def set_params_dependencies(self, interval1, interval2, val):
-        pass
-
-    def set_time_dependencies(self, abstract_line1, abstract_line2, time):
+    def register_constraint(self, constraint):
+        """
+        Sample use:
+        t = Teacher(effect, [cause1, cause2])
+        t.register_constraint(TimeConstraint(effect, cause1, min_delta=-300, max_delta=1))
+        t.register_constraint(IdenticalIntervals([interval1, interval2, interval3))
+        """
+        # in implementation remember to delete earlier added constraint
+        # when the new one excludes the earlier.
         pass
 
     def set_causes_relation(self, relation):
-        pass
-
-    def undo(self):
-        pass
-
-    def redo(self):
+        """
+        Determines which combinations of causes can cause effect.
+        :param relation: kind of sentence made of AND, OR, brackets and cause symbols.
+        """
         pass
 
     def save(self):
