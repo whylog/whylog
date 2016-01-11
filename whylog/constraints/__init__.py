@@ -1,36 +1,61 @@
-class Constraint(object):
+import abc
+
+
+class AbstractConstraint(object):
     def __init__(self):
         pass
 
-
-class TimeConstraint(Constraint):
-    def __init__(self, abstract_line_earlier, abstract_line_later, min_delta=None, max_delta=None):
+    @abc.abstractmethod
+    def save(self, rulebase_rule):
         pass
 
 
-class IdenticalIntervals(Constraint):
-    def __init__(self, interval_list):
+class TimeConstraint(AbstractConstraint):
+    def __init__(self, line_earlier, line_later, min_delta=None, max_delta=None):
+        pass
+
+    def save(self, rulebase_rule):
         pass
 
 
-class AnyValueIntervals(Constraint):
-    def __init__(self, interval_list):
+class IdenticalIntervals(AbstractConstraint):
+    def __init__(self, intervals):
+        pass
+
+    def save(self, rulebase_rule):
         pass
 
 
-class DifferentValueIntervals(Constraint):
-    def __init__(self, interval_list):
+class AnyValueIntervals(AbstractConstraint):
+    def __init__(self, intervals):
+        pass
+
+    def save(self, rulebase_rule):
         pass
 
 
-class ConstIntervals(Constraint):
-    def __init__(self, Interval_list):
+class DifferentValueIntervals(AbstractConstraint):
+    def __init__(self, intervals):
+        pass
+
+    def save(self, rulebase_rule):
         pass
 
 
-class ValueDeltaIntervals(Constraint):
+class ConstIntervals(AbstractConstraint):
+    def __init__(self, intervals):
+        pass
+
+    def save(self, rulebase_rule):
+        pass
+
+
+class ValueDeltaIntervals(AbstractConstraint):
     def __init__(self, interval_lower, interval_greater, min_delta=None, max_delta=None):
         """
         Sets Minimum and maximum difference between values of params (if values are numbers).
         """
+        pass
+
+    def save(self, rulebase_rule):
         pass

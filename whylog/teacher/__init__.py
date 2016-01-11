@@ -3,10 +3,10 @@ class Interval(object):
     Represents interval in line.
     """
 
-    def __init__(self, start_offset, length, abstract_line):
+    def __init__(self, start_offset, length, line):
         self.start_offset = start_offset
         self.length = length
-        self.abstract_line = abstract_line
+        self.line = line
 
 
 class Rule(object):
