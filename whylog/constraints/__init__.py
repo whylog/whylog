@@ -14,15 +14,9 @@ class TimeConstraint(AbstractConstraint):
     def __init__(self, line_earlier, line_later, min_delta=None, max_delta=None):
         pass
 
-    def save(self, rulebase_rule):
-        pass
-
 
 class IdenticalIntervals(AbstractConstraint):
     def __init__(self, intervals):
-        pass
-
-    def save(self, rulebase_rule):
         pass
 
 
@@ -30,23 +24,14 @@ class AnyValueIntervals(AbstractConstraint):
     def __init__(self, intervals):
         pass
 
-    def save(self, rulebase_rule):
-        pass
-
 
 class DifferentValueIntervals(AbstractConstraint):
     def __init__(self, intervals):
         pass
 
-    def save(self, rulebase_rule):
-        pass
-
 
 class ConstIntervals(AbstractConstraint):
     def __init__(self, intervals):
-        pass
-
-    def save(self, rulebase_rule):
         pass
 
 
@@ -55,7 +40,4 @@ class ValueDeltaIntervals(AbstractConstraint):
         """
         Sets Minimum and maximum difference between values of params (if values are numbers).
         """
-        pass
-
-    def save(self, rulebase_rule):
         pass

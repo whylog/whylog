@@ -25,10 +25,9 @@ class Teacher(object):
     Enable teaching new rule. One Teacher per one entering rule.
     """
 
-    def __init__(self, effect, causes=None):
+    def __init__(self, effect, causes=tuple()):
         self._rule = Rule(effect)
-        if causes is not None:
-            self._rule.causes.update(causes)
+        self._rule.causes.update(causes)
 
     def add_cause(self, cause):
         self._rule.causes.add(cause)
@@ -43,8 +42,6 @@ class Teacher(object):
         t.register_constraint(TimeConstraint(effect, cause1, min_delta=-300, max_delta=1))
         t.register_constraint(IdenticalIntervals([interval1, interval2, interval3))
         """
-        # in implementation remember to delete earlier added constraint
-        # when the new one excludes the earlier.
         pass
 
     def set_causes_relation(self, relation):
