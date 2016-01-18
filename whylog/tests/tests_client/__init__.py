@@ -54,8 +54,8 @@ class TestBasic(TestCase):
             # remove this comment after implement whylog client and base
             # assert result == f.read()
 
-class TestBacktrackSearcher(TestCase):
 
+class TestBacktrackSearcher(TestCase):
     def test_imports_correctness(self):
         FOO_BAR = "/foo/bar"
         client = WhylogClient(rulesbase=WhylogBase())
@@ -86,7 +86,7 @@ class TestBacktrackSearcher(TestCase):
 
     def _check_lines(self, lines_normally, lines_reversed):
         assert len(lines_reversed) == len(lines_normally)
-        for i,j in zip(lines_reversed, reversed(lines_normally)):
+        for i, j in zip(lines_reversed, reversed(lines_normally)):
             assert i == j
 
     def test_basic(self):
