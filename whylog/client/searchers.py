@@ -39,7 +39,7 @@ class BacktrackSearcher(Searcher):
                     else:
                         yield truncated
                 truncated = lines[0]
-                for index in xrange(len(lines) - 1, 0, -1):
+                for index in range(len(lines) - 1, 0, -1):
                     if len(lines[index]):
                         yield lines[index]
             yield truncated

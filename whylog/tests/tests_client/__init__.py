@@ -63,8 +63,9 @@ class TestBacktrackSearcher(TestCase):
         assert bts._file_path == FOO_BAR
 
     def _get_log_file_path(self):
-        client_tests_path = "/".join(path_test_files)
-        return "%s/a_few_lines.log" % client_tests_path
+        prefix_path = path_join(*path_test_files)
+        path = path_join(prefix_path, "a_few_lines.log")
+        return path
 
     def _get_sample_offset(self, line_num):
         """
