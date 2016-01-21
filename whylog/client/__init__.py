@@ -23,3 +23,6 @@ class WhylogClient(AbstractClient):
 
     def get_cause(self, offset, vim_line):
         pass
+
+    def get_cause_tree(self, offset, vim_line):
+        pass

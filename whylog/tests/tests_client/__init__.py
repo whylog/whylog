@@ -1,11 +1,9 @@
-from os.path import join as path_join
 from unittest import TestCase
-
-from generator import generate, generator
-from nose.plugins.skip import SkipTest
+from os.path import join as path_join, getsize as get_file_size
+from generator import generator, generate
 
 from whylog.config import YamlConfig
-from whylog.client import WhylogClient, searchers
+from whylog.client import WhylogClient, searchers, constants
 
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
@@ -48,7 +46,6 @@ class TestBasic(TestCase):
         # TODO call get_cause with sens...
         # result = whylog_client.get_cause(1, vim_line)
 
-        raise SkipTest('Not implemented yet')
         with open(output_path, 'r') as f:
             pass
             # remove this comment after implement whylog client and base
@@ -56,12 +53,6 @@ class TestBasic(TestCase):
 
 
 class TestBacktrackSearcher(TestCase):
-    def test_imports_correctness(self):
-        FOO_BAR = "/foo/bar"
-        client = WhylogClient(rulesbase=WhylogBase())
-        bts = searchers.BacktrackSearcher(file_path=FOO_BAR)
-        assert bts._file_path == FOO_BAR
-
     def _get_log_file_path(self):
         prefix_path = path_join(*path_test_files)
         path = path_join(prefix_path, "a_few_lines.log")
@@ -73,8 +64,7 @@ class TestBacktrackSearcher(TestCase):
         referring to the file a_few_lines.log construction.
         Be careful when modifying a_few_lines.log.
         """
-        line_length = 10
-        return line_num * line_length
+        return line_num * constants.AFewLinesLogParams.SINGLE_LINE_LENGTH
 
     def _reverse_from_offset_wrapper(self, backtracker, offset, buf_size=None):
         if buf_size == None:
@@ -90,10 +80,7 @@ class TestBacktrackSearcher(TestCase):
         for i, j in zip(lines_reversed, reversed(lines_normally)):
             assert i == j
 
-    def test_basic(self):
-        self._sample_call()
-
-    def _sample_call(self):
+    def test_sample_call(self):
         self._sample_call_with_specified_bufsize(None)
 
     def _sample_call_with_specified_bufsize(self, bufsize):
@@ -110,10 +97,8 @@ class TestBacktrackSearcher(TestCase):
         self._check_lines(lines_reversed, lines)
 
     def test_very_small_bufsize(self):
-        self._sample_call_with_specified_bufsize(4)
-        self._sample_call_with_specified_bufsize(3)
-        self._sample_call_with_specified_bufsize(2)
-        self._sample_call_with_specified_bufsize(1)
+        for i in range(1, 5):
+            self._sample_call_with_specified_bufsize(i)
 
     def _get_file_size(self, file_path):
         with open(file_path) as f:
@@ -123,7 +108,7 @@ class TestBacktrackSearcher(TestCase):
     def test_file_size_as_offset(self):
         log_file_path = self._get_log_file_path()
 
-        file_size_as_offset = self._get_file_size(log_file_path)
+        file_size_as_offset = get_file_size(log_file_path)
 
         backtracker = searchers.BacktrackSearcher(log_file_path)
 

@@ -1,19 +1,20 @@
 from abc import ABCMeta, abstractmethod
+from os import SEEK_SET
 
 
-class Searcher(object):
-    __metaclass__ = ABCMeta
-
-
-class IndexSearcher(Searcher):
+class AbstractSearcher(object):
     pass
 
 
-class DataBaseSearcher(Searcher):
+class IndexSearcher(AbstractSearcher):
     pass
 
 
-class BacktrackSearcher(Searcher):
+class DatabaseSearcher(AbstractSearcher):
+    pass
+
+
+class BacktrackSearcher(AbstractSearcher):
     def __init__(self, file_path):
         self._file_path = file_path
 
@@ -29,7 +30,7 @@ class BacktrackSearcher(Searcher):
             truncated = None
             while remaining_size > 0:
                 reverse_offset = min(total_size, reverse_offset + buf_size)
-                fh.seek(total_size - reverse_offset, 0)
+                fh.seek(total_size - reverse_offset, SEEK_SET)
                 buffer_ = fh.read(min(remaining_size, buf_size))
                 lines = buffer_.split('\n')
                 remaining_size -= buf_size
