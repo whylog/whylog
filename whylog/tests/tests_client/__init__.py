@@ -1,9 +1,10 @@
 from unittest import TestCase
 from os.path import join as path_join, getsize as get_file_size
 from generator import generator, generate
+import constants
 
 from whylog.config import YamlConfig
-from whylog.client import WhylogClient, searchers, constants
+from whylog.client import WhylogClient, searchers
 
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
