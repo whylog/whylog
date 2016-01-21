@@ -100,11 +100,6 @@ class TestBacktrackSearcher(TestCase):
         for i in range(1, 5):
             self._sample_call_with_specified_bufsize(i)
 
-    def _get_file_size(self, file_path):
-        with open(file_path) as f:
-            f.seek(0, 2)
-            return f.tell()
-
     def test_file_size_as_offset(self):
         log_file_path = self._get_log_file_path()
 
