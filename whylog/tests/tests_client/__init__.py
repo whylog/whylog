@@ -1,7 +1,7 @@
 from unittest import TestCase
 from os.path import join as path_join, getsize as get_file_size
 from generator import generator, generate
-import constants
+from .constants import AFewLinesLogParams
 
 from whylog.config import YamlConfig
 from whylog.client import WhylogClient, searchers
