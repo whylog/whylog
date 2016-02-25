@@ -1,5 +1,5 @@
 ---
-cause: cause
+causes: [cause]
 effect: effect
 constraints:
     - {type: latest}

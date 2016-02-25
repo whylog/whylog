@@ -1,10 +1,10 @@
 ---
-cause: intermediate
+causes: [intermediate]
 effect: effect
 constraints:
     - {type: time, range: -1}
 ---
-cause: cause
+causes: [cause]
 effect: intermediate
 constraints:
     - {type: time, range: -1}

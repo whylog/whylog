@@ -1,0 +1,2 @@
+---
+- ['RegexFilenameMatcher', {'type': 'default', 'path_pattern': 'node_1.log'}]
