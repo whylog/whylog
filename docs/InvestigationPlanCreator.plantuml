@@ -1,0 +1,40 @@
+@startuml
+participant "<u>:Client" as Client
+participant "<u>:AbstractConfig" as AbstractConfig
+participant "<u>:InvestigationPlan" as InvestigationPlan
+participant "<u>:RuleSubset" as RuleSubset
+participant "<u>:InvestigationStep" as InvestigationStep
+
+Client -> AbstractConfig : create_investigation_plan(front_input)
+activate AbstractConfig
+AbstractConfig -> AbstractConfig : get_log_type(front_input) : LogType
+AbstractConfig -> AbstractConfig : _find_matching_parsers(front_input, log_type) : List<AbstractParser>
+AbstractConfig -> AbstractConfig : _filter_rule_set(parsers_list): RuleSubset
+AbstractConfig -> RuleSubset : get_logs_types()
+activate RuleSubset
+RuleSubset -> AbstractConfig : List<LogType>
+deactivate RuleSubset
+AbstractConfig -> AbstractConfig : get_locations_for_logs(logs_types_list) : Map<LogType, List<LogLocation>> 
+AbstractConfig -> InvestigationPlan :  InvestigationPlan(front_input, rule_subset, log_location_dict)
+activate InvestigationPlan
+loop (for log_type in log_location_dict)
+        InvestigationPlan -> RuleSubset : get_rules_for_log_type(log_type)
+        activate RuleSubset
+        RuleSubset -> InvestigationPlan : List<Rule>
+        deactivate RuleSubset
+        InvestigationPlan -> RuleSubset : get_parsers_for_log_type(log_type)
+        activate RuleSubset
+        RuleSubset -> InvestigationPlan : List<AbstractParser>
+        deactivate RuleSubset
+        loop (for log_location in location_dict[log_type])
+                InvestigationPlan -> InvestigationStep: InvestigationStep(parsers, rules, log_location, front_input)
+                activate InvestigationStep
+                InvestigationPlan <- InvestigationStep: InvestigationStep
+                deactivate InvestigationStep
+        end
+end
+InvestigationPlan -> AbstractConfig : InvestigationPlan
+deactivate InvestigationPlan
+deactivate AbstractConfig
+Client <- AbstractConfig : InvestigationPlan
+@enduml
