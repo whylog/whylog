@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class AbstractFilenameParser(object):
+class AbstractFilenameMatcher(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -9,7 +9,7 @@ class AbstractFilenameParser(object):
         pass
 
 
-class RegexFilenameParser(AbstractFilenameParser):
+class RegexFilenameMatcher(AbstractFilenameMatcher):
     def __init__(self, path_pattern):
         pass
 

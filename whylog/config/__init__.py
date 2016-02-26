@@ -53,7 +53,7 @@ class RuleSubset(object):
 
 class InvestigationStep(object):
     """
-    Represents rules,parsers and locations of logs which are necessary
+    Represents rules, parsers and locations of logs which are necessary
     to find and parse log files with potential causes.
     """
 
