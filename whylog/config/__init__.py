@@ -38,6 +38,9 @@ class InvestigationPlan(object):
 
 
 class RuleSubset(object):
+    def __init__(self, rule_dict):
+        pass
+
     def get_logs_types(self):
         pass
 
