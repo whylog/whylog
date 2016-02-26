@@ -52,10 +52,20 @@ class RuleSubset(object):
 
 
 class InvestigationStep(object):
+    """
+    Represents rules,parsers and locations of logs which are necessary
+    to find and parse log files with potential causes.
+    """
+
     def __init__(self, parsers, rules, log_location, front_input):
         pass
 
     def get_clues(self, line):
+        """
+        Basing on parsers creates clues in investigation
+        :param line: line from parsed file
+        :returns: list of created clues
+        """
         pass
 
 
