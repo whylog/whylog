@@ -56,22 +56,6 @@ class InvestigationStep(object):
         pass
 
 
-class AbstractParser(object):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def get_clue(self, line):
-        pass
-
-
-class RegexParser(AbstractParser):
-    def __init__(self, name, regex, params):
-        pass
-
-    def get_clue(self, line):
-        pass
-
-
 class Rule(object):
     def __init__(self, causes, effect, constraints):
         pass
@@ -84,13 +68,4 @@ class LogType(object):
 
 class LogLocation(object):
     def __init__(self, filename_parser, log_type):
-        pass
-
-
-class AbstractFilenameParser(object):
-    __metaclass__ = ABCMeta
-
-
-class RegexFilenameParser(AbstractFilenameParser):
-    def __init__(self, path_pattern):
         pass
