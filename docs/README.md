@@ -1,0 +1,1 @@
+![seq_diagram](InvestigationPlan.png)
