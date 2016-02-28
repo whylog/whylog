@@ -57,7 +57,7 @@ class InvestigationStep(object):
     to find and parse log files with potential causes.
     """
 
-    def __init__(self, parsers, rules, log_location, front_input):
+    def __init__(self, parsers, rules, log_location, effect_time):
         pass
 
     def get_clues(self, line):
@@ -66,6 +66,16 @@ class InvestigationStep(object):
         :param line: line from parsed file
         :returns: list of created clues
         """
+        pass
+
+
+class Clue(object):
+    """
+    Collects all the data that parser can extract from single log line.
+    Also, contains parsed line, the location of parsed file and offset to that line.
+    """
+
+    def __init__(self, regex_parameters, line_time, line_content, file_location, file_offset):
         pass
 
 
