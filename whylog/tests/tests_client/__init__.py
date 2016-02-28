@@ -2,7 +2,7 @@ from unittest import TestCase
 from os.path import join as path_join
 from generator import generator, generate
 
-from whylog.rulesbase import WhylogBase
+from whylog.config import YamlConfig
 from whylog.client import WhylogClient
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
@@ -31,8 +31,13 @@ class TestBasic(TestCase):
         rules_path = path_join(path, 'rules.yaml')
         input_path = path_join(path, 'input.txt')
         output_path = path_join(path, 'expected_output.txt')
+        log_location_path = path_join(path, 'log_locations.yaml')
 
-        whylog_base = WhylogBase(parser=parsers_path, rules=rules_path)
+        whylog_base = YamlConfig(
+            parsers_path=parsers_path,
+            rules_path=rules_path,
+            log_locations_path=log_location_path,
+        )
         whylog_client = WhylogClient(base=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
