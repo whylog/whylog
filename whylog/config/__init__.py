@@ -72,10 +72,10 @@ class InvestigationStep(object):
 class Clue(object):
     """
     Collects all the data that parser can extract from single log line.
-    Also, contains parsed line, the location of parsed file and offset to that line.
+    Also, contains parsed line and its source.
     """
 
-    def __init__(self, regex_parameters, line_time, line_content, file_location, file_offset):
+    def __init__(self, regex_parameters, line_time, line_content, line_source):
         pass
 
 

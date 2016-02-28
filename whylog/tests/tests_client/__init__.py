@@ -36,7 +36,7 @@ class TestBasic(TestCase):
         whylog_base = YamlConfig(
             parsers_path=parsers_path,
             rules_path=rules_path,
-            log_locations_path=log_location_path
+            log_locations_path=log_location_path,
         )
         whylog_client = WhylogClient(base=whylog_base, open_path=path)
 
