@@ -1,5 +1,5 @@
 from unittest import TestCase
-from os.path import join as path_join, getsize as get_file_size
+import os.path
 from generator import generator, generate
 from .constants import AFewLinesLogParams
 
@@ -27,13 +27,13 @@ class TestBasic(TestCase):
         '013_match_and_incomplete',
     )
     def test_one(self, test_name):
-        prefix_path = path_join(*path_test_files)
-        path = path_join(prefix_path, test_name)
-        parsers_path = path_join(path, 'parsers.yaml')
-        rules_path = path_join(path, 'rules.yaml')
-        input_path = path_join(path, 'input.txt')
-        output_path = path_join(path, 'expected_output.txt')
-        log_location_path = path_join(path, 'log_locations.yaml')
+        prefix_path = os.path.join(*path_test_files)
+        path = os.path.join(prefix_path, test_name)
+        parsers_path = os.path.join(path, 'parsers.yaml')
+        rules_path = os.path.join(path, 'rules.yaml')
+        input_path = os.path.join(path, 'input.txt')
+        output_path = os.path.join(path, 'expected_output.txt')
+        log_location_path = os.path.join(path, 'log_locations.yaml')
 
         whylog_base = YamlConfig(
             parsers_path=parsers_path,
@@ -55,9 +55,12 @@ class TestBasic(TestCase):
 
 class TestBacktrackSearcher(TestCase):
     def _get_log_file_path(self):
-        prefix_path = path_join(*path_test_files)
-        path = path_join(prefix_path, "a_few_lines.log")
+        prefix_path = os.path.join(*path_test_files)
+        path = os.path.join(prefix_path, "a_few_lines.log")
         return path
+
+    def _count_lines_in_file(self, file_name):
+        return sum(1 for line in open(file_name))
 
     def _get_sample_offset(self, line_num):
         """
@@ -65,6 +68,7 @@ class TestBacktrackSearcher(TestCase):
         referring to the file a_few_lines.log construction.
         Be careful when modifying a_few_lines.log.
         """
+        assert line_num <= self._count_lines_in_file(self._get_log_file_path())
         return line_num * constants.AFewLinesLogParams.SINGLE_LINE_LENGTH
 
     def _reverse_from_offset_wrapper(self, backtracker, offset, buf_size=None):
@@ -104,7 +108,7 @@ class TestBacktrackSearcher(TestCase):
     def test_file_size_as_offset(self):
         log_file_path = self._get_log_file_path()
 
-        file_size_as_offset = get_file_size(log_file_path)
+        file_size_as_offset = os.path.getsize(log_file_path)
 
         backtracker = searchers.BacktrackSearcher(log_file_path)
 
