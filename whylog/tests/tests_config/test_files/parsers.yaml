@@ -16,4 +16,8 @@ params:
 ---
 class: WildCardParser
 name: other
-type: apache access log
+log_type: apache access log
+---
+class: WildCardParser1
+name: other
+log_type: apache access log

@@ -1,5 +1,7 @@
+from whylog.config.parsers import *
 from abc import ABCMeta, abstractmethod
 import yaml
+import logging
 
 
 class AbstractConfig(object):
@@ -36,12 +38,33 @@ class YamlConfig(AbstractConfig):
         with open(path, "r") as config_file:
             return list(yaml.load_all(config_file))
 
+    def _create_parser_object(self, document):
+        if document.get("log_type") is None:
+            log_type = LogType("default")
+        else:
+            log_type = LogType(document.get("log_type"))
+        document["log_type"] = log_type
+        if document.get("class") is None:
+            if document.get("params") is None:
+                document["params"] = []
+            return RegexParser(**document)
+        else:
+            try:
+                parser_class = globals()[document.get("class")]
+                del document["class"]
+                return parser_class(**document)
+            except KeyError:
+                logging.error("Unable to creating object of " + document.get("class") + " class")
+                return None
+
     def _load_parsers(self):
         documents = self._load_config_from_file(self._parsers_path)
         parsers = []
         for document in documents:
-            pass
-        return documents
+            parser = self._create_parser_object(document)
+            if parser is not None:
+                parsers.append(parser)
+        return parsers
 
 
 class InvestigationPlan(object):

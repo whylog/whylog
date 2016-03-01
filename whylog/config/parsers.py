@@ -11,14 +11,17 @@ class AbstractParser(object):
 
 class RegexParser(AbstractParser):
     def __init__(self, name, regex, params, log_type):
-        pass
+        self._name = name
+        self._regex_str = regex
+        self._params = params
+        self._log_type = log_type
 
     def get_clue(self, line):
         pass
 
 
 class WildCardParser(AbstractParser):
-    def __init__(self, name):
+    def __init__(self, name, log_type):
         pass
 
     def get_clue(self, line):

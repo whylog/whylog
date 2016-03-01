@@ -18,5 +18,3 @@ class TestConfig(TestCase):
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
-
-        print config._parsers
