@@ -35,11 +35,16 @@ class YamlConfig(AbstractConfig):
     def _get_locations_for_logs(self, logs_types_list):
         pass
 
-    def _create_parser_object(self, document):
+    def _create_parser_object(self, document, log_types):
         if document.get("log_type") is None:
-            log_type = LogType("default")
+            log_type_str = "default"
         else:
-            log_type = LogType(document.get("log_type"))
+            log_type_str = document.get("log_type")
+        if log_types.get(log_type_str) is None:
+            log_type = LogType(log_type_str)
+            log_types[log_type_str] = log_type
+        else:
+            log_type = log_types.get(log_type_str)
         document["log_type"] = log_type
         if document.get("class") is None:
             if document.get("params") is None:
@@ -55,15 +60,16 @@ class YamlConfig(AbstractConfig):
                 return None
 
     def _load_parsers(self):
-        documents = self._load_config_from_file(self._parsers_path)
+        documents = self._load_file_with_config(self._parsers_path)
         parsers = []
+        log_types = {}
         for document in documents:
-            parser = self._create_parser_object(document)
+            parser = self._create_parser_object(document, log_types)
             if parser is not None:
                 parsers.append(parser)
         return parsers
 
-    def _load_config_from_file(self, path):
+    def _load_file_with_config(self, path):
         with open(path, "r") as config_file:
             return list(yaml.load_all(config_file))
 
