@@ -1,4 +1,5 @@
 from whylog.config.parsers import *
+
 from abc import ABCMeta, abstractmethod
 import yaml
 import logging
@@ -34,10 +35,6 @@ class YamlConfig(AbstractConfig):
     def _get_locations_for_logs(self, logs_types_list):
         pass
 
-    def _load_config_from_file(self, path):
-        with open(path, "r") as config_file:
-            return list(yaml.load_all(config_file))
-
     def _create_parser_object(self, document):
         if document.get("log_type") is None:
             log_type = LogType("default")
@@ -65,6 +62,10 @@ class YamlConfig(AbstractConfig):
             if parser is not None:
                 parsers.append(parser)
         return parsers
+
+    def _load_config_from_file(self, path):
+        with open(path, "r") as config_file:
+            return list(yaml.load_all(config_file))
 
 
 class InvestigationPlan(object):
@@ -123,8 +124,8 @@ class Rule(object):
 
 
 class LogType(object):
-    def __init__(self, type_name):
-        pass
+    def __init__(self, name):
+        self._name = name
 
 
 class LogLocation(object):

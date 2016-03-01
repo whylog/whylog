@@ -18,6 +18,6 @@ class: WildCardParser
 name: other
 log_type: apache access log
 ---
-class: WildCardParser1
+class: NotDefinedClass
 name: other
 log_type: apache access log

@@ -22,7 +22,8 @@ class RegexParser(AbstractParser):
 
 class WildCardParser(AbstractParser):
     def __init__(self, name, log_type):
-        pass
+        self._name = name
+        self._log_type = log_type
 
     def get_clue(self, line):
         pass
