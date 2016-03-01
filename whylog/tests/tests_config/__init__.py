@@ -23,13 +23,17 @@ class TestConfig(TestCase):
         assert sorted(
             parser._name for parser in config._parsers
         ) == ['cause', 'effect', 'intermediate', 'other']
-        regex_parser = filter(
-            lambda parser: parser.__class__.__name__ == "RegexParser", config._parsers
+        regex_parser = list(
+            filter(
+                lambda parser: parser.__class__.__name__ == "RegexParser", config._parsers
+            )
         )
         assert len(regex_parser) == 3
         assert sorted(map(lambda x: x._name, regex_parser)) == ['cause', 'effect', 'intermediate']
-        wildcards_parsers = filter(
-            lambda parser: parser.__class__.__name__ == "WildCardParser", config._parsers
+        wildcards_parsers = list(
+            filter(
+                lambda parser: parser.__class__.__name__ == "WildCardParser", config._parsers
+            )
         )
         assert len(wildcards_parsers) == 1
-        assert map(lambda x: x._name, wildcards_parsers) == ['other']
+        assert list(map(lambda x: x._name, wildcards_parsers)) == ['other']
