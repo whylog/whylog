@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+import yaml
 
 
 class AbstractConfig(object):
@@ -11,7 +12,10 @@ class AbstractConfig(object):
 
 class YamlConfig(AbstractConfig):
     def __init__(self, parsers_path, rules_path, log_locations_path):
-        pass
+        self._parsers_path = parsers_path
+        self._rules_path = rules_path
+        self._log_locations_path = log_locations_path
+        self._parsers = self._load_parsers()
 
     def create_investigation_plan(self, front_input):
         pass
@@ -27,6 +31,17 @@ class YamlConfig(AbstractConfig):
 
     def _get_locations_for_logs(self, logs_types_list):
         pass
+
+    def _load_config_from_file(self, path):
+        with open(path, "r") as config_file:
+            return list(yaml.load_all(config_file))
+
+    def _load_parsers(self):
+        documents = self._load_config_from_file(self._parsers_path)
+        parsers = []
+        for document in documents:
+            pass
+        return documents
 
 
 class InvestigationPlan(object):

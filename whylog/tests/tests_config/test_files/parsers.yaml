@@ -1,0 +1,19 @@
+---
+name: cause
+regex: ^(\d+) root cause
+params:
+    - {type: time, format: '%s'}
+---
+name: effect
+regex: ^(\d+) visible effect$
+params:
+    - {type: time, format: '%s'}
+---
+name: intermediate
+regex: ^(\d+) intermediate effect$
+params:
+    - {type: time, format: '%s'}
+---
+class: WildCardParser
+name: other
+type: apache access log

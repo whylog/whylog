@@ -10,7 +10,15 @@ class AbstractParser(object):
 
 
 class RegexParser(AbstractParser):
-    def __init__(self, name, regex, params):
+    def __init__(self, name, regex, params, log_type):
+        pass
+
+    def get_clue(self, line):
+        pass
+
+
+class WildCardParser(AbstractParser):
+    def __init__(self, name):
         pass
 
     def get_clue(self, line):
