@@ -6,9 +6,9 @@ class Interval(object):
     Represents interval in line.
     """
 
-    def __init__(self, start_offset, length, line):
+    def __init__(self, start_offset, end_offset, line):
         self.start_offset = start_offset
-        self.length = length
+        self.end_offset = end_offset
         self.line = line
 
 
