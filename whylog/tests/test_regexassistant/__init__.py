@@ -1,9 +1,8 @@
 from unittest import TestCase
-from os.path import join as path_join
 from nose.plugins.skip import SkipTest
-#raise SkipTest()
 from whylog.regexassistant import RegexAssistant
 from whylog.teacher import Interval
+
 
 class FrontInput(object):
     """
@@ -13,6 +12,7 @@ class FrontInput(object):
         self.offset = offset
         self.line_content = line_content
         self.resource_location = resource_location
+
 
 class TestBasic(TestCase):
 
@@ -41,7 +41,7 @@ class TestBasic(TestCase):
         beta36_in_2 = Interval(40, 45, cause2)
 
         raise SkipTest
-        # Not implemented yet.
+        # Methods called below are not implemented yet.
         regex_assistant.make_groups([beta36_in_1, beta36_in_2])
         assert regex_assistant.regexes[cause1] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
         assert regex_assistant.regexes[cause2] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
