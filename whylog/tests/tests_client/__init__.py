@@ -71,11 +71,6 @@ class TestBacktrackSearcher(TestCase):
         assert line_num <= self._count_lines_in_file(self._get_log_file_path())
         return line_num * constants.AFewLinesLogParams.SINGLE_LINE_LENGTH
 
-    def _reverse_from_offset_wrapper(self, backtracker, offset, buf_size=None):
-        if buf_size == None:
-            return [line for line in backtracker._reverse_from_offset(offset)]
-        return [line for line in backtracker._reverse_from_offset(offset, buf_size)]
-
     def _read_all_lines_from_file(self, file_path):
         with open(file_path) as f:
             return f.read().splitlines()
@@ -84,9 +79,6 @@ class TestBacktrackSearcher(TestCase):
         assert len(lines_reversed) == len(lines_normally)
         for i, j in zip(lines_reversed, reversed(lines_normally)):
             assert i == j
-
-    def test_sample_call(self):
-        self._sample_call_with_specified_bufsize(None)
 
     def _sample_call_with_specified_bufsize(self, bufsize):
         log_file_path = self._get_log_file_path()
@@ -97,7 +89,7 @@ class TestBacktrackSearcher(TestCase):
         backtracker = searchers.BacktrackSearcher(log_file_path)
 
         lines = self._read_all_lines_from_file(log_file_path)[:how_many_lines]
-        lines_reversed = self._reverse_from_offset_wrapper(backtracker, offset, bufsize)
+        lines_reversed = list(backtracker._reverse_from_offset(offset, bufsize))
 
         self._check_lines(lines_reversed, lines)
 
@@ -113,6 +105,6 @@ class TestBacktrackSearcher(TestCase):
         backtracker = searchers.BacktrackSearcher(log_file_path)
 
         lines = self._read_all_lines_from_file(log_file_path)
-        lines_reversed = self._reverse_from_offset_wrapper(backtracker, file_size_as_offset)
+        lines_reversed = list(backtracker._reverse_from_offset(file_size_as_offset))
 
         self._check_lines(lines_reversed, lines)
