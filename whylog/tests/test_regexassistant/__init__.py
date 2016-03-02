@@ -8,6 +8,7 @@ class FrontInput(object):
     """
     FrontInput for test purpose only while module Front is not implemented yet.
     """
+
     def __init__(self, offset, line_content, resource_location):
         self.offset = offset
         self.line_content = line_content
@@ -15,11 +16,10 @@ class FrontInput(object):
 
 
 class TestBasic(TestCase):
-
     def test_one(self):
         content1 = "2015-12-03 12:08:09 Connection error occurred on beta36"
         content2 = "2015-12-03 12:10:10 Data migration from beta36 to beta21 failed"
-        content3 = "2015-12-03 12:11:00 Data is missing at beta21"
+        content3 = "2015-12-03 12:11:00 Data is missing on beta21"
 
         cause1 = FrontInput(903, content1, None)
         cause2 = FrontInput(53, content2, None)
@@ -43,18 +43,26 @@ class TestBasic(TestCase):
         raise SkipTest
         # Methods called below are not implemented yet.
         regex_assistant.make_groups([beta36_in_1, beta36_in_2])
-        assert regex_assistant.regexes[cause1] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
-        assert regex_assistant.regexes[cause2] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
+        assert regex_assistant.regexes[
+            cause1
+        ] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
+        assert regex_assistant.regexes[
+            cause2
+        ] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
 
         regex_assistant.undo(cause1)
         assert regex_assistant.regexes[cause1] == '^' + content2 + '$'
         regex_assistant.redo(cause1)
-        assert regex_assistant.regexes[cause1] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
+        assert regex_assistant.regexes[
+            cause1
+        ] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
 
         regex_assistant.guess_regex(effect)
-        assert regex_assistant.regexes[effect] == "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
+        assert regex_assistant.regexes[
+            effect
+        ] == "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
 
-        proposed_regex = "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (?P<machine>.*)$"
+        proposed_regex = "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (?P<machine>.*)$"
         regex_assistant.load_regex(effect, proposed_regex)
         assert regex_assistant.regexes[effect] == proposed_regex
 
