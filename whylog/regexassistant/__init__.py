@@ -17,8 +17,11 @@ class RegexAssistant(object):
         return '^' + text + '$'
 
     def __init__(self, line_objects=tuple()):
-        self.regexes = dict([(line, self._obvious_regex(line.line_content)) for line in line_objects
-                            ])
+        self.regexes = dict(
+            [
+                (line, self._obvious_regex(line.line_content)) for line in line_objects
+            ]
+        )
         self.history = dict([(line, []) for line in line_objects])
         pass
 
