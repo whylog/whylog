@@ -33,7 +33,6 @@ class TestBasic(TestCase):
         regex_assistant.add_lines([cause2, effect])
         assert len(regex_assistant.history) == 3
 
-        print regex_assistant.regexes[cause2]
         assert regex_assistant.regexes[cause2] == '^' + content2 + '$'
 
         assert 'beta36' == content1[49:55]
