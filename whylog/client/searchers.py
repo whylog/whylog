@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from os import SEEK_SET
 
+
 class constants:
     STANDARD_BUF_SIZE = 8192
 
