@@ -1,10 +1,10 @@
 from unittest import TestCase
 import os.path
 from generator import generator, generate
+from whylog.tests.tests_client.constants import test_paths
 
 from whylog.config import YamlConfig
 from whylog.client import WhylogClient
-
 
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
@@ -27,7 +27,7 @@ class TestBasic(TestCase):
         '013_match_and_incomplete',
     )
     def test_one(self, test_name):
-        prefix_path = os.path.join(*path_test_files)
+        prefix_path = os.path.join(*test_paths.path_test_files)
         path = os.path.join(prefix_path, test_name)
         parsers_path = os.path.join(path, 'parsers.yaml')
         rules_path = os.path.join(path, 'rules.yaml')

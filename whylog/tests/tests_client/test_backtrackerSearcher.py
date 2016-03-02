@@ -1,13 +1,13 @@
 from unittest import TestCase
 import os.path
-from .constants import AFewLinesLogParams
+from whylog.tests.tests_client.constants import test_paths, AFewLinesLogParams
 
 from whylog.client import searchers
 
 
 class TestBacktrackSearcher(TestCase):
     def _get_log_file_path(self):
-        prefix_path = os.path.join(*path_test_files)
+        prefix_path = os.path.join(*test_paths.path_test_files)
         path = os.path.join(prefix_path, "a_few_lines.log")
         return path
 
@@ -21,7 +21,7 @@ class TestBacktrackSearcher(TestCase):
         Be careful when modifying a_few_lines.log.
         """
         assert line_num <= self._count_lines_in_file(self._get_log_file_path())
-        return line_num * constants.AFewLinesLogParams.SINGLE_LINE_LENGTH
+        return line_num * AFewLinesLogParams.SINGLE_LINE_LENGTH
 
     def _read_all_lines_from_file(self, file_path):
         with open(file_path) as f:
