@@ -1,8 +1,7 @@
-from whylog.config.parsers import *
+from whylog.config.parsers import RegexParser
 
 from abc import ABCMeta, abstractmethod
 import yaml
-import logging
 
 
 class AbstractConfig(object):
@@ -35,43 +34,29 @@ class YamlConfig(AbstractConfig):
     def _get_locations_for_logs(self, logs_types_list):
         pass
 
-    def _create_parser_object(self, document, log_types):
-        if document.get("log_type") is None:
-            log_type_str = "default"
-        else:
-            log_type_str = document.get("log_type")
+    def _load_parsers(self):
+        parsers_definitions = self._load_file_with_config(self._parsers_path)
+        log_types = {}
+        return [
+            self._create_parser_object(parser_definition, log_types)
+            for parser_definition in parsers_definitions
+        ]
+
+    def _load_file_with_config(self, path):
+        with open(path, "r") as config_file:
+            return list(yaml.load_all(config_file))
+
+    def _create_parser_object(self, parser_definition, log_types):
+        log_type_str = parser_definition.get("log_type", "default")
         if log_types.get(log_type_str) is None:
             log_type = LogType(log_type_str)
             log_types[log_type_str] = log_type
         else:
             log_type = log_types.get(log_type_str)
-        document["log_type"] = log_type
-        if document.get("class") is None:
-            if document.get("params") is None:
-                document["params"] = []
-            return RegexParser(**document)
-        else:
-            try:
-                parser_class = globals()[document.get("class")]
-                del document["class"]
-                return parser_class(**document)
-            except KeyError:
-                logging.error("Unable to creating object of " + document.get("class") + " class")
-                return None
-
-    def _load_parsers(self):
-        documents = self._load_file_with_config(self._parsers_path)
-        parsers = []
-        log_types = {}
-        for document in documents:
-            parser = self._create_parser_object(document, log_types)
-            if parser is not None:
-                parsers.append(parser)
-        return parsers
-
-    def _load_file_with_config(self, path):
-        with open(path, "r") as config_file:
-            return list(yaml.load_all(config_file))
+        parser_definition["log_type"] = log_type
+        if parser_definition.get("params") is None:
+            parser_definition["params"] = []
+        return RegexParser(**parser_definition)
 
 
 class InvestigationPlan(object):

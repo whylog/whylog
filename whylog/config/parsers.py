@@ -18,12 +18,3 @@ class RegexParser(AbstractParser):
 
     def get_clue(self, line):
         pass
-
-
-class WildCardParser(AbstractParser):
-    def __init__(self, name, log_type):
-        self._name = name
-        self._log_type = log_type
-
-    def get_clue(self, line):
-        pass
