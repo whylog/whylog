@@ -26,7 +26,7 @@ class YamlConfig(AbstractConfig):
         pass
 
     def _get_log_type(self, front_input):
-        pass
+        return
 
     def _find_matching_parsers(self, front_input, log_type):
         pass
@@ -45,15 +45,14 @@ class YamlConfig(AbstractConfig):
         self._save_parsers_definition(parsers_definition)
 
     def _save_rule_definition(self, rule_definition):
+        print rule_definition
         print yaml.dump(rule_definition)
         with open(self._rules_path, "a") as rules_file:
-            rules_file.write(yaml.safe_dump(rule_definition))
+            rules_file.write(yaml.safe_dump(rule_definition, explicit_start=True))
 
     def _save_parsers_definition(self, parser_definitions):
-        print parser_definitions
-        print yaml.dump(parser_definitions)
         with open(self._parsers_path, "a") as parsers_file:
-            parsers_file.write(yaml.safe_dump_all(parser_definitions))
+            parsers_file.write(yaml.safe_dump_all(parser_definitions, explicit_start=True))
 
     def _create_rule_from_user_rule_intent(self, user_rule_intent):
         parsers_dict = {
