@@ -1,3 +1,6 @@
+from whylog.teacher.mockoutputs import create_sample_rule
+
+
 class Interval(object):
     """
     Represents interval in line.
@@ -25,7 +28,8 @@ class Teacher(object):
     Enable teaching new rule. One Teacher per one entering rule.
     """
 
-    def __init__(self, effect, causes=tuple()):
+    def __init__(self, config, effect, causes=tuple()):
+        self.config = config
         self._rule = Rule(effect)
         self._rule.causes.update(causes)
 
@@ -52,4 +56,4 @@ class Teacher(object):
         pass
 
     def save(self):
-        pass
+        self.config.add_rule(create_sample_rule())
