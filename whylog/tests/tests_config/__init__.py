@@ -9,7 +9,6 @@ path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
 class TestBasic(TestCase):
     def test_transform(self):
-
         path = join(*path_test_files)
         parsers_path = join(path, 'parsers.yaml')
         rules_path = join(path, 'rules.yaml')
@@ -24,7 +23,6 @@ class TestBasic(TestCase):
         identical_constr = "identical"
         different_constr = "different"
         hetero_constr = "hetero"
-
 
         regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*). Host name: (.*)$"
         regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed. Host name: (.*)$"

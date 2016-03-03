@@ -37,6 +37,53 @@ class YamlConfig(AbstractConfig):
     def _get_locations_for_logs(self, logs_types_list):
         pass
 
+    def add_rule(self, user_rule_intent):
+        rule = self._create_rule_from_user_rule_intent(user_rule_intent)
+        rule_definition = rule.get_rule_in_form_to_save()
+        parsers_definition = rule.get_rule_parsers_in_form_to_save()
+        # self._save_rule_definition(rule_definition)
+        self._save_parsers_definition(parsers_definition)
+
+    def _save_rule_definition(self, rule_definition):
+        print yaml.dump(rule_definition)
+        with open(self._rules_path, "a") as rules_file:
+            rules_file.write(yaml.dump(rule_definition))
+
+    def _save_parsers_definition(self, parser_definitions):
+        print parser_definitions
+        print yaml.dump(parser_definitions)
+        with open(self._parsers_path, "w") as parsers_file:
+            parsers_file.write(yaml.dump_all(parser_definitions))
+
+    def _create_rule_from_user_rule_intent(self, user_rule_intent):
+        parsers_dict = {
+            intent_id: RegexParser(
+                str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
+                parser_intent.log_type_name, parser_intent.data_conversions
+            )
+            for intent_id, parser_intent in user_rule_intent.parser_intents.iteritems()
+        }
+        effect = parsers_dict.get(user_rule_intent.effect_id)
+        parsers_dict.pop(user_rule_intent.effect_id)
+        parser_ids_mapper = {user_rule_intent.effect_id: 0}
+        free_clue_index = 1
+        causes = []
+        for intent_id in parsers_dict:
+            causes.append(parsers_dict.get(intent_id))
+            parser_ids_mapper[intent_id] = free_clue_index
+            free_clue_index += 1
+        constraints = []
+        for constraint_intent in user_rule_intent.constraint_intents:
+            clues = [
+                (parser_ids_mapper.get(parser_id), group)
+                for (parser_id, group) in constraint_intent.groups
+            ]
+            constraint_dict = {"name": constraint_intent.type, "clues": clues}
+            if constraint_intent.params is not None:
+                constraint_dict["params"] = constraint_intent.params
+            constraints.append(constraint_dict)
+        return Rule(causes, effect, constraints)
+
 
 class Rule(object):
     def __init__(self, causes, effect, constraints):
