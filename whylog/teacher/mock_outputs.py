@@ -1,4 +1,4 @@
-from whylog.teacher.userintent import UserParserIntent, UserConstraintIntent, UserRuleIntent
+from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 
 def create_sample_rule():
@@ -17,13 +17,13 @@ def create_sample_rule():
     content3 = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
     """
 
-    regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*). Host name: (.*)$"
-    regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed. Host name: (.*)$"
-    regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*). Loss = (.*) GB. Host name; (.*)$"
+    regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
+    regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
+    regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
-    parser1 = UserParserIntent("hydra", regex1, [1], dict([(1, to_date)]))
-    parser2 = UserParserIntent("hydra", regex2, [1], dict([(1, to_date)]))
-    parser3 = UserParserIntent("filesystem", regex3, [1], dict([(1, to_date), (3, to_float)]))
+    parser1 = UserParserIntent("hydra", regex1, [1], {1: to_date})
+    parser2 = UserParserIntent("hydra", regex2, [1], {1: to_date})
+    parser3 = UserParserIntent("filesystem", regex3, [1], {1: to_date, 3: to_float})
 
     parsers = {0: parser1, 1: parser2, 2: parser3}
     effect_id = 2

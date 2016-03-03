@@ -1,4 +1,4 @@
-from whylog.teacher.mockoutputs import create_sample_rule
+from whylog.teacher.mock_outputs import create_sample_rule
 
 
 class Interval(object):

@@ -3,14 +3,14 @@ class UserParserIntent(object):
         self.log_type_name = log_type_name
         self.regex = regex
         self.primary_key_groups = primary_key_groups
-        self.data_conversions = data_conversions
+        self.data_conversions = data_conversions or {}
 
 
 class UserConstraintIntent(object):
     def __init__(self, constr_type, groups, params=None):
         self.type = constr_type
         self.groups = groups
-        self.params = params
+        self.params = params or {}
 
 
 class UserRuleIntent(object):
