@@ -60,7 +60,7 @@ class YamlConfig(AbstractConfig):
                 str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
                 parser_intent.log_type_name, parser_intent.data_conversions
             )
-            for intent_id, parser_intent in user_rule_intent.parser_intents.iteritems()
+            for intent_id, parser_intent in user_rule_intent.parsers.iteritems()
         }
         effect = parsers_dict.get(user_rule_intent.effect_id)
         parsers_dict.pop(user_rule_intent.effect_id)
@@ -72,7 +72,7 @@ class YamlConfig(AbstractConfig):
             parser_ids_mapper[intent_id] = free_clue_index
             free_clue_index += 1
         constraints = []
-        for constraint_intent in user_rule_intent.constraint_intents:
+        for constraint_intent in user_rule_intent.constraints:
             clues = [
                 (parser_ids_mapper.get(parser_id), group)
                 for (parser_id, group) in constraint_intent.groups

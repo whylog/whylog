@@ -1,66 +1,50 @@
 ---
-causes: [fafcada4-a3e7-476f-a3c0-c267757c3547, b073b29a-b6fc-446f-a835-9ac00e2582f7]
+causes: [7c928a6e-d9be-4730-9d8f-b4bec17cff9f, 25637a80-477d-420e-bbd3-e855c025f79c]
 constraints:
 - clues:
   - [1, 2]
   - [2, 2]
   name: identical
+  params: {}
 - clues:
   - [2, 3]
   - [0, 2]
   name: identical
+  params: {}
 - clues:
   - [2, 2]
   - [2, 3]
   name: different
+  params: {}
 - clues:
   - [1, 3]
   - [2, 4]
   - [0, 4]
   name: hetero
   params: [1]
-effect: e30c210f-fa38-448a-a3bf-a1346b57f0ee
+effect: 719e510b-2804-4b9d-be8b-be29884e9d35
 ---
-causes: [288fc8db-b364-4dd2-aa31-44d7b2132994, 5f5771c2-0831-4e21-aa19-399585c9808a]
+causes: [86df62a6-6d9e-44b1-b36c-894251de6ab8, 825ebe9b-4761-4726-bf5b-d10f482e4e3d]
 constraints:
 - clues:
   - [1, 2]
   - [2, 2]
   name: identical
+  params: {}
 - clues:
   - [2, 3]
   - [0, 2]
   name: identical
+  params: {}
 - clues:
   - [2, 2]
   - [2, 3]
   name: different
+  params: {}
 - clues:
   - [1, 3]
   - [2, 4]
   - [0, 4]
   name: hetero
   params: [1]
-effect: 582c718f-7031-4186-9934-44bcb99e54c7
----
-causes: [f19a4ea0-d03c-4524-a58b-e0d5699609a3, 28c79016-bfd2-4fa9-8454-4bac91760d97]
-constraints:
-- clues:
-  - [1, 2]
-  - [2, 2]
-  name: identical
-- clues:
-  - [2, 3]
-  - [0, 2]
-  name: identical
-- clues:
-  - [2, 2]
-  - [2, 3]
-  name: different
-- clues:
-  - [1, 3]
-  - [2, 4]
-  - [0, 4]
-  name: hetero
-  params: [1]
-effect: 86c06171-2a85-40cd-97a7-e4afbcf09804
+effect: b600337c-cbcc-4aec-a449-c865048c41f2
