@@ -1,6 +1,9 @@
-from abc import ABCMeta, abstractmethod
+from whylog.config.parsers import RegexParser
 
+from abc import ABCMeta, abstractmethod
+import uuid
 import yaml
+
 
 from whylog.config.parsers import RegexParser
 
@@ -18,8 +21,6 @@ class YamlConfig(AbstractConfig):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
         self._log_locations_path = log_locations_path
-        self._log_type_manager = log_type_manager or LogTypeManager()
-        self._parsers = self._load_parsers()
 
     def create_investigation_plan(self, front_input):
         pass
@@ -36,37 +37,40 @@ class YamlConfig(AbstractConfig):
     def _get_locations_for_logs(self, logs_types_list):
         pass
 
-    def _load_parsers(self):
-        parsers_definitions = self._load_file_with_config(self._parsers_path)
-        return [self._create_parser(parser_definition) for parser_definition in parsers_definitions]
 
-    def _load_file_with_config(self, path):
-        with open(path, "r") as config_file:
-            return list(yaml.load_all(config_file))
+class Rule(object):
+    def __init__(self, causes, effect, constraints):
+        self._causes = causes
+        self._effect = effect
+        self._constraints = constraints
 
-    def _create_parser(self, parser_definition):
-        log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
-        parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
-        return RegexParser(**parser_definition)
+    def get_rule_in_form_to_save(self):
+        return {
+            "causes": [cause.name for cause in self._causes],
+            "effect": self._effect.name,
+            "constraints": self._constraints
+        }
 
-
-class LogType(object):
-    def __init__(self, name):
-        self._name = name
-
-
-class LogTypeManager(object):
-
-    DEFAULT_LOG_TYPE = "default"
-
-    def __init__(self, log_types=None):
-        self._log_types = log_types or {}
-
-    def get_log_type(self, log_type_str):
-        log_type = self._log_types.get(log_type_str)
-        if log_type is None:
-            log_type = self._log_types[log_type_str] = LogType(log_type_str)
-        return log_type
+    def get_rule_parsers_in_form_to_save(self):
+        parser_definitions = [
+            {
+                "name": parser.name,
+                "regex": parser.regex_str,
+                "primary_key_groups": parser.primary_key_groups,
+                "log_type": parser.log_type,
+                "convertions": parser.convertions
+            } for parser in self._causes
+        ]
+        parser_definitions.append(
+            {
+                "name": self._effect.name,
+                "regex": self._effect.regex_str,
+                "primary_key_groups": self._effect.primary_key_groups,
+                "log_type": self._effect.log_type,
+                "convertions": self._effect.convertions
+            }
+        )
+        return parser_definitions
 
 
 class InvestigationPlan(object):
@@ -116,11 +120,6 @@ class Clue(object):
     """
 
     def __init__(self, regex_parameters, line_time, line_content, line_source):
-        pass
-
-
-class Rule(object):
-    def __init__(self, causes, effect, constraints):
         pass
 
 

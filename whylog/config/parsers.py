@@ -10,11 +10,12 @@ class AbstractParser(object):
 
 
 class RegexParser(AbstractParser):
-    def __init__(self, name, regex, log_type, params=None):
-        self._name = name
-        self._regex_str = regex
-        self._params = params or []
-        self._log_type = log_type
+    def __init__(self, name, regex, primary_key_groups, log_type, convertions):
+        self.name = name
+        self.regex_str = regex
+        self.primary_key_groups = primary_key_groups
+        self.log_type = log_type
+        self.convertions = convertions
 
     def get_clue(self, line):
         pass
