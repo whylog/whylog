@@ -41,19 +41,19 @@ class YamlConfig(AbstractConfig):
         rule = self._create_rule_from_user_rule_intent(user_rule_intent)
         rule_definition = rule.get_rule_in_form_to_save()
         parsers_definition = rule.get_rule_parsers_in_form_to_save()
-        # self._save_rule_definition(rule_definition)
+        self._save_rule_definition(rule_definition)
         self._save_parsers_definition(parsers_definition)
 
     def _save_rule_definition(self, rule_definition):
         print yaml.dump(rule_definition)
         with open(self._rules_path, "a") as rules_file:
-            rules_file.write(yaml.dump(rule_definition))
+            rules_file.write(yaml.safe_dump(rule_definition))
 
     def _save_parsers_definition(self, parser_definitions):
         print parser_definitions
         print yaml.dump(parser_definitions)
-        with open(self._parsers_path, "w") as parsers_file:
-            parsers_file.write(yaml.dump_all(parser_definitions))
+        with open(self._parsers_path, "a") as parsers_file:
+            parsers_file.write(yaml.safe_dump_all(parser_definitions))
 
     def _create_rule_from_user_rule_intent(self, user_rule_intent):
         parsers_dict = {
