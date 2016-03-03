@@ -18,9 +18,9 @@ matrix:
     - python: "2.7"
       env: JYTHON=true
     - python: "2.7"
-      env: YAPF=true
+      env: SCA=true
     - python: "3.5"
-      env: YAPF=true
+      env: SCA=true
 
 cache:
   - pip
@@ -46,12 +46,13 @@ before_install:
 install:
   # `pip install -r requirements.txt` does not work on jython
   - cat requirements*.txt | xargs pip install
-  - if [ -z "$YAPF" ]; then python setup.py develop; fi
+  - if [ -z "$SCA" ]; then python setup.py develop; fi
 
 before_script:
   # Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
   - if [ -n "$JYTHON" ]; then python -c "print ''"; fi
 
 script:
-  - if [ -n "$YAPF" ]; then yapf --diff --recursive .; exit; fi
+  - if [ -n "$SCA" ]; then yapf --diff --recursive .; exit; fi
+  - if [ -n "$SCA" ]; then pyflakes .; exit; fi
   - python setup.py nosetests
