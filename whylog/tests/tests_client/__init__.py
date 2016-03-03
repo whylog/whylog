@@ -1,3 +1,4 @@
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 from os.path import join as path_join
 from generator import generator, generate
@@ -44,7 +45,6 @@ class TestBasic(TestCase):
             vim_line = f.read()
         result = whylog_client.get_cause(vim_line)
 
+        raise SkipTest('Not implemented yet')
         with open(output_path, 'r') as f:
-            pass
-            # remove this comment after implement whylog client and base
-            # assert result == f.read()
+            assert result == f.read()
