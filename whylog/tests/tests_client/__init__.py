@@ -1,10 +1,11 @@
-from nose.plugins.skip import SkipTest
-from unittest import TestCase
 from os.path import join as path_join
-from generator import generator, generate
+from unittest import TestCase
 
-from whylog.config import YamlConfig
+from generator import generate, generator
+from nose.plugins.skip import SkipTest
+
 from whylog.client import WhylogClient
+from whylog.config import YamlConfig
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
 
