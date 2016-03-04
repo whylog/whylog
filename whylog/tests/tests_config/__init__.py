@@ -1,7 +1,6 @@
 from whylog.teacher import Teacher
 from whylog.config import YamlConfig
 
-
 from unittest import TestCase
 from os.path import join
 

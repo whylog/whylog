@@ -26,7 +26,7 @@ class YamlConfig(AbstractConfig):
         pass
 
     def _get_log_type(self, front_input):
-        return
+        pass
 
     def _find_matching_parsers(self, front_input, log_type):
         pass
@@ -45,7 +45,7 @@ class YamlConfig(AbstractConfig):
     def _save_rule_definition(self, rule_definition):
         with open(self._rules_path, "a") as rules_file:
             rules_file.write(yaml.safe_dump(rule_definition, explicit_start=True))
-    
+
     def _save_parsers_definition(self, parser_definitions):
         with open(self._parsers_path, "a") as parsers_file:
             parsers_file.write(yaml.safe_dump_all(parser_definitions, explicit_start=True))
@@ -54,7 +54,9 @@ class YamlConfig(AbstractConfig):
         parsers_dict = self._create_parsers_from_parsers_intents(user_rule_intent)
         effect = parsers_dict.get(user_rule_intent.effect_id)
         parsers_dict.pop(user_rule_intent.effect_id)
-        causes, parser_ids_mapper = self._create_causes_list_with_clue_index(parsers_dict, user_rule_intent)
+        causes, parser_ids_mapper = self._create_causes_list_with_clue_index(
+            parsers_dict, user_rule_intent
+        )
         constraints = self._create_constraints_list(parser_ids_mapper, user_rule_intent)
         return Rule(causes, effect, constraints)
 
@@ -65,7 +67,7 @@ class YamlConfig(AbstractConfig):
                 parser_intent.log_type_name, parser_intent.data_conversions
             )
             for intent_id, parser_intent in user_rule_intent.parsers.iteritems()
-            }
+        }
 
     def _create_causes_list_with_clue_index(self, parsers_dict, user_rule_intent):
         parser_ids_mapper = {user_rule_intent.effect_id: 0}
@@ -83,7 +85,7 @@ class YamlConfig(AbstractConfig):
             clues = [
                 (parser_ids_mapper.get(parser_id), group)
                 for (parser_id, group) in constraint_intent.groups
-                ]
+            ]
             constraint_dict = {"name": constraint_intent.type, "clues": clues}
             if bool(constraint_intent.params):
                 constraint_dict["params"] = constraint_intent.params
