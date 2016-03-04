@@ -13,10 +13,7 @@ class TestBasic(TestCase):
         path = join(*path_test_files)
         parsers_path = join(path, 'parsers.yaml')
         rules_path = join(path, 'rules.yaml')
-        input_path = join(path, 'input.txt')
-        output_path = join(path, 'expected_output.txt')
-        log_location_path = join(path, 'log_locations.yaml')
 
-        config = YamlConfig(parsers_path, rules_path, log_location_path)
+        config = YamlConfig(parsers_path, rules_path, None)
         teacher = Teacher(config, [], [])
         teacher.save()
