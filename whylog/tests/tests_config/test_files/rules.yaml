@@ -1,5 +1,5 @@
 ---
-causes: [450d43b3-46d5-480a-a72f-3c7a819d5cbb, 6c3ce3c6-aab0-4835-a683-c3ad0482bf5f]
+causes: [766b9b32-adac-45b8-944d-111cbcf6e9b6, 1dd9342c-583e-4e7f-92ad-132bd1682e24]
 constraints:
 - clues:
   - [1, 2]
@@ -19,4 +19,4 @@ constraints:
   - [0, 4]
   name: hetero
   params: [1]
-effect: e69f3c3f-3fc4-4594-8389-bb0edcdeafff
+effect: 40fcf774-1155-4468-a75b-eb5bf0ad8159

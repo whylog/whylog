@@ -1,8 +1,9 @@
-from whylog.config.parsers import RegexParser
-
-from abc import ABCMeta, abstractmethod
 import uuid
+from abc import ABCMeta, abstractmethod
+
 import yaml
+
+from whylog.config.parsers import RegexParser
 
 
 from whylog.config.parsers import RegexParser
@@ -61,13 +62,14 @@ class YamlConfig(AbstractConfig):
         return Rule(causes, effect, constraints)
 
     def _create_parsers_from_parsers_intents(self, user_rule_intent):
-        return {
-            intent_id: RegexParser(
-                str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
-                parser_intent.log_type_name, parser_intent.data_conversions
-            )
-            for intent_id, parser_intent in user_rule_intent.parsers.iteritems()
-        }
+        return dict(
+            (
+                intent_id, RegexParser(
+                    str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
+                    parser_intent.log_type_name, parser_intent.data_conversions
+                )
+            ) for intent_id, parser_intent in user_rule_intent.parsers.iteritems()
+        )
 
     def _create_causes_list_with_clue_index(self, parsers_dict, user_rule_intent):
         parser_ids_mapper = {user_rule_intent.effect_id: 0}
