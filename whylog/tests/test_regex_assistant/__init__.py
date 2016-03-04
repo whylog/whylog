@@ -1,18 +1,11 @@
 from unittest import TestCase
+
 from nose.plugins.skip import SkipTest
-from whylog.regexassistant import RegexAssistant
+
+from whylog.assistant import RegexAssistant
+from whylog.assistant.regex_assistant_exceptions import NoDateGroupException
+from whylog.front import FrontInput
 from whylog.teacher import Interval
-
-
-class FrontInput(object):
-    """
-    FrontInput for test purpose only while module Front is not implemented yet.
-    """
-
-    def __init__(self, offset, line_content, resource_location):
-        self.offset = offset
-        self.line_content = line_content
-        self.resource_location = resource_location
 
 
 class TestBasic(TestCase):
@@ -25,18 +18,15 @@ class TestBasic(TestCase):
         cause2 = FrontInput(53, content2, None)
         effect = FrontInput(1087, content3, None)
 
-        regex_assistant = RegexAssistant([cause1, effect])
+        regex_assistant = RegexAssistant(effect, [cause1])
 
         regex_assistant.remove_lines([effect])
         assert len(regex_assistant.regexes) == 1
 
         regex_assistant.add_lines([cause2, effect])
-        assert len(regex_assistant.history) == 3
 
         assert regex_assistant.regexes[cause2] == '^' + content2 + '$'
 
-        assert 'beta36' == content1[49:55]
-        assert 'beta36' == content2[40:46]
         beta36_in_1 = Interval(49, 54, cause1)
         beta36_in_2 = Interval(40, 45, cause2)
 
@@ -66,9 +56,5 @@ class TestBasic(TestCase):
         regex_assistant.load_regex(effect, proposed_regex)
         assert regex_assistant.regexes[effect] == proposed_regex
 
-        error_occured = False
-        try:
+        with self.assertRaises(NoDateGroupException):
             regex_assistant.verify_regex(cause1)
-        except NoDateGroupError:
-            error_occured = True
-        assert error_occured

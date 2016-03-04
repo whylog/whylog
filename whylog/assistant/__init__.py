@@ -1,39 +1,57 @@
-class RegexAssistant(object):
+import abc
+
+
+class AbstractAssistant(object):
+    @abc.abstractmethod
+    def guess(self, guess_base):
+        pass
+
+    @abc.abstractmethod
+    def verify(self):
+        pass
+
+    @abc.abstractmethod
+    def undo(self, history_keeper):
+        pass
+
+    @abc.abstractmethod
+    def redo(self, history_keeper):
+        pass
+
+
+class RegexAssistant(AbstractAssistant):
     """
     Responsible for creating regex for each line of Rule.
-    RegexAssistant helps user to write regex, it can also proposes regex.
+    RegexAssistant helps user to write regex, it can also propose regex.
     One RegexAssistant per one entering Rule.
     """
+
+    def __init__(self, effect, line_objects=tuple()):
+        self.regexes = {}
+        self.add_lines([effect])
+        self.add_lines(line_objects)
+        # TODO: line indexing (here and in other methods)
+        # after adding new line, we assign an index for it
+        # and modify this line using line index.
+
+    def add_lines(self, line_objects):
+        for line in line_objects:
+            self.regexes[line] = self._obvious_regex(line.line_content)
+
+    def remove_lines(self, line_objects):
+        for line in line_objects:
+            del self.regexes[line]
 
     def _obvious_regex(self, text):
         """
         Creates regex form text by simple transformation:
-        - add backslash to special characters
+        - backslash before special character
         - text -> '^' + text + '$'
         :param text:
         :return:
         """
         # not finished yet
         return '^' + text + '$'
-
-    def __init__(self, line_objects=tuple()):
-        self.regexes = dict(
-            [
-                (line, self._obvious_regex(line.line_content)) for line in line_objects
-            ]
-        )
-        self.history = dict([(line, []) for line in line_objects])
-        pass
-
-    def add_lines(self, line_objects):
-        for line in line_objects:
-            self.regexes[line] = self._obvious_regex(line.line_content)
-            self.history[line] = []
-
-    def remove_lines(self, line_objects):
-        for line in line_objects:
-            del self.regexes[line]
-            del self.history[line]
 
     def make_groups(self, intervals):
         """
@@ -42,25 +60,16 @@ class RegexAssistant(object):
         """
         pass
 
-    def remove_groups(self, intervals):
+    def verify(self):
         """
-        Removes regex groups from regexes.
-        :param intervals: represents interval of text together with line_object
-        """
-        pass
-
-    def verify_regex(self, line_object):
-        """
-        Check if created regex meets all requirements.
+        Check if created regexes meet all requirements.
         For example, required is:
-         - unambiguous matching line content
-         - having a group with date
+         - regex should match its line in one way only.
         It throws some exceptions if a requirement is not met
-        :param line_object: line object, keeps specific information about line.
         """
         pass
 
-    def load_regex(self, line_object, regex):
+    def update_regex(self, line_object, regex):
         """
         Loads regex proposed by user, verifies match, remember it in history.
         :param line_object: line object, keeps specific information about line.
@@ -80,21 +89,21 @@ class RegexAssistant(object):
         """
         pass
 
-    def guess_regex(self, line_object):
+    def guess(self, line_object):
         """
         Guess regex. It includes guessing date format and regex groups.
         :param line_object: line object that keeps specific information about line.
         """
         pass
 
-    def guess_groups(self, line_object):
+    def _guess_groups(self, line_object):
         """
         Guess regex groups (params/variables )
         :return: regex improved by time format
         """
         pass
 
-    def guess_time(self, line_object):
+    def _guess_time(self, line_object):
         """
         Guess time format
         :return: regex improved by time format

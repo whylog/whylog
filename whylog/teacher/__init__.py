@@ -32,6 +32,9 @@ class Teacher(object):
         self.config = config
         self._rule = Rule(effect)
         self._rule.causes.update(causes)
+        # TODO: line indexing (here and in other methods)
+        # after adding new line, we assign an index for it
+        # and modify this line using line index.
 
     def add_cause(self, cause):
         self._rule.causes.add(cause)
