@@ -1,7 +1,8 @@
-from whylog.config.parsers import RegexParser
-
 from abc import ABCMeta, abstractmethod
+
 import yaml
+
+from whylog.config.parsers import RegexParser
 
 
 class AbstractConfig(object):
@@ -48,14 +49,10 @@ class YamlConfig(AbstractConfig):
 
     def _create_parser_object(self, parser_definition, log_types):
         log_type_str = parser_definition.get("log_type", "default")
-        if log_types.get(log_type_str) is None:
-            log_type = LogType(log_type_str)
-            log_types[log_type_str] = log_type
-        else:
-            log_type = log_types.get(log_type_str)
+        log_type = log_types.get(log_type_str)
+        if log_type is None:
+            log_type = log_types[log_type_str] = LogType(log_type_str)
         parser_definition["log_type"] = log_type
-        if parser_definition.get("params") is None:
-            parser_definition["params"] = []
         return RegexParser(**parser_definition)
 
 
