@@ -1,0 +1,22 @@
+---
+causes: [3644641c-1404-4afd-a6bc-03a1a0dd6fbb, b7576241-643a-4285-b628-f2bcf72e43d0]
+constraints:
+- clues:
+  - [1, 2]
+  - [2, 2]
+  name: identical
+- clues:
+  - [2, 3]
+  - [0, 2]
+  name: identical
+- clues:
+  - [2, 2]
+  - [2, 3]
+  name: different
+- clues:
+  - [1, 3]
+  - [2, 4]
+  - [0, 4]
+  name: hetero
+  params: [1]
+effect: e3e26c1a-2021-4dcc-882a-2797fe889b63
