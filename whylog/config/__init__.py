@@ -68,7 +68,7 @@ class YamlConfig(AbstractConfig):
                     str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
                     parser_intent.log_type_name, parser_intent.data_conversions
                 )
-            ) for intent_id, parser_intent in user_rule_intent.parsers.iteritems()
+            ) for intent_id, parser_intent in user_rule_intent.parsers.items()
         )
 
     def _create_causes_list_with_clue_index(self, parsers_dict, user_rule_intent):
@@ -109,25 +109,15 @@ class Rule(object):
         }
 
     def get_rule_parsers_in_form_to_save(self):
-        parser_definitions = [
+        return [
             {
                 "name": parser.name,
                 "regex": parser.regex_str,
                 "primary_key_groups": parser.primary_key_groups,
                 "log_type": parser.log_type,
                 "convertions": parser.convertions
-            } for parser in self._causes
+            } for parser in self._causes + [self._effect]
         ]
-        parser_definitions.append(
-            {
-                "name": self._effect.name,
-                "regex": self._effect.regex_str,
-                "primary_key_groups": self._effect.primary_key_groups,
-                "log_type": self._effect.log_type,
-                "convertions": self._effect.convertions
-            }
-        )
-        return parser_definitions
 
 
 class InvestigationPlan(object):
