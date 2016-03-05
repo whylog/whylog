@@ -6,9 +6,9 @@ class Interval(object):
     Represents interval in line.
     """
 
-    def __init__(self, start_offset, length, line):
+    def __init__(self, start_offset, end_offset, line):
         self.start_offset = start_offset
-        self.length = length
+        self.end_offset = end_offset
         self.line = line
 
 
@@ -32,6 +32,9 @@ class Teacher(object):
         self.config = config
         self._rule = Rule(effect)
         self._rule.causes.update(causes)
+        # TODO: line indexing (here and in other methods)
+        # after adding new line, we assign an index for it
+        # and modify this line using line index.
 
     def add_cause(self, cause):
         self._rule.causes.add(cause)

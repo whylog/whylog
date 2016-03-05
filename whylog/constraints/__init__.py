@@ -1,11 +1,11 @@
-import abc
+from abc import ABCMeta, abstractmethod
+
+import six
 
 
+@six.add_metaclass(ABCMeta)
 class AbstractConstraint(object):
-    def __init__(self):
-        pass
-
-    @abc.abstractmethod
+    @abstractmethod
     def save(self, rulebase_rule):
         pass
 
