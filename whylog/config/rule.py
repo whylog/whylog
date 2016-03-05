@@ -67,7 +67,7 @@ class RuleFactory(object):
                     clues.append((cause_id, group))
             constraint_dict = {
                 "name": constraint_intent.type,
-                "clues": clues,
+                "clues_groups": clues,
                 "params": constraint_intent.params
             }
             constraints.append(constraint_dict)

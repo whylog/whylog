@@ -1,21 +1,21 @@
 ---
 convertions: {1: 0}
 log_type: hydra
-name: 097495d3-01e0-42d9-9951-55bd368fa5fd
+name: 6d5896e4-b57b-4f0a-9fa4-16110332caa5
 primary_key_groups: [1]
 regex: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host
   name: (.*)$'
 ---
 convertions: {1: 0}
 log_type: hydra
-name: 00f86bc9-13c2-4d7b-9bd9-38a59db2220e
+name: e3e2baa1-26d2-43e0-9326-75ec419ba240
 primary_key_groups: [1]
 regex: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\.
   Host name: (.*)$'
 ---
-convertions: {1: 0, 3: 3}
+convertions: {1: 0}
 log_type: filesystem
-name: db89c71f-51bc-4e62-a137-8a5e19693463
+name: fe4ee3b6-3310-4db4-9327-0212dd119214
 primary_key_groups: [1]
 regex: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*)
   GB\. Host name: (.*)$'

@@ -1,5 +1,4 @@
-from whylog.teacher.user_intent import (UserConstraintIntent, UserParserIntent,
-                                        UserRuleIntent)
+from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 
 def create_sample_rule():
@@ -10,7 +9,7 @@ def create_sample_rule():
 
     # convertions
     to_date = 0
-    to_float = 3
+    # to_float = 3
     # default: TO_STRING = 1
     """
     content1 = "2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2"
@@ -24,7 +23,7 @@ def create_sample_rule():
 
     parser1 = UserParserIntent("hydra", regex1, [1], {1: to_date})
     parser2 = UserParserIntent("hydra", regex2, [1], {1: to_date})
-    parser3 = UserParserIntent("filesystem", regex3, [1], {1: to_date, 3: to_float})
+    parser3 = UserParserIntent("filesystem", regex3, [1], {1: to_date})
 
     parsers = {0: parser1, 1: parser2, 2: parser3}
     effect_id = 2
