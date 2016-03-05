@@ -1,12 +1,18 @@
-import abc
+from abc import ABCMeta, abstractmethod
+
+import six
 
 
+@six.add_metaclass(ABCMeta)
 class AbstractAssistant(object):
-    @abc.abstractmethod
+
+    abstractmethod
+
     def guess(self, guess_base):
         pass
 
-    @abc.abstractmethod
+    abstractmethod
+
     def verify(self):
         pass
 
@@ -45,10 +51,11 @@ class RegexAssistant(AbstractAssistant):
         # not finished yet
         return '^' + text + '$'
 
-    def make_groups(self, intervals):
+    def update(self, line_object, regex):
         """
-        Improves regexes by adding to them regex groups corresponding to params in text.
-        :param intervals: represents interval of text together with line_object
+        Loads regex proposed by user, verifies match, remember it in history.
+        :param line_object: line object, keeps specific information about line.
+        :param regex: proposed regex
         """
         pass
 
@@ -61,11 +68,10 @@ class RegexAssistant(AbstractAssistant):
         """
         pass
 
-    def update_regex(self, line_object, regex):
+    def make_groups(self, intervals):
         """
-        Loads regex proposed by user, verifies match, remember it in history.
-        :param line_object: line object, keeps specific information about line.
-        :param regex: proposed regex
+        Improves regexes by adding to them regex groups corresponding to params in text.
+        :param intervals: represents interval of text together with line_object
         """
         pass
 
