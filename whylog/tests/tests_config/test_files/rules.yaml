@@ -1,5 +1,5 @@
 ---
-causes: [0391f5c3-0225-433e-9f85-e49326a0009f, 79534797-f348-4bf3-a8bc-8757dee0b023]
+causes: [65cce252-12af-48e4-a8c9-b0272c1e2160, 5f71c8a2-b020-48c8-bb2d-448de8ced861]
 constraints:
 - clues:
   - [1, 2]
@@ -18,5 +18,5 @@ constraints:
   - [2, 4]
   - [0, 4]
   name: hetero
-  params: [1]
-effect: e3b3e13f-da20-42af-808d-ec3698d67bad
+  params: {different: 1}
+effect: 74f1724f-3394-4b5c-9a2a-1956a5d4496e

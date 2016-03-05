@@ -1,4 +1,5 @@
 from whylog.config.parsers import RegexParserFactory
+import itertools
 
 
 class Rule(object):
@@ -22,7 +23,7 @@ class Rule(object):
                 "primary_key_groups": parser.primary_key_groups,
                 "log_type": parser.log_type,
                 "convertions": parser.convertions
-            } for parser in self._causes + [self._effect]
+            } for parser in itertools.chain(self._causes, [self._effect])
         ]
 
 
@@ -66,7 +67,7 @@ class RuleFactory(object):
                 for (parser_id, group) in constraint_intent.groups
             ]
             constraint_dict = {"name": constraint_intent.type, "clues": clues}
-            if bool(constraint_intent.params):
+            if constraint_intent.params:
                 constraint_dict["params"] = constraint_intent.params
             constraints.append(constraint_dict)
         return constraints

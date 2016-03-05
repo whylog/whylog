@@ -44,11 +44,11 @@ class YamlConfig(AbstractConfig):
         self._save_parsers_definition(rule.get_rule_parsers_in_form_to_save())
 
     def _save_rule_definition(self, rule_definition):
-        with open(self._rules_path, "a") as rules_file:
+        with open(self._rules_path, "w") as rules_file:
             rules_file.write(yaml.safe_dump(rule_definition, explicit_start=True))
 
     def _save_parsers_definition(self, parser_definitions):
-        with open(self._parsers_path, "a") as parsers_file:
+        with open(self._parsers_path, "w") as parsers_file:
             parsers_file.write(yaml.safe_dump_all(parser_definitions, explicit_start=True))
 
 

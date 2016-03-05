@@ -31,7 +31,7 @@ def create_sample_rule():
     constraint1 = UserConstraintIntent(identical_constr, [(0, 2), (1, 2)])
     constraint2 = UserConstraintIntent(identical_constr, [(1, 3), (2, 2)])
     constraint3 = UserConstraintIntent(different_constr, [(1, 2), (1, 3)])
-    constraint4 = UserConstraintIntent(hetero_constr, [(0, 3), (1, 4), (2, 4)], [1])
+    constraint4 = UserConstraintIntent(hetero_constr, [(0, 3), (1, 4), (2, 4)], {"different": 1})
 
     constraints = [constraint1, constraint2, constraint3, constraint4]
 
