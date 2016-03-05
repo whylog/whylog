@@ -1,5 +1,6 @@
-from whylog.config.parsers import RegexParserFactory
 import itertools
+
+from whylog.config.parsers import RegexParserFactory
 
 
 class Rule(object):
@@ -11,11 +12,15 @@ class Rule(object):
     def get_rule_in_form_to_save(self):
         return {
             "causes": [cause.name for cause in self._causes],
-            "effect": self._effect.name,
+            "effect": self._effect.name if self._effect is not None else None,
             "constraints": self._constraints
         }
 
     def get_rule_parsers_in_form_to_save(self):
+        if self._effect is not None:
+            effect_list = [self._effect]
+        else:
+            effect_list = []
         return [
             {
                 "name": parser.name,
@@ -23,7 +28,8 @@ class Rule(object):
                 "primary_key_groups": parser.primary_key_groups,
                 "log_type": parser.log_type,
                 "convertions": parser.convertions
-            } for parser in itertools.chain(self._causes, [self._effect])
+            }
+            for parser in itertools.chain(self._causes, effect_list)
         ]
 
 
@@ -31,8 +37,9 @@ class RuleFactory(object):
     @classmethod
     def create_rule_from_user_rule_intent(cls, user_rule_intent):
         parsers_dict = cls._create_parsers_from_parsers_intents(user_rule_intent)
-        effect = parsers_dict.get(user_rule_intent.effect_id)
-        parsers_dict.pop(user_rule_intent.effect_id)
+        effect = None
+        if user_rule_intent.effect_id is not None:
+            effect = parsers_dict.pop(user_rule_intent.effect_id)
         causes, parser_ids_mapper = cls._create_causes_list_with_clue_index(
             parsers_dict, user_rule_intent
         )
@@ -52,8 +59,8 @@ class RuleFactory(object):
         parser_ids_mapper = {user_rule_intent.effect_id: 0}
         free_clue_index = 1
         causes = []
-        for intent_id in parsers_dict:
-            causes.append(parsers_dict.get(intent_id))
+        for intent_id, parser in parsers_dict.items():
+            causes.append(parser)
             parser_ids_mapper[intent_id] = free_clue_index
             free_clue_index += 1
         return causes, parser_ids_mapper
@@ -62,12 +69,15 @@ class RuleFactory(object):
     def _create_constraints_list(cls, parser_ids_mapper, user_rule_intent):
         constraints = []
         for constraint_intent in user_rule_intent.constraints:
-            clues = [
-                (parser_ids_mapper.get(parser_id), group)
-                for (parser_id, group) in constraint_intent.groups
-            ]
-            constraint_dict = {"name": constraint_intent.type, "clues": clues}
-            if constraint_intent.params:
-                constraint_dict["params"] = constraint_intent.params
+            clues = []
+            for parser_id, group in constraint_intent.groups:
+                cause_id = parser_ids_mapper.get(parser_id)
+                if cause_id is not None:
+                    clues.append((cause_id, group))
+            constraint_dict = {
+                "name": constraint_intent.type,
+                "clues": clues,
+                "params": constraint_intent.params
+            }
             constraints.append(constraint_dict)
         return constraints

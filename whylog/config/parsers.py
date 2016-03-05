@@ -1,6 +1,5 @@
-from abc import ABCMeta, abstractmethod
-
 import uuid
+from abc import ABCMeta, abstractmethod
 
 
 class AbstractParser(object):
