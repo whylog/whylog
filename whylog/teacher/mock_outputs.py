@@ -1,4 +1,5 @@
-from whylog.teacher.user_intent import (UserConstraintIntent, UserParserIntent, UserRuleIntent)
+from whylog.teacher.user_intent import (UserConstraintIntent, UserParserIntent,
+                                        UserRuleIntent)
 
 
 def create_sample_rule():
@@ -26,7 +27,7 @@ def create_sample_rule():
     parser3 = UserParserIntent("filesystem", regex3, [1], {1: to_date, 3: to_float})
 
     parsers = {0: parser1, 1: parser2, 2: parser3}
-    effect_id = None
+    effect_id = 2
 
     constraint1 = UserConstraintIntent(identical_constr, [(0, 2), (1, 2)])
     constraint2 = UserConstraintIntent(identical_constr, [(1, 3), (2, 2)])

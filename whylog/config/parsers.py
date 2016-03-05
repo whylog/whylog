@@ -21,6 +21,15 @@ class RegexParser(AbstractParser):
     def get_clue(self, line):
         pass
 
+    def serialize_parser(self):
+        return {
+            "name": self.name,
+            "regex": self.regex_str,
+            "primary_key_groups": self.primary_key_groups,
+            "log_type": self.log_type,
+            "convertions": self.convertions
+        }
+
 
 class RegexParserFactory(object):
     @classmethod

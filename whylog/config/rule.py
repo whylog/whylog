@@ -9,28 +9,19 @@ class Rule(object):
         self._effect = effect
         self._constraints = constraints
 
-    def get_rule_in_form_to_save(self):
+    def serialize_rule(self):
         return {
             "causes": [cause.name for cause in self._causes],
             "effect": self._effect.name if self._effect is not None else None,
             "constraints": self._constraints
         }
 
-    def get_rule_parsers_in_form_to_save(self):
+    def serialize_parsers(self):
         if self._effect is not None:
             effect_list = [self._effect]
         else:
             effect_list = []
-        return [
-            {
-                "name": parser.name,
-                "regex": parser.regex_str,
-                "primary_key_groups": parser.primary_key_groups,
-                "log_type": parser.log_type,
-                "convertions": parser.convertions
-            }
-            for parser in itertools.chain(self._causes, effect_list)
-        ]
+        return [parser.serialize_parser() for parser in itertools.chain(self._causes, effect_list)]
 
 
 class RuleFactory(object):

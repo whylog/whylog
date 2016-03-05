@@ -2,7 +2,6 @@ from abc import ABCMeta, abstractmethod
 
 import yaml
 
-from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RuleFactory
 
 
@@ -15,6 +14,15 @@ class AbstractConfig(object):
     @abstractmethod
     def create_investigation_plan(self, front_input):
         pass
+
+    def add_rule(self, user_rule_intent):
+        created_rule = RuleFactory.create_rule_from_user_rule_intent(user_rule_intent)
+        self._save_rule_definition(created_rule.serialize_rule())
+        self._save_parsers_definition(created_rule.serialize_parsers())
+
+
+class AbstractFileConfig(AbstractConfig):
+    __metaclass__ = ABCMeta
 
 
 class YamlConfig(AbstractConfig):
@@ -37,11 +45,6 @@ class YamlConfig(AbstractConfig):
 
     def _get_locations_for_logs(self, logs_types_list):
         pass
-
-    def add_rule(self, user_rule_intent):
-        rule = RuleFactory.create_rule_from_user_rule_intent(user_rule_intent)
-        self._save_rule_definition(rule.get_rule_in_form_to_save())
-        self._save_parsers_definition(rule.get_rule_parsers_in_form_to_save())
 
     def _save_rule_definition(self, rule_definition):
         with open(self._rules_path, "w") as rules_file:
