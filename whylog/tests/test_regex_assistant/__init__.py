@@ -40,20 +40,13 @@ class TestBasic(TestCase):
             cause2
         ] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
 
-        regex_assistant.undo(cause1)
-        assert regex_assistant.regexes[cause1] == '^' + content2 + '$'
-        regex_assistant.redo(cause1)
-        assert regex_assistant.regexes[
-            cause1
-        ] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
-
         regex_assistant.guess_regex(effect)
         assert regex_assistant.regexes[
             effect
         ] == "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
 
         proposed_regex = "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (?P<machine>.*)$"
-        regex_assistant.load_regex(effect, proposed_regex)
+        regex_assistant.update_regex(effect, proposed_regex)
         assert regex_assistant.regexes[effect] == proposed_regex
 
         with self.assertRaises(NoDateGroupException):

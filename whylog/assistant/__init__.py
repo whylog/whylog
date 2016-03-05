@@ -10,14 +10,6 @@ class AbstractAssistant(object):
     def verify(self):
         pass
 
-    @abc.abstractmethod
-    def undo(self, history_keeper):
-        pass
-
-    @abc.abstractmethod
-    def redo(self, history_keeper):
-        pass
-
 
 class RegexAssistant(AbstractAssistant):
     """
@@ -74,18 +66,6 @@ class RegexAssistant(AbstractAssistant):
         Loads regex proposed by user, verifies match, remember it in history.
         :param line_object: line object, keeps specific information about line.
         :param regex: proposed regex
-        """
-        pass
-
-    def undo(self, line_object):
-        """
-        :return: next remembered regex (in reference to current place in history)
-        """
-        pass
-
-    def redo(self, line_object):
-        """
-        :return: previous remembered regex (in reference to current place in history)
         """
         pass
 
