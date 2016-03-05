@@ -1,7 +1,4 @@
 from abc import ABCMeta, abstractmethod
-import os
-
-from whylog.config import YamlConfig
 
 
 class AbstractClient(object):

@@ -1,6 +1,8 @@
-from unittest import TestCase, SkipTest
+from unittest import TestCase
 import os.path
+
 from generator import generator, generate
+from nose.plugins.skip import SkipTest
 
 from whylog.tests.tests_client.constants import TestPaths
 from whylog.config import YamlConfig
