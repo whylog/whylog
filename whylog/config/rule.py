@@ -13,7 +13,7 @@ class Rule(object):
         return {
             "causes": [cause.name for cause in self._causes],
             "effect": self._effect.name if self._effect is not None else None,
-            "constraints": self._constraints
+            "constraints": self._constraints,
         }
 
     def serialize_parsers(self):

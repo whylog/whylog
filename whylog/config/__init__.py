@@ -20,9 +20,33 @@ class AbstractConfig(object):
         self._save_rule_definition(created_rule.serialize_rule())
         self._save_parsers_definition(created_rule.serialize_parsers())
 
+    @abstractmethod
+    def _save_rule_definition(self, rule_definition):
+        pass
+
+    @abstractmethod
+    def _save_parsers_definition(self, parser_definitions):
+        pass
+
 
 class AbstractFileConfig(AbstractConfig):
     __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def _convert_rule_to_file_form(self, dict_definition):
+        pass
+
+    @abstractmethod
+    def _convert_parsers_to_file_form(self, dict_definition):
+        pass
+
+    def _save_rule_definition(self, rule_definition):
+        with open(self._rules_path, "a") as rules_file:
+            rules_file.write(self._convert_rule_to_file_form(rule_definition))
+
+    def _save_parsers_definition(self, parser_definitions):
+        with open(self._parsers_path, "a") as parsers_file:
+            parsers_file.write(self._convert_parsers_to_file_form(parser_definitions))
 
 
 class YamlConfig(AbstractConfig):
@@ -30,6 +54,12 @@ class YamlConfig(AbstractConfig):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
         self._log_locations_path = log_locations_path
+
+    def _convert_rule_to_file_form(self, rule_definition):
+        return yaml.safe_dump(rule_definition, explicit_start=True)
+
+    def _convert_parsers_to_file_form(self, parser_definitions):
+        return yaml.safe_dump_all(parser_definitions, explicit_start=True)
 
     def create_investigation_plan(self, front_input):
         pass
@@ -45,14 +75,6 @@ class YamlConfig(AbstractConfig):
 
     def _get_locations_for_logs(self, logs_types_list):
         pass
-
-    def _save_rule_definition(self, rule_definition):
-        with open(self._rules_path, "w") as rules_file:
-            rules_file.write(yaml.safe_dump(rule_definition, explicit_start=True))
-
-    def _save_parsers_definition(self, parser_definitions):
-        with open(self._parsers_path, "w") as parsers_file:
-            parsers_file.write(yaml.safe_dump_all(parser_definitions, explicit_start=True))
 
 
 class InvestigationPlan(object):
