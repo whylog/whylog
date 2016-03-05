@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
+import uuid
+
 
 class AbstractParser(object):
     __metaclass__ = ABCMeta
@@ -19,3 +21,12 @@ class RegexParser(AbstractParser):
 
     def get_clue(self, line):
         pass
+
+
+class RegexParserFactory(object):
+    @classmethod
+    def create_from_intent(cls, parser_intent):
+        return RegexParser(
+            str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
+            parser_intent.log_type_name, parser_intent.data_conversions
+        )

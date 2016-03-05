@@ -1,9 +1,8 @@
-import uuid
 from abc import ABCMeta, abstractmethod
 
 import yaml
 
-from whylog.config.parsers import RegexParser
+from whylog.config.parsers import RegexParser, RegexParserFactory
 
 
 from whylog.config.parsers import RegexParser
@@ -64,10 +63,7 @@ class YamlConfig(AbstractConfig):
     def _create_parsers_from_parsers_intents(self, user_rule_intent):
         return dict(
             (
-                intent_id, RegexParser(
-                    str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
-                    parser_intent.log_type_name, parser_intent.data_conversions
-                )
+                intent_id, RegexParserFactory.create_from_intent(parser_intent)
             ) for intent_id, parser_intent in user_rule_intent.parsers.items()
         )
 
