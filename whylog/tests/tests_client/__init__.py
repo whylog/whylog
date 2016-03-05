@@ -1,8 +1,8 @@
-from unittest import TestCase
+from unittest import TestCase, skip
 import os.path
 from generator import generator, generate
-from whylog.tests.tests_client.constants import test_paths
 
+from whylog.tests.tests_client.constants import TestPaths
 from whylog.config import YamlConfig
 from whylog.client import WhylogClient
 
@@ -26,8 +26,9 @@ class TestBasic(TestCase):
         '012_multiple_rulebooks',
         '013_match_and_incomplete',
     )
+    @skip("Functionality not implemented yet")
     def test_one(self, test_name):
-        prefix_path = os.path.join(*test_paths.path_test_files)
+        prefix_path = os.path.join(*TestPaths.path_test_files)
         path = os.path.join(prefix_path, test_name)
         parsers_path = os.path.join(path, 'parsers.yaml')
         rules_path = os.path.join(path, 'rules.yaml')
@@ -40,14 +41,13 @@ class TestBasic(TestCase):
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
-        # whylog_client = WhylogClient(config=whylog_base, open_path=path)
+        whylog_client = WhylogClient(config=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
             vim_line = f.read()
         # TODO call get_cause with sens...
-        # result = whylog_client.get_cause(1, vim_line)
+        result = whylog_client.get_cause(1, vim_line)
 
+        # TODO check up correctness in appropriate way
         with open(output_path, 'r') as f:
-            pass
-            # remove this comment after implement whylog client and base
-            # assert result == f.read()
+            assert result == f.read()

@@ -14,10 +14,6 @@ class AbstractClient(object):
 
 
 class WhylogClient(AbstractClient):
-    """
-	first naive client implementation
-	"""
-
     def __init__(self, config):
         self.config = config
 
