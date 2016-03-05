@@ -1,11 +1,10 @@
-from unittest import TestCase, skip
+from unittest import TestCase, SkipTest
 import os.path
 from generator import generator, generate
 
 from whylog.tests.tests_client.constants import TestPaths
 from whylog.config import YamlConfig
 from whylog.client import WhylogClient
-
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
 
@@ -26,7 +25,6 @@ class TestBasic(TestCase):
         '012_multiple_rulebooks',
         '013_match_and_incomplete',
     )
-    @skip("Functionality not implemented yet")
     def test_one(self, test_name):
         prefix_path = os.path.join(*TestPaths.path_test_files)
         path = os.path.join(prefix_path, test_name)
@@ -41,6 +39,7 @@ class TestBasic(TestCase):
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
+        raise SkipTest("Functionality not implemented yet")
         whylog_client = WhylogClient(config=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
