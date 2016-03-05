@@ -37,9 +37,9 @@ class YamlConfig(AbstractConfig):
 
     def _load_parsers(self):
         parsers_definitions = self._load_file_with_config(self._parsers_path)
-        log_types = {}
+        log_type_manager = LogTypeManager()
         return [
-            self._create_parser_object(parser_definition, log_types)
+            self._create_parser(parser_definition, log_type_manager)
             for parser_definition in parsers_definitions
         ]
 
@@ -47,13 +47,29 @@ class YamlConfig(AbstractConfig):
         with open(path, "r") as config_file:
             return list(yaml.load_all(config_file))
 
-    def _create_parser_object(self, parser_definition, log_types):
-        log_type_str = parser_definition.get("log_type", "default")
-        log_type = log_types.get(log_type_str)
-        if log_type is None:
-            log_type = log_types[log_type_str] = LogType(log_type_str)
-        parser_definition["log_type"] = log_type
+    def _create_parser(self, parser_definition, log_type_manager):
+        log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
+        parser_definition["log_type"] = log_type_manager.get_log_type(log_type_str)
         return RegexParser(**parser_definition)
+
+
+class LogType(object):
+    def __init__(self, name):
+        self._name = name
+
+
+class LogTypeManager(object):
+
+    DEFAULT_LOG_TYPE = "default"
+
+    def __init__(self, log_types=None):
+        self._log_types = log_types or {}
+
+    def get_log_type(self, log_type_str):
+        log_type = self._log_types.get(log_type_str)
+        if log_type is None:
+            log_type = self._log_types[log_type_str] = LogType(log_type_str)
+        return log_type
 
 
 class InvestigationPlan(object):
@@ -109,11 +125,6 @@ class Clue(object):
 class Rule(object):
     def __init__(self, causes, effect, constraints):
         pass
-
-
-class LogType(object):
-    def __init__(self, name):
-        self._name = name
 
 
 class LogLocation(object):
