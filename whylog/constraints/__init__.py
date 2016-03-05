@@ -5,9 +5,7 @@ import six
 
 @six.add_metaclass(ABCMeta)
 class AbstractConstraint(object):
-
-    abstractmethod
-
+    @abstractmethod
     def save(self, rulebase_rule):
         pass
 

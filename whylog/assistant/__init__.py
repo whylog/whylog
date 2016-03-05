@@ -5,14 +5,11 @@ import six
 
 @six.add_metaclass(ABCMeta)
 class AbstractAssistant(object):
-
-    abstractmethod
-
+    @abstractmethod
     def guess(self, guess_base):
         pass
 
-    abstractmethod
-
+    @abstractmethod
     def verify(self):
         pass
 
