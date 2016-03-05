@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from os import SEEK_SET
+
 from whylog.client.const import BufsizeConsts
 
 
