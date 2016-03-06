@@ -1,4 +1,4 @@
-from os.path import join as path_join
+import os.path
 from unittest import TestCase
 
 from generator import generate, generator
@@ -6,6 +6,7 @@ from nose.plugins.skip import SkipTest
 
 from whylog.client import WhylogClient
 from whylog.config import YamlConfig
+from whylog.tests.tests_client.constants import TestPaths
 
 path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
 
@@ -27,25 +28,27 @@ class TestBasic(TestCase):
         '013_match_and_incomplete',
     )
     def test_one(self, test_name):
-        prefix_path = path_join(*path_test_files)
-        path = path_join(prefix_path, test_name)
-        parsers_path = path_join(path, 'parsers.yaml')
-        rules_path = path_join(path, 'rules.yaml')
-        input_path = path_join(path, 'input.txt')
-        output_path = path_join(path, 'expected_output.txt')
-        log_location_path = path_join(path, 'log_locations.yaml')
+        prefix_path = os.path.join(*TestPaths.path_test_files)
+        path = os.path.join(prefix_path, test_name)
+        parsers_path = os.path.join(path, 'parsers.yaml')
+        rules_path = os.path.join(path, 'rules.yaml')
+        input_path = os.path.join(path, 'input.txt')
+        output_path = os.path.join(path, 'expected_output.txt')
+        log_location_path = os.path.join(path, 'log_locations.yaml')
 
         whylog_base = YamlConfig(
             parsers_path=parsers_path,
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
-        whylog_client = WhylogClient(base=whylog_base, open_path=path)
+        raise SkipTest("Functionality not implemented yet")
+        whylog_client = WhylogClient(config=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
-            vim_line = f.read()
-        result = whylog_client.get_cause(vim_line)
+            line = f.read()
+        # TODO call get_cause with sens...
+        result = whylog_client.get_cause(line)
 
-        raise SkipTest('Not implemented yet')
+        # TODO check up correctness in appropriate way
         with open(output_path, 'r') as f:
             assert result == f.read()
