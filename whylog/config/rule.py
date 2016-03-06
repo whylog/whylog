@@ -1,5 +1,9 @@
 import itertools
+from abc import ABCMeta, abstractmethod
 
+import six
+
+from whylog.config.parser_exceptions import InvalidParserIndex
 from whylog.config.parsers import RegexParserFactory
 
 
@@ -24,10 +28,11 @@ class Rule(object):
         return [parser.serialize_parser() for parser in itertools.chain(self._causes, effect_list)]
 
 
-class RuleFactory(object):
+@six.add_metaclass(ABCMeta)
+class AbstractRuleFactory(object):
     @classmethod
-    def create_rule_from_user_rule_intent(cls, user_rule_intent):
-        parsers_dict = cls._create_parsers_from_parsers_intents(user_rule_intent)
+    def create_from_intent(cls, user_rule_intent):
+        parsers_dict = cls._create_parsers_from_intents(user_rule_intent)
         effect = None
         if user_rule_intent.effect_id is not None:
             effect = parsers_dict.pop(user_rule_intent.effect_id)
@@ -38,12 +43,9 @@ class RuleFactory(object):
         return Rule(causes, effect, constraints)
 
     @classmethod
-    def _create_parsers_from_parsers_intents(cls, user_rule_intent):
-        return dict(
-            (
-                intent_id, RegexParserFactory.create_from_intent(parser_intent)
-            ) for intent_id, parser_intent in user_rule_intent.parsers.items()
-        )
+    @abstractmethod
+    def _create_parsers_from_intents(cls, user_rule_intent):
+        pass
 
     @classmethod
     def _create_causes_list_with_clue_index(cls, parsers_dict, user_rule_intent):
@@ -65,6 +67,8 @@ class RuleFactory(object):
                 cause_id = parser_ids_mapper.get(parser_id)
                 if cause_id is not None:
                     clues.append((cause_id, group))
+                else:
+                    raise InvalidParserIndex(parser_id)
             constraint_dict = {
                 "name": constraint_intent.type,
                 "clues_groups": clues,
@@ -72,3 +76,13 @@ class RuleFactory(object):
             }
             constraints.append(constraint_dict)
         return constraints
+
+
+class RegexRuleFactory(AbstractRuleFactory):
+    @classmethod
+    def _create_parsers_from_intents(cls, user_rule_intent):
+        return dict(
+            (
+                intent_id, RegexParserFactory.create_from_intent(parser_intent)
+            ) for intent_id, parser_intent in user_rule_intent.parsers.items()
+        )

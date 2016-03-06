@@ -8,9 +8,8 @@ def create_sample_rule():
     hetero_constr = "hetero"
 
     # convertions
-    to_date = 0
-    # to_float = 3
-    # default: TO_STRING = 1
+    to_date = "date"
+    # to_float = "float"
     """
     content1 = "2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2"
     content2 = "2015-12-03 12:10:10 Data migration from alfa36 to alfa21 failed. Host name: 2"

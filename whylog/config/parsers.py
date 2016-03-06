@@ -1,5 +1,8 @@
+import re
 import uuid
 from abc import ABCMeta, abstractmethod
+
+import six
 
 
 class AbstractParser(object):
@@ -14,6 +17,7 @@ class RegexParser(AbstractParser):
     def __init__(self, name, regex, primary_key_groups, log_type, convertions):
         self.name = name
         self.regex_str = regex
+        self.regex = re.compile(regex)
         self.primary_key_groups = primary_key_groups
         self.log_type = log_type
         self.convertions = convertions
@@ -29,6 +33,14 @@ class RegexParser(AbstractParser):
             "log_type": self.log_type,
             "convertions": self.convertions
         }
+
+
+@six.add_metaclass(ABCMeta)
+class AbstractParserFactory(object):
+    @classmethod
+    @abstractmethod
+    def create_from_intent(cls, parser_intent):
+        pass
 
 
 class RegexParserFactory(object):
