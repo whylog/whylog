@@ -1,15 +1,18 @@
 from abc import ABCMeta, abstractmethod
 from os import SEEK_SET
 
+import six
+
 from whylog.client.const import BufsizeConsts
 
 
+@six.add_metaclass(ABCMeta)
 class AbstractSearcher(object):
-
-    __metaclass__ = ABCMeta
-
     @abstractmethod
     def search(self, search_data):
+        """
+        transfer investigation to searcher
+        """
         pass
 
 
@@ -30,9 +33,9 @@ class BacktrackSearcher(AbstractSearcher):
 
     def _reverse_from_offset(self, offset, buf_size=BufsizeConsts.STANDARD_BUF_SIZE):
         """
-		a generator that returns the lines of a file in reverse order
-		beginning with the specified offset
-		"""
+        a generator that returns the lines of a file in reverse order
+        beginning with the specified offset
+        """
         with open(self._file_path) as fh:
             fh.seek(offset)
             total_size = remaining_size = fh.tell()

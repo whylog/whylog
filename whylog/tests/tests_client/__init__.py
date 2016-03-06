@@ -45,9 +45,9 @@ class TestBasic(TestCase):
         whylog_client = WhylogClient(config=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
-            vim_line = f.read()
+            line = f.read()
         # TODO call get_cause with sens...
-        result = whylog_client.get_cause(1, vim_line)
+        result = whylog_client.get_cause(line)
 
         # TODO check up correctness in appropriate way
         with open(output_path, 'r') as f:
