@@ -10,6 +10,6 @@ class TestPaths(object):
     path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
 
     @classmethod
-    def get_file_path(self, filename):
+    def get_file_path(cls, filename):
         prefix_path = os.path.join(*TestPaths.path_test_files)
         return os.path.join(prefix_path, filename)
