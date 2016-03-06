@@ -3,10 +3,8 @@ from abc import ABCMeta, abstractmethod
 import six
 import yaml
 
-from whylog.config.rule import RegexRuleFactory
-
-
 from whylog.config.parsers import RegexParser
+from whylog.config.rule import RegexRuleFactory
 
 
 @six.add_metaclass(ABCMeta)
@@ -48,11 +46,28 @@ class AbstractFileConfig(AbstractConfig):
             parsers_file.write(self._convert_parsers_to_file_form(parser_definitions))
 
 
-class YamlConfig(AbstractConfig):
+class YamlConfig(AbstractFileConfig):
     def __init__(self, parsers_path, rules_path, log_locations_path, log_type_manager=None):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
         self._log_locations_path = log_locations_path
+        self._log_type_manager = log_type_manager or LogTypeManager()
+        #TODO update .yaml files to new parser and rule format
+        # self._parsers = self._load_parsers()
+
+    def _load_parsers(self):
+        parsers_definitions = self._load_file_with_config(self._parsers_path)
+        return [self._create_parser(parser_definition) for parser_definition in parsers_definitions]
+
+    def _load_file_with_config(self, path):
+        with open(path, "r") as config_file:
+            return list(yaml.load_all(config_file))
+
+    def _create_parser(self, parser_definition):
+        log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
+        parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
+        print parser_definition
+        return RegexParser(**parser_definition)
 
     def _convert_rule_to_file_form(self, rule_definition):
         return yaml.safe_dump(rule_definition, explicit_start=True)
@@ -74,6 +89,25 @@ class YamlConfig(AbstractConfig):
 
     def _get_locations_for_logs(self, logs_types_list):
         pass
+
+
+class LogType(object):
+    def __init__(self, name):
+        self._name = name
+
+
+class LogTypeManager(object):
+
+    DEFAULT_LOG_TYPE = "default"
+
+    def __init__(self, log_types=None):
+        self._log_types = log_types or {}
+
+    def get_log_type(self, log_type_str):
+        log_type = self._log_types.get(log_type_str)
+        if log_type is None:
+            log_type = self._log_types[log_type_str] = LogType(log_type_str)
+        return log_type
 
 
 class InvestigationPlan(object):
