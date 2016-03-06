@@ -14,10 +14,11 @@ class AbstractConfig(object):
 
 
 class YamlConfig(AbstractConfig):
-    def __init__(self, parsers_path, rules_path, log_locations_path):
+    def __init__(self, parsers_path, rules_path, log_locations_path, log_type_manager=None):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
         self._log_locations_path = log_locations_path
+        self._log_type_manager = log_type_manager or LogTypeManager()
         self._parsers = self._load_parsers()
 
     def create_investigation_plan(self, front_input):
@@ -37,19 +38,15 @@ class YamlConfig(AbstractConfig):
 
     def _load_parsers(self):
         parsers_definitions = self._load_file_with_config(self._parsers_path)
-        log_type_manager = LogTypeManager()
-        return [
-            self._create_parser(parser_definition, log_type_manager)
-            for parser_definition in parsers_definitions
-        ]
+        return [self._create_parser(parser_definition) for parser_definition in parsers_definitions]
 
     def _load_file_with_config(self, path):
         with open(path, "r") as config_file:
             return list(yaml.load_all(config_file))
 
-    def _create_parser(self, parser_definition, log_type_manager):
+    def _create_parser(self, parser_definition):
         log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
-        parser_definition["log_type"] = log_type_manager.get_log_type(log_type_str)
+        parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
         return RegexParser(**parser_definition)
 
 
