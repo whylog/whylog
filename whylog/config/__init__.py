@@ -4,6 +4,7 @@ import six
 import yaml
 
 from whylog.config.parsers import RegexParser
+from whylog.config.rule import RegexRuleFactory
 
 
 @six.add_metaclass(ABCMeta)
@@ -12,14 +13,66 @@ class AbstractConfig(object):
     def create_investigation_plan(self, front_input):
         pass
 
+    def add_rule(self, user_rule_intent):
+        created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
+        self._save_rule_definition(created_rule.serialize_rule())
+        self._save_parsers_definition(created_rule.serialize_parsers())
 
-class YamlConfig(AbstractConfig):
+    @abstractmethod
+    def _save_rule_definition(self, rule_definition):
+        pass
+
+    @abstractmethod
+    def _save_parsers_definition(self, parser_definitions):
+        pass
+
+
+@six.add_metaclass(ABCMeta)
+class AbstractFileConfig(AbstractConfig):
+    @abstractmethod
+    def _convert_rule_to_file_form(self, dict_definition):
+        pass
+
+    @abstractmethod
+    def _convert_parsers_to_file_form(self, dict_definition):
+        pass
+
+    def _save_rule_definition(self, rule_definition):
+        with open(self._rules_path, "a") as rules_file:
+            rules_file.write(self._convert_rule_to_file_form(rule_definition))
+
+    def _save_parsers_definition(self, parser_definitions):
+        with open(self._parsers_path, "a") as parsers_file:
+            parsers_file.write(self._convert_parsers_to_file_form(parser_definitions))
+
+
+class YamlConfig(AbstractFileConfig):
     def __init__(self, parsers_path, rules_path, log_locations_path, log_type_manager=None):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
         self._log_locations_path = log_locations_path
         self._log_type_manager = log_type_manager or LogTypeManager()
-        self._parsers = self._load_parsers()
+        # TODO update .yaml files to new parser and rule format
+        # self._parsers = self._load_parsers()
+
+    def _load_parsers(self):
+        parsers_definitions = self._load_file_with_config(self._parsers_path)
+        return [self._create_parser(parser_definition) for parser_definition in parsers_definitions]
+
+    def _load_file_with_config(self, path):
+        with open(path, "r") as config_file:
+            return list(yaml.load_all(config_file))
+
+    def _create_parser(self, parser_definition):
+        log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
+        parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
+        return RegexParser(**parser_definition)
+
+    def _convert_rule_to_file_form(self, rule_definition):
+        return yaml.safe_dump(rule_definition, explicit_start=True)
+
+    def _convert_parsers_to_file_form(self, parser_definitions):
+        return yaml.safe_dump_all(parser_definitions, explicit_start=True)
 
     def create_investigation_plan(self, front_input):
         pass
@@ -36,19 +89,6 @@ class YamlConfig(AbstractConfig):
     def _get_locations_for_logs(self, logs_types_list):
         pass
 
-    def _load_parsers(self):
-        parsers_definitions = self._load_file_with_config(self._parsers_path)
-        return [self._create_parser(parser_definition) for parser_definition in parsers_definitions]
-
-    def _load_file_with_config(self, path):
-        with open(path, "r") as config_file:
-            return list(yaml.load_all(config_file))
-
-    def _create_parser(self, parser_definition):
-        log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
-        parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
-        return RegexParser(**parser_definition)
-
 
 class LogType(object):
     def __init__(self, name):
@@ -56,7 +96,6 @@ class LogType(object):
 
 
 class LogTypeManager(object):
-
     DEFAULT_LOG_TYPE = "default"
 
     def __init__(self, log_types=None):
@@ -116,11 +155,6 @@ class Clue(object):
     """
 
     def __init__(self, regex_parameters, line_time, line_content, line_source):
-        pass
-
-
-class Rule(object):
-    def __init__(self, causes, effect, constraints):
         pass
 
 
