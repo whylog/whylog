@@ -16,16 +16,12 @@ class Rule(object):
     def serialize_rule(self):
         return {
             "causes": [cause.name for cause in self._causes],
-            "effect": self._effect.name if self._effect is not None else None,
+            "effect": self._effect.name,
             "constraints": self._constraints,
         }
 
     def serialize_parsers(self):
-        if self._effect is not None:
-            effect_list = [self._effect]
-        else:
-            effect_list = []
-        return [parser.serialize_parser() for parser in itertools.chain(self._causes, effect_list)]
+        return [parser.serialize_parser() for parser in itertools.chain(self._causes, [self._effect])]
 
 
 @six.add_metaclass(ABCMeta)
@@ -33,9 +29,7 @@ class AbstractRuleFactory(object):
     @classmethod
     def create_from_intent(cls, user_rule_intent):
         parsers_dict = cls._create_parsers_from_intents(user_rule_intent)
-        effect = None
-        if user_rule_intent.effect_id is not None:
-            effect = parsers_dict.pop(user_rule_intent.effect_id)
+        effect = parsers_dict.pop(user_rule_intent.effect_id)
         causes, parser_ids_mapper = cls._create_causes_list_with_clue_index(
             parsers_dict, user_rule_intent
         )
