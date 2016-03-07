@@ -21,7 +21,9 @@ class Rule(object):
         }
 
     def serialize_parsers(self):
-        return [parser.serialize_parser() for parser in itertools.chain(self._causes, [self._effect])]
+        return [
+            parser.serialize_parser() for parser in itertools.chain(self._causes, [self._effect])
+        ]
 
 
 @six.add_metaclass(ABCMeta)

@@ -5,9 +5,8 @@ from abc import ABCMeta, abstractmethod
 import six
 
 
+@six.add_metaclass(ABCMeta)
 class AbstractParser(object):
-    __metaclass__ = ABCMeta
-
     @abstractmethod
     def get_clue(self, line):
         pass

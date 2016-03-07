@@ -1,9 +1,10 @@
 from abc import ABCMeta, abstractmethod
 
+import six
 
+
+@six.add_metaclass(ABCMeta)
 class AbstractFilenameMatcher(object):
-    __metaclass__ = ABCMeta
-
     @abstractmethod
     def get_matched_logs(self):
         pass
