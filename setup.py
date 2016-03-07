@@ -27,4 +27,5 @@ setup(
     classifiers=[
         "Development Status :: 0 - Alpha",
     ],
+    packages=['whylog'],
 )
