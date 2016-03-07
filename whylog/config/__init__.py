@@ -1,13 +1,13 @@
 from abc import ABCMeta, abstractmethod
 
+import six
 import yaml
 
 from whylog.config.parsers import RegexParser
 
 
+@six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
-    __metaclass__ = ABCMeta
-
     @abstractmethod
     def create_investigation_plan(self, front_input):
         pass

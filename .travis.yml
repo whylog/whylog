@@ -56,5 +56,6 @@ script:
   - if [ -n "$SCA" ]; then yapf --diff --recursive . || exit; fi
   - if [ -n "$SCA" ]; then pyflakes . || exit; fi
   - if [ -n "$SCA" ]; then isort --order-by-type --recursive --line-width 100 --diff --verbose --check-only || exit; fi
+  - if [ -n "$SCA" ]; then grep -r '\_\_metaclass\_\_' whylog/ && exit 1 || true; fi
   - if [ -n "$SCA" ]; then exit; fi
   - python setup.py nosetests
