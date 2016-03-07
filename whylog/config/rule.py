@@ -3,7 +3,6 @@ from abc import ABCMeta, abstractmethod
 
 import six
 
-from whylog.config.parser_exceptions import InvalidParserIndex
 from whylog.config.parsers import RegexParserFactory
 
 
@@ -60,11 +59,8 @@ class AbstractRuleFactory(object):
         for constraint_intent in user_rule_intent.constraints:
             clues = []
             for parser_id, group in constraint_intent.groups:
-                cause_id = parser_ids_mapper.get(parser_id)
-                if cause_id is not None:
-                    clues.append((cause_id, group))
-                else:
-                    raise InvalidParserIndex(parser_id)
+                cause_id = parser_ids_mapper[parser_id]
+                clues.append((cause_id, group))
             constraint_dict = {
                 "name": constraint_intent.type,
                 "clues_groups": clues,
