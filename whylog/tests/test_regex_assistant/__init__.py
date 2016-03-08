@@ -18,11 +18,7 @@ class TestBasic(TestCase):
         cause2 = FrontInput(53, content2, None)
         effect = FrontInput(1087, content3, None)
 
-        id_to_line_dict = {
-            1: cause1,
-            2: cause2,
-            3: effect
-        }
+        id_to_line_dict = {1: cause1, 2: cause2, 3: effect}
 
         regex_assistant = RegexAssistant()
         regex_assistant.add_lines(id_to_line_dict)
@@ -41,11 +37,17 @@ class TestBasic(TestCase):
         raise SkipTest
         # Methods called below are not implemented yet.
         regex_assistant.make_groups([beta36_in_1, beta36_in_2])
-        assert regex_assistant.regexes[1] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
-        assert regex_assistant.regexes[2] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
+        assert regex_assistant.regexes[
+            1
+        ] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
+        assert regex_assistant.regexes[
+            2
+        ] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
 
         regex_assistant.guess_regex(3)
-        assert regex_assistant.regexes[3] == "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
+        assert regex_assistant.regexes[
+            3
+        ] == "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
 
         proposed_regex = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (beta.*)$"
         regex_assistant.update_regex(3, proposed_regex)
