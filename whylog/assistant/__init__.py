@@ -21,13 +21,9 @@ class RegexAssistant(AbstractAssistant):
     One RegexAssistant per one entering Rule.
     """
 
-    def __init__(self, effect, line_objects=tuple()):
+    def __init__(self):
+        self.lines = {}
         self.regexes = {}
-        self.add_lines([effect])
-        self.add_lines(line_objects)
-        # TODO: line indexing (here and in other methods)
-        # after adding new line, we assign an index for it
-        # and modify this line using line index.
 
     def add_lines(self, line_objects):
         for line in line_objects:
