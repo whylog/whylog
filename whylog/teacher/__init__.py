@@ -18,7 +18,7 @@ class Teacher(object):
     """
 
     def __init__(self, id_to_line_dict, effect_id, config, pattern_assistant):
-        self.lines = id_to_line_dict.copy()
+        self._lines = id_to_line_dict.copy()
         self.effect_id = effect_id
         self.constraints = set()
         self.config = config
