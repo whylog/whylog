@@ -1,6 +1,10 @@
+import os.path
 from unittest import TestCase
+import yaml
 
+from whylog.config import YamlConfig
 from whylog.config.rule import RegexRuleFactory
+from whylog.config.parsers import RegexParserFactory
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 # Constraint types
@@ -18,6 +22,8 @@ regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = 
 parser1 = UserParserIntent("hydra", regex1, [1], {1: to_date})
 parser2 = UserParserIntent("hydra", regex2, [1], {1: to_date})
 parser3 = UserParserIntent("filesystem", regex3, [1], {1: to_date})
+
+path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
 
 class TestBasic(TestCase):
@@ -46,3 +52,12 @@ class TestBasic(TestCase):
 
         assert rule._effect.regex_str == regex3
         assert sorted(cause.regex_str for cause in rule._causes) == [regex1, regex2]
+
+    def test_parser_serialization(self):
+        # path = os.path.join(*path_test_files)
+        # parsers_path = os.path.join(path, 'parsers.yaml')
+        # rules_path = os.path.join(path, 'rules.yaml')
+        parser = RegexParserFactory.create_from_intent(parser1)
+        dumped_parser = yaml.dump(parser.to_data_access_object_form())
+        loaded_parser = yaml.load(dumped_parser).create_parser()
+        assert dumped_parser == yaml.dump(loaded_parser.to_data_access_object_form())

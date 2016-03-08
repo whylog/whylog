@@ -1,12 +1,12 @@
 import re
 import uuid
 from abc import ABCMeta, abstractmethod
-
 import six
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractParser(object):
+
     @abstractmethod
     def get_clue(self, line):
         pass
@@ -24,14 +24,20 @@ class RegexParser(AbstractParser):
     def get_clue(self, line):
         pass
 
-    def serialize_parser(self):
-        return {
-            "name": self.name,
-            "regex": self.regex_str,
-            "primary_key_groups": self.primary_key_groups,
-            "log_type": self.log_type,
-            "convertions": self.convertions
-        }
+    def to_data_access_object_form(self):
+        return RegexParserDAO(self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions)
+
+
+class RegexParserDAO(object):
+    def __init__(self, name, regex, primary_key_groups, log_type, convertions):
+        self.name = name
+        self.regex_str = regex
+        self.primary_key_groups = primary_key_groups
+        self.log_type = log_type
+        self.convertions = convertions
+
+    def create_parser(self):
+        return RegexParser(self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions)
 
 
 @six.add_metaclass(ABCMeta)
