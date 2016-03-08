@@ -70,7 +70,7 @@ class RegexAssistant(AbstractAssistant):
         """
         pass
 
-    def guess(self, line_ids):
+    def guess(self, line_id):
         """
         Guess regex. It includes guessing date format and regex groups.
         :param line_object: line object that keeps specific information about line.
