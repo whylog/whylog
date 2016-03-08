@@ -1,4 +1,5 @@
 from whylog.teacher.mock_outputs import create_sample_rule
+from whylog.teacher.user_intent import UserRuleIntent
 
 
 class Interval(object):
@@ -19,8 +20,7 @@ class Teacher(object):
 
     def __init__(self, id_to_line_dict, effect_id, config, pattern_assistant):
         self._lines = id_to_line_dict.copy()
-        self.effect_id = effect_id
-        self.constraints = set()
+        self.rule = UserRuleIntent(effect_id, parsers={}, constraints=[])
         self.config = config
         self.pattern_assistant = pattern_assistant
 
