@@ -14,7 +14,7 @@ class UserConstraintIntent(object):
 
 
 class UserRuleIntent(object):
-    def __init__(self, parsers, effect_id, constraints):
-        self.parsers = parsers
+    def __init__(self, effect_id, parsers, constraints):
         self.effect_id = effect_id
+        self.parsers = parsers
         self.constraints = constraints
