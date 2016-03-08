@@ -41,7 +41,7 @@ class TestBasic(TestCase):
         )
         constraints = [constraint1, constraint2, constraint3, constraint4]
 
-        user_intent = UserRuleIntent(parsers, effect_id, constraints)
+        user_intent = UserRuleIntent(effect_id, parsers, constraints)
         rule = RegexRuleFactory.create_from_intent(user_intent)
 
         assert rule._effect.regex_str == regex3
