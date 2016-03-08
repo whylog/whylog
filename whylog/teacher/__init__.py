@@ -20,7 +20,7 @@ class Teacher(object):
 
     def __init__(self, id_to_line_dict, effect_id, config, pattern_assistant):
         self._lines = id_to_line_dict.copy()
-        self.rule_intent = UserRuleIntent(effect_id, parsers=None, constraints=None)
+        self.rule_intent = UserRuleIntent(effect_id)
         self.config = config
         self.pattern_assistant = pattern_assistant
 
