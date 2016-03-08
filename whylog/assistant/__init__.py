@@ -21,21 +21,19 @@ class RegexAssistant(AbstractAssistant):
     One RegexAssistant per one entering Rule.
     """
 
-    def __init__(self, effect, line_objects=tuple()):
+    def __init__(self):
+        self.lines = {}
         self.regexes = {}
-        self.add_lines([effect])
-        self.add_lines(line_objects)
-        # TODO: line indexing (here and in other methods)
-        # after adding new line, we assign an index for it
-        # and modify this line using line index.
 
-    def add_lines(self, line_objects):
-        for line in line_objects:
-            self.regexes[line] = self._obvious_regex(line.line_content)
+    def add_lines(self, id_to_line_dict):
+        self.lines.update(id_to_line_dict)
+        for line_id in id_to_line_dict:
+            self.regexes[line_id] = self._obvious_regex(self.lines[line_id].line_content)
 
-    def remove_lines(self, line_objects):
-        for line in line_objects:
-            del self.regexes[line]
+    def remove_lines(self, line_ids):
+        for line_id in line_ids:
+            del self.regexes[line_id]
+            del self.lines[line_id]
 
     def _obvious_regex(self, text):
         """
@@ -48,7 +46,7 @@ class RegexAssistant(AbstractAssistant):
         # not finished yet
         return '^' + text + '$'
 
-    def update(self, line_object, regex):
+    def update(self, line_id, regex):
         """
         Loads regex proposed by user, verifies match, remember it in history.
         :param line_object: line object, keeps specific information about line.
@@ -72,21 +70,21 @@ class RegexAssistant(AbstractAssistant):
         """
         pass
 
-    def guess(self, line_object):
+    def guess(self, line_id):
         """
         Guess regex. It includes guessing date format and regex groups.
         :param line_object: line object that keeps specific information about line.
         """
         pass
 
-    def _guess_groups(self, line_object):
+    def _guess_groups(self, line_ids):
         """
         Guess regex groups (params/variables )
         :return: regex improved by time format
         """
         pass
 
-    def _guess_time(self, line_object):
+    def _guess_time(self, line_id):
         """
         Guess time format
         :return: regex improved by time format

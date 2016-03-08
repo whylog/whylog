@@ -18,36 +18,40 @@ class TestBasic(TestCase):
         cause2 = FrontInput(53, content2, None)
         effect = FrontInput(1087, content3, None)
 
-        regex_assistant = RegexAssistant(effect, [cause1])
+        id_to_line_dict = {1: cause1, 2: cause2, 3: effect}
 
-        regex_assistant.remove_lines([effect])
-        assert len(regex_assistant.regexes) == 1
+        regex_assistant = RegexAssistant()
+        regex_assistant.add_lines(id_to_line_dict)
 
-        regex_assistant.add_lines([cause2, effect])
+        regex_assistant.remove_lines([3])
+        assert len(regex_assistant.regexes) == 2
 
-        assert regex_assistant.regexes[cause2] == '^' + content2 + '$'
+        regex_assistant.add_lines({3: effect})
+        assert len(regex_assistant.regexes) == 3
 
-        beta36_in_1 = Interval(49, 54, cause1)
-        beta36_in_2 = Interval(40, 45, cause2)
+        assert regex_assistant.regexes[2] == '^' + content2 + '$'
+
+        beta36_in_1 = Interval(49, 54, 1)
+        beta36_in_2 = Interval(40, 45, 1)
 
         raise SkipTest
         # Methods called below are not implemented yet.
         regex_assistant.make_groups([beta36_in_1, beta36_in_2])
         assert regex_assistant.regexes[
-            cause1
+            1
         ] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
         assert regex_assistant.regexes[
-            cause2
+            2
         ] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
 
-        regex_assistant.guess_regex(effect)
+        regex_assistant.guess_regex(3)
         assert regex_assistant.regexes[
-            effect
-        ] == "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
+            3
+        ] == "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
 
-        proposed_regex = "^(?P<date>\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (?P<machine>.*)$"
-        regex_assistant.update_regex(effect, proposed_regex)
-        assert regex_assistant.regexes[effect] == proposed_regex
+        proposed_regex = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (beta.*)$"
+        regex_assistant.update_regex(3, proposed_regex)
+        assert regex_assistant.regexes[3] == proposed_regex
 
         with self.assertRaises(NoDateGroupException):
-            regex_assistant.verify_regex(cause1)
+            regex_assistant.verify_regex(1)
