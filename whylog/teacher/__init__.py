@@ -17,11 +17,12 @@ class Teacher(object):
     Enable teaching new rule. One Teacher per one entering rule.
     """
 
-    def __init__(self, id_to_line_dict, effect_id, config):
+    def __init__(self, id_to_line_dict, effect_id, config, pattern_assistant):
         self.lines = dict(id_to_line_dict)
         self.effect_id = effect_id
         self.constraints = set()
         self.config = config
+        self.pattern_assistant = pattern_assistant
 
     def add_line(self, line_id, line_object):
         self.lines[line_id] = line_object
@@ -32,21 +33,21 @@ class Teacher(object):
             # TODO: return something that represents warning "No effect line, remember to add it!"
             pass
 
-    def update_regex(self, line_id, proposed_regex):
+    def update_pattern(self, line_id, proposed_pattern):
         """
-        Loads regex proposed by user, verifies match.
+        Loads text pattern proposed by user, verifies if it matches line text.
         """
         pass
 
     def make_groups(self, intervals):
         """
-        Improves regexes by adding to them regex groups corresponding to params in text.
+        Improves text patterns by adding to them groups corresponding to params in text.
         """
         pass
 
-    def guess_regex(self, line_id):
+    def guess_pattern(self, line_id):
         """
-        Guess regex. It includes guessing date format and regex groups.
+        Guess text pattern for line text.
         """
         pass
 
@@ -68,13 +69,13 @@ class Teacher(object):
 
     def _verify(self):
         """
-        Verifies if regexes and constraints meet all requirements.
-        E.g it is required regex match its line in one way only.
+        Verifies if text patterns and constraints meet all requirements.
+        E.g it is required text pattern match its line in one way only.
         """
         pass
 
     def save(self):
         """
-        Verifies regexes and constraints. If they meet all requirements, saves Rule.
+        Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
         self.config.add_rule(create_sample_rule())
