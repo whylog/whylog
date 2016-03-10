@@ -29,7 +29,9 @@ class BacktrackSearcher(AbstractSearcher):
         self._file_path = file_path
 
     def search(self, search_data):
-        pass
+        for line in self._reverse_from_offset(search_data.offset):
+            pass  # TODO check if line somehow fits
+        return None  # TODO returns line that fit
 
     @classmethod
     def _decrease_actual_offset_properly(cls, actual_offset, drop_string):
