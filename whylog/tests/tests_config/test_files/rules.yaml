@@ -22,4 +22,10 @@ constraints:
   - [0, 4]
   name: hetero
   params: {different: 1}
+- clues_groups:
+  - [1, 3]
+  - [2, 4]
+  name: time
+  params: {earlier: 1, later: 2,  min_delta: 10, max_delta: 20}
 effect: 150bd23f-8115-45ed-85d6-f19bc7f9cd4a
+Map<Regex_ID, List<Clue>>, List<Regex_ID>

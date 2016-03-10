@@ -47,26 +47,24 @@ class AbstractFileConfig(AbstractConfig):
 
 
 class YamlConfig(AbstractFileConfig):
-    def __init__(self, parsers_path, rules_path, log_locations_path, log_type_manager=None):
+    def __init__(self, parsers_path, rules_path, log_locations_path):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
         self._log_locations_path = log_locations_path
-        self._log_type_manager = log_type_manager or LogTypeManager()
         # TODO update .yaml files to new parser and rule format
         # self._parsers = self._load_parsers()
 
     def _load_parsers(self):
-        parsers_definitions = self._load_file_with_config(self._parsers_path)
-        return [self._create_parser(parser_definition) for parser_definition in parsers_definitions]
+        return [parser_dao.create_parser() for parser_dao in self._load_file_with_config(self._parsers_path)]
 
     def _load_file_with_config(self, path):
         with open(path, "r") as config_file:
             return list(yaml.load_all(config_file))
 
-    def _create_parser(self, parser_definition):
-        log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
-        parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
-        return RegexParser(**parser_definition)
+    # def _create_parser(self, parser_definition):
+    #     log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
+    #     parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
+    #     return RegexParser(**parser_definition)
 
     def _convert_rule_to_file_form(self, rule_definition):
         return yaml.safe_dump(rule_definition, explicit_start=True)

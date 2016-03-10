@@ -6,7 +6,6 @@ import six
 
 @six.add_metaclass(ABCMeta)
 class AbstractParser(object):
-
     @abstractmethod
     def get_clue(self, line):
         pass
@@ -25,7 +24,9 @@ class RegexParser(AbstractParser):
         pass
 
     def to_data_access_object_form(self):
-        return RegexParserDAO(self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions)
+        return RegexParserDAO(
+            self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions
+        )
 
 
 class RegexParserDAO(object):
@@ -37,7 +38,9 @@ class RegexParserDAO(object):
         self.convertions = convertions
 
     def create_parser(self):
-        return RegexParser(self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions)
+        return RegexParser(
+            self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions
+        )
 
 
 @six.add_metaclass(ABCMeta)

@@ -2,7 +2,7 @@ import os.path
 from unittest import TestCase
 import yaml
 
-from whylog.config import YamlConfig
+from whylog.config import LogTypeManager
 from whylog.config.rule import RegexRuleFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
@@ -19,9 +19,9 @@ regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)
 regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
 regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
-parser1 = UserParserIntent("hydra", regex1, [1], {1: to_date})
-parser2 = UserParserIntent("hydra", regex2, [1], {1: to_date})
-parser3 = UserParserIntent("filesystem", regex3, [1], {1: to_date})
+parser_intent1 = UserParserIntent("hydra", regex1, [1], {1: to_date})
+parser_intent2 = UserParserIntent("hydra", regex2, [1], {1: to_date})
+parser_intent3 = UserParserIntent("filesystem", regex3, [1], {1: to_date})
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
@@ -34,7 +34,7 @@ class TestBasic(TestCase):
     """
 
     def test_simple_transform(self):
-        parsers = {0: parser1, 1: parser2, 2: parser3}
+        parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
         effect_id = 2
 
         constraint1 = UserConstraintIntent(identical_constr, [(0, 2), (1, 2)])
@@ -54,10 +54,15 @@ class TestBasic(TestCase):
         assert sorted(cause.regex_str for cause in rule._causes) == [regex1, regex2]
 
     def test_parser_serialization(self):
-        # path = os.path.join(*path_test_files)
-        # parsers_path = os.path.join(path, 'parsers.yaml')
-        # rules_path = os.path.join(path, 'rules.yaml')
-        parser = RegexParserFactory.create_from_intent(parser1)
-        dumped_parser = yaml.dump(parser.to_data_access_object_form())
-        loaded_parser = yaml.load(dumped_parser).create_parser()
-        assert dumped_parser == yaml.dump(loaded_parser.to_data_access_object_form())
+        parser1 = RegexParserFactory.create_from_intent(parser_intent1)
+        parser2 = RegexParserFactory.create_from_intent(parser_intent2)
+        parser3 = RegexParserFactory.create_from_intent(parser_intent3)
+        parsers_list = [parser1, parser2, parser3]
+
+        parsers_dao_list = [parser.to_data_access_object_form() for parser in parsers_list]
+        dumped_parsers = yaml.dump_all(parsers_dao_list, explicit_start=True)
+        loaded_parsers = [dumped_parser.create_parser() for dumped_parser in yaml.load_all(dumped_parsers)]
+        dumped_parsers_again = yaml.dump_all([parser.to_data_access_object_form() for parser in loaded_parsers],
+                                             explicit_start=True)
+
+        assert dumped_parsers_again == dumped_parsers
