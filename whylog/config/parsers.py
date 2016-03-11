@@ -57,3 +57,12 @@ class RegexParserFactory(object):
     @classmethod
     def from_dao(cls, serialized_parser):
         return RegexParser(**serialized_parser)
+
+
+class ConcatedRegexParser(object):
+    def __init__(self, parser_list):
+        self._parsers = parser_list
+        self._regex = re.compile(self._create_concated_regex())
+
+    def _create_concated_regex(self):
+        return "|".join(["(" + parser.regex_str + ")" for parser in self._parsers])

@@ -1,11 +1,12 @@
 import os.path
+import re
 from unittest import TestCase
 
 import yaml
 
 from whylog.config import YamlConfig
-from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
+from whylog.config.parsers import RegexParserFactory, ConcatedRegexParser
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 # Constraint types
@@ -15,6 +16,10 @@ hetero_constr = "hetero"
 
 # convertions
 to_date = "date"
+
+content1 = "2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2"
+content2 = "2015-12-03 12:10:10 Data migration from alfa36 to alfa21 failed. Host name: 2"
+content3 = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
 
 regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
 regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
@@ -40,12 +45,6 @@ path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
 
 class TestBasic(TestCase):
-    """
-    content1 = "2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2"
-    content2 = "2015-12-03 12:10:10 Data migration from alfa36 to alfa21 failed. Host name: 2"
-    content3 = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
-    """
-
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(user_intent)
 
@@ -83,3 +82,14 @@ class TestBasic(TestCase):
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
             parser.name for parser in config._parsers.values()
         )
+
+    def test_creating_concated_regex(self):
+        parser1 = RegexParserFactory.create_from_intent(parser_intent1)
+        parser2 = RegexParserFactory.create_from_intent(parser_intent2)
+        parser3 = RegexParserFactory.create_from_intent(parser_intent3)
+
+        concated2 = ConcatedRegexParser([parser1, parser2])
+        assert concated2._create_concated_regex() == "(" + regex1 + ")|(" + regex2 + ")"
+
+        compiled = re.compile("(" + regex1 + ")|(" + regex2 + ")")
+        print compiled.match(content2).groups()
