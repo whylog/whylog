@@ -27,10 +27,10 @@ parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_
 parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
 effect_id = 2
 
-constraint1 = UserConstraintIntent(identical_constr, [(0, 2), (1, 2)])
-constraint2 = UserConstraintIntent(identical_constr, [(1, 3), (2, 2)])
-constraint3 = UserConstraintIntent(different_constr, [(1, 2), (1, 3)])
-constraint4 = UserConstraintIntent(hetero_constr, [(0, 3), (1, 4), (2, 4)], {"different": 1})
+constraint1 = UserConstraintIntent(identical_constr, [[0, 2], [1, 2]])
+constraint2 = UserConstraintIntent(identical_constr, [[1, 3], [2, 2]])
+constraint3 = UserConstraintIntent(different_constr, [[1, 2], [1, 3]])
+constraint4 = UserConstraintIntent(hetero_constr, [[0, 3], [1, 4], [2, 4]], {"different": 1})
 
 constraints = [constraint1, constraint2, constraint3, constraint4]
 
@@ -58,13 +58,14 @@ class TestBasic(TestCase):
         parser3 = RegexParserFactory.create_from_intent(parser_intent3)
         parsers_list = [parser1, parser2, parser3]
 
-        parsers_dao_list = [parser.to_data_access_object_form() for parser in parsers_list]
+        parsers_dao_list = [parser.serialize() for parser in parsers_list]
         dumped_parsers = yaml.dump_all(parsers_dao_list, explicit_start=True)
         loaded_parsers = [
-            dumped_parser.create_parser() for dumped_parser in yaml.load_all(dumped_parsers)
+            RegexParserFactory.deserialize(dumped_parser)
+            for dumped_parser in yaml.load_all(dumped_parsers)
         ]
         dumped_parsers_again = yaml.dump_all(
-            [parser.to_data_access_object_form() for parser in loaded_parsers],
+            [parser.serialize() for parser in loaded_parsers],
             explicit_start=True
         )
 

@@ -23,24 +23,14 @@ class RegexParser(AbstractParser):
     def get_clue(self, line):
         pass
 
-    def to_data_access_object_form(self):
-        return RegexParserDAO(
-            self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions
-        )
-
-
-class RegexParserDAO(object):
-    def __init__(self, name, regex, primary_key_groups, log_type, convertions):
-        self.name = name
-        self.regex_str = regex
-        self.primary_key_groups = primary_key_groups
-        self.log_type = log_type
-        self.convertions = convertions
-
-    def create_parser(self):
-        return RegexParser(
-            self.name, self.regex_str, self.primary_key_groups, self.log_type, self.convertions
-        )
+    def serialize(self):
+        return {
+            "name": self.name,
+            "regex": self.regex_str,
+            "primary_key_groups": self.primary_key_groups,
+            "log_type": self.log_type,
+            "convertions": self.convertions,
+        }
 
 
 @six.add_metaclass(ABCMeta)
@@ -48,6 +38,11 @@ class AbstractParserFactory(object):
     @classmethod
     @abstractmethod
     def create_from_intent(cls, parser_intent):
+        pass
+
+    @classmethod
+    @abstractmethod
+    def deserialize(cls, serialized_parser):
         pass
 
 
@@ -58,3 +53,7 @@ class RegexParserFactory(object):
             parser_intent.regex_name, parser_intent.regex, parser_intent.primary_key_groups,
             parser_intent.log_type_name, parser_intent.data_conversions
         )
+
+    @classmethod
+    def deserialize(cls, serialized_parser):
+        return RegexParser(**serialized_parser)

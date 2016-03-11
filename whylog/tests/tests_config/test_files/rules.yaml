@@ -1,25 +1,25 @@
---- !!python/object:whylog.config.rule.RuleDAO
+---
 causes: [connectionerror, datamigration]
 constraints:
 - clues_groups:
-  - !!python/tuple [1, 2]
-  - !!python/tuple [2, 2]
+  - [1, 2]
+  - [2, 2]
   name: identical
   params: {}
 - clues_groups:
-  - !!python/tuple [2, 3]
-  - !!python/tuple [0, 2]
+  - [2, 3]
+  - [0, 2]
   name: identical
   params: {}
 - clues_groups:
-  - !!python/tuple [2, 2]
-  - !!python/tuple [2, 3]
+  - [2, 2]
+  - [2, 3]
   name: different
   params: {}
 - clues_groups:
-  - !!python/tuple [1, 3]
-  - !!python/tuple [2, 4]
-  - !!python/tuple [0, 4]
+  - [1, 3]
+  - [2, 4]
+  - [0, 4]
   name: hetero
   params: {different: 1}
 effect: lostdata

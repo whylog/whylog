@@ -12,8 +12,13 @@ class Rule(object):
         self._effect = effect
         self._constraints = constraints
 
-    def to_data_access_object_form(self):
-        return RuleDAO([cause.name for cause in self._causes], self._effect.name, self._constraints)
+    def serialize(self):
+
+        return {
+            "causes": [cause.name for cause in self._causes],
+            "effect": self._effect.name,
+            "constraints": self._constraints,
+        }
 
     def get_new_parsers(self, old_parsers):
         new_parsers = []
@@ -21,20 +26,6 @@ class Rule(object):
             if old_parsers.get(parser.name) is None:
                 new_parsers.append(parser)
         return new_parsers
-
-
-class RuleDAO(object):
-    def __init__(self, causes, effect, constraints):
-        self.causes = causes
-        self.effect = effect
-        self.constraints = constraints
-
-    def create_rule(self, parsers):
-        return Rule(
-            [
-                parsers[cause] for cause in self.causes
-            ], parsers[self.effect], self.constraints
-        )
 
 
 @six.add_metaclass(ABCMeta)
@@ -80,6 +71,13 @@ class AbstractRuleFactory(object):
             }
             constraints.append(constraint_dict)
         return constraints
+
+    @classmethod
+    def deserialize(cls, serialized_rule, parsers):
+        return Rule(
+            [parsers[cause] for cause in serialized_rule["causes"]],
+            parsers[serialized_rule["effect"]], serialized_rule["constraints"]
+        )
 
 
 class RegexRuleFactory(AbstractRuleFactory):
