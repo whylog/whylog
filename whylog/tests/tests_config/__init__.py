@@ -2,7 +2,7 @@ import os.path
 from unittest import TestCase
 import yaml
 
-from whylog.config import LogTypeManager
+from whylog.config import YamlConfig
 from whylog.config.rule import RegexRuleFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
@@ -53,6 +53,13 @@ class TestBasic(TestCase):
         assert rule._effect.regex_str == regex3
         assert sorted(cause.regex_str for cause in rule._causes) == [regex1, regex2]
 
+        path = os.path.join(*path_test_files)
+        parsers_path = os.path.join(path, 'parsers.yaml')
+        rules_path = os.path.join(path, 'rules.yaml')
+
+        config = YamlConfig(parsers_path, rules_path, None)
+        config.add_rule(user_intent)
+
     def test_parser_serialization(self):
         parser1 = RegexParserFactory.create_from_intent(parser_intent1)
         parser2 = RegexParserFactory.create_from_intent(parser_intent2)
@@ -61,8 +68,20 @@ class TestBasic(TestCase):
 
         parsers_dao_list = [parser.to_data_access_object_form() for parser in parsers_list]
         dumped_parsers = yaml.dump_all(parsers_dao_list, explicit_start=True)
-        loaded_parsers = [dumped_parser.create_parser() for dumped_parser in yaml.load_all(dumped_parsers)]
-        dumped_parsers_again = yaml.dump_all([parser.to_data_access_object_form() for parser in loaded_parsers],
-                                             explicit_start=True)
+        loaded_parsers = [
+            dumped_parser.create_parser() for dumped_parser in yaml.load_all(dumped_parsers)
+        ]
+        dumped_parsers_again = yaml.dump_all(
+            [parser.to_data_access_object_form() for parser in loaded_parsers],
+            explicit_start=True
+        )
 
         assert dumped_parsers_again == dumped_parsers
+
+    def test_save_regex_file(self):
+        path = os.path.join(*path_test_files)
+        parsers_path = os.path.join(path, 'parsers.yaml')
+        rules_path = os.path.join(path, 'rules.yaml')
+
+        config = YamlConfig(parsers_path, rules_path, None)
+        print config._rules
