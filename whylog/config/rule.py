@@ -30,8 +30,11 @@ class RuleDAO(object):
         self.constraints = constraints
 
     def create_rule(self, parsers):
-        return Rule([parsers[cause]
-                     for cause in self.causes], parsers[self.effect], self.constraints)
+        return Rule(
+            [
+                parsers[cause] for cause in self.causes
+            ], parsers[self.effect], self.constraints
+        )
 
 
 @six.add_metaclass(ABCMeta)

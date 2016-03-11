@@ -3,7 +3,6 @@ from abc import ABCMeta, abstractmethod
 import six
 import yaml
 
-from whylog.config.parsers import RegexParser
 from whylog.config.rule import RegexRuleFactory
 
 

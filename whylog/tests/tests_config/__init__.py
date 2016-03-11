@@ -1,10 +1,11 @@
 import os.path
 from unittest import TestCase
+
 import yaml
 
 from whylog.config import YamlConfig
-from whylog.config.rule import RegexRuleFactory
 from whylog.config.parsers import RegexParserFactory
+from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 # Constraint types
@@ -33,7 +34,7 @@ constraint4 = UserConstraintIntent(hetero_constr, [(0, 3), (1, 4), (2, 4)], {"di
 
 constraints = [constraint1, constraint2, constraint3, constraint4]
 
-user_intent = UserRuleIntent(parsers, effect_id, constraints)
+user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
@@ -46,7 +47,6 @@ class TestBasic(TestCase):
     """
 
     def test_simple_transform(self):
-        user_intent = UserRuleIntent(effect_id, parsers, constraints)
         rule = RegexRuleFactory.create_from_intent(user_intent)
 
         assert rule._effect.regex_str == regex3
@@ -70,13 +70,14 @@ class TestBasic(TestCase):
 
         assert dumped_parsers_again == dumped_parsers
 
-    def test_loading_signle_rule_its_parsers(self):
+    def test_loading_single_rule_its_parsers(self):
         path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'expected_parsers.yaml')
-        rules_path = os.path.join(path, 'expected_rules.yaml')
+        parsers_path = os.path.join(path, 'parsers.yaml')
+        rules_path = os.path.join(path, 'rules.yaml')
 
         config = YamlConfig(parsers_path, rules_path, None)
         assert len(config._rules) == 1
         rule = config._rules[0]
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
-            [parser.name for parser in config._parsers.values()])
+            [parser.name for parser in config._parsers.values()]
+        )
