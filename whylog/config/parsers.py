@@ -1,5 +1,4 @@
 import re
-import uuid
 from abc import ABCMeta, abstractmethod
 import six
 
@@ -55,6 +54,6 @@ class RegexParserFactory(object):
     @classmethod
     def create_from_intent(cls, parser_intent):
         return RegexParser(
-            str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
+            parser_intent.regex_name, parser_intent.regex, parser_intent.primary_key_groups,
             parser_intent.log_type_name, parser_intent.data_conversions
         )

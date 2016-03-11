@@ -25,8 +25,14 @@ class AbstractConfig(object):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
         self._save_rule_definition(created_rule.to_data_access_object_form())
         created_parsers = created_rule.get_new_parsers(self._parsers)
-        self._save_parsers_definition([parser.to_data_access_object_form()
-                                       for parser in created_parsers])
+        self._save_parsers_definition(
+            [
+                parser.to_data_access_object_form() for parser in created_parsers
+            ]
+        )
+        self._rules.append(created_rule)
+        for parser in created_parsers:
+            self._parsers[parser.name] = parser
 
     @abstractmethod
     def _save_rule_definition(self, rule_definition):

@@ -1,25 +1,21 @@
----
-causes: [14b9e481-d9d6-4285-8e6d-287d59b6be2e, 905668b4-4758-4e81-b26a-201fe0e44a62]
-constraints:
-- clues_groups:
-  - [1, 2]
-  - [2, 2]
-  name: identical
-  params: {}
-- clues_groups:
-  - [2, 3]
-  - [0, 2]
-  name: identical
-  params: {}
-- clues_groups:
-  - [2, 2]
-  - [2, 3]
-  name: different
-  params: {}
-- clues_groups:
-  - [1, 3]
-  - [2, 4]
-  - [0, 4]
-  name: hetero
-  params: {different: 1}
-effect: 401412b8-342a-483b-b849-734a00da939e
+--- !!python/object:whylog.config.parsers.RegexParserDAO
+convertions: {1: date}
+log_type: filesystem
+name: lostdata
+primary_key_groups: [1]
+regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss =
+  (.*) GB\. Host name: (.*)$'
+--- !!python/object:whylog.config.parsers.RegexParserDAO
+convertions: {1: date}
+log_type: hydra
+name: connectionerror
+primary_key_groups: [1]
+regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\.
+  Host name: (.*)$'
+--- !!python/object:whylog.config.parsers.RegexParserDAO
+convertions: {1: date}
+log_type: hydra
+name: datamigration
+primary_key_groups: [1]
+regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*)
+  failed\. Host name: (.*)$'

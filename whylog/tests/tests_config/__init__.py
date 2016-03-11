@@ -19,9 +19,21 @@ regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)
 regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
 regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
-parser_intent1 = UserParserIntent("hydra", regex1, [1], {1: to_date})
-parser_intent2 = UserParserIntent("hydra", regex2, [1], {1: to_date})
-parser_intent3 = UserParserIntent("filesystem", regex3, [1], {1: to_date})
+parser_intent1 = UserParserIntent("connectionerror", "hydra", regex1, [1], {1: to_date})
+parser_intent2 = UserParserIntent("datamigration", "hydra", regex2, [1], {1: to_date})
+parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_date})
+
+parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
+effect_id = 2
+
+constraint1 = UserConstraintIntent(identical_constr, [(0, 2), (1, 2)])
+constraint2 = UserConstraintIntent(identical_constr, [(1, 3), (2, 2)])
+constraint3 = UserConstraintIntent(different_constr, [(1, 2), (1, 3)])
+constraint4 = UserConstraintIntent(hetero_constr, [(0, 3), (1, 4), (2, 4)], {"different": 1})
+
+constraints = [constraint1, constraint2, constraint3, constraint4]
+
+user_intent = UserRuleIntent(parsers, effect_id, constraints)
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
@@ -34,31 +46,11 @@ class TestBasic(TestCase):
     """
 
     def test_simple_transform(self):
-        parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
-        effect_id = 2
-
-        constraint1 = UserConstraintIntent(identical_constr, [(0, 2), (1, 2)])
-        constraint2 = UserConstraintIntent(identical_constr, [(1, 3), (2, 2)])
-        constraint3 = UserConstraintIntent(different_constr, [(1, 2), (1, 3)])
-        constraint4 = UserConstraintIntent(
-            hetero_constr, [
-                (0, 3), (1, 4), (2, 4)
-            ], {"different": 1}
-        )
-        constraints = [constraint1, constraint2, constraint3, constraint4]
-
         user_intent = UserRuleIntent(effect_id, parsers, constraints)
         rule = RegexRuleFactory.create_from_intent(user_intent)
 
         assert rule._effect.regex_str == regex3
         assert sorted(cause.regex_str for cause in rule._causes) == [regex1, regex2]
-
-        path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
-
-        config = YamlConfig(parsers_path, rules_path, None)
-        config.add_rule(user_intent)
 
     def test_parser_serialization(self):
         parser1 = RegexParserFactory.create_from_intent(parser_intent1)
@@ -78,10 +70,13 @@ class TestBasic(TestCase):
 
         assert dumped_parsers_again == dumped_parsers
 
-    def test_save_regex_file(self):
+    def test_loading_signle_rule_its_parsers(self):
         path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
+        parsers_path = os.path.join(path, 'expected_parsers.yaml')
+        rules_path = os.path.join(path, 'expected_rules.yaml')
 
         config = YamlConfig(parsers_path, rules_path, None)
-        print config._rules
+        assert len(config._rules) == 1
+        rule = config._rules[0]
+        assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
+            [parser.name for parser in config._parsers.values()])
