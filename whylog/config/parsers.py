@@ -7,7 +7,7 @@ import six
 @six.add_metaclass(ABCMeta)
 class AbstractParser(object):
     @abstractmethod
-    def get_clue(self, line):
+    def get_regex_params(self, line):
         pass
 
 
@@ -19,7 +19,7 @@ class RegexParser(AbstractParser):
         self.log_type = log_type
         self.convertions = convertions
 
-    def get_clue(self, line):
+    def get_regex_params(self, line):
         pass
 
     def serialize(self):
@@ -61,30 +61,70 @@ class RegexParserFactory(object):
 class ConcatedRegexParser(object):
     def __init__(self, parser_list):
         self._parsers = parser_list
-        self._regex = re.compile(self._create_concated_regex())
-        self._parsers_indexes = self._get_indexes_of_groups_for_parsers()
+        forward, backward = self._create_concated_regexes()
+        self._forward_regex = re.compile(forward)
+        self._backward_regex = re.compile(backward)
+        self._forward_parsers_indexes = self._get_indexes_of_groups_for_parsers(self._parsers)
+        self._backward_parsers_indexes = self._get_indexes_of_groups_for_parsers(
+            reversed(
+                self._parsers
+            )
+        )
+        self._numbers_in_list = self._number_in_list()
 
-    def _create_concated_regex(self):
-        return "|".join(["(" + parser.regex_str + ")" for parser in self._parsers])
+    def _create_concated_regexes(self):
+        return (
+            "|".join(
+                "(" + parser.regex_str + ")" for parser in self._parsers
+            ), "|".join(
+                "(" + parser.regex_str + ")" for parser in reversed(self._parsers)
+            )
+        )
 
-    def _get_indexes_of_groups_for_parsers(self):
+    def _get_indexes_of_groups_for_parsers(self, parser_list):
         indexes_dict = {}
         free_index = 0
-        for parser in self._parsers:
+        for parser in parser_list:
             amount_of_group = parser.regex_str.count('(') - parser.regex_str.count('\(')
             indexes_dict[parser.name] = (free_index, amount_of_group)
             free_index += amount_of_group + 1
         return indexes_dict
 
+    def _number_in_list(self):
+        regex_numbers = {}
+        number = 0
+        for parser in self._parsers:
+            regex_numbers[parser.name] = number
+            number += 1
+        return regex_numbers
+
     def get_extracted_regex_params(self, line):
-        matched = self._regex.match(line)
-        if matched is None:
+        forward_matched = self._forward_regex.match(line)
+        backward_matched = self._backward_regex.match(line)
+        if forward_matched is None:
             return {}
         clues = {}
-        groups = matched.groups()
-        for name, indexes in self._parsers_indexes.items():
-            if groups[indexes[0]] is not None:
+        forward_groups = forward_matched.groups()
+        backward_groups = backward_matched.groups()
+        for name, indexes in self._forward_parsers_indexes.items():
+            regex_index, regex_group_number = indexes[0], indexes[1]
+            if forward_groups[regex_index] is not None:
                 clues[name] = [
-                    groups[i] for i in range(indexes[0] + 1, indexes[0] + indexes[1] + 1)
+                    forward_groups[i]
+                    for i in range(regex_index + 1, regex_index + regex_group_number + 1)
                 ]
+                if backward_groups[self._backward_parsers_indexes[name][0]] is None:
+                    left = self._numbers_in_list[name] + 1
+                    right = len(self._parsers) - 1
+                    for parser in reversed(self._parsers):
+                        if backward_groups[self._backward_parsers_indexes[parser.name][0]] is not None:
+                            regex_index = self._backward_parsers_indexes[parser.name][0]
+                            regex_group_number = self._backward_parsers_indexes[parser.name][1]
+                            clues[parser.name] = [
+                                backward_groups[i]
+                                for i in range(regex_index + 1, regex_index + regex_group_number + 1)
+                            ]
+                            right -= 1
+                            break
+                        right -= 1
         return clues

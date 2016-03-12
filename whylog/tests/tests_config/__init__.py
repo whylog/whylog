@@ -32,7 +32,6 @@ parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_
 parser_intent4 = UserParserIntent("rootcause", "filesystem", regex4, [], {})
 parser_intent5 = UserParserIntent("date", "filesystem", regex5, [1], {1: to_date})
 
-
 parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
 effect_id = 2
 
@@ -95,7 +94,7 @@ class TestBasic(TestCase):
         parser5 = RegexParserFactory.create_from_intent(parser_intent5)
 
         concated = ConcatedRegexParser([parser1, parser2, parser3, parser4, parser5])
-        assert concated._parsers_indexes == {
+        assert concated._forward_parsers_indexes == {
             parser1.name: (0, 3),
             parser2.name: (4, 4),
             parser3.name: (9, 4),
@@ -114,10 +113,10 @@ class TestBasic(TestCase):
                 "2015-12-03 12:10:10", "alfa36", "alfa21", "2"
             ]
         }
-        # assert concated.get_extracted_regex_params(content3) == {
-        #     parser3.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-        #     parser5.name: ["2015-12-03 12:11:00"]
-        # }
+        assert concated.get_extracted_regex_params(content3) == {
+            parser3.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
+            parser5.name: ["2015-12-03 12:11:00"]
+        }
 
         assert concated.get_extracted_regex_params(content4) == {parser4.name: []}
 
