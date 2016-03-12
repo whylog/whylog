@@ -3,20 +3,32 @@ from abc import ABCMeta, abstractmethod
 import six
 import yaml
 
-from whylog.config.parsers import RegexParser
+from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
+    def __init__(self):
+        self._parsers = self._load_parsers()
+        self._rules = self._load_rules()
+
     @abstractmethod
-    def create_investigation_plan(self, front_input):
+    def _load_parsers(self):
+        pass
+
+    @abstractmethod
+    def _load_rules(self):
         pass
 
     def add_rule(self, user_rule_intent):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
-        self._save_rule_definition(created_rule.serialize_rule())
-        self._save_parsers_definition(created_rule.serialize_parsers())
+        self._save_rule_definition(created_rule.serialize())
+        created_parsers = created_rule.get_new_parsers(self._parsers)
+        self._save_parsers_definition(parser.serialize() for parser in created_parsers)
+        self._rules.append(created_rule)
+        for parser in created_parsers:
+            self._parsers[parser.name] = parser
 
     @abstractmethod
     def _save_rule_definition(self, rule_definition):
@@ -25,54 +37,6 @@ class AbstractConfig(object):
     @abstractmethod
     def _save_parsers_definition(self, parser_definitions):
         pass
-
-
-@six.add_metaclass(ABCMeta)
-class AbstractFileConfig(AbstractConfig):
-    @abstractmethod
-    def _convert_rule_to_file_form(self, dict_definition):
-        pass
-
-    @abstractmethod
-    def _convert_parsers_to_file_form(self, dict_definition):
-        pass
-
-    def _save_rule_definition(self, rule_definition):
-        with open(self._rules_path, "a") as rules_file:
-            rules_file.write(self._convert_rule_to_file_form(rule_definition))
-
-    def _save_parsers_definition(self, parser_definitions):
-        with open(self._parsers_path, "a") as parsers_file:
-            parsers_file.write(self._convert_parsers_to_file_form(parser_definitions))
-
-
-class YamlConfig(AbstractFileConfig):
-    def __init__(self, parsers_path, rules_path, log_locations_path, log_type_manager=None):
-        self._parsers_path = parsers_path
-        self._rules_path = rules_path
-        self._log_locations_path = log_locations_path
-        self._log_type_manager = log_type_manager or LogTypeManager()
-        # TODO update .yaml files to new parser and rule format
-        # self._parsers = self._load_parsers()
-
-    def _load_parsers(self):
-        parsers_definitions = self._load_file_with_config(self._parsers_path)
-        return [self._create_parser(parser_definition) for parser_definition in parsers_definitions]
-
-    def _load_file_with_config(self, path):
-        with open(path, "r") as config_file:
-            return list(yaml.load_all(config_file))
-
-    def _create_parser(self, parser_definition):
-        log_type_str = parser_definition.get("log_type", LogTypeManager.DEFAULT_LOG_TYPE)
-        parser_definition["log_type"] = self._log_type_manager.get_log_type(log_type_str)
-        return RegexParser(**parser_definition)
-
-    def _convert_rule_to_file_form(self, rule_definition):
-        return yaml.safe_dump(rule_definition, explicit_start=True)
-
-    def _convert_parsers_to_file_form(self, parser_definitions):
-        return yaml.safe_dump_all(parser_definitions, explicit_start=True)
 
     def create_investigation_plan(self, front_input):
         pass
@@ -88,6 +52,62 @@ class YamlConfig(AbstractFileConfig):
 
     def _get_locations_for_logs(self, logs_types_list):
         pass
+
+
+@six.add_metaclass(ABCMeta)
+class AbstractFileConfig(AbstractConfig):
+    def __init__(self, parsers_path, rules_path, log_locations_path):
+        self._parsers_path = parsers_path
+        self._rules_path = rules_path
+        self._log_locations_path = log_locations_path
+        super(AbstractFileConfig, self).__init__()
+
+    def _load_parsers(self):
+        return dict(
+            (parser_definition["name"], RegexParserFactory.from_dao(parser_definition))
+            for parser_definition in self._load_file_with_config(self._parsers_path)
+        )
+
+    def _load_rules(self):
+        return [
+            RegexRuleFactory.from_dao(serialized_rule, self._parsers)
+            for serialized_rule in self._load_file_with_config(self._rules_path)
+        ]
+
+    @abstractmethod
+    def _load_file_with_config(self, path):
+        pass
+
+    def _save_rule_definition(self, rule_definition):
+        with open(self._rules_path, "a") as rules_file:
+            rules_file.write(self._convert_rule_to_file_form(rule_definition))
+
+    def _save_parsers_definition(self, parser_definitions):
+        with open(self._parsers_path, "a") as parsers_file:
+            parsers_file.write(self._convert_parsers_to_file_form(parser_definitions))
+
+    @abstractmethod
+    def _convert_rule_to_file_form(self, dict_definition):
+        pass
+
+    @abstractmethod
+    def _convert_parsers_to_file_form(self, dict_definition):
+        pass
+
+
+class YamlConfig(AbstractFileConfig):
+    def __init__(self, parsers_path, rules_path, log_locations_path):
+        super(YamlConfig, self).__init__(parsers_path, rules_path, log_locations_path)
+
+    def _load_file_with_config(self, path):
+        with open(path, "r") as config_file:
+            return list(yaml.load_all(config_file))
+
+    def _convert_rule_to_file_form(self, rule_definition):
+        return yaml.safe_dump(rule_definition, explicit_start=True)
+
+    def _convert_parsers_to_file_form(self, parser_definitions):
+        return yaml.safe_dump_all(parser_definitions, explicit_start=True)
 
 
 class LogType(object):

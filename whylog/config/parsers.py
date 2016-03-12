@@ -1,5 +1,4 @@
 import re
-import uuid
 from abc import ABCMeta, abstractmethod
 
 import six
@@ -24,13 +23,13 @@ class RegexParser(AbstractParser):
     def get_clue(self, line):
         pass
 
-    def serialize_parser(self):
+    def serialize(self):
         return {
             "name": self.name,
             "regex": self.regex_str,
             "primary_key_groups": self.primary_key_groups,
             "log_type": self.log_type,
-            "convertions": self.convertions
+            "convertions": self.convertions,
         }
 
 
@@ -41,11 +40,20 @@ class AbstractParserFactory(object):
     def create_from_intent(cls, parser_intent):
         pass
 
+    @classmethod
+    @abstractmethod
+    def from_dao(cls, serialized_parser):
+        pass
+
 
 class RegexParserFactory(object):
     @classmethod
     def create_from_intent(cls, parser_intent):
         return RegexParser(
-            str(uuid.uuid4()), parser_intent.regex, parser_intent.primary_key_groups,
+            parser_intent.regex_name, parser_intent.regex, parser_intent.primary_key_groups,
             parser_intent.log_type_name, parser_intent.data_conversions
         )
+
+    @classmethod
+    def from_dao(cls, serialized_parser):
+        return RegexParser(**serialized_parser)

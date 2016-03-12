@@ -36,12 +36,14 @@ class TestBasic(TestCase):
         output_path = os.path.join(path, 'expected_output.txt')
         log_location_path = os.path.join(path, 'log_locations.yaml')
 
+        raise SkipTest("Functionality not implemented yet")
+
         whylog_base = YamlConfig(
             parsers_path=parsers_path,
             rules_path=rules_path,
             log_locations_path=log_location_path,
         )
-        raise SkipTest("Functionality not implemented yet")
+
         whylog_client = WhylogClient(config=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:

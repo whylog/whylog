@@ -1,5 +1,5 @@
 ---
-causes: [78854d35-b8da-4ce5-8905-46e03c99dfc6, a971d012-5735-4f14-9860-030aebb86b1b]
+causes: [connectionerror, datamigration]
 constraints:
 - clues_groups:
   - [1, 2]
@@ -22,4 +22,4 @@ constraints:
   - [0, 4]
   name: hetero
   params: {different: 1}
-effect: 150bd23f-8115-45ed-85d6-f19bc7f9cd4a
+effect: lostdata
