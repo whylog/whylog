@@ -42,7 +42,7 @@ class AbstractParserFactory(object):
 
     @classmethod
     @abstractmethod
-    def deserialize(cls, serialized_parser):
+    def from_dao(cls, serialized_parser):
         pass
 
 
@@ -55,5 +55,5 @@ class RegexParserFactory(object):
         )
 
     @classmethod
-    def deserialize(cls, serialized_parser):
+    def from_dao(cls, serialized_parser):
         return RegexParser(**serialized_parser)

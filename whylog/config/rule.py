@@ -23,7 +23,7 @@ class Rule(object):
     def get_new_parsers(self, old_parsers):
         new_parsers = []
         for parser in itertools.chain([self._effect], self._causes):
-            if old_parsers.get(parser.name) is None:
+            if parser.name not in old_parsers:
                 new_parsers.append(parser)
         return new_parsers
 
@@ -73,7 +73,7 @@ class AbstractRuleFactory(object):
         return constraints
 
     @classmethod
-    def deserialize(cls, serialized_rule, parsers):
+    def from_dao(cls, serialized_rule, parsers):
         return Rule(
             [parsers[cause] for cause in serialized_rule["causes"]],
             parsers[serialized_rule["effect"]], serialized_rule["constraints"]

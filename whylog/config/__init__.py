@@ -25,7 +25,7 @@ class AbstractConfig(object):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
         self._save_rule_definition(created_rule.serialize())
         created_parsers = created_rule.get_new_parsers(self._parsers)
-        self._save_parsers_definition([parser.serialize() for parser in created_parsers])
+        self._save_parsers_definition(parser.serialize() for parser in created_parsers)
         self._rules.append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
@@ -60,17 +60,17 @@ class AbstractFileConfig(AbstractConfig):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
         self._log_locations_path = log_locations_path
-        AbstractConfig.__init__(self)
+        super(AbstractFileConfig, self).__init__()
 
     def _load_parsers(self):
         return dict(
-            (parser_definition["name"], RegexParserFactory.deserialize(parser_definition))
+            (parser_definition["name"], RegexParserFactory.from_dao(parser_definition))
             for parser_definition in self._load_file_with_config(self._parsers_path)
         )
 
     def _load_rules(self):
         return [
-            RegexRuleFactory.deserialize(serialized_rule, self._parsers)
+            RegexRuleFactory.from_dao(serialized_rule, self._parsers)
             for serialized_rule in self._load_file_with_config(self._rules_path)
         ]
 
@@ -97,7 +97,7 @@ class AbstractFileConfig(AbstractConfig):
 
 class YamlConfig(AbstractFileConfig):
     def __init__(self, parsers_path, rules_path, log_locations_path):
-        AbstractFileConfig.__init__(self, parsers_path, rules_path, log_locations_path)
+        super(YamlConfig, self).__init__(parsers_path, rules_path, log_locations_path)
 
     def _load_file_with_config(self, path):
         with open(path, "r") as config_file:
