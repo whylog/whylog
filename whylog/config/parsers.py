@@ -15,7 +15,6 @@ class RegexParser(AbstractParser):
     def __init__(self, name, regex, primary_key_groups, log_type, convertions):
         self.name = name
         self.regex_str = regex
-        self.regex = re.compile(regex)
         self.primary_key_groups = primary_key_groups
         self.log_type = log_type
         self.convertions = convertions
@@ -63,6 +62,27 @@ class ConcatedRegexParser(object):
     def __init__(self, parser_list):
         self._parsers = parser_list
         self._regex = re.compile(self._create_concated_regex())
+        self._parsers_indexes = self._get_indexes_of_groups_for_parsers()
 
     def _create_concated_regex(self):
         return "|".join(["(" + parser.regex_str + ")" for parser in self._parsers])
+
+    def _get_indexes_of_groups_for_parsers(self):
+        indexes_dict = {}
+        free_index = 0
+        for parser in self._parsers:
+            amount_of_group = parser.regex_str.count('(') - parser.regex_str.count('\(')
+            indexes_dict[parser.name] = (free_index, amount_of_group)
+            free_index += amount_of_group + 1
+        return indexes_dict
+
+    def get_extracted_regex_params(self, line):
+        matched = self._regex.match(line)
+        if matched is None:
+            return {}
+        clues = {}
+        groups = matched.groups()
+        for name, indexes in self._parsers_indexes.items():
+            if groups[indexes[0]] is not None:
+                clues[name] = [groups[i] for i in range(indexes[0] + 1, indexes[0] + indexes[1] + 1)]
+        return clues
