@@ -84,5 +84,7 @@ class ConcatedRegexParser(object):
         groups = matched.groups()
         for name, indexes in self._parsers_indexes.items():
             if groups[indexes[0]] is not None:
-                clues[name] = [groups[i] for i in range(indexes[0] + 1, indexes[0] + indexes[1] + 1)]
+                clues[name] = [
+                    groups[i] for i in range(indexes[0] + 1, indexes[0] + indexes[1] + 1)
+                ]
         return clues
