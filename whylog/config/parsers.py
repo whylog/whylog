@@ -1,4 +1,4 @@
-import regex as re
+import regex
 from abc import ABCMeta, abstractmethod
 
 import six
@@ -13,10 +13,10 @@ class AbstractParser(object):
 
 
 class RegexParser(AbstractParser):
-    def __init__(self, name, regex, primary_key_groups, log_type, convertions):
+    def __init__(self, name, regex_str, primary_key_groups, log_type, convertions):
         self.name = name
-        self.regex_str = regex
-        self.regex = re.compile(self.regex_str)
+        self.regex_str = regex_str
+        self.regex = regex.compile(self.regex_str)
         self.primary_key_groups = primary_key_groups
         self.log_type = log_type
         self.convertions = convertions
@@ -29,7 +29,7 @@ class RegexParser(AbstractParser):
     def serialize(self):
         return {
             "name": self.name,
-            "regex": self.regex_str,
+            "regex_str": self.regex_str,
             "primary_key_groups": self.primary_key_groups,
             "log_type": self.log_type,
             "convertions": self.convertions,
@@ -68,8 +68,8 @@ class ConcatedRegexParser(object):
     def __init__(self, parser_list):
         self._parsers = parser_list
         forward, backward = self._create_concated_regexes()
-        self._forward_regex = re.compile(forward)
-        self._backward_regex = re.compile(backward)
+        self._forward_regex = regex.compile(forward)
+        self._backward_regex = regex.compile(backward)
         self._forward_parsers_indexes = self._get_indexes_of_groups_for_parsers(self._parsers)
         self._backward_parsers_indexes = self._get_indexes_of_groups_for_parsers(
             reversed(
@@ -79,13 +79,9 @@ class ConcatedRegexParser(object):
         self._numbers_in_list = self._number_in_list()
 
     def _create_concated_regexes(self):
-        return (
-            "|".join(
-                "(" + parser.regex_str + ")" for parser in self._parsers
-            ), "|".join(
-                "(" + parser.regex_str + ")" for parser in reversed(self._parsers)
-            )
-        )
+        forward_regex = "|".join("(" + parser.regex_str + ")" for parser in self._parsers)
+        backward_regex = "|".join("(" + parser.regex_str + ")" for parser in reversed(self._parsers))
+        return forward_regex, backward_regex
 
     def _get_indexes_of_groups_for_parsers(self, parser_list):
         indexes_dict = {}
