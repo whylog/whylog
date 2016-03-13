@@ -1,4 +1,4 @@
-import re
+import regex as re
 from abc import ABCMeta, abstractmethod
 
 import six
