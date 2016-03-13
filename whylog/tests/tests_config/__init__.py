@@ -1,7 +1,8 @@
 import os.path
-import re
 from unittest import TestCase
+
 import yaml
+
 from whylog.config import YamlConfig
 from whylog.config.parsers import ConcatedRegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory

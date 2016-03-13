@@ -2,6 +2,7 @@ import re
 from abc import ABCMeta, abstractmethod
 
 import six
+from frozendict import frozendict
 
 
 @six.add_metaclass(ABCMeta)
@@ -62,6 +63,8 @@ class RegexParserFactory(object):
 
 
 class ConcatedRegexParser(object):
+    NO_MATCH = frozendict()
+
     def __init__(self, parser_list):
         self._parsers = parser_list
         forward, backward = self._create_concated_regexes()
@@ -105,16 +108,20 @@ class ConcatedRegexParser(object):
         forward_matched = self._forward_regex.match(line)
         backward_matched = self._backward_regex.match(line)
         if forward_matched is None:
-            return {}
+            return ConcatedRegexParser.NO_MATCH
         clues = {}
         forward_groups = forward_matched.groups()
         backward_groups = backward_matched.groups()
         for name, indexes in self._forward_parsers_indexes.items():
             regex_index, regex_group_number = indexes[0], indexes[1]
             if forward_groups[regex_index] is not None:
-                clues[name] = self._extract_regex_params(forward_groups, regex_group_number, regex_index)
+                clues[name] = self._extract_regex_params(
+                    forward_groups, regex_group_number, regex_index
+                )
                 if backward_groups[self._backward_parsers_indexes[name][0]] is None:
-                    left, right = self._calculate_range_for_brute_search(backward_groups, clues, name)
+                    left, right = self._calculate_range_for_brute_search(
+                        backward_groups, clues, name
+                    )
                     self._brute_subregexes_matching(clues, left, right, line)
                 break
         return clues
@@ -125,16 +132,21 @@ class ConcatedRegexParser(object):
             if backward_groups[self._backward_parsers_indexes[parser.name][0]] is not None:
                 regex_index = self._backward_parsers_indexes[parser.name][0]
                 regex_group_number = self._backward_parsers_indexes[parser.name][1]
-                clues[parser.name] = self._extract_regex_params(backward_groups, regex_group_number, regex_index)
+                clues[parser.name] = self._extract_regex_params(
+                    backward_groups, regex_group_number, regex_index
+                )
                 right = self._parsers.index(parser) - 1
                 break
         return left, right
 
     def _extract_regex_params(self, groups, regex_group_number, regex_index):
-        return [groups[i] for i in range(regex_index + 1, regex_index + regex_group_number + 1)]
+        return [
+            groups[i]
+            for i in six.moves.range(regex_index + 1, regex_index + regex_group_number + 1)
+        ]
 
     def _brute_subregexes_matching(self, clues, left, right, line):
-        for i in range(left, right + 1):
+        for i in six.moves.range(left, right + 1):
             match = self._parsers[i].get_regex_params(line)
             if match is not None:
                 clues[self._parsers[i].name] = match
