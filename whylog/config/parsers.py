@@ -1,8 +1,15 @@
 from abc import ABCMeta, abstractmethod
 
-import regex
 import six
 from frozendict import frozendict
+
+IMPORTED_RE = False
+
+try:
+    import regex
+except ImportError:
+    import re as regex
+    IMPORTED_RE = True
 
 
 @six.add_metaclass(ABCMeta)
@@ -67,6 +74,8 @@ class ConcatedRegexParser(object):
 
     def __init__(self, parser_list):
         self._parsers = parser_list
+        if IMPORTED_RE:
+            return
         forward, backward = self._create_concated_regexes()
         self._forward_regex = regex.compile(forward)
         self._backward_regex = regex.compile(backward)
@@ -115,6 +124,10 @@ class ConcatedRegexParser(object):
         return index_to_regex
 
     def get_extracted_regex_params(self, line):
+        if IMPORTED_RE:
+            clues = {}
+            self._brute_subregexes_matching(clues, 0, len(self._parsers) - 1, line)
+            return clues
         forward_matched = self._forward_regex.match(line)
         if forward_matched is None:
             return ConcatedRegexParser.NO_MATCH
