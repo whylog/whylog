@@ -15,12 +15,15 @@ class RegexParser(AbstractParser):
     def __init__(self, name, regex, primary_key_groups, log_type, convertions):
         self.name = name
         self.regex_str = regex
+        self.regex = re.compile(self.regex_str)
         self.primary_key_groups = primary_key_groups
         self.log_type = log_type
         self.convertions = convertions
 
     def get_regex_params(self, line):
-        pass
+        matches = self.regex.match(line)
+        if matches is not None:
+            return list(matches.groups())
 
     def serialize(self):
         return {
@@ -109,22 +112,33 @@ class ConcatedRegexParser(object):
         for name, indexes in self._forward_parsers_indexes.items():
             regex_index, regex_group_number = indexes[0], indexes[1]
             if forward_groups[regex_index] is not None:
-                clues[name] = [
-                    forward_groups[i]
-                    for i in range(regex_index + 1, regex_index + regex_group_number + 1)
-                ]
+                self._extract_regex_params_from_match(forward_groups, clues, name,
+                                                      regex_group_number, regex_index)
                 if backward_groups[self._backward_parsers_indexes[name][0]] is None:
-                    left = self._numbers_in_list[name] + 1
-                    right = len(self._parsers) - 1
-                    for parser in reversed(self._parsers):
-                        if backward_groups[self._backward_parsers_indexes[parser.name][0]] is not None:
-                            regex_index = self._backward_parsers_indexes[parser.name][0]
-                            regex_group_number = self._backward_parsers_indexes[parser.name][1]
-                            clues[parser.name] = [
-                                backward_groups[i]
-                                for i in range(regex_index + 1, regex_index + regex_group_number + 1)
-                            ]
-                            right -= 1
-                            break
-                        right -= 1
+                    left, right = self._calculate_range_for_search(backward_groups, clues, name)
+                    self._brute_subregexes_matching(clues, left, right, line)
+                break
         return clues
+
+    def _calculate_range_for_search(self, backward_groups, clues, name):
+        left = self._numbers_in_list[name] + 1
+        for parser in reversed(self._parsers):
+            if backward_groups[self._backward_parsers_indexes[parser.name][0]] is not None:
+                regex_index = self._backward_parsers_indexes[parser.name][0]
+                regex_group_number = self._backward_parsers_indexes[parser.name][1]
+                self._extract_regex_params_from_match(backward_groups, clues, parser.name,
+                                                      regex_group_number, regex_index)
+                right = self._parsers.index(parser) - 1
+                break
+        return left, right
+
+    def _extract_regex_params_from_match(self, groups, clues, parser_name, regex_group_number,
+                                         regex_index):
+        clues[parser_name] = [groups[i]
+                              for i in range(regex_index + 1, regex_index + regex_group_number + 1)]
+
+    def _brute_subregexes_matching(self, clues, left, right, line):
+        for i in range(left, right + 1):
+            match = self._parsers[i].get_regex_params(line)
+            if match is not None:
+                clues[self._parsers[i].name] = match

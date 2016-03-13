@@ -25,12 +25,14 @@ regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) 
 regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 regex4 = "^root cause$"
 regex5 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing"
+regex6 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
 
 parser_intent1 = UserParserIntent("connectionerror", "hydra", regex1, [1], {1: to_date})
 parser_intent2 = UserParserIntent("datamigration", "hydra", regex2, [1], {1: to_date})
 parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_date})
 parser_intent4 = UserParserIntent("rootcause", "filesystem", regex4, [], {})
 parser_intent5 = UserParserIntent("date", "filesystem", regex5, [1], {1: to_date})
+parser_intent6 = UserParserIntent("onlymissdata", "filesystem", regex6, [1], {1: to_date})
 
 parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
 effect_id = 2
@@ -92,15 +94,9 @@ class TestBasic(TestCase):
         parser3 = RegexParserFactory.create_from_intent(parser_intent3)
         parser4 = RegexParserFactory.create_from_intent(parser_intent4)
         parser5 = RegexParserFactory.create_from_intent(parser_intent5)
+        parser6 = RegexParserFactory.create_from_intent(parser_intent6)
 
-        concated = ConcatedRegexParser([parser1, parser2, parser3, parser4, parser5])
-        assert concated._forward_parsers_indexes == {
-            parser1.name: (0, 3),
-            parser2.name: (4, 4),
-            parser3.name: (9, 4),
-            parser4.name: (14, 0),
-            parser5.name: (15, 1)
-        }
+        concated = ConcatedRegexParser([parser1, parser2, parser3, parser4, parser5, parser6])
 
         assert concated.get_extracted_regex_params("aaaaa") == {}
         assert concated.get_extracted_regex_params(content1) == {
@@ -115,18 +111,8 @@ class TestBasic(TestCase):
         }
         assert concated.get_extracted_regex_params(content3) == {
             parser3.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-            parser5.name: ["2015-12-03 12:11:00"]
+            parser5.name: ["2015-12-03 12:11:00"],
+            parser6.name: ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
         }
 
         assert concated.get_extracted_regex_params(content4) == {parser4.name: []}
-
-        assert re.match(
-            "(" + regex5 + ")|(" + regex3 + ")", content3
-        ).groups() == (
-            '2015-12-03 12:11:00 Data is missing', '2015-12-03 12:11:00', None, None, None, None,
-            None
-        )
-        assert re.match("(" + regex3 + ")|(" + regex5 + ")", content3).groups() == (
-            '2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101',
-            '2015-12-03 12:11:00', 'alfa21', '567.02', '101', None, None
-        )
