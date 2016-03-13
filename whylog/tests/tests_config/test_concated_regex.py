@@ -1,8 +1,8 @@
-from unittest import TestCase
-import uuid
-import six
-
 import random
+import uuid
+from unittest import TestCase
+
+import six
 
 from whylog.config import RegexParserFactory
 from whylog.config.parsers import ConcatedRegexParser
@@ -43,16 +43,19 @@ class TestConcatedRegexParser(TestCase):
         concated = ConcatedRegexParser([parser1, parser2, parser3, parser4, parser5, parser6])
 
         assert concated.get_extracted_regex_params("aaaaa") == {}
+
         assert concated.get_extracted_regex_params(content1) == {
             parser1.name: [
                 "2015-12-03 12:08:09", "alfa36", "2"
             ]
         }
+
         assert concated.get_extracted_regex_params(content2) == {
             parser2.name: [
                 "2015-12-03 12:10:10", "alfa36", "alfa21", "2"
             ]
         }
+
         assert concated.get_extracted_regex_params(content3) == {
             parser3.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
             parser5.name: ["2015-12-03 12:11:00"],
@@ -101,7 +104,8 @@ class TestConcatedRegexParser(TestCase):
         dummy_parser = RegexParserFactory.create_from_intent(parser_intent4)
 
         concated = ConcatedRegexParser(
-            [parser1, dummy_parser, dummy_parser, parser2, dummy_parser, dummy_parser, parser3])
+            [parser1, dummy_parser, dummy_parser, parser2, dummy_parser, dummy_parser, parser3]
+        )
 
         content = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
 
@@ -147,7 +151,7 @@ class TestConcatedRegexParser(TestCase):
         regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
         regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
 
-        parser_intent1 = UserParserIntent("date", "filesystem", regex1, [1], {1: to_date})
+        parser_intent1 = UserParserIntent("lostdata", "filesystem", regex1, [1], {1: to_date})
         parser_intent2 = UserParserIntent("onlymissdata", "filesystem", regex2, [1], {1: to_date})
 
         parser1 = RegexParserFactory.create_from_intent(parser_intent1)
