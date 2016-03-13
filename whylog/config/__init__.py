@@ -61,10 +61,10 @@ class AbstractConfig(object):
 
 @six.add_metaclass(ABCMeta)
 class AbstractFileConfig(AbstractConfig):
-    def __init__(self, parsers_path, rules_path, log_locations_path):
+    def __init__(self, parsers_path, rules_path, log_type_path):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
-        self._log_locations_path = log_locations_path
+        self._log_type_path = log_type_path
         super(AbstractFileConfig, self).__init__()
 
     def _load_parsers(self):
@@ -79,6 +79,11 @@ class AbstractFileConfig(AbstractConfig):
             for serialized_rule in self._load_file_with_config(self._rules_path)
         ]
 
+    def _load_log_types(self):
+        return [
+            LogTypeFactory.from_dao(serialized_log_type)
+            for serialized_log_type in self._load_file_with_config(self._log_type_path)
+        ]
 
     @abstractmethod
     def _load_file_with_config(self, path):
@@ -102,8 +107,8 @@ class AbstractFileConfig(AbstractConfig):
 
 
 class YamlConfig(AbstractFileConfig):
-    def __init__(self, parsers_path, rules_path, log_locations_path):
-        super(YamlConfig, self).__init__(parsers_path, rules_path, log_locations_path)
+    def __init__(self, parsers_path, rules_path, log_type_path):
+        super(YamlConfig, self).__init__(parsers_path, rules_path, log_type_path)
 
     def _load_file_with_config(self, path):
         with open(path, "r") as config_file:
@@ -117,21 +122,26 @@ class YamlConfig(AbstractFileConfig):
 
 
 class LogType(object):
-    def __init__(self, name):
+    def __init__(self, name, filename_matcher_class_name, host_pattern, path_pattern):
         self._name = name
+        self._filename_matcher_class_name = filename_matcher_class_name
+        self._host_pattern_str = host_pattern
+        self._path_pattern_str = path_pattern
+        #TODO skompilować regexy
+
+    def serialize(self):
+        return {
+            "name": self._name,
+            "filename_matcher_class_name": self._filename_matcher_class_name,
+            "host_pattern": self._host_pattern,
+            "path_pattern": self._path_pattern,
+        }
 
 
-class LogTypeManager(object):
-    DEFAULT_LOG_TYPE = "default"
-
-    def __init__(self, log_types=None):
-        self._log_types = log_types or {}
-
-    def get_log_type(self, log_type_str):
-        log_type = self._log_types.get(log_type_str)
-        if log_type is None:
-            log_type = self._log_types[log_type_str] = LogType(log_type_str)
-        return log_type
+class LogTypeFactory(object):
+    @classmethod
+    def from_dao(cls, serialized_log_type):
+        return LogType(**serialized_log_type)
 
 
 class InvestigationPlan(object):

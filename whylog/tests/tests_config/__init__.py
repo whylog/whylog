@@ -63,7 +63,7 @@ class TestBasic(TestCase):
         loaded_parsers = [
             RegexParserFactory.from_dao(dumped_parser)
             for dumped_parser in yaml.load_all(dumped_parsers)
-        ]
+            ]
         dumped_parsers_again = yaml.dump_all(
             [parser.serialize() for parser in loaded_parsers],
             explicit_start=True
@@ -75,10 +75,12 @@ class TestBasic(TestCase):
         path = os.path.join(*path_test_files)
         parsers_path = os.path.join(path, 'parsers.yaml')
         rules_path = os.path.join(path, 'rules.yaml')
+        log_type_path = os.path.join(path, 'log_type.yaml')
 
-        config = YamlConfig(parsers_path, rules_path, None)
+        config = YamlConfig(parsers_path, rules_path, log_type_path)
         assert len(config._rules) == 1
         rule = config._rules[0]
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
             parser.name for parser in config._parsers.values()
         )
+
