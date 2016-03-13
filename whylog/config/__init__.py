@@ -12,6 +12,7 @@ class AbstractConfig(object):
     def __init__(self):
         self._parsers = self._load_parsers()
         self._rules = self._load_rules()
+        self._log_types = self._load_log_types()
 
     @abstractmethod
     def _load_parsers(self):
@@ -19,6 +20,10 @@ class AbstractConfig(object):
 
     @abstractmethod
     def _load_rules(self):
+        pass
+
+    @abstractmethod
+    def _load_log_types(self):
         pass
 
     def add_rule(self, user_rule_intent):
@@ -73,6 +78,7 @@ class AbstractFileConfig(AbstractConfig):
             RegexRuleFactory.from_dao(serialized_rule, self._parsers)
             for serialized_rule in self._load_file_with_config(self._rules_path)
         ]
+
 
     @abstractmethod
     def _load_file_with_config(self, path):

@@ -1,0 +1,10 @@
+---
+class: RegexParser
+name: default
+host_pattern: localhost
+path_pattern: 'node_1.log'
+---
+class: RegexParser
+name: 'apache access log'
+host_pattern: localhost
+path_pattern: 'access.log'
