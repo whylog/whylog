@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 import six
 
-from whylog.client.searchers import BacktrackSearcher
+from whylog.log_reader.searchers import BacktrackSearcher
 
 
 @six.add_metaclass(ABCMeta)
@@ -25,7 +25,7 @@ class LogReader(AbstractLogReader):
         if not investigation_plan:
             return None  # TODO information about no investigation plan must somehow be returned to
             # the front-module - we need more data to provide the investigation
-            # we have the investigation plan, so we can begin the investigation
+            # if we have the investigation plan, we can begin the investigation
         manager = SearchManager(investigation_plan)
         return manager.investigate()
 
@@ -43,9 +43,9 @@ class SearchManager(object):
         """
         for step in self._investigation_plan.get_step():
             search_handler = SearchHandler(step)
-            # TODO do something with ret
-            ret = search_handler.investigate()
-        return None  # TODO of course return something with sense
+            # TODO where checking up the constraints should take place?
+            clues = search_handler.investigate()
+        return InvestigationResult()  # TODO of course return something with sense
 
 
 class SearchHandler(object):
@@ -53,12 +53,12 @@ class SearchHandler(object):
         self._investigation_step = investigation_step
 
     def investigate(self):
-        # TODO investigate basing on investigation_step
+        clues = []
+        # TODO where checking up the constraints should take place?
         for host, file_path in self._investigation_step.get_data():
             searcher = BacktrackSearcher(file_path)
-            # TODO do somethin with ret
-            ret = searcher.search()  # TODO on what data it should be called?
-        return None  # TODO of course return something with sense
+            clues += searcher.search(self._investigation_step)  # TODO on what data it should be called?
+        return clues  # TODO of course return something with sense
 
 
 class InvestigationResult(object):

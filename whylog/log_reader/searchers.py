@@ -17,21 +17,24 @@ class AbstractSearcher(object):
 
 
 class IndexSearcher(AbstractSearcher):
-    pass
+    def search(self, search_data):
+        pass
 
 
 class DatabaseSearcher(AbstractSearcher):
-    pass
+    def search(self, search_data):
+        pass
 
 
 class BacktrackSearcher(AbstractSearcher):
     def __init__(self, file_path):
         self._file_path = file_path
 
-    def search(self, search_data):
-        for line in self._reverse_from_offset(search_data.offset):
-            pass  # TODO check if line somehow fits
-        return None  # TODO returns line that fit
+    def search(self, investigation_step):
+        clues = []
+        for line in self._reverse_from_offset(investigation_step.offset):  # TODO offset - where it really is?
+            clues.append(investigation_step.get_clues(line))  # TODO check if line somehow fits
+        return clues
 
     @classmethod
     def _decrease_actual_offset_properly(cls, actual_offset, drop_string):
