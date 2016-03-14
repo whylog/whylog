@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import six
 import yaml
 
+from whylog.config.log_type import LogTypeFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 
@@ -12,6 +13,7 @@ class AbstractConfig(object):
     def __init__(self):
         self._parsers = self._load_parsers()
         self._rules = self._load_rules()
+        self._log_types = self._load_log_types()
 
     @abstractmethod
     def _load_parsers(self):
@@ -19,6 +21,10 @@ class AbstractConfig(object):
 
     @abstractmethod
     def _load_rules(self):
+        pass
+
+    @abstractmethod
+    def _load_log_types(self):
         pass
 
     def add_rule(self, user_rule_intent):
@@ -29,6 +35,10 @@ class AbstractConfig(object):
         self._rules.append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
+
+    def add_log_type(self, log_type):
+        #TODO Can assume that exists onlny one LogType object for one log type name
+        pass
 
     @abstractmethod
     def _save_rule_definition(self, rule_definition):
@@ -56,10 +66,10 @@ class AbstractConfig(object):
 
 @six.add_metaclass(ABCMeta)
 class AbstractFileConfig(AbstractConfig):
-    def __init__(self, parsers_path, rules_path, log_locations_path):
+    def __init__(self, parsers_path, rules_path, log_type_path):
         self._parsers_path = parsers_path
         self._rules_path = rules_path
-        self._log_locations_path = log_locations_path
+        self._log_type_path = log_type_path
         super(AbstractFileConfig, self).__init__()
 
     def _load_parsers(self):
@@ -72,6 +82,12 @@ class AbstractFileConfig(AbstractConfig):
         return [
             RegexRuleFactory.from_dao(serialized_rule, self._parsers)
             for serialized_rule in self._load_file_with_config(self._rules_path)
+        ]
+
+    def _load_log_types(self):
+        return [
+            LogTypeFactory.from_dao(serialized_log_type)
+            for serialized_log_type in self._load_file_with_config(self._log_type_path)
         ]
 
     @abstractmethod
@@ -96,8 +112,8 @@ class AbstractFileConfig(AbstractConfig):
 
 
 class YamlConfig(AbstractFileConfig):
-    def __init__(self, parsers_path, rules_path, log_locations_path):
-        super(YamlConfig, self).__init__(parsers_path, rules_path, log_locations_path)
+    def __init__(self, parsers_path, rules_path, log_type_path):
+        super(YamlConfig, self).__init__(parsers_path, rules_path, log_type_path)
 
     def _load_file_with_config(self, path):
         with open(path, "r") as config_file:
@@ -108,24 +124,6 @@ class YamlConfig(AbstractFileConfig):
 
     def _convert_parsers_to_file_form(self, parser_definitions):
         return yaml.safe_dump_all(parser_definitions, explicit_start=True)
-
-
-class LogType(object):
-    def __init__(self, name):
-        self._name = name
-
-
-class LogTypeManager(object):
-    DEFAULT_LOG_TYPE = "default"
-
-    def __init__(self, log_types=None):
-        self._log_types = log_types or {}
-
-    def get_log_type(self, log_type_str):
-        log_type = self._log_types.get(log_type_str)
-        if log_type is None:
-            log_type = self._log_types[log_type_str] = LogType(log_type_str)
-        return log_type
 
 
 class InvestigationPlan(object):
@@ -175,9 +173,4 @@ class Clue(object):
     """
 
     def __init__(self, regex_parameters, line_time, line_content, line_source):
-        pass
-
-
-class LogLocation(object):
-    def __init__(self, filename_parser, log_type):
         pass

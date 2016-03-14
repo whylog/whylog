@@ -75,8 +75,9 @@ class TestBasic(TestCase):
         path = os.path.join(*path_test_files)
         parsers_path = os.path.join(path, 'parsers.yaml')
         rules_path = os.path.join(path, 'rules.yaml')
+        log_type_path = os.path.join(path, 'log_type.yaml')
 
-        config = YamlConfig(parsers_path, rules_path, None)
+        config = YamlConfig(parsers_path, rules_path, log_type_path)
         assert len(config._rules) == 1
         rule = config._rules[0]
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
