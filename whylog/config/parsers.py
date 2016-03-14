@@ -31,7 +31,7 @@ class RegexParser(AbstractParser):
     def get_regex_params(self, line):
         matches = self.regex.match(line)
         if matches is not None:
-            return list(matches.groups())
+            return matches.groups()
 
     def serialize(self):
         return {
@@ -125,9 +125,9 @@ class ConcatedRegexParser(object):
 
     def get_extracted_regex_params(self, line):
         if IMPORTED_RE:
-            clues = {}
-            self._brute_subregexes_matching(clues, 0, len(self._parsers) - 1, line)
-            return clues
+            extracted_regex_params = {}
+            self._brute_subregexes_matching(extracted_regex_params, 0, len(self._parsers) - 1, line)
+            return extracted_regex_params
         forward_matched = self._forward_regex.match(line)
         if forward_matched is None:
             return ConcatedRegexParser.NO_MATCH
@@ -141,20 +141,20 @@ class ConcatedRegexParser(object):
         regex_params = self._extract_regex_params_by_regex_name(
             forward_groups, forward_matched_regex_name, self._forward_parsers_indexes
         )
-        clues = {forward_matched_regex_name: regex_params}
+        extracted_regex_params = {forward_matched_regex_name: regex_params}
         if only_one:
-            return clues
+            return extracted_regex_params
         backward_matched_regex_name = self._get_first_matches_regex_name(
             backward_groups, self._backward_group_index_to_regex
         )
         regex_params = self._extract_regex_params_by_regex_name(
             backward_groups, backward_matched_regex_name, self._backward_parsers_indexes
         )
-        clues[backward_matched_regex_name] = regex_params
+        extracted_regex_params[backward_matched_regex_name] = regex_params
         left = self._numbers_in_list[forward_matched_regex_name] + 1
         right = self._numbers_in_list[backward_matched_regex_name] - 1
-        self._brute_subregexes_matching(clues, left, right, line)
-        return clues
+        self._brute_subregexes_matching(extracted_regex_params, left, right, line)
+        return extracted_regex_params
 
     def _extract_regex_params_by_regex_name(self, groups, matched_regex_name, parsers_indexes):
         start_index = parsers_indexes[matched_regex_name][0]
@@ -190,10 +190,10 @@ class ConcatedRegexParser(object):
         return groups[-1] is not None
 
     def _extract_regex_params(self, groups, regex_group_number, regex_index):
-        return [
+        return tuple(
             groups[i]
             for i in six.moves.range(regex_index + 1, regex_index + regex_group_number + 1)
-        ]
+        )
 
     def _brute_subregexes_matching(self, clues, left, right, line):
         for i in six.moves.range(left, right + 1):

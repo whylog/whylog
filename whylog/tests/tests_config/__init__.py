@@ -7,26 +7,13 @@ from whylog.config import YamlConfig
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
+from whylog.tests.tests_config.consts_for_tests import *
 
 # Constraint types
 identical_constr = "identical"
 different_constr = "different"
 hetero_constr = "hetero"
 
-# convertions
-to_date = "date"
-
-content1 = "2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2"
-content2 = "2015-12-03 12:10:10 Data migration from alfa36 to alfa21 failed. Host name: 2"
-content3 = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
-
-regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
-regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
-regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
-
-parser_intent1 = UserParserIntent("connectionerror", "hydra", regex1, [1], {1: to_date})
-parser_intent2 = UserParserIntent("datamigration", "hydra", regex2, [1], {1: to_date})
-parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_date})
 
 parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
 effect_id = 2
