@@ -180,14 +180,14 @@ class ConcatedRegexParser(object):
         ] is not None
 
     def _extract_params_from_last_regex(self, forward_groups):
-        last_regex_name = self._parsers[len(self._parsers) - 1].name
+        last_regex_name = self._parsers[-1].name
         last_regex_params = self._extract_regex_params_by_regex_name(
             forward_groups, last_regex_name, self._forward_parsers_indexes
         )
         return {last_regex_name: last_regex_params}
 
     def _is_matched_last_group(self, groups):
-        return groups[len(groups) - 1] is not None
+        return groups[-1] is not None
 
     def _extract_regex_params(self, groups, regex_group_number, regex_index):
         return [
