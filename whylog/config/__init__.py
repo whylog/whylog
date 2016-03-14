@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import six
 import yaml
 
+from whylog.config.log_type import LogTypeFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 
@@ -34,6 +35,10 @@ class AbstractConfig(object):
         self._rules.append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
+
+    def add_log_type(self, log_type):
+        #TODO Can assume that exists onlny one LogType object for one log type name
+        pass
 
     @abstractmethod
     def _save_rule_definition(self, rule_definition):
@@ -121,29 +126,6 @@ class YamlConfig(AbstractFileConfig):
         return yaml.safe_dump_all(parser_definitions, explicit_start=True)
 
 
-class LogType(object):
-    def __init__(self, name, filename_matcher_class_name, host_pattern, path_pattern):
-        self._name = name
-        self._filename_matcher_class_name = filename_matcher_class_name
-        self._host_pattern_str = host_pattern
-        self._path_pattern_str = path_pattern
-        #TODO skompilować regexy
-
-    def serialize(self):
-        return {
-            "name": self._name,
-            "filename_matcher_class_name": self._filename_matcher_class_name,
-            "host_pattern": self._host_pattern,
-            "path_pattern": self._path_pattern,
-        }
-
-
-class LogTypeFactory(object):
-    @classmethod
-    def from_dao(cls, serialized_log_type):
-        return LogType(**serialized_log_type)
-
-
 class InvestigationPlan(object):
     def __init__(self, front_input, rule_subset, log_location_dict):
         pass
@@ -191,9 +173,4 @@ class Clue(object):
     """
 
     def __init__(self, regex_parameters, line_time, line_content, line_source):
-        pass
-
-
-class LogLocation(object):
-    def __init__(self, filename_parser, log_type):
         pass

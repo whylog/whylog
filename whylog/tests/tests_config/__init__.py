@@ -63,7 +63,7 @@ class TestBasic(TestCase):
         loaded_parsers = [
             RegexParserFactory.from_dao(dumped_parser)
             for dumped_parser in yaml.load_all(dumped_parsers)
-            ]
+        ]
         dumped_parsers_again = yaml.dump_all(
             [parser.serialize() for parser in loaded_parsers],
             explicit_start=True
@@ -83,4 +83,3 @@ class TestBasic(TestCase):
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
             parser.name for parser in config._parsers.values()
         )
-
