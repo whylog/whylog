@@ -51,7 +51,19 @@ class Teacher(object):
         """
         pass
 
+    def set_convertion(self, group, conversion):
+        pass
+
+    def set_primary_key(self, groups):
+        pass
+
+    def set_log_type(self, line_id, log_type):
+        pass
+
     def register_constraint(self, constr_id, constr_type, groups, params):
+        pass
+
+    def remove_constraint(self, constr_id):
         pass
 
     def set_causes_relation(self, relation):
