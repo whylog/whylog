@@ -25,12 +25,12 @@ class Teacher(object):
         self.pattern_assistant = pattern_assistant
 
     def add_line(self, line_id, line_object):
-        self.lines[line_id] = line_object
+        self._lines[line_id] = line_object
 
     def remove_line(self, line_id):
-        del self.lines[id]
+        del self._lines[line_id]
         if line_id == self.effect_id:
-            # TODO: return something that represents warning "No effect line, remember to add it!"
+            # TODO: do something that represents warning "No effect line, remember to add it!"
             pass
 
     def update_pattern(self, line_id, proposed_pattern):
