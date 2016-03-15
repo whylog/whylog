@@ -1,4 +1,3 @@
-import uuid
 from unittest import TestCase
 
 import six
@@ -6,207 +5,155 @@ import six
 from whylog.config import RegexParserFactory
 from whylog.config.parsers import ConcatedRegexParser
 from whylog.teacher.user_intent import UserParserIntent
-from whylog.tests.tests_config.consts_for_tests import *
+
+# convertions
+to_date = "date"
 
 
 class TestConcatedRegexParser(TestCase):
-    def test_common_cases(self):
+    def setUp(self):
+        self.connection_error_line = "2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2"
+        self.data_migration_line = "2015-12-03 12:10:10 Data migration from alfa36 to alfa21 failed. Host name: 2"
+        self.lost_data_line = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
+        self.root_cause_line = "root cause"
 
-        concated = ConcatedRegexParser([parser1, parser2, parser3, parser4, parser5, parser6])
+        regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
+        regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
+        regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
+        regex4 = "^root cause$"
+        regex5 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing"
+        regex6 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
+        regex7 = "^dummy regex"
+
+        parser_intent1 = UserParserIntent("connectionerror", "hydra", regex1, [1], {1: to_date})
+        parser_intent2 = UserParserIntent("datamigration", "hydra", regex2, [1], {1: to_date})
+        parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_date})
+        parser_intent4 = UserParserIntent("rootcause", "filesystem", regex4, [], {})
+        parser_intent5 = UserParserIntent("date", "filesystem", regex5, [1], {1: to_date})
+        parser_intent6 = UserParserIntent("onlymissdata", "filesystem", regex6, [1], {1: to_date})
+        parser_intent7 = UserParserIntent("dummy", "filesystem", regex7, [], {1: to_date})
+
+        self.connection_error = RegexParserFactory.create_from_intent(parser_intent1)
+        self.data_migration = RegexParserFactory.create_from_intent(parser_intent2)
+        self.lost_data = RegexParserFactory.create_from_intent(parser_intent3)
+        self.root_cause = RegexParserFactory.create_from_intent(parser_intent4)
+        self.lost_data_date = RegexParserFactory.create_from_intent(parser_intent5)
+        self.lost_data_suffix = RegexParserFactory.create_from_intent(parser_intent6)
+        self.dummy_parser = RegexParserFactory.create_from_intent(parser_intent7)
+
+    def test_common_cases(self):
+        concated = ConcatedRegexParser([self.connection_error, self.data_migration, self.lost_data,
+                                        self.root_cause, self.lost_data_date, self.lost_data_suffix])
 
         assert concated.get_extracted_regex_params("aaaaa") == {}
 
-        assert concated.get_extracted_regex_params(content1) == {
-            parser1.name: (
+        assert concated.get_extracted_regex_params(self.connection_error_line) == {
+            self.connection_error.name: (
                 "2015-12-03 12:08:09", "alfa36", "2"
             )
         }
 
-        assert concated.get_extracted_regex_params(content2) == {
-            parser2.name: (
+        assert concated.get_extracted_regex_params(self.data_migration_line) == {
+            self.data_migration.name: (
                 "2015-12-03 12:10:10", "alfa36", "alfa21", "2"
             )
         }
 
-        assert concated.get_extracted_regex_params(content3) == {
-            parser3.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            parser5.name: ("2015-12-03 12:11:00",),
-            parser6.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_date.name: ("2015-12-03 12:11:00",),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
         }
 
-        assert concated.get_extracted_regex_params(content4) == {parser4.name: ()}
+        assert concated.get_extracted_regex_params(self.root_cause_line) == {self.root_cause.name: ()}
 
-    # def test_all_subregexes_matches(self):
-    #     regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
-    #     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
-    #     regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing"
-    #
-    #     parser_intent1 = UserParserIntent("date", "filesystem", regex1, [1], {1: to_date})
-    #     parser_intent2 = UserParserIntent("onlymissdata", "filesystem", regex2, [1], {1: to_date})
-    #     parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_date})
-    #
-    #     parser1 = RegexParserFactory.create_from_intent(parser_intent1)
-    #     parser2 = RegexParserFactory.create_from_intent(parser_intent2)
-    #     parser3 = RegexParserFactory.create_from_intent(parser_intent3)
-    #
-    #     concated = ConcatedRegexParser([parser1, parser2, parser3])
-    #
-    #     content = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         parser1.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         parser2.name: ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #         parser3.name: ["2015-12-03 12:11:00"],
-    #     }
-    #
-    # def test_matches_first_and_last_and_one_in_middle(self):
-    #     regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
-    #     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
-    #     regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing"
-    #     dummy_regex = "^dummy regex"
-    #
-    #     parser_intent1 = UserParserIntent("date", "filesystem", regex1, [1], {1: to_date})
-    #     parser_intent2 = UserParserIntent("onlymissdata", "filesystem", regex2, [1], {1: to_date})
-    #     parser_intent3 = UserParserIntent("lostdata", "filesystem", regex3, [1], {1: to_date})
-    #     parser_intent4 = UserParserIntent("dummy", "filesystem", dummy_regex, [], {1: to_date})
-    #
-    #     parser1 = RegexParserFactory.create_from_intent(parser_intent1)
-    #     parser2 = RegexParserFactory.create_from_intent(parser_intent2)
-    #     parser3 = RegexParserFactory.create_from_intent(parser_intent3)
-    #     dummy_parser = RegexParserFactory.create_from_intent(parser_intent4)
-    #
-    #     concated = ConcatedRegexParser(
-    #         [parser1, dummy_parser, dummy_parser, parser2, dummy_parser, dummy_parser, parser3]
-    #     )
-    #
-    #     content = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         parser1.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         parser2.name: ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #         parser3.name: ["2015-12-03 12:11:00"],
-    #     }
-    #
-    # def test_matches_first_and_second_and_reverse(self):
-    #     regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
-    #     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
-    #     regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
-    #     regex4 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
-    #
-    #     parser_intent1 = UserParserIntent("date", "filesystem", regex1, [1], {1: to_date})
-    #     parser_intent2 = UserParserIntent("onlymissdata", "filesystem", regex2, [1], {1: to_date})
-    #     parser_intent3 = UserParserIntent("connectionerror", "hydra", regex3, [1], {1: to_date})
-    #     parser_intent4 = UserParserIntent("datamigration", "hydra", regex4, [1], {1: to_date})
-    #
-    #     parser1 = RegexParserFactory.create_from_intent(parser_intent1)
-    #     parser2 = RegexParserFactory.create_from_intent(parser_intent2)
-    #     parser3 = RegexParserFactory.create_from_intent(parser_intent3)
-    #     parser4 = RegexParserFactory.create_from_intent(parser_intent4)
-    #
-    #     content = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
-    #
-    #     concated = ConcatedRegexParser([parser1, parser2, parser3, parser4])
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         parser1.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         parser2.name: ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
-    #
-    #     concated = ConcatedRegexParser([parser4, parser3, parser2, parser1])
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         parser1.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         parser2.name: ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
-    #
-    # def test_single_subregex(self):
-    #     regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
-    #     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
-    #
-    #     parser_intent1 = UserParserIntent("lostdata", "filesystem", regex1, [1], {1: to_date})
-    #     parser_intent2 = UserParserIntent("onlymissdata", "filesystem", regex2, [1], {1: to_date})
-    #
-    #     parser1 = RegexParserFactory.create_from_intent(parser_intent1)
-    #     parser2 = RegexParserFactory.create_from_intent(parser_intent2)
-    #
-    #     content = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
-    #
-    #     concated = ConcatedRegexParser([parser1])
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         parser1.name: ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #     }
-    #
-    #     concated = ConcatedRegexParser([parser2])
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         parser2.name: ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
-    #
-    # def test_large_concated_regex(self):
-    #     regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
-    #     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
-    #     regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
-    #     regex4 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
-    #
-    #     size = 100
-    #
-    #     parser_intent1 = UserParserIntent("lostdata", "filesystem", regex1, [1], {1: to_date})
-    #     parser_intent2 = UserParserIntent("onlymissdata", "filesystem", regex2, [1], {1: to_date})
-    #
-    #     base_list = []
-    #
-    #     for i in six.moves.range(size):
-    #         if i % 2 == 0:
-    #             base_list.append(UserParserIntent(uuid.uuid4(), "hydra", regex3, [1], {1: to_date}))
-    #         else:
-    #             base_list.append(UserParserIntent(uuid.uuid4(), "hydra", regex4, [1], {1: to_date}))
-    #
-    #     content = "2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101"
-    #
-    #     intents_list = [parser_intent1, parser_intent2] + base_list
-    #
-    #     parser_list = [RegexParserFactory.create_from_intent(intent) for intent in intents_list]
-    #
-    #     concated = ConcatedRegexParser(parser_list)
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         "lostdata": ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         "onlymissdata": ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
-    #
-    #     concated = ConcatedRegexParser(list(reversed(parser_list)))
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         "lostdata": ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         "onlymissdata": ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
-    #
-    #     intents_list = [parser_intent1] + base_list + [parser_intent2]
-    #
-    #     parser_list = [RegexParserFactory.create_from_intent(intent) for intent in intents_list]
-    #
-    #     concated = ConcatedRegexParser(parser_list)
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         "lostdata": ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         "onlymissdata": ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
-    #
-    #     random.shuffle(parser_list)
-    #
-    #     concated = ConcatedRegexParser(parser_list)
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         "lostdata": ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         "onlymissdata": ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
-    #
-    #     random.shuffle(parser_list)
-    #
-    #     concated = ConcatedRegexParser(parser_list)
-    #
-    #     assert concated.get_extracted_regex_params(content) == {
-    #         "lostdata": ["2015-12-03 12:11:00", "alfa21", "567.02", "101"],
-    #         "onlymissdata": ["2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"],
-    #     }
+    def test_all_subregexes_matches(self):
+        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix, self.lost_data_date])
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_date.name: ("2015-12-03 12:11:00",),
+        }
+
+    def test_matches_first_and_last_and_one_in_middle(self):
+        concated = ConcatedRegexParser(
+            [self.lost_data, self.dummy_parser, self.dummy_parser, self.lost_data_suffix, self.dummy_parser,
+             self.dummy_parser, self.lost_data_date]
+        )
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_date.name: ("2015-12-03 12:11:00",),
+        }
+
+    def test_matches_first_and_second_and_reverse(self):
+        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix, self.connection_error,
+                                        self.data_migration])
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        }
+
+        concated = ConcatedRegexParser([self.data_migration, self.connection_error, self.lost_data_suffix,
+                                        self.lost_data])
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        }
+
+    def test_single_subregex(self):
+        concated = ConcatedRegexParser([self.lost_data])
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+        }
+
+        concated = ConcatedRegexParser([self.lost_data_suffix])
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        }
+
+    def get_no_lost_data_parser_list(self):
+        size = 100
+        base_list = []
+        for i in six.moves.range(size):
+            if i % 2 == 0:
+                parser = self.connection_error
+            else:
+                parser = self.data_migration
+            base_list.append(parser)
+        return base_list
+
+    def test_large_matches_first_and_second(self):
+        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix] + self.get_no_lost_data_parser_list())
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        }
+
+    def test_large_matches_first_second_and_last(self):
+        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix] + self.get_no_lost_data_parser_list() +
+                                       [self.lost_data_date])
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_date.name: ("2015-12-03 12:11:00",),
+        }
+
+    def test_large_matches_first_and_last_two(self):
+        concated = ConcatedRegexParser([self.lost_data_suffix] + self.get_no_lost_data_parser_list() +
+                                       [self.lost_data, self.lost_data_date])
+
+        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_date.name: ("2015-12-03 12:11:00",),
+        }
+
