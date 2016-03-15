@@ -20,22 +20,23 @@ path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
 
 class TestBasic(TestCase):
-    def setUp(self):
-        self.regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
-        self.regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
-        self.regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
+    @classmethod
+    def setUpClass(cls):
+        cls.regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
+        cls.regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
+        cls.regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
-        self.parser_intent1 = UserParserIntent(
-            "connectionerror", "hydra", self.regex1, [1], {1: to_date}
+        cls.parser_intent1 = UserParserIntent(
+            "connectionerror", "hydra", cls.regex1, [1], {1: to_date}
         )
-        self.parser_intent2 = UserParserIntent(
-            "datamigration", "hydra", self.regex2, [1], {1: to_date}
+        cls.parser_intent2 = UserParserIntent(
+            "datamigration", "hydra", cls.regex2, [1], {1: to_date}
         )
-        self.parser_intent3 = UserParserIntent(
-            "lostdata", "filesystem", self.regex3, [1], {1: to_date}
+        cls.parser_intent3 = UserParserIntent(
+            "lostdata", "filesystem", cls.regex3, [1], {1: to_date}
         )
 
-        parsers = {0: self.parser_intent1, 1: self.parser_intent2, 2: self.parser_intent3}
+        parsers = {0: cls.parser_intent1, 1: cls.parser_intent2, 2: cls.parser_intent3}
         effect_id = 2
 
         constraint1 = UserConstraintIntent(identical_constr, [[0, 2], [1, 2]])
@@ -49,7 +50,7 @@ class TestBasic(TestCase):
 
         constraints = [constraint1, constraint2, constraint3, constraint4]
 
-        self.user_intent = UserRuleIntent(effect_id, parsers, constraints)
+        cls.user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
