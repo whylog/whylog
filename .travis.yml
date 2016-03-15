@@ -44,6 +44,8 @@ before_install:
   - if [ -n "$JYTHON" ]; then source $HOME/.virtualenv/jython/bin/activate; fi
 
 install:
+  # install PyYAML before pip tries to do it
+  - if [ -n "$JYTHON" -a ! -d "$HOME/PyYAML-3.11" ]; then wget https://pypi.python.org/packages/source/P/PyYAML/PyYAML-3.11.tar.gz; tar -zxvf PyYAML-3.11.tar.gz; cd PyYAML-3.11/; wget http://pyyaml.org/raw-attachment/ticket/163/jython-setup.patch; patch < jython-setup.patch; python setup.py install; cd; fi
   # `pip install -r requirements.txt` does not work on jython
   - cat requirements*.txt | xargs pip install
   - if [ -z "$SCA" ]; then python setup.py develop; fi
