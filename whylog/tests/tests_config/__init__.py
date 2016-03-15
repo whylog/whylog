@@ -25,9 +25,15 @@ class TestBasic(TestCase):
         self.regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
         self.regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
-        self.parser_intent1 = UserParserIntent("connectionerror", "hydra", self.regex1, [1], {1: to_date})
-        self.parser_intent2 = UserParserIntent("datamigration", "hydra", self.regex2, [1], {1: to_date})
-        self.parser_intent3 = UserParserIntent("lostdata", "filesystem", self.regex3, [1], {1: to_date})
+        self.parser_intent1 = UserParserIntent(
+            "connectionerror", "hydra", self.regex1, [1], {1: to_date}
+        )
+        self.parser_intent2 = UserParserIntent(
+            "datamigration", "hydra", self.regex2, [1], {1: to_date}
+        )
+        self.parser_intent3 = UserParserIntent(
+            "lostdata", "filesystem", self.regex3, [1], {1: to_date}
+        )
 
         parsers = {0: self.parser_intent1, 1: self.parser_intent2, 2: self.parser_intent3}
         effect_id = 2
@@ -35,7 +41,11 @@ class TestBasic(TestCase):
         constraint1 = UserConstraintIntent(identical_constr, [[0, 2], [1, 2]])
         constraint2 = UserConstraintIntent(identical_constr, [[1, 3], [2, 2]])
         constraint3 = UserConstraintIntent(different_constr, [[1, 2], [1, 3]])
-        constraint4 = UserConstraintIntent(hetero_constr, [[0, 3], [1, 4], [2, 4]], {"different": 1})
+        constraint4 = UserConstraintIntent(
+            hetero_constr, [[0, 3], [1, 4], [2, 4]], {
+                "different": 1
+            }
+        )
 
         constraints = [constraint1, constraint2, constraint3, constraint4]
 

@@ -3,7 +3,7 @@ from unittest import TestCase
 import six
 
 from whylog.config import RegexParserFactory
-from whylog.config.parsers import ConcatedRegexParser
+from whylog.config.parsers import ConcatenatedRegexParser
 from whylog.teacher.user_intent import UserParserIntent
 
 # convertions
@@ -42,80 +42,104 @@ class TestConcatedRegexParser(TestCase):
         self.dummy_parser = RegexParserFactory.create_from_intent(parser_intent7)
 
     def test_common_cases(self):
-        concated = ConcatedRegexParser([self.connection_error, self.data_migration, self.lost_data,
-                                        self.root_cause, self.lost_data_date, self.lost_data_suffix])
+        concatenated = ConcatenatedRegexParser(
+            [
+                self.connection_error, self.data_migration, self.lost_data, self.root_cause,
+                self.lost_data_date, self.lost_data_suffix
+            ]
+        )
 
-        assert concated.get_extracted_regex_params("aaaaa") == {}
+        assert concatenated.get_extracted_regex_params("aaaaa") == {}
 
-        assert concated.get_extracted_regex_params(self.connection_error_line) == {
+        assert concatenated.get_extracted_regex_params(self.connection_error_line) == {
             self.connection_error.name: (
                 "2015-12-03 12:08:09", "alfa36", "2"
             )
         }
 
-        assert concated.get_extracted_regex_params(self.data_migration_line) == {
+        assert concatenated.get_extracted_regex_params(self.data_migration_line) == {
             self.data_migration.name: (
                 "2015-12-03 12:10:10", "alfa36", "alfa21", "2"
             )
         }
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
             self.lost_data_date.name: ("2015-12-03 12:11:00",),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
         }
 
-        assert concated.get_extracted_regex_params(self.root_cause_line) == {self.root_cause.name: ()}
+        assert concatenated.get_extracted_regex_params(self.root_cause_line) == {
+            self.root_cause.name: ()
+        }
 
     def test_all_subregexes_matches(self):
-        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix, self.lost_data_date])
+        concatenated = ConcatenatedRegexParser(
+            [
+                self.lost_data, self.lost_data_suffix, self.lost_data_date
+            ]
+        )
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
             self.lost_data_date.name: ("2015-12-03 12:11:00",),
         }
 
     def test_matches_first_and_last_and_one_in_middle(self):
-        concated = ConcatedRegexParser(
-            [self.lost_data, self.dummy_parser, self.dummy_parser, self.lost_data_suffix, self.dummy_parser,
-             self.dummy_parser, self.lost_data_date]
+        concatenated = ConcatenatedRegexParser(
+            [
+                self.lost_data, self.dummy_parser, self.dummy_parser, self.lost_data_suffix,
+                self.dummy_parser, self.dummy_parser, self.lost_data_date
+            ]
         )
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
             self.lost_data_date.name: ("2015-12-03 12:11:00",),
         }
 
     def test_matches_first_and_second_and_reverse(self):
-        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix, self.connection_error,
-                                        self.data_migration])
+        concatenated = ConcatenatedRegexParser(
+            [
+                self.lost_data, self.lost_data_suffix, self.connection_error, self.data_migration
+            ]
+        )
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
         }
 
-        concated = ConcatedRegexParser([self.data_migration, self.connection_error, self.lost_data_suffix,
-                                        self.lost_data])
+        concatenated = ConcatenatedRegexParser(
+            [
+                self.data_migration, self.connection_error, self.lost_data_suffix, self.lost_data
+            ]
+        )
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
         }
 
     def test_single_subregex(self):
-        concated = ConcatedRegexParser([self.lost_data])
+        concatenated = ConcatenatedRegexParser([self.lost_data])
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
         }
 
-        concated = ConcatedRegexParser([self.lost_data_suffix])
+        concatenated = ConcatenatedRegexParser([self.lost_data_suffix])
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
         }
 
     def get_no_lost_data_parser_list(self):
@@ -130,30 +154,39 @@ class TestConcatedRegexParser(TestCase):
         return base_list
 
     def test_large_matches_first_and_second(self):
-        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix] + self.get_no_lost_data_parser_list())
+        concatenated = ConcatenatedRegexParser(
+            [self.lost_data, self.lost_data_suffix] + self.get_no_lost_data_parser_list()
+        )
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
         }
 
     def test_large_matches_first_second_and_last(self):
-        concated = ConcatedRegexParser([self.lost_data, self.lost_data_suffix] + self.get_no_lost_data_parser_list() +
-                                       [self.lost_data_date])
+        concatenated = ConcatenatedRegexParser(
+            [self.lost_data, self.lost_data_suffix] + self.get_no_lost_data_parser_list(
+            ) + [self.lost_data_date]
+        )
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
             self.lost_data_date.name: ("2015-12-03 12:11:00",),
         }
 
     def test_large_matches_first_and_last_two(self):
-        concated = ConcatedRegexParser([self.lost_data_suffix] + self.get_no_lost_data_parser_list() +
-                                       [self.lost_data, self.lost_data_date])
+        concatenated = ConcatenatedRegexParser(
+            [self.lost_data_suffix] + self.get_no_lost_data_parser_list() + [
+                self.lost_data, self.lost_data_date
+            ]
+        )
 
-        assert concated.get_extracted_regex_params(self.lost_data_line) == {
+        assert concatenated.get_extracted_regex_params(self.lost_data_line) == {
             self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name: ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
             self.lost_data_date.name: ("2015-12-03 12:11:00",),
         }
-
