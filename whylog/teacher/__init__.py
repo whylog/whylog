@@ -60,7 +60,7 @@ class Teacher(object):
     def set_log_type(self, line_id, log_type):
         pass
 
-    def register_constraint(self, constr_id, constr_type, groups, params):
+    def register_constraint(self, constr_id, constr_type, groups, params=None):
         pass
 
     def remove_constraint(self, constr_id):
