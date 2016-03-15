@@ -25,12 +25,12 @@ class Teacher(object):
         self.pattern_assistant = pattern_assistant
 
     def add_line(self, line_id, line_object):
-        self.lines[line_id] = line_object
+        self._lines[line_id] = line_object
 
     def remove_line(self, line_id):
-        del self.lines[id]
+        del self._lines[line_id]
         if line_id == self.effect_id:
-            # TODO: return something that represents warning "No effect line, remember to add it!"
+            # TODO: do something that represents warning "No effect line, remember to add it!"
             pass
 
     def update_pattern(self, line_id, proposed_pattern):
@@ -39,7 +39,7 @@ class Teacher(object):
         """
         pass
 
-    def make_groups(self, intervals):
+    def make_groups(self, groups):
         """
         Improves text patterns by adding to them groups corresponding to params in text.
         """
@@ -51,13 +51,19 @@ class Teacher(object):
         """
         pass
 
-    def register_constraint(self, constraint):
-        """
-        Sample use:
-        t = Teacher(effect, [cause1, cause2])
-        t.register_constraint(TimeConstraint(effect, cause1, min_delta=-300, max_delta=1))
-        t.register_constraint(IdenticalIntervals([interval1, interval2, interval3))
-        """
+    def set_convertion(self, group, conversion):
+        pass
+
+    def set_primary_key(self, groups):
+        pass
+
+    def set_log_type(self, line_id, log_type):
+        pass
+
+    def register_constraint(self, constr_id, constr_type, groups, params=None):
+        pass
+
+    def remove_constraint(self, constr_id):
         pass
 
     def set_causes_relation(self, relation):
