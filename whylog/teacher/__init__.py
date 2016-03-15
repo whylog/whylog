@@ -39,7 +39,7 @@ class Teacher(object):
         """
         pass
 
-    def make_groups(self, intervals):
+    def make_groups(self, groups):
         """
         Improves text patterns by adding to them groups corresponding to params in text.
         """
@@ -51,13 +51,7 @@ class Teacher(object):
         """
         pass
 
-    def register_constraint(self, constraint):
-        """
-        Sample use:
-        t = Teacher(effect, [cause1, cause2])
-        t.register_constraint(TimeConstraint(effect, cause1, min_delta=-300, max_delta=1))
-        t.register_constraint(IdenticalIntervals([interval1, interval2, interval3))
-        """
+    def register_constraint(self, constr_id, constr_type, groups, params):
         pass
 
     def set_causes_relation(self, relation):
