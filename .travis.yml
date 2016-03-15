@@ -41,7 +41,7 @@ before_install:
   - if [ -n "$JYTHON" -a ! -d "$HOME/jython-pip" ]; then wget https://pypi.python.org/packages/py2.py3/p/pip/pip-7.1.2-py2.py3-none-any.whl -O ~/jython-pip/pip-7.1.2-py2.py3-none-any.whl; fi
   # create jython virtualenv
   - if [ -n "$JYTHON" -a ! -d "$HOME/.virtualenv/jython" ]; then virtualenv --system-site-packages --extra-search-dir=$HOME/jython-pip -p $HOME/jython/bin/jython $HOME/.virtualenv/jython; fi
-  - if [ -n "$JYTHON" -a ! -d "$HOME/.virtualenv/jython" ]; then source $HOME/.virtualenv/jython/bin/activate; fi
+  - if [ -n "$JYTHON" ]; then source $HOME/.virtualenv/jython/bin/activate; fi
 
 install:
   # `pip install -r requirements.txt` does not work on jython
