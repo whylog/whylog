@@ -3,19 +3,19 @@ convertions: {1: date}
 log_type: filesystem
 name: lostdata
 primary_key_groups: [1]
-regex: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*)
+regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*)
   GB\. Host name: (.*)$'
 ---
 convertions: {1: date}
 log_type: hydra
 name: connectionerror
 primary_key_groups: [1]
-regex: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host
+regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host
   name: (.*)$'
 ---
 convertions: {1: date}
 log_type: hydra
 name: datamigration
 primary_key_groups: [1]
-regex: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\.
+regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\.
   Host name: (.*)$'
