@@ -1,3 +1,4 @@
+import itertools
 from unittest import TestCase
 
 import six
@@ -55,6 +56,21 @@ class TestConcatedRegexParser(TestCase):
             base_list.append(parser)
         return base_list
 
+    def is_three_lost_data_parsers_matched(self, concatenated):
+        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_date.name: ("2015-12-03 12:11:00",),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        }
+
+    def is_two_lost_data_parsers_matched(self, concatenated):
+        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
+            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
+            self.lost_data_suffix.name:
+            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
+        }
+
     def test_common_cases(self):
         concatenated = ConcatenatedRegexParser(
             [
@@ -77,12 +93,7 @@ class TestConcatedRegexParser(TestCase):
             )
         }
 
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_date.name: ("2015-12-03 12:11:00",),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-        }
+        self.is_three_lost_data_parsers_matched(concatenated)
 
         assert concatenated.get_extracted_parsers_params(self.root_cause_line) == {
             self.root_cause.name: ()
@@ -95,12 +106,7 @@ class TestConcatedRegexParser(TestCase):
             ]
         )
 
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-            self.lost_data_date.name: ("2015-12-03 12:11:00",),
-        }
+        self.is_three_lost_data_parsers_matched(concatenated)
 
     def test_matches_first_and_last_and_one_in_middle(self):
         concatenated = ConcatenatedRegexParser(
@@ -110,37 +116,14 @@ class TestConcatedRegexParser(TestCase):
             ]
         )
 
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-            self.lost_data_date.name: ("2015-12-03 12:11:00",),
-        }
+        self.is_three_lost_data_parsers_matched(concatenated)
 
-    def test_matches_first_and_second_and_reverse(self):
-        concatenated = ConcatenatedRegexParser(
-            [
-                self.lost_data, self.lost_data_suffix, self.connection_error, self.data_migration
-            ]
-        )
-
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-        }
-
-        concatenated = ConcatenatedRegexParser(
-            [
-                self.data_migration, self.connection_error, self.lost_data_suffix, self.lost_data
-            ]
-        )
-
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-        }
+    def test_two_parsers_matches_permutations(self):
+        for parser_list in itertools.permutations(
+            [self.data_migration, self.connection_error, self.lost_data_suffix, self.lost_data], 4
+        ):
+            concatenated = ConcatenatedRegexParser(parser_list)
+            self.is_two_lost_data_parsers_matched(concatenated)
 
     def test_single_subregex(self):
         concatenated = ConcatenatedRegexParser([self.lost_data])
@@ -161,11 +144,7 @@ class TestConcatedRegexParser(TestCase):
             [self.lost_data, self.lost_data_suffix] + self.no_lost_data_parser_list
         )
 
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-        }
+        self.is_two_lost_data_parsers_matched(concatenated)
 
     def test_large_matches_first_second_and_last(self):
         concatenated = ConcatenatedRegexParser(
@@ -174,12 +153,7 @@ class TestConcatedRegexParser(TestCase):
             ] + self.no_lost_data_parser_list + [self.lost_data_date]
         )
 
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-            self.lost_data_date.name: ("2015-12-03 12:11:00",),
-        }
+        self.is_three_lost_data_parsers_matched(concatenated)
 
     def test_large_matches_first_and_last_two(self):
         concatenated = ConcatenatedRegexParser(
@@ -188,9 +162,4 @@ class TestConcatedRegexParser(TestCase):
             ]
         )
 
-        assert concatenated.get_extracted_parsers_params(self.lost_data_line) == {
-            self.lost_data.name: ("2015-12-03 12:11:00", "alfa21", "567.02", "101"),
-            self.lost_data_suffix.name:
-            ("2015-12-03 12:11:00", "alfa21. Loss = 567.02 GB. Host name: 101"),
-            self.lost_data_date.name: ("2015-12-03 12:11:00",),
-        }
+        self.is_three_lost_data_parsers_matched(concatenated)
