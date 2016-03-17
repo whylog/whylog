@@ -4,13 +4,13 @@ import six
 
 
 @six.add_metaclass(ABCMeta)
-class AbstractClient(object):
+class AbstractLogReader(object):
     @abstractmethod
     def get_cause(self, front_input):
         pass
 
 
-class WhylogClient(AbstractClient):
+class LogReader(AbstractLogReader):
     def __init__(self, config):
         self.config = config
 
