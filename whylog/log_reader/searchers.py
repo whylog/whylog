@@ -31,9 +31,13 @@ class BacktrackSearcher(AbstractSearcher):
         self._file_path = file_path
 
     def search(self, investigation_step):
-        clues = []
-        for line in self._reverse_from_offset(investigation_step.offset):  # TODO offset - where it really is?
-            clues.append(investigation_step.get_clues(line))  # TODO check if line somehow fits
+        # TODO should be one such function per log file
+        clues = {}
+        offset = deduce_offset(investigation_step.effect_time)  # TODO write function deduce_offset
+        for line, actual_offset in self._reverse_from_offset(offset):
+            clue_dict = investigation_step.get_clues(line, actual_offset)  # TODO check if line somehow fits
+            # TODO ^ contains dict
+            # TODO append information from clue to clues dict
         return clues
 
     @classmethod

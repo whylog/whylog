@@ -21,14 +21,10 @@ class LogReader(AbstractLogReader):
         self.config = config
 
     def get_causes(self, front_input):
-        input_log_type = self.config.get_log_type(front_input)  # TODO what to do with input_log_type?
+        input_log_type = self.config.get_log_type(front_input)
         if not input_log_type:
             return None  # TODO information about no input_log_type must somehow be returned to the Front
         investigation_plan = self.config.create_investigation_plan(front_input)  # TODO call it on input_log_type too
-        if not investigation_plan:
-            return None  # TODO information about no investigation plan must somehow be returned to
-            # the front-module - we need more data to provide the investigation
-            # if we have the investigation plan, we can begin the investigation
         manager = SearchManager(investigation_plan)
         return manager.investigate()
 
@@ -41,28 +37,30 @@ class SearchManager(object):
         self._investigation_plan = investigation_plan
 
     def investigate(self):
-        """
-        :rtype: InvestigationResult
-        """
-        for step in self._investigation_plan.get_step():
-            search_handler = SearchHandler(step)
+        for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
+            search_handler = SearchHandler(step, log_type)
             # TODO where checking up the constraints should take place?
             clues = search_handler.investigate()
+        # TODO do something with clues
         return InvestigationResult()  # TODO of course return something with sense
 
 
 class SearchHandler(object):
-    def __init__(self, investigation_step):
+    def __init__(self, investigation_step, log_type):
         self._investigation_step = investigation_step
+        self._log_type = log_type
 
     def investigate(self):
-        clues = []
-        # TODO where checking up the constraints should take place?
-        for host, file_path in self._investigation_step.get_data():
-            searcher = BacktrackSearcher(file_path)
-            clues += searcher.search(self._investigation_step)  # TODO on what data it should be called?
+        clues = []  # TODO it should be dict
+        # TODO where checking up the constraints should take place? ANSWER: no!
+        for host, path in self._log_type.get_next_file_to_parse():
+            # TODO remember about not localhost case
+            searcher = BacktrackSearcher(path)
+            clues += searcher.search(self._investigation_step)
+            # TODO add this ^ to dict, not simply append
         return clues  # TODO of course return something with sense
 
 
 class InvestigationResult(object):
     pass  # TODO discuss with Front what should be returned and in what form
+    # TODO this class will be probably replaced with FrontInput
