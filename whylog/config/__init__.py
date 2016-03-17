@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import six
 import yaml
 
+from whylog.config.mock_outputs import mocked_investigation_plan
 from whylog.config.log_type import LogTypeFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
@@ -37,7 +38,7 @@ class AbstractConfig(object):
             self._parsers[parser.name] = parser
 
     def add_log_type(self, log_type):
-        #TODO Can assume that exists onlny one LogType object for one log type name
+        #TODO Can assume that exists only one LogType object for one log type name
         pass
 
     @abstractmethod
@@ -49,7 +50,7 @@ class AbstractConfig(object):
         pass
 
     def create_investigation_plan(self, front_input):
-        pass
+        return mocked_investigation_plan()
 
     def _get_log_type(self, front_input):
         pass
@@ -127,8 +128,10 @@ class YamlConfig(AbstractFileConfig):
 
 
 class InvestigationPlan(object):
-    def __init__(self, front_input, rule_subset, log_location_dict):
-        pass
+    def __init__(self, suspected_rules, investigation_steps, log_types):
+        self._suspected_rules = suspected_rules
+        self._investigation_steps = investigation_steps
+        self._log_types = log_types
 
     def get_next_investigation_step(self):
         pass
@@ -149,15 +152,12 @@ class RuleSubset(object):
 
 
 class InvestigationStep(object):
-    """
-    Represents rules, parsers and locations of logs which are necessary
-    to find and parse log files with potential causes.
-    """
+    def __init__(self, concatenated_parser, effect_time, earliest_cause_time):
+        self._concatenated_parser = concatenated_parser
+        self.effect_time = effect_time
+        self.earliest_cause_time = earliest_cause_time
 
-    def __init__(self, parsers, rules, log_location, effect_time):
-        pass
-
-    def get_clues(self, line):
+    def get_clues(self, line, offset):
         """
         Basing on parsers creates clues in investigation
         :param line: line from parsed file
@@ -172,5 +172,5 @@ class Clue(object):
     Also, contains parsed line and its source.
     """
 
-    def __init__(self, regex_parameters, line_time, line_content, line_source):
+    def __init__(self, regex_parameters, line_time, line_prefix_content, line_source):
         pass

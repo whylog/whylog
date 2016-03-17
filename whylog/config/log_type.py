@@ -8,7 +8,7 @@ class LogType(object):
         self._host_pattern_str = host_pattern
         self._path_pattern_str = path_pattern
         self._host_regex = re.compile(self._host_pattern_str)
-        self._path_p = re.compile(self._host_pattern_str)
+        self._path_pattern = re.compile(self._host_pattern_str)
 
     def serialize(self):
         return {

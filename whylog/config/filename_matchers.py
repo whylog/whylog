@@ -11,8 +11,9 @@ class AbstractFilenameMatcher(object):
 
 
 class RegexFilenameMatcher(AbstractFilenameMatcher):
-    def __init__(self, path_pattern):
-        pass
+    def __init__(self, host_pattern, path_pattern):
+        self._host_regex = re.compile(host_pattern)
+        self._path_regex = re.compile(host_pattern)
 
     def get_matched_logs(self):
         pass
