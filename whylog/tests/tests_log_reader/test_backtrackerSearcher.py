@@ -41,7 +41,8 @@ class TestBacktrackSearcher(TestCase):
         backtracker = searchers.BacktrackSearcher(log_file_path)
 
         lines = self._read_last_n_lines_from_file(log_file_path, how_many_last_lines)
-        lines_reversed = list(backtracker._reverse_from_offset(*reverse_from_offset_params))
+        lines_reversed = [item[0] for item in list(backtracker._reverse_from_offset(*reverse_from_offset_params))]
+        print list(backtracker._reverse_from_offset(*reverse_from_offset_params))
 
         self._verify_lines(lines_reversed, lines)
 
