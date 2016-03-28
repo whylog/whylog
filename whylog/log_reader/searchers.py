@@ -56,7 +56,8 @@ class BacktrackSearcher(AbstractSearcher):
                     if buffer_[-1] is not '\n':
                         lines[-1] += truncated
                     else:
-                        actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
+                        actual_offset = self._decrease_actual_offset_properly(actual_offset,
+                                                                              truncated)
                         yield truncated, actual_offset
                 truncated = lines[0]
                 for line in reversed(lines[1:]):
