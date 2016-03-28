@@ -7,7 +7,7 @@ class AFewLinesLogParams:
 
 
 class TestPaths(object):
-    path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
+    path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
     @classmethod
     def get_file_path(cls, filename):
