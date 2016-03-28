@@ -1,8 +1,8 @@
 import os.path
 from unittest import TestCase
 
-from whylog.client import searchers
-from whylog.tests.tests_client.constants import AFewLinesLogParams, TestPaths
+from whylog.log_reader import searchers
+from whylog.tests.tests_log_reader.constants import AFewLinesLogParams, TestPaths
 
 
 class TestBacktrackSearcher(TestCase):

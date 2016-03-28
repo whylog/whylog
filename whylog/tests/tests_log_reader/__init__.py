@@ -4,11 +4,11 @@ from unittest import TestCase
 from generator import generate, generator
 from nose.plugins.skip import SkipTest
 
-from whylog.client import LogReader
+from whylog.log_reader import LogReader
 from whylog.config import YamlConfig
-from whylog.tests.tests_client.constants import TestPaths
+from whylog.tests.tests_log_reader.constants import TestPaths
 
-path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
+path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
 
 @generator
