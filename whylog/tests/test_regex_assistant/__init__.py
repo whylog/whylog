@@ -10,7 +10,7 @@ from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
     _find_date_spans_by_force, _find_spans_by_regex, find_date_spans
 )
-from whylog.front import FrontInput
+from whylog.front.utils import FrontInput
 
 
 class TestBasic(TestCase):

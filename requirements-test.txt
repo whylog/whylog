@@ -1,4 +1,5 @@
 isort
+mock
 nose
 pyflakes
 test-generator

@@ -18,6 +18,7 @@ class ConstraintLinksBase:
         :type links: list[(int, int, int)]
         """
 
+        links = links or []
         self.links = []
         self.add_links(links)
 

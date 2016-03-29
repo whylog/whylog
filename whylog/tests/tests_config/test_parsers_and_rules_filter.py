@@ -6,7 +6,7 @@ from unittest import TestCase
 import six
 
 from whylog.config import YamlConfig
-from whylog.front import FrontInput
+from whylog.front.utils import FrontInput
 from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']

@@ -5,7 +5,7 @@ from generator import generate, generator
 from nose.plugins.skip import SkipTest
 
 from whylog.config import YamlConfig
-from whylog.front import FrontInput
+from whylog.front.utils import FrontInput
 from whylog.log_reader import LogReader
 from whylog.tests.tests_log_reader.constants import TestPaths
 from whylog.tests.utils import ConfigPathFactory
