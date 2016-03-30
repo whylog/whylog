@@ -37,7 +37,8 @@ class BacktrackSearcher(AbstractSearcher):
 
     def _reverse_from_offset(self, offset, buf_size=BufsizeConsts.STANDARD_BUF_SIZE):
         """
-        a generator that returns the lines of a file in reverse order
+        a generator that returns the pairs consisting of
+        lines in reverse order and offsets corresponding to them,
         beginning with the specified offset
         """
         with open(self._file_path) as fh:
