@@ -103,11 +103,11 @@ def create_date_regex(date_text):
         if c.isalpha():
             date_regex += "[a-zA-Z]+"
         elif c.isdigit():
-            len = match.end(0) - match.start(0)
+            length = match.end(0) - match.start(0)
             repet = "+"
-            if len <= 2:
+            if length <= 2:
                 repet = "{1,2}"
-            elif len == 4:
+            elif length == 4:
                 repet = "{4}"
             date_regex += "[0-9]" + repet
         else:
