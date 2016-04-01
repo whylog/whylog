@@ -91,6 +91,25 @@ class TestBasic(TestCase):
         assert dates[0] == '2015-12-03'
         assert dates[1] == '10/Oct/1999:21:15:05 +0500'
 
+    def test_guess_regex(self):
+        line = r'2015-12-03 or [10/Oct/1999 21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
+        front_input = FrontInput(0, line, 0)
+        line_id = 1
+        ra = RegexAssistant()
+        ra.add_line(line_id, front_input)
+        ra.guess(line_id)
+        regex = ra.regex_objects[line_id].regex
 
+        matched, groups, errors = verify_regex(regex, line)
+        assert (matched, len(groups), len(errors)) == (True, 2, 0)
+        assert groups == ('2015-12-03', '10/Oct/1999 21:15:05 +0500')
 
+        similar_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "GET /index.html HTTP/1.0" 200 1043'
+        matched, groups, errors = verify_regex(regex, similar_line)
+        assert (matched, len(groups), len(errors)) == (True, 2, 0)
+        assert groups == ('2016-1-5', '11/September/2000 1:02:50 +0400')
 
+        fake_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "POST /index.html HTTP/1.0" 200 1043'
+        matched, groups, errors = verify_regex(regex, fake_line)
+        assert (matched, len(groups), len(errors)) == (False, 0, 1)
+        assert isinstance(errors[0], NotMatchingRegexError)
