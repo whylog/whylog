@@ -18,6 +18,45 @@ class NoDateGroupError(Exception):
         )
 
 
+class NotMatchingRegexError(Exception):
+    def __init__(self, line_content, regex):
+        self.line_content = line_content
+        self.regex = regex
+
+    def __str__(self):
+        return 'Regex do not match line. Regex: %s. Line content: %s' % (
+            self.regex, self.line_content
+        )
+
+
+def verify_regex(regex, text):
+    """
+    Verifies regex properties such as:
+    - matching a whole text
+    - matching text in a one way only
+    If properties are not met, proper exceptions are returned.
+    """
+    # TODO: verify if regex matches text in a one way only
+
+    # regex must match a whole text from its beginning to end.
+    if not regex[0] == "^":
+        regex = "^" + regex
+    if not regex[-1] == "$":
+        regex += "$"
+    pattern = re.compile(regex)
+
+    m = re.search(pattern, text)
+    matched = False
+    groups = []
+    errors = []
+    if m is not None:
+        matched = True
+        groups = m.groups()
+    else:
+        errors.append(NotMatchingRegexError(text, regex))
+    return matched, groups, errors
+
+
 def create_obvious_regex(text):
     """
     Creates regex form text by simple transformation:
