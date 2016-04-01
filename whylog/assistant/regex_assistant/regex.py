@@ -29,6 +29,17 @@ class NotMatchingRegexError(Exception):
         )
 
 
+class DateFromFutureError(Exception):
+    def __init__(self, parsed_date, date_text):
+        self.date_text = date_text
+        self.parsed_date = parsed_date
+
+    def __str__(self):
+        return 'Date is from future. date text %s,  parsed date %s' % (
+            self.date_text, self.parsed_date
+        )
+
+
 def verify_regex(regex, text):
     """
     Verifies regex properties such as:
