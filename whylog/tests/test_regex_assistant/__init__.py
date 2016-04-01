@@ -80,8 +80,8 @@ class TestBasic(TestCase):
         assert dates[2] == '21:15:05 +0500'
 
     def test_find_date_spans(self):
-        raw_date_regexes = {r"\d+/[a-zA-z]+/\d+:\d+:\d+:\d+ \+\d+"}
-        date_regexes = {re.compile(regex): regex for regex in raw_date_regexes}
+        raw_date_regexes = [r"\d+/[a-zA-z]+/\d+:\d+:\d+:\d+ \+\d+"]
+        date_regexes = dict((re.compile(regex), regex) for regex in raw_date_regexes)
 
         text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         spans = find_date_spans(text, date_regexes)
