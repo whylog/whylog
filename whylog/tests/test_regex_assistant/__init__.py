@@ -58,7 +58,7 @@ class TestBasic(TestCase):
         date_regex = r"\d+-\d+-\d\d"
         object_regex = r"comp\d\d"
         raw_regexes = [date_regex, object_regex]
-        regexes = {re.compile(regex): regex for regex in raw_regexes}
+        regexes = dict((re.compile(regex), regex) for regex in raw_regexes)
 
         text = r"2015-12-03 Data migration from comp36 to comp21 failed"
         spans = _find_spans_by_regex(regexes, text)
