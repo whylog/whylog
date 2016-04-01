@@ -1,5 +1,5 @@
-from whylog.assistant.regex_assistant.regex_object import RegexObject
 from whylog.assistant import AbstractAssistant
+from whylog.assistant.regex_assistant.regex_object import RegexObject
 from whylog.assistant.spans_finding import find_date_spans
 
 
