@@ -2,17 +2,6 @@ from whylog.teacher.mock_outputs import create_sample_rule
 from whylog.teacher.user_intent import UserRuleIntent
 
 
-class Interval(object):
-    """
-    Represents interval in line.
-    """
-
-    def __init__(self, start_offset, end_offset, line_id):
-        self.start_offset = start_offset
-        self.end_offset = end_offset
-        self.line_id = line_id
-
-
 class Teacher(object):
     """
     Enable teaching new rule. One Teacher per one entering rule.
