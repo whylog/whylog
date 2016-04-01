@@ -5,6 +5,10 @@ from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.assistant.regex_assistant.regex import (
     NotMatchingRegexError, create_date_regex, create_obvious_regex, verify_regex
 )
+from whylog.assistant.span import sort_by_start
+from whylog.assistant.spans_finding import (
+    _find_date_spans_by_force, _find_spans_by_regex, find_date_spans
+)
 from whylog.front import FrontInput
 
 
@@ -50,10 +54,42 @@ class TestBasic(TestCase):
         for ok_date in ok_dates:
             assert verify_regex(regex, ok_date)[0] is True
 
+    def test_find_spans_by_regex(self):
+        date_regex = r"\d+-\d+-\d\d"
+        object_regex = r"comp\d\d"
+        raw_regexes = {date_regex, object_regex}
+        regexes = {re.compile(regex): regex for regex in raw_regexes}
 
+        text = r"2015-12-03 Data migration from comp36 to comp21 failed"
+        spans = _find_spans_by_regex(regexes, text)
+        assert len(spans) == 3
+        spans = sort_by_start(spans)
+        groups = [text[s.start:s.end] for s in spans]
+        assert groups[0] == '2015-12-03'
+        assert groups[1] == 'comp36'
+        assert groups[2] == 'comp21'
 
+    def test_find_date_spans_by_force(self):
+        text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
+        spans = _find_date_spans_by_force(text)
+        assert len(spans) == 3
+        spans = sort_by_start(spans)
+        dates = [text[s.start:s.end] for s in spans]
+        assert dates[0] == '2015-12-03'
+        assert dates[1] == '10/Oct/1999'
+        assert dates[2] == '21:15:05 +0500'
 
+    def test_find_date_spans(self):
+        raw_date_regexes = {r"\d+/[a-zA-z]+/\d+:\d+:\d+:\d+ \+\d+"}
+        date_regexes = {re.compile(regex): regex for regex in raw_date_regexes}
 
+        text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
+        spans = find_date_spans(text, date_regexes)
+        assert len(spans) == 2
+        spans = sort_by_start(spans)
+        dates = [text[s.start:s.end] for s in spans]
+        assert dates[0] == '2015-12-03'
+        assert dates[1] == '10/Oct/1999:21:15:05 +0500'
 
 
 
