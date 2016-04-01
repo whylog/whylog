@@ -2,3 +2,4 @@ frozendict
 pyyaml
 regex
 six>=1.10
+dateutil
