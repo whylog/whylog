@@ -1,57 +1,60 @@
+import re
 from unittest import TestCase
 
-from nose.plugins.skip import SkipTest
-
-from whylog.assistant import RegexAssistant
-from whylog.assistant.regex_assistant_exceptions import NoDateGroupException
+from whylog.assistant.regex_assistant import RegexAssistant
+from whylog.assistant.regex_assistant.regex import (
+    NotMatchingRegexError, create_date_regex, create_obvious_regex, verify_regex
+)
 from whylog.front import FrontInput
-from whylog.teacher import Interval
 
 
 class TestBasic(TestCase):
-    def test_one(self):
-        content1 = "2015-12-03 12:08:09 Connection error occurred on beta36"
-        content2 = "2015-12-03 12:10:10 Data migration from beta36 to beta21 failed"
-        content3 = "2015-12-03 12:11:00 Data is missing on beta21"
+    def test_verify_regex(self):
+        line = r"2015-12-03 12:11:00 Data is missing on comp21"
+        regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
+        matched, groups, errors = verify_regex(regex, line)
+        assert (matched, len(groups), len(errors)) == (True, 2, 0)
+        assert groups[0] == r"2015-12-03 12:11:00"
+        assert groups[1] == r"comp21"
 
-        cause1 = FrontInput(903, content1, None)
-        cause2 = FrontInput(53, content2, None)
-        effect = FrontInput(1087, content3, None)
+        line2 = r"2015-12-03 12:11:00 Data is missing"
+        matched, groups, errors = verify_regex(regex, line2)
+        assert (matched, len(groups), len(errors)) == (False, 0, 1)
+        assert isinstance(errors[0], NotMatchingRegexError)
 
-        id_to_line_dict = {1: cause1, 2: cause2, 3: effect}
+    def test_create_obvious_regex(self):
+        line = r".^$*x+x{5}?\*[x]x|y(x)(?iLmsux)(?:x)(?P<name>x)(?#x)(?<!x)\4\b\A"
+        obvious_regex = create_obvious_regex(line)
+        assert obvious_regex == \
+               r"\.\^\$\*x\+x\{5\}\?\\\*\[x\]x\|y\(x\)\(\?iLmsux\)\(\?:x\)\(\?P<name>x\)\(\?#x\)\(\?<!x\)\\4\\b\\A"
+        matched, groups, errors = verify_regex(obvious_regex, line)
+        assert (matched, len(groups), len(errors)) == (True, 0, 0)
 
-        regex_assistant = RegexAssistant()
-        regex_assistant.add_lines(id_to_line_dict)
+    def test_create_date_regex(self):
+        date = '10/Oct/1999:21:15:05'
+        regex = create_date_regex(date)
+        matched, groups, errors = verify_regex(regex, date)
+        assert (matched, len(groups), len(errors)) == (True, 0, 0)
+        bad_dates = [
+            date + " ", date + ":", "1" + date, '10/10/1999:21:15:05', '10/Oct/199:21:15:05',
+            '10/Oct1/1999:21:15:05', '10/Oct/1999:21:15:05PM', '10/Oct/1999:021:15:05',
+            '10\Oct\1999:21:15:05'
+        ]
+        for bad_date in bad_dates:
+            assert verify_regex(regex, bad_date)[0] is False
 
-        regex_assistant.remove_lines([3])
-        assert len(regex_assistant.regexes) == 2
+        ok_dates = [
+            '1/Oct/1999:21:15:05', '10/October/1999:21:15:05', '10/Octyyy/1999:21:15:05',
+            '10/O/1999:21:15:05', '1/Oct/1999:2:1:0'
+        ]
+        for ok_date in ok_dates:
+            assert verify_regex(regex, ok_date)[0] is True
 
-        regex_assistant.add_lines({3: effect})
-        assert len(regex_assistant.regexes) == 3
 
-        assert regex_assistant.regexes[2] == '^' + content2 + '$'
 
-        beta36_in_1 = Interval(49, 54, 1)
-        beta36_in_2 = Interval(40, 45, 1)
 
-        raise SkipTest
-        # Methods called below are not implemented yet.
-        regex_assistant.make_groups([beta36_in_1, beta36_in_2])
-        assert regex_assistant.regexes[
-            1
-        ] == "^2015-12-03 12:08:09 Connection error occurred on (.*)$"
-        assert regex_assistant.regexes[
-            2
-        ] == "^2015-12-03 12:10:10 Data migration from (.*) to beta21 failed$"
 
-        regex_assistant.guess_regex(3)
-        assert regex_assistant.regexes[
-            3
-        ] == "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
 
-        proposed_regex = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (beta.*)$"
-        regex_assistant.update_regex(3, proposed_regex)
-        assert regex_assistant.regexes[3] == proposed_regex
 
-        with self.assertRaises(NoDateGroupException):
-            regex_assistant.verify_regex(1)
+
+
