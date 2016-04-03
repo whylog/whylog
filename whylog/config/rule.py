@@ -13,7 +13,6 @@ class Rule(object):
         self._constraints = constraints
 
     def serialize(self):
-
         return {
             "causes": [cause.name for cause in self._causes],
             "effect": self._effect.name,

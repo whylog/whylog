@@ -1,5 +1,5 @@
 ---
-filename_matcher_class_name: RegexFilenameMatcher
+matcher_class_name: RegexFilenameMatcher
 name: default
 host_pattern: localhost
-path_pattern: 'node_1.log'
+path_pattern: node_1.log

@@ -3,10 +3,15 @@ from abc import ABCMeta, abstractmethod
 import six
 import yaml
 
-from whylog.config.mock_outputs import mocked_investigation_plan
-from whylog.config.log_type import LogTypeFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
+
+from datetime import datetime
+
+from whylog.config.log_type import LogType
+from whylog.config.filename_matchers import RegexFilenameMatcher
+from whylog.config.parsers import ConcatenatedRegexParser, RegexParser
+from whylog.config.rule import Rule
 
 
 @six.add_metaclass(ABCMeta)
@@ -49,8 +54,25 @@ class AbstractConfig(object):
     def _save_parsers_definition(self, parser_definitions):
         pass
 
+    # mocked investigation plan for 003_match_time_range test
+    def mocked_investigation_plan(self):
+        matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
+        default_log_type = LogType('default', [matcher])
+        cause = RegexParser('cause', '^root cause$', [1], 'default', {1: 'date'})
+        effect = RegexParser('effect', '^visible effect$', [1], 'default', {1: 'date'})
+        concatenated = ConcatenatedRegexParser([cause])
+        effect_time = datetime(2015, 12, 3, 12, 8, 9)
+        earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)
+        default_investigation_step = InvestigationStep(concatenated, effect_time, earliest_cause_time)
+        rule = Rule([cause], effect, [{
+            'clues_groups': [[1, 1], [0, 1]],
+            'name': 'time',
+            'params': {'max_delta': 1}
+        }])
+        return InvestigationPlan([], [(default_investigation_step, default_log_type)])
+
     def create_investigation_plan(self, front_input):
-        return mocked_investigation_plan()
+        return self.mocked_investigation_plan()
 
     def _get_log_type(self, front_input):
         pass
@@ -86,10 +108,11 @@ class AbstractFileConfig(AbstractConfig):
         ]
 
     def _load_log_types(self):
-        return [
-            LogTypeFactory.from_dao(serialized_log_type)
-            for serialized_log_type in self._load_file_with_config(self._log_type_path)
-        ]
+        # return [
+        #     LogTypeFactory.from_dao(serialized_log_type)
+        #     for serialized_log_type in self._load_file_with_config(self._log_type_path)
+        # ]
+        pass
 
     @abstractmethod
     def _load_file_with_config(self, path):
@@ -128,12 +151,11 @@ class YamlConfig(AbstractFileConfig):
 
 
 class InvestigationPlan(object):
-    def __init__(self, suspected_rules, investigation_steps, log_types):
+    def __init__(self, suspected_rules, investigation_metadata):
         self._suspected_rules = suspected_rules
-        self._investigation_steps = investigation_steps
-        self._log_types = log_types
+        self._investigation_metadata = investigation_metadata
 
-    def get_next_investigation_step(self):
+    def get_next_investigation_step_with_log_type(self):
         pass
 
 
