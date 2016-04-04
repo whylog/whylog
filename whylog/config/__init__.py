@@ -54,8 +54,13 @@ class AbstractConfig(object):
     def mocked_investigation_plan(self):
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         default_log_type = LogType('default', [matcher])
-        cause = RegexParser('cause', '^root cause$', [1], 'default', {1: 'date'})
-        effect = RegexParser('effect', '^visible effect$', [1], 'default', {1: 'date'})
+        cause = RegexParser(
+            'cause', '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$', [1], 'default', {1: 'date'}
+        )
+        effect = RegexParser(
+            'effect', '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$', [1], 'default',
+            {1: 'date'}
+        )
         concatenated = ConcatenatedRegexParser([cause])
         effect_time = datetime(2015, 12, 3, 12, 8, 9)
         earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)
