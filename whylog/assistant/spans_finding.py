@@ -9,7 +9,7 @@ from datetime import datetime
 from dateutil.parser import parse as date_parse
 
 from whylog.assistant.const import DataType, DateParams
-from whylog.assistant.regex_assistant.regex import DateFromFutureError, create_date_regex
+from whylog.assistant.regex_assistant.regex import create_date_regex
 from whylog.assistant.span import Span, not_overlapping_spans, sort_as_date
 
 
