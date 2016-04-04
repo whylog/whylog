@@ -1,6 +1,6 @@
+import re
 from abc import ABCMeta, abstractmethod
 
-import re
 import six
 
 

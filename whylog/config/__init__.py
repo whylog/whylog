@@ -1,17 +1,13 @@
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
 
 import six
 import yaml
 
-from whylog.config.parsers import RegexParserFactory
-from whylog.config.rule import RegexRuleFactory
-
-from datetime import datetime
-
-from whylog.config.log_type import LogType
 from whylog.config.filename_matchers import RegexFilenameMatcher
-from whylog.config.parsers import ConcatenatedRegexParser, RegexParser
-from whylog.config.rule import Rule
+from whylog.config.log_type import LogType
+from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
+from whylog.config.rule import RegexRuleFactory, Rule
 
 
 @six.add_metaclass(ABCMeta)
@@ -43,7 +39,7 @@ class AbstractConfig(object):
             self._parsers[parser.name] = parser
 
     def add_log_type(self, log_type):
-        #TODO Can assume that exists only one LogType object for one log type name
+        # TODO Can assume that exists only one LogType object for one log type name
         pass
 
     @abstractmethod
@@ -63,13 +59,19 @@ class AbstractConfig(object):
         concatenated = ConcatenatedRegexParser([cause])
         effect_time = datetime(2015, 12, 3, 12, 8, 9)
         earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)
-        default_investigation_step = InvestigationStep(concatenated, effect_time, earliest_cause_time)
-        rule = Rule([cause], effect, [{
-            'clues_groups': [[1, 1], [0, 1]],
-            'name': 'time',
-            'params': {'max_delta': 1}
-        }])
-        return InvestigationPlan([], [(default_investigation_step, default_log_type)])
+        default_investigation_step = InvestigationStep(
+            concatenated, effect_time, earliest_cause_time
+        )
+        rule = Rule(
+            [cause], effect, [
+                {
+                    'clues_groups': [[1, 1], [0, 1]],
+                    'name': 'time',
+                    'params': {'max_delta': 1}
+                }
+            ]
+        )
+        return InvestigationPlan([rule], [(default_investigation_step, default_log_type)])
 
     def create_investigation_plan(self, front_input):
         return self.mocked_investigation_plan()
@@ -156,7 +158,7 @@ class InvestigationPlan(object):
         self._investigation_metadata = investigation_metadata
 
     def get_next_investigation_step_with_log_type(self):
-        pass
+        return self._investigation_metadata[0]
 
 
 class RuleSubset(object):
@@ -179,13 +181,22 @@ class InvestigationStep(object):
         self.effect_time = effect_time
         self.earliest_cause_time = earliest_cause_time
 
+    # mocked Clue for second line in node_1.log for 003 test
+    def mocked_clues(self):
+        line_source = LineSource('localhost', 'path', 40)
+        line_time = datetime(2015, 12, 3, 12, 8, 8)
+        regex_parametes = {'cause': (line_time,)}
+        return {
+            'cause': Clue(regex_parametes, line_time, '2015-12-03 12:08:08 root cause', line_source)
+        }
+
     def get_clues(self, line, offset):
         """
         Basing on parsers creates clues in investigation
         :param line: line from parsed file
         :returns: list of created clues
         """
-        pass
+        return self.mocked_clues()
 
 
 class Clue(object):
@@ -196,3 +207,10 @@ class Clue(object):
 
     def __init__(self, regex_parameters, line_time, line_prefix_content, line_source):
         pass
+
+
+class LineSource(object):
+    def __init__(self, host, path, offset):
+        self.host = host
+        self.path = path
+        self.offset = offset
