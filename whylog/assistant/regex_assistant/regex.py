@@ -50,19 +50,16 @@ def verify_regex(regex, text):
     # TODO: verify if regex matches text in a one way only
 
     # regex must match a whole text from its beginning to end.
-    if not regex[0] == "^":
-        regex = "^" + regex
-    if not regex[-1] == "$":
-        regex += "$"
-    pattern = re.compile(regex)
+    whole_text_regex = "^" + regex + "$"
+    pattern = re.compile(whole_text_regex)
 
-    m = re.search(pattern, text)
+    match = re.search(pattern, text)
     matched = False
     groups = []
     errors = []
-    if m is not None:
+    if match is not None:
         matched = True
-        groups = m.groups()
+        groups = match.groups()
     else:
         errors.append(NotMatchingRegexError(text, regex))
     return matched, groups, errors
@@ -78,10 +75,10 @@ def create_obvious_regex(text):
     """
     double_backslashed_text = text.replace("\\", "\\\\")
     regex = r""
-    for c in double_backslashed_text:
-        if c in special_characters:
+    for char in double_backslashed_text:
+        if char in special_characters:
             regex += "\\"
-        regex += c
+        regex += char
     return regex
 
 
@@ -99,10 +96,10 @@ def create_date_regex(date_text):
     group_pattern = re.compile(group_regex)
     date_regex = r""
     for match in re.finditer(group_pattern, date_text):
-        c = date_text[match.start(0)]
-        if c.isalpha():
+        char = date_text[match.start(0)]
+        if char.isalpha():
             date_regex += "[a-zA-Z]+"
-        elif c.isdigit():
+        elif char.isdigit():
             length = match.end(0) - match.start(0)
             repet = "+"
             if length <= 2:

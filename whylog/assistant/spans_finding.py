@@ -45,7 +45,6 @@ def _find_date_spans_by_force(text):
 
     date_now = datetime.now()
     not_overlapping_start = 0
-
     for start in proper_starts:
         if start < not_overlapping_start:
             continue
@@ -55,23 +54,16 @@ def _find_date_spans_by_force(text):
             try:
                 date_text = text[start:end]
                 date = date_parse(date_text)
-                if date_now.year - date.year < -1:
-                    raise DateFromFutureError(date, date_text)
-            except (ValueError, DateFromFutureError):
-                # TODO: how to write it without bad looking 'pass'?
-                pass
-            else:
-                date_spans.add(
-                    Span(
-                        start,
-                        end,
-                        pattern_creator=create_date_regex,
-                        data_type=DataType.DATE
-                    )
-                )
-                not_overlapping_start = end
-                # break, because we don't care about shorter date groups
-                break
+            except (ValueError):
+                continue
+
+            if date_now.year - date.year < -1:
+                continue
+            new_span = Span(start, end, pattern_creator=create_date_regex, data_type=DataType.DATE)
+            date_spans.add(new_span)
+            not_overlapping_start = end
+            # break, because we don't care about shorter date groups
+            break
     return date_spans
 
 
@@ -79,8 +71,8 @@ def _find_spans_by_regex(regexes, text, pattern_creator=None, converter=DataType
     spans = set()
     for compiled_regex, regex in regexes.items():
         for match in re.finditer(compiled_regex, text):
-            s = Span(match.start(0), match.end(0), regex, pattern_creator, converter)
-            spans.add(s)
+            new_span = Span(match.start(0), match.end(0), regex, pattern_creator, converter)
+            spans.add(new_span)
     return spans
 
 

@@ -13,7 +13,7 @@ from whylog.front import FrontInput
 
 
 class TestBasic(TestCase):
-    def test_verify_regex(self):
+    def test_verify_regex_success(self):
         line = r"2015-12-03 12:11:00 Data is missing on comp21"
         regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
         matched, groups, errors = verify_regex(regex, line)
@@ -21,7 +21,9 @@ class TestBasic(TestCase):
         assert groups[0] == r"2015-12-03 12:11:00"
         assert groups[1] == r"comp21"
 
+    def test_verify_regex_fail(self):
         line2 = r"2015-12-03 12:11:00 Data is missing"
+        regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
         matched, groups, errors = verify_regex(regex, line2)
         assert (matched, len(groups), len(errors)) == (False, 0, 1)
         assert isinstance(errors[0], NotMatchingRegexError)
@@ -29,8 +31,10 @@ class TestBasic(TestCase):
     def test_create_obvious_regex(self):
         line = r".^$*x+x{5}?\*[x]x|y(x)(?iLmsux)(?:x)(?P<name>x)(?#x)(?<!x)\4\b\A"
         obvious_regex = create_obvious_regex(line)
-        assert obvious_regex == \
-               r"\.\^\$\*x\+x\{5\}\?\\\*\[x\]x\|y\(x\)\(\?iLmsux\)\(\?:x\)\(\?P<name>x\)\(\?#x\)\(\?<!x\)\\4\\b\\A"
+        assert (
+            obvious_regex == r"\.\^\$\*x\+x\{5\}\?\\\*\[x\]x\|y\(x\)\(\?iLmsux\)\(\?:x\)"
+            r"\(\?P<name>x\)\(\?#x\)\(\?<!x\)\\4\\b\\A"
+        )
         matched, groups, errors = verify_regex(obvious_regex, line)
         assert (matched, len(groups), len(errors)) == (True, 0, 0)
 
@@ -39,27 +43,23 @@ class TestBasic(TestCase):
         regex = create_date_regex(date)
         matched, groups, errors = verify_regex(regex, date)
         assert (matched, len(groups), len(errors)) == (True, 0, 0)
-        bad_dates = [
+        not_matching_dates = [
             date + " ", date + ":", "1" + date, '10/10/1999:21:15:05', '10/Oct/199:21:15:05',
             '10/Oct1/1999:21:15:05', '10/Oct/1999:21:15:05PM', '10/Oct/1999:021:15:05',
             '10\Oct\1999:21:15:05'
         ]
-        for bad_date in bad_dates:
-            assert verify_regex(regex, bad_date)[0] is False
+        for not_matching_date in not_matching_dates:
+            assert verify_regex(regex, not_matching_date)[0] is False
 
-        ok_dates = [
+        matching_dates = [
             '1/Oct/1999:21:15:05', '10/October/1999:21:15:05', '10/Octyyy/1999:21:15:05',
             '10/O/1999:21:15:05', '1/Oct/1999:2:1:0'
         ]
-        for ok_date in ok_dates:
-            assert verify_regex(regex, ok_date)[0] is True
+        for matching_date in matching_dates:
+            assert verify_regex(regex, matching_date)[0] is True
 
     def test_find_spans_by_regex(self):
-        date_regex = r"\d+-\d+-\d\d"
-        object_regex = r"comp\d\d"
-        raw_regexes = [date_regex, object_regex]
-        regexes = dict((re.compile(regex), regex) for regex in raw_regexes)
-
+        regexes = dict((re.compile(regex), regex) for regex in [r"\d+-\d+-\d\d", r"comp\d\d"])
         text = r"2015-12-03 Data migration from comp36 to comp21 failed"
         spans = _find_spans_by_regex(regexes, text)
         assert len(spans) == 3
@@ -80,8 +80,8 @@ class TestBasic(TestCase):
         assert dates[2] == '21:15:05 +0500'
 
     def test_find_date_spans(self):
-        raw_date_regexes = [r"\d+/[a-zA-z]+/\d+:\d+:\d+:\d+ \+\d+"]
-        date_regexes = dict((re.compile(regex), regex) for regex in raw_date_regexes)
+        raw_date_regex = r"\d+/[a-zA-z]+/\d+:\d+:\d+:\d+ \+\d+"
+        date_regexes = {re.compile(raw_date_regex): raw_date_regex}
 
         text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         spans = find_date_spans(text, date_regexes)
