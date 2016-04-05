@@ -54,11 +54,7 @@ class RegexAssistant(AbstractAssistant):
         """
         Guess regex. It includes guessing date and other regex groups.
         """
-
         regex_obj = self.regex_objects[line_id]
-
         date_spans = find_date_spans(regex_obj.line_text)
-
         group_spans = date_spans  #TODO: date_spans + other found spans
-
         regex_obj.update_forcefully(group_spans)

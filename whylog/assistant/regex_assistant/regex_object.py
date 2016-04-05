@@ -1,5 +1,4 @@
 from whylog.assistant.regex_assistant.regex import create_obvious_regex
-
 from whylog.assistant.span import (
     complementary_intervals, overlapping_check, sort_by_start, spans_from_pairs
 )

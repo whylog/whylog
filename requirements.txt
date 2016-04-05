@@ -1,5 +1,5 @@
 frozendict
+python-dateutil
 pyyaml
 regex
 six>=1.10
-python-dateutil

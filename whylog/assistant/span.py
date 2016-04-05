@@ -133,15 +133,15 @@ def complementary_intervals(spans, start_index, end_index):
     return list(compl_pairs)
 
 
-def spans_from_pairs(pairs, pattern_creator=None, pattern=None, is_param=False):
+def spans_from_ranges(ranges_list, pattern_creator=None, pattern=None, is_param=False):
     spans = [
         Span(
-            pair[0],
-            pair[1],
+            start,
+            end,
             pattern_creator=pattern_creator,
             pattern=pattern,
             is_param=is_param
-        ) for pair in pairs
+        ) for start, end in ranges_list
     ]
     overlapping_check(spans)
     return list(spans)
