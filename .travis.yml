@@ -36,8 +36,7 @@ cache:
 
 before_install:
   - uname -a
-  - lsb_release -a
-  - virtualenv --version
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then lsb_release -a; fi
   # get jython
   - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/bin/activate" ]; then wget http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.1b3/jython-installer-2.7.1b3.jar -O jython-installer-2.7.1b3.jar; else echo skip; fi
   - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/bin/activate" ]; then java -jar jython-installer-2.7.1b3.jar --silent --directory "$HOME/jython"; else echo skip; fi
@@ -52,6 +51,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv -p python3 "$HOME/.virtualenv/python3-osx"; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source "$HOME/.virtualenv/python3-osx/bin/activate"; fi
+  - virtualenv --version
 
 install:
   # install PyYAML on Jython manually before pip tries to do it and fails
