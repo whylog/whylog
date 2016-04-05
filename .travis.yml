@@ -24,6 +24,7 @@ matrix:
       env: SCA=true
     - python: 3.5
       os: osx
+      language: generic
 
 cache:
   - pip
