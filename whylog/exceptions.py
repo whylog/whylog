@@ -1,0 +1,2 @@
+class WhylogError(Exception):
+    pass

@@ -1,43 +1,12 @@
 """
 Regex verification and creating (but not finding groups in regex)
 """
+
 import re
 
-special_characters = frozenset(['.', '^', '$', '*', '+', '{', '}', '?', '[', ']', '|', '(', ')'])
+from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 
-
-class NoDateGroupError(Exception):
-    def __init__(self, line_content, regex, line_index):
-        self.line_content = line_content
-        self.regex = regex
-        self.line_index = line_index
-
-    def __str__(self):
-        return 'No date group in regex. Regex: %s. Line content: %s' % (
-            self.regex, self.line_content
-        )
-
-
-class NotMatchingRegexError(Exception):
-    def __init__(self, line_content, regex):
-        self.line_content = line_content
-        self.regex = regex
-
-    def __str__(self):
-        return 'Regex do not match line. Regex: %s. Line content: %s' % (
-            self.regex, self.line_content
-        )
-
-
-class DateFromFutureError(Exception):
-    def __init__(self, parsed_date, date_text):
-        self.date_text = date_text
-        self.parsed_date = parsed_date
-
-    def __str__(self):
-        return 'Date is from future. date text %s,  parsed date %s' % (
-            self.date_text, self.parsed_date
-        )
+special_characters = frozenset('.^$*+{}?[]|()]')
 
 
 def verify_regex(regex, text):
@@ -53,7 +22,7 @@ def verify_regex(regex, text):
     whole_text_regex = "^" + regex + "$"
     pattern = re.compile(whole_text_regex)
 
-    match = re.search(pattern, text)
+    match = re.match(pattern, text)
     matched = False
     groups = []
     errors = []
@@ -92,23 +61,23 @@ def create_date_regex(date_text):
     """
     # We divide date_text into groups consisting of:
     # only alpha or only num or only non-alphanumerical marks
-    group_regex = r"[a-zA-Z]+|[0-9]+|\s+|[\W]+"
-    group_pattern = re.compile(group_regex)
+    group_regex = re.compile(r"[a-zA-Z]+|[0-9]+|\s+|[\W]+")
     date_regex = r""
-    for match in re.finditer(group_pattern, date_text):
-        char = date_text[match.start(0)]
+    for matcher in re.finditer(group_regex, date_text):
+        start, end = matcher.span(0)
+        char = date_text[start]
         if char.isalpha():
             date_regex += "[a-zA-Z]+"
         elif char.isdigit():
-            length = match.end(0) - match.start(0)
-            repet = "+"
+            length = matcher.end(0) - matcher.start(0)
+            repetition_cnt = "+"
             if length <= 2:
-                repet = "{1,2}"
+                repetition_cnt = "{1,2}"
             elif length == 4:
-                repet = "{4}"
-            date_regex += "[0-9]" + repet
+                repetition_cnt = "{4}"
+            date_regex += "[0-9]" + repetition_cnt
         else:
-            date_regex += create_obvious_regex(match.group(0))
+            date_regex += create_obvious_regex(matcher.group(0))
     return date_regex
 
 

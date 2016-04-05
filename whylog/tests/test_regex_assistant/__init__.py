@@ -2,8 +2,9 @@ import re
 from unittest import TestCase
 
 from whylog.assistant.regex_assistant import RegexAssistant
+from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.regex_assistant.regex import (
-    NotMatchingRegexError, create_date_regex, create_obvious_regex, verify_regex
+    create_date_regex, create_obvious_regex, verify_regex
 )
 from whylog.assistant.span import sort_by_start
 from whylog.assistant.spans_finding import (
