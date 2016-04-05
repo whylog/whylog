@@ -23,7 +23,7 @@ setup(
     author_email="",
     description="whylog v0.1",
     license="BSD 3-clause",
-    test_require=required_test,
+    tests_require=required_test,
     install_requires=required,
     url="https://github.com/9livesdata/whylog",
     long_description=read('README.md'),
