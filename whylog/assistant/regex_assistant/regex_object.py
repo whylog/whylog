@@ -1,6 +1,6 @@
 from whylog.assistant.regex_assistant.regex import create_obvious_regex
 from whylog.assistant.span import (
-    complementary_intervals, overlapping_check, sort_by_start, spans_from_pairs
+    complementary_intervals, overlapping_check, sort_by_start, spans_from_ranges
 )
 
 
@@ -30,7 +30,7 @@ class RegexObject(object):
         Returns spans between group_spans in line_text
         """
         compl_intervals = complementary_intervals(self.group_spans, 0, len(self.line_text))
-        compl_spans = spans_from_pairs(compl_intervals, pattern_creator=create_obvious_regex)
+        compl_spans = spans_from_ranges(compl_intervals, pattern_creator=create_obvious_regex)
         return compl_spans
 
     def _update_regex(self, force=False):
