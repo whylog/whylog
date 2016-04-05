@@ -1,6 +1,6 @@
 ---
 name: cause
-regex_str: ^(\d+) root cause
+regex_str: ^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$
 primary_key_groups: [1]
 log_type: default
 convertions: {1: date}
@@ -8,5 +8,5 @@ convertions: {1: date}
 primary_key_groups: [1]
 log_type: default
 name: effect
-regex_str: ^(\d+) visible effect$
+regex_str: ^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$
 convertions: {1: date}

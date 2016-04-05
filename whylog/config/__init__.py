@@ -188,7 +188,7 @@ class InvestigationStep(object):
 
     # mocked Clue for second line in node_1.log for 003 test
     def mocked_clues(self):
-        line_source = LineSource('localhost', 'path', 40)
+        line_source = LineSource('localhost', 'node_1.log', 40)
         line_time = datetime(2015, 12, 3, 12, 8, 8)
         regex_parametes = {'cause': (line_time,)}
         return {
