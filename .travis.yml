@@ -45,9 +45,10 @@ before_install:
 
 install:
   # install PyYAML on Jython manually before pip tries to do it and fails
-  - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/Lib/site-packages/PyYAML-3.11-py2.7.egg-info" ]; then wget https://pypi.python.org/packages/source/P/PyYAML/PyYAML-3.11.tar.gz; tar -zxvf PyYAML-3.11.tar.gz; cd PyYAML-3.11/; wget http://pyyaml.org/raw-attachment/ticket/163/jython-setup.patch; patch < jython-setup.patch; python setup.py install; cd -; fi
-  # `pip install -r requirements.txt` does not work on jython
-  - cat requirements*.txt | xargs pip install
+  - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/Lib/site-packages/PyYAML-3.11-py2.7.egg-info" ]; then wget https://pypi.python.org/packages/source/P/PyYAML/PyYAML-3.11.tar.gz; tar -zxf PyYAML-3.11.tar.gz; cd PyYAML-3.11/; wget http://pyyaml.org/raw-attachment/ticket/163/jython-setup.patch; patch < jython-setup.patch; python setup.py install; cd -; fi
+  # `pip install -r requirements.txt` does not work on jython 2.7.1b2
+  # installing regex on jython fails (jython can't compile the native extension), this awk filter prevents it
+  - cat requirements*.txt | awk \"${JYTHON:-False}'" == "True" && /^regex/ || ! /^regex/' | xargs pip install
   - if [ -z "$SCA" ]; then python setup.py develop; else echo skip; fi
 
 before_script:
