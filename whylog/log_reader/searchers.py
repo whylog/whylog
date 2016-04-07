@@ -32,8 +32,8 @@ class BacktrackSearcher(AbstractSearcher):
         pass
 
     @classmethod
-    def _decrease_actual_offset_properly(cls, actual_offset, decreasion_string):
-        return actual_offset - len(decreasion_string) - 1
+    def _decrease_actual_offset_properly(cls, actual_offset, drop_string):
+        return actual_offset - len(drop_string) - 1
 
     def _reverse_from_offset(self, offset, buf_size=BufsizeConsts.STANDARD_BUF_SIZE):
         """
