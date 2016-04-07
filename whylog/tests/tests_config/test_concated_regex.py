@@ -1,8 +1,8 @@
 import itertools
 from unittest import TestCase
-from nose.plugins.skip import SkipTest
 
 import six
+from nose.plugins.skip import SkipTest
 
 from whylog.config import RegexParserFactory
 from whylog.config.parsers import ConcatenatedRegexParser
