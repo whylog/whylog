@@ -39,9 +39,8 @@ class SearchManager(object):
     def investigate(self):
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
-            # TODO where checking up the constraints should take place?
             clues = search_handler.investigate()
-        # TODO do something with clues
+            # TODO checking up the constraints should tahe place here
         return InvestigationResult()  # TODO of course return something with sense
 
 
@@ -51,14 +50,13 @@ class SearchHandler(object):
         self._log_type = log_type
 
     def investigate(self):
-        clues = []  # TODO it should be dict
-        # TODO where checking up the constraints should take place? ANSWER: no!
+        clues = {}
         for host, path in self._log_type.get_next_file_to_parse():
             # TODO remember about not localhost case
             searcher = BacktrackSearcher(path)
             clues += searcher.search(self._investigation_step)
             # TODO add this ^ to dict, not simply append
-        return clues  # TODO of course return something with sense
+        return clues
 
 
 class InvestigationResult(object):

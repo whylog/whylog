@@ -1,4 +1,6 @@
 from abc import ABCMeta, abstractmethod
+
+import os.path
 from os import SEEK_SET
 
 import six
@@ -30,12 +32,28 @@ class BacktrackSearcher(AbstractSearcher):
     def __init__(self, file_path):
         self._file_path = file_path
 
+    @classmethod
+    def _extract_time_from_line(cls, line_str):
+        """
+        extracts time from line
+        """
+        pass  # TODO this function (or equivalent) should be written in config module
+
+    def _deduce_offset(self, time):
+        """
+        returns offset of the line with the specified time
+        """
+        # for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
+        #     if self.get_time_from_line(line(0)) <= time:
+        #         return line(1)
+        return 69  # FIXME it is only mock for test 003
+
     def search(self, investigation_step):
-        # TODO should be one such function per log file
+        # TODO should be one such function per log file <- what?!?
         clues = {}
-        offset = deduce_offset(investigation_step.effect_time)  # TODO write function deduce_offset
+        offset = self._deduce_offset(investigation_step.effect_time)
         for line, actual_offset in self._reverse_from_offset(offset):
-            clue_dict = investigation_step.get_clues(line, actual_offset)  # TODO check if line somehow fits
+            one_clue_dict = investigation_step.get_clues(line, actual_offset)  # TODO check if line somehow fits
             # TODO ^ contains dict
             # TODO append information from clue to clues dict
         return clues
