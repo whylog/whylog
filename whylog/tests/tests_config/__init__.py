@@ -6,7 +6,7 @@ import yaml
 from whylog.config import YamlConfig
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
-from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
+from whylog.teacher.user_intent import Group, UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 # Constraint types
 identical_constr = "identical"
@@ -32,23 +32,29 @@ class TestBasic(TestCase):
         cls.regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
         cls.regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
-        cls.groups_and_converters1 = [
-            ("2016-04-12 23:54:45", to_date), ("comp1", to_string), ("host1", to_string)
-        ]
-        cls.groups_and_converters2 = [
-            ("2016-04-12 23:54:40", to_date), ("comp2", to_string), ("host2", to_string)
-        ]
-        cls.groups_and_converters3 = [
-            ("2016-04-12 23:54:43", to_date), ("comp2", to_string), ("150", to_int),
-            ("host2", to_string)
-        ]
+        cls.groups1 = {
+            1: Group("2016-04-12 23:54:45", to_date),
+            2: Group("comp1", to_string),
+            3: Group("host1", to_string)
+        }
+        cls.groups2 = {
+            1: Group("2016-04-12 23:54:40", to_date),
+            2: Group("comp2", to_string),
+            3: Group("host2", to_string)
+        }
+        cls.groups3 = {
+            1: Group("2016-04-12 23:54:43", to_date),
+            2: Group("comp2", to_string),
+            3: Group("150", to_int),
+            4: Group("host2", to_string)
+        }
 
         cls.parser_intent1 = UserParserIntent(
             "connectionerror",
             cls.regex1,
             "hydra",
             [1],
-            cls.groups_and_converters1,
+            cls.groups1,
             cls.sample_line1,
             line_offset=None,
             line_resource_location=None
@@ -58,7 +64,7 @@ class TestBasic(TestCase):
             cls.regex2,
             "hydra",
             [1],
-            cls.groups_and_converters2,
+            cls.groups2,
             cls.sample_line2,
             line_offset=None,
             line_resource_location=None
@@ -68,7 +74,7 @@ class TestBasic(TestCase):
             cls.regex3,
             "filesystem",
             [1],
-            cls.groups_and_converters3,
+            cls.groups3,
             cls.sample_line3,
             line_offset=None,
             line_resource_location=None

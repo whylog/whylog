@@ -1,4 +1,4 @@
-from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
+from whylog.teacher.user_intent import Group, UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 
 def create_sample_rule():
@@ -18,16 +18,22 @@ def create_sample_rule():
     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
     regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
-    groups_and_converters1 = [
-        ("2016-04-12 23:54:45", to_date), ("comp1", to_string), ("host1", to_string)
-    ]
-    groups_and_converters2 = [
-        ("2016-04-12 23:54:40", to_date), ("comp2", to_string), ("host2", to_string)
-    ]
-    groups_and_converters3 = [
-        ("2016-04-12 23:54:43", to_date), ("comp2", to_string), ("150", to_int),
-        ("host2", to_string)
-    ]
+    groups1 = {
+        1: Group("2016-04-12 23:54:45", to_date),
+        2: Group("comp1", to_string),
+        3: Group("host1", to_string)
+    }
+    groups2 = {
+        1: Group("2016-04-12 23:54:40", to_date),
+        2: Group("comp2", to_string),
+        3: Group("host2", to_string)
+    }
+    groups3 = {
+        1: Group("2016-04-12 23:54:43", to_date),
+        2: Group("comp2", to_string),
+        3: Group("150", to_int),
+        4: Group("host2", to_string)
+    }
 
     # resource location is temporary a string, because there is no ResourceLocation class yet.
     # TODO: Change following resource locations to ResourceLocation objects
@@ -36,16 +42,13 @@ def create_sample_rule():
     resource_location3 = "serwer3"
 
     parser_intent1 = UserParserIntent(
-        "connectionerror", regex1, "hydra", [1], groups_and_converters1, sample_line1, 18,
-        resource_location1
+        "connectionerror", regex1, "hydra", [1], groups1, sample_line1, 18, resource_location1
     )
     parser_intent2 = UserParserIntent(
-        "datamigration", regex2, "hydra", [1], groups_and_converters2, sample_line2, 9,
-        resource_location2
+        "datamigration", regex2, "hydra", [1], groups2, sample_line2, 9, resource_location2
     )
     parser_intent3 = UserParserIntent(
-        "lostdata", regex3, "filesystem", [1], groups_and_converters3, sample_line3, 1994,
-        resource_location3
+        "lostdata", regex3, "filesystem", [1], groups3, sample_line3, 1994, resource_location3
     )
 
     parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
