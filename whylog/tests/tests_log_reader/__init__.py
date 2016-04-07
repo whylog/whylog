@@ -4,11 +4,11 @@ from unittest import TestCase
 from generator import generate, generator
 from nose.plugins.skip import SkipTest
 
-from whylog.client import WhylogClient
 from whylog.config import YamlConfig
-from whylog.tests.tests_client.constants import TestPaths
+from whylog.log_reader import LogReader
+from whylog.tests.tests_log_reader.constants import TestPaths
 
-path_test_files = ['whylog', 'tests', 'tests_client', 'test_files']
+path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
 
 @generator
@@ -44,12 +44,12 @@ class TestBasic(TestCase):
             log_type_path=log_location_path,
         )
 
-        whylog_client = WhylogClient(config=whylog_base, open_path=path)
+        log_reader = LogReader(config=whylog_base, open_path=path)
 
         with open(input_path, 'r') as f:
             line = f.read()
         # TODO call get_cause with sens...
-        result = whylog_client.get_cause(line)
+        result = log_reader.get_cause(line)
 
         # TODO check up correctness in appropriate way
         with open(output_path, 'r') as f:

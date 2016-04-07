@@ -3,7 +3,7 @@ from os import SEEK_SET
 
 import six
 
-from whylog.client.const import BufsizeConsts
+from whylog.log_reader.const import BufsizeConsts
 
 
 @six.add_metaclass(ABCMeta)
