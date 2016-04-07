@@ -10,9 +10,9 @@ def create_sample_rule():
     to_string = "string"
     to_int = "int"
 
-    sample_line1 = "(2016-04-12 23:54:45) Connection error occurred on comp1. Host name: host1"
-    sample_line2 = "(2016-04-12 23:54:40) Data migration from comp1 to comp2 failed. Host name: host2"
-    sample_line3 = "(2016-04-12 23:54:43) Data is missing at comp2. Loss = 150 GB. Host name: host2"
+    sample_line1 = "2016-04-12 23:54:45 Connection error occurred on comp1. Host name: host1"
+    sample_line2 = "2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2"
+    sample_line3 = "2016-04-12 23:54:43 Data is missing at comp2. Loss = 150 GB. Host name: host2"
 
     regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
