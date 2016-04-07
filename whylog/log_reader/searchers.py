@@ -31,15 +31,21 @@ class BacktrackSearcher(AbstractSearcher):
     def search(self, search_data):
         pass
 
+    @classmethod
+    def _decrease_actual_offset_properly(cls, actual_offset, drop_string):
+        return actual_offset - len(drop_string) - 1
+
     def _reverse_from_offset(self, offset, buf_size=BufsizeConsts.STANDARD_BUF_SIZE):
         """
-        a generator that returns the lines of a file in reverse order
+        a generator that returns the pairs consisting of
+        lines in reverse order and offsets corresponding to them,
         beginning with the specified offset
         """
         with open(self._file_path) as fh:
             fh.seek(offset)
             total_size = remaining_size = fh.tell()
             reverse_offset = 0
+            actual_offset = offset
             truncated = None
             while remaining_size > 0:
                 reverse_offset = min(total_size, reverse_offset + buf_size)
@@ -51,9 +57,14 @@ class BacktrackSearcher(AbstractSearcher):
                     if buffer_[-1] is not '\n':
                         lines[-1] += truncated
                     else:
-                        yield truncated
+                        actual_offset = self._decrease_actual_offset_properly(
+                            actual_offset, truncated
+                        )
+                        yield truncated, actual_offset
                 truncated = lines[0]
                 for line in reversed(lines[1:]):
                     if len(line):
-                        yield line
-            yield truncated
+                        actual_offset = self._decrease_actual_offset_properly(actual_offset, line)
+                        yield line, actual_offset
+            actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
+            yield truncated, actual_offset
