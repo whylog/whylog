@@ -1,7 +1,6 @@
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 
-
 def create_sample_rule():
     identical_constr = "identical"
     different_constr = "different"
@@ -36,35 +35,16 @@ def create_sample_rule():
     resource_location2 = "serwer2"
     resource_location3 = "serwer3"
 
-
     parser_intent1 = UserParserIntent(
-        "connectionerror",
-        regex1,
-        "hydra",
-        [1],
-        groups_and_converters1,
-        sample_line1,
-        18,
+        "connectionerror", regex1, "hydra", [1], groups_and_converters1, sample_line1, 18,
         resource_location1
     )
     parser_intent2 = UserParserIntent(
-        "datamigration",
-        regex2,
-        "hydra",
-        [1],
-        groups_and_converters2,
-        sample_line2,
-        9,
+        "datamigration", regex2, "hydra", [1], groups_and_converters2, sample_line2, 9,
         resource_location2
     )
     parser_intent3 = UserParserIntent(
-        "lostdata",
-        regex3,
-        "filesystem",
-        [1],
-        groups_and_converters3,
-        sample_line3,
-        1994,
+        "lostdata", regex3, "filesystem", [1], groups_and_converters3, sample_line3, 1994,
         resource_location3
     )
 
