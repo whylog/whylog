@@ -1,10 +1,16 @@
 class UserParserIntent(object):
-    def __init__(self, regex_name, log_type_name, regex, primary_key_groups, data_conversions=None):
-        self.regex_name = regex_name
+    def __init__(
+        self, pattern_name, pattern, log_type_name, primary_key_groups, groups_and_converters,
+        line_content, line_offset, line_resource_location
+    ):
+        self.pattern_name = pattern_name
+        self.pattern = pattern
         self.log_type_name = log_type_name
-        self.regex = regex
         self.primary_key_groups = primary_key_groups
-        self.data_conversions = data_conversions or {}
+        self.groups_and_converters = groups_and_converters
+        self.line_content = line_content
+        self.line_offset = line_offset
+        self.line_resource_location = line_resource_location
 
 
 class UserConstraintIntent(object):

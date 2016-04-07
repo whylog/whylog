@@ -67,9 +67,13 @@ class AbstractParserFactory(object):
 class RegexParserFactory(object):
     @classmethod
     def create_from_intent(cls, parser_intent):
+        # TODO: Hey Config Owner, maybe RegexParser could take a list of converters in constructor?
+        convertions = zip(*parser_intent.groups_and_converters)[1]
+        indexes = range(1, len(convertions) + 1)
+        convertions_dict = dict(zip(indexes, convertions))
         return RegexParser(
-            parser_intent.regex_name, parser_intent.regex, parser_intent.primary_key_groups,
-            parser_intent.log_type_name, parser_intent.data_conversions
+            parser_intent.pattern_name, parser_intent.pattern, parser_intent.primary_key_groups,
+            parser_intent.log_type_name, convertions_dict
         )
 
     @classmethod

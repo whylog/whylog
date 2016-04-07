@@ -87,6 +87,12 @@ class Teacher(object):
         """
         pass
 
+    def get_rule(self):
+        """
+        Creates rule for Front that will be shown to user
+        """
+        return create_sample_rule()
+
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.

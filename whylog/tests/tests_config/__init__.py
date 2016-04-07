@@ -15,6 +15,8 @@ hetero_constr = "hetero"
 
 # convertions
 to_date = "date"
+to_string = "string"
+to_int = "int"
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
@@ -22,18 +24,54 @@ path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 class TestBasic(TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.sample_line1 = "(2016-04-12 23:54:45) Connection error occurred on comp1. Host name: host1"
+        cls.sample_line2 = "(2016-04-12 23:54:40) Data migration from comp1 to comp2 failed. Host name: host2"
+        cls.sample_line3 = "(2016-04-12 23:54:43) Data is missing at comp2. Loss = (.*) GB. Host name: host2"
+
         cls.regex1 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$"
         cls.regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
         cls.regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
+        cls.groups_and_converters1 = [
+            ("2016-04-12 23:54:45", to_date), ("comp1", to_string), ("host1", to_string)
+        ]
+        cls.groups_and_converters2 = [
+            ("2016-04-12 23:54:40", to_date), ("comp2", to_string), ("host2", to_string)
+        ]
+        cls.groups_and_converters3 = [
+            ("2016-04-12 23:54:43", to_date), ("comp2", to_string), ("150", to_int),
+            ("host2", to_string)
+        ]
+
         cls.parser_intent1 = UserParserIntent(
-            "connectionerror", "hydra", cls.regex1, [1], {1: to_date}
+            "connectionerror",
+            cls.regex1,
+            "hydra",
+            [1],
+            cls.groups_and_converters1,
+            cls.sample_line1,
+            line_offset=None,
+            line_resource_location=None
         )
         cls.parser_intent2 = UserParserIntent(
-            "datamigration", "hydra", cls.regex2, [1], {1: to_date}
+            "datamigration",
+            cls.regex2,
+            "hydra",
+            [1],
+            cls.groups_and_converters2,
+            cls.sample_line2,
+            line_offset=None,
+            line_resource_location=None
         )
         cls.parser_intent3 = UserParserIntent(
-            "lostdata", "filesystem", cls.regex3, [1], {1: to_date}
+            "lostdata",
+            cls.regex3,
+            "filesystem",
+            [1],
+            cls.groups_and_converters3,
+            cls.sample_line3,
+            line_offset=None,
+            line_resource_location=None
         )
 
         parsers = {0: cls.parser_intent1, 1: cls.parser_intent2, 2: cls.parser_intent3}
