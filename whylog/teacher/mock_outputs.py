@@ -61,6 +61,4 @@ def create_sample_rule():
 
     constraints = [constraint1, constraint2, constraint3, constraint4]
 
-    rule_intent = UserRuleIntent(effect_id, parsers, constraints)
-
-    return rule_intent
+    return UserRuleIntent(effect_id, parsers, constraints)

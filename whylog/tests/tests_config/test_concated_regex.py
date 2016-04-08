@@ -10,6 +10,8 @@ from whylog.teacher.user_intent import Group, UserParserIntent
 
 # convertions
 to_date = "date"
+to_string = "string"
+to_float = "float"
 
 
 class TestConcatedRegexParser(TestCase):
@@ -31,33 +33,46 @@ class TestConcatedRegexParser(TestCase):
         regex6 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
         regex7 = "^dummy regex"
 
+        date_group = Group(None, to_date)
+        string_group = Group(None, to_string)
+        float_group = Group(None, to_float)
+
         parser_intent1 = UserParserIntent(
-            "connectionerror", "hydra", regex1, [1], {1: Group(None, to_date)},
-            cls.connection_error_line, 1, "serwer1"
+            "connectionerror", "hydra", regex1, [1], {
+                1: date_group,
+                2: string_group,
+                3: string_group
+            }, cls.connection_error_line, 1, "serwer1"
         )
         parser_intent2 = UserParserIntent(
-            "datamigration", "hydra", regex2, [1], {1: Group(None, to_date)},
-            cls.data_migration_line, 2, "serwer2"
+            "datamigration", "hydra", regex2, [1], {
+                1: date_group,
+                2: string_group,
+                3: string_group,
+                4: string_group
+            }, cls.data_migration_line, 2, "serwer2"
         )
         parser_intent3 = UserParserIntent(
-            "lostdata", "filesystem", regex3, [1], {1: Group(None, to_date)}, cls.lost_data_line, 3,
-            "serwer3"
+            "lostdata", "filesystem", regex3, [1], {
+                1: date_group,
+                2: string_group,
+                3: float_group,
+                4: string_group
+            }, cls.lost_data_line, 3, "serwer3"
         )
         parser_intent4 = UserParserIntent(
-            "rootcause", "filesystem", regex4, [], {1: Group(None, to_date)}, cls.root_cause_line,
-            4, "serwer4"
+            "rootcause", "filesystem", regex4, [], {}, cls.root_cause_line, 4, "serwer4"
         )
         parser_intent5 = UserParserIntent(
-            "date", "filesystem", regex5, [1], {1: Group(None, to_date)}, cls.data_missing_line, 5,
-            "serwer5"
+            "date", "filesystem", regex5, [1], {1: date_group}, cls.data_missing_line, 5, "serwer5"
         )
         parser_intent6 = UserParserIntent(
-            "onlymissdata", "filesystem", regex6, [1], {1: Group(None, to_date)},
-            cls.data_missing_at_line, 6, "serwer6"
+            "onlymissdata", "filesystem", regex6, [1], {1: date_group,
+                                                        2: string_group}, cls.data_missing_at_line,
+            6, "serwer6"
         )
         parser_intent7 = UserParserIntent(
-            "dummy", "filesystem", regex7, [], {1: Group(None, to_date)}, cls.dummy_line, 7,
-            "serwer7"
+            "dummy", "filesystem", regex7, [], {}, cls.dummy_line, 7, "serwer7"
         )
 
         cls.connection_error = RegexParserFactory.create_from_intent(parser_intent1)
