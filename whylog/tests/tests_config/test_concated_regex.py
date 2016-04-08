@@ -67,9 +67,10 @@ class TestConcatedRegexParser(TestCase):
             "date", "filesystem", regex5, [1], {1: date_group}, cls.data_missing_line, 5, "serwer5"
         )
         parser_intent6 = UserParserIntent(
-            "onlymissdata", "filesystem", regex6, [1], {1: date_group,
-                                                        2: string_group}, cls.data_missing_at_line,
-            6, "serwer6"
+            "onlymissdata", "filesystem", regex6, [1], {
+                1: date_group,
+                2: string_group
+            }, cls.data_missing_at_line, 6, "serwer6"
         )
         parser_intent7 = UserParserIntent(
             "dummy", "filesystem", regex7, [], {}, cls.dummy_line, 7, "serwer7"
