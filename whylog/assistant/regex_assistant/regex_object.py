@@ -1,7 +1,5 @@
 from whylog.assistant.regex_assistant.regex import create_obvious_regex
-from whylog.assistant.span import (
-    complementary_intervals, overlapping_check, sort_by_start, spans_from_ranges
-)
+from whylog.assistant.span_list import SpanList
 
 
 class RegexObject(object):
@@ -22,7 +20,7 @@ class RegexObject(object):
         """
         self.line = line_object
         self.line_text = line_object.line_content
-        self.group_spans = []
+        self.group_spans = SpanList()
         self.regex = self._update_regex()
 
     def _hole_spans(self):
@@ -32,8 +30,8 @@ class RegexObject(object):
         I.e having line_text of length 50 and group_spans corresponding to intervals: (1, 21), (30, 41),
         returns complementary spans corresponding to intervals (0, 1), (21, 30), (41, 50)
         """
-        compl_intervals = complementary_intervals(self.group_spans, 0, len(self.line_text))
-        compl_spans = spans_from_ranges(compl_intervals, pattern_creator=create_obvious_regex)
+        compl_intervals = self.group_spans.complementary_intervals(0, len(self.line_text))
+        compl_spans = SpanList.from_ranges(compl_intervals, pattern_creator=create_obvious_regex)
         return compl_spans
 
     def _update_regex(self, force=False):
@@ -43,7 +41,7 @@ class RegexObject(object):
 
         hole_spans = self._hole_spans()
 
-        line_spans = sort_by_start(hole_spans + self.group_spans)
+        line_spans = (hole_spans + self.group_spans).sort_by_start()
 
         regex = r""
         for span in line_spans:
@@ -60,7 +58,8 @@ class RegexObject(object):
         Completely replaces group_spans to new_spans, updates regex
         :param new_spans: non-overlapping spans (if they overlaps error will be raised)
         """
-        overlapping_check(new_spans)
+        print(new_spans)
+        new_spans.overlapping_check()
         self.group_spans = new_spans
         self.regex = self._update_regex()
 

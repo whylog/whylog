@@ -6,7 +6,7 @@ from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.regex_assistant.regex import (
     create_date_regex, create_obvious_regex, verify_regex
 )
-from whylog.assistant.span import sort_by_start
+from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
     _find_date_spans_by_force, _find_spans_by_regex, find_date_spans
 )
@@ -63,7 +63,7 @@ class TestBasic(TestCase):
         text = r"2015-12-03 Data migration from comp36 to comp21 failed"
         spans = _find_spans_by_regex(regexes, text)
         assert len(spans) == 3
-        spans = sort_by_start(spans)
+        spans = SpanList(spans).sort_by_start()
         groups = [text[s.start:s.end] for s in spans]
         assert groups[0] == '2015-12-03'
         assert groups[1] == 'comp36'
@@ -73,7 +73,7 @@ class TestBasic(TestCase):
         text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         spans = _find_date_spans_by_force(text)
         assert len(spans) == 3
-        spans = sort_by_start(spans)
+        spans = SpanList(spans).sort_by_start()
         dates = [text[s.start:s.end] for s in spans]
         assert dates[0] == '2015-12-03'
         assert dates[1] == '10/Oct/1999'
@@ -86,7 +86,7 @@ class TestBasic(TestCase):
         text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         spans = find_date_spans(text, date_regexes)
         assert len(spans) == 2
-        spans = sort_by_start(spans)
+        spans = spans.sort_by_start()
         dates = [text[s.start:s.end] for s in spans]
         assert dates[0] == '2015-12-03'
         assert dates[1] == '10/Oct/1999:21:15:05 +0500'

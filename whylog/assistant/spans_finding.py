@@ -10,7 +10,8 @@ from dateutil.parser import parse as date_parse
 
 from whylog.assistant.const import DataType, DateParams
 from whylog.assistant.regex_assistant.regex import create_date_regex
-from whylog.assistant.span import Span, not_overlapping_spans, sort_as_date
+from whylog.assistant.span import Span
+from whylog.assistant.span_list import SpanList
 
 possible_span_start_pattern = re.compile(r"(?<=[^\w])[\w]|^[\w]")
 possible_span_end_pattern = re.compile(r"\w(?=[^\w])|\w$")
@@ -24,9 +25,9 @@ def find_date_spans(text, regexes=None):
 
     unique_spans = forced_date_spans.union(regex_date_spans)
 
-    ordered_date_spans = sort_as_date(unique_spans)
+    ordered_date_spans = SpanList(unique_spans).sort_as_date()
 
-    best_spans = not_overlapping_spans(ordered_date_spans)
+    best_spans = SpanList.not_overlapping_spans(ordered_date_spans)
 
     return best_spans
 

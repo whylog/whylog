@@ -3,18 +3,7 @@ Span as representation of interval and its pattern in som text
 Auxilary methods for Span
 """
 
-from operator import attrgetter
-
 from whylog.assistant.const import DataType
-
-
-class OverlappingSpansError(Exception):
-    def __init__(self, span1, span2):
-        self.span1 = span1
-        self.span2 = span2
-
-    def __str__(self):
-        return "%s overlaps %s" % (self.span1, self.span2)
 
 
 class SpanConstructorParamsError(Exception):
@@ -107,69 +96,3 @@ def update_span_patterns(spans, text):
     for span in spans:
         span.update_pattern(text)
     return spans
-
-
-def sort_by_start(spans):
-    return sorted(spans, key=attrgetter('start'))
-
-
-def sort_as_date(spans):
-    # we prefer longer dates, because it is safer (date is different in each log)
-    return sorted(spans, key=attrgetter('length'), reverse=True)
-
-
-def complementary_intervals(spans, start_index, end_index):
-    overlapping_check(spans)
-    compl_pairs = set()
-    span_start = start_index
-    for span in sort_by_start(spans):
-        new_span_end = span.start
-        if span_start < new_span_end:
-            compl_pairs.add((span_start, new_span_end))
-        span_start = span.end
-    if span_start < end_index:
-        compl_pairs.add((span_start, end_index))
-    return list(compl_pairs)
-
-
-def spans_from_ranges(ranges_list, pattern_creator=None, pattern=None, is_param=False):
-    spans = [
-        Span(
-            start,
-            end,
-            pattern_creator=pattern_creator,
-            pattern=pattern,
-            is_param=is_param
-        ) for start, end in ranges_list
-    ]
-    overlapping_check(spans)
-    return spans
-
-
-def overlapping_check(spans):
-    if not spans:
-        return
-    sorted_spans = sort_by_start(spans)
-    previous_span = sorted_spans[0]
-    for span in sorted_spans[1:]:
-        if previous_span.overlaps(span):
-            raise OverlappingSpansError(previous_span, span)
-        previous_span = span
-
-
-def not_overlapping_spans(sorted_spans):
-    """
-    For given list of spans, returns list of non-overlapping spans.
-    Greedy, takes spans one after another from sorted list and tries to add it into non_overlapping spans.
-    :param [Span] sorted_spans: sorted spans due to some order
-    """
-    spans_not_overlapping = []
-    for span in sorted_spans:
-        not_overlaps = True
-        for good_span in spans_not_overlapping:
-            if span.overlaps(good_span):
-                not_overlaps = False
-                break
-        if not_overlaps:
-            spans_not_overlapping.append(span)
-    return sort_by_start(spans_not_overlapping)
