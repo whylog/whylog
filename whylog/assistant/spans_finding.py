@@ -12,6 +12,9 @@ from whylog.assistant.const import DataType, DateParams
 from whylog.assistant.regex_assistant.regex import create_date_regex
 from whylog.assistant.span import Span, not_overlapping_spans, sort_as_date
 
+possible_span_start_pattern = re.compile(r"(?<=[^\w])[\w]|^[\w]")
+possible_span_end_pattern = re.compile(r"\w(?=[^\w])|\w$")
+
 
 def find_date_spans(text, regexes=None):
     regexes = regexes or {}
@@ -54,10 +57,10 @@ def _find_date_spans_by_force(text):
             try:
                 date_text = text[start:end]
                 date = date_parse(date_text)
-            except (ValueError):
+            except ValueError:
                 continue
 
-            if date_now.year - date.year < -1:
+            if date.year - date_now.year > 1:
                 continue
             new_span = Span(start, end, pattern_creator=create_date_regex, data_type=DataType.DATE)
             date_spans.add(new_span)
@@ -89,11 +92,9 @@ def _possible_span_starts_and_ends(text):
     """
 
     starts = []
-    start_pattern = re.compile(r"(?<=[^\w])[\w]|^[\w]")
-    for match in re.finditer(start_pattern, text):
-        starts.append(match.start(0))
+    for matcher in possible_span_start_pattern.finditer(text):
+        starts.append(matcher.start(0))
     ends = []
-    end_pattern = re.compile(r"\w(?=[^\w])|\w$")
-    for match in re.finditer(end_pattern, text):
-        ends.append(match.end(0))
+    for matcher in possible_span_end_pattern.finditer(text):
+        ends.append(matcher.end(0))
     return starts, ends

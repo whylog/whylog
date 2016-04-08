@@ -121,12 +121,11 @@ def sort_as_date(spans):
 def complementary_intervals(spans, start_index, end_index):
     overlapping_check(spans)
     compl_pairs = set()
-    sorted_spans = sort_by_start(spans)
     span_start = start_index
-    for span in sorted_spans:
-        span_end = span.start
-        if span_start < span_end:
-            compl_pairs.add((span_start, span_end))
+    for span in sort_by_start(spans):
+        new_span_end = span.start
+        if span_start < new_span_end:
+            compl_pairs.add((span_start, new_span_end))
         span_start = span.end
     if span_start < end_index:
         compl_pairs.add((span_start, end_index))
@@ -144,18 +143,18 @@ def spans_from_ranges(ranges_list, pattern_creator=None, pattern=None, is_param=
         ) for start, end in ranges_list
     ]
     overlapping_check(spans)
-    return list(spans)
+    return spans
 
 
 def overlapping_check(spans):
-    if len(spans) == 0:
+    if not spans:
         return
     sorted_spans = sort_by_start(spans)
-    last_span = sorted_spans[0]
+    previous_span = sorted_spans[0]
     for span in sorted_spans[1:]:
-        if last_span.overlaps(span):
-            raise OverlappingSpansError(last_span, span)
-        last_span = span
+        if previous_span.overlaps(span):
+            raise OverlappingSpansError(previous_span, span)
+        previous_span = span
 
 
 def not_overlapping_spans(sorted_spans):

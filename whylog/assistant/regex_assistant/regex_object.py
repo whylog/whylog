@@ -28,6 +28,9 @@ class RegexObject(object):
     def _hole_spans(self):
         """
         Returns spans between group_spans in line_text
+
+        I.e having line_text of length 50 and group_spans corresponding to intervals: (1, 21), (30, 41),
+        returns complementary spans corresponding to intervals (0, 1), (21, 30), (41, 50)
         """
         compl_intervals = complementary_intervals(self.group_spans, 0, len(self.line_text))
         compl_spans = spans_from_ranges(compl_intervals, pattern_creator=create_obvious_regex)

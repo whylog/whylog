@@ -18,9 +18,8 @@ class TestBasic(TestCase):
         line = r"2015-12-03 12:11:00 Data is missing on comp21"
         regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
         matched, groups, errors = verify_regex(regex, line)
-        assert (matched, len(groups), len(errors)) == (True, 2, 0)
-        assert groups[0] == r"2015-12-03 12:11:00"
-        assert groups[1] == r"comp21"
+        assert matched and not errors
+        assert groups == ('2015-12-03 12:11:00', 'comp21')
 
     def test_verify_regex_fail(self):
         line2 = r"2015-12-03 12:11:00 Data is missing"
@@ -102,15 +101,15 @@ class TestBasic(TestCase):
         regex = ra.regex_objects[line_id].regex
 
         matched, groups, errors = verify_regex(regex, line)
-        assert (matched, len(groups), len(errors)) == (True, 2, 0)
+        assert not errors
         assert groups == ('2015-12-03', '10/Oct/1999 21:15:05 +0500')
 
         similar_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "GET /index.html HTTP/1.0" 200 1043'
         matched, groups, errors = verify_regex(regex, similar_line)
-        assert (matched, len(groups), len(errors)) == (True, 2, 0)
+        assert not errors
         assert groups == ('2016-1-5', '11/September/2000 1:02:50 +0400')
 
         fake_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "POST /index.html HTTP/1.0" 200 1043'
         matched, groups, errors = verify_regex(regex, fake_line)
-        assert (matched, len(groups), len(errors)) == (False, 0, 1)
+        assert not groups and not matched
         assert isinstance(errors[0], NotMatchingRegexError)

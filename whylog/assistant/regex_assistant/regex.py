@@ -7,28 +7,25 @@ import re
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 
 special_characters = frozenset('.^$*+{}?[]|()]')
+group_pattern = re.compile(r"[a-zA-Z]+|[0-9]+|\s+|[\W]+")
 
 
 def verify_regex(regex, text):
     """
     Verifies regex properties such as:
     - matching a whole text
-    - matching text in a one way only
     If properties are not met, proper exceptions are returned.
     """
-    # TODO: verify if regex matches text in a one way only
 
     # regex must match a whole text from its beginning to end.
-    whole_text_regex = "^" + regex + "$"
-    pattern = re.compile(whole_text_regex)
+    matcher = re.match('^%s$' % (regex,), text)
 
-    match = re.match(pattern, text)
     matched = False
     groups = []
     errors = []
-    if match is not None:
+    if matcher is not None:
         matched = True
-        groups = match.groups()
+        groups = matcher.groups()
     else:
         errors.append(NotMatchingRegexError(text, regex))
     return matched, groups, errors
@@ -61,9 +58,8 @@ def create_date_regex(date_text):
     """
     # We divide date_text into groups consisting of:
     # only alpha or only num or only non-alphanumerical marks
-    group_regex = re.compile(r"[a-zA-Z]+|[0-9]+|\s+|[\W]+")
     date_regex = r""
-    for matcher in re.finditer(group_regex, date_text):
+    for matcher in group_pattern.finditer(date_text):
         start, end = matcher.span(0)
         char = date_text[start]
         if char.isalpha():
@@ -81,5 +77,5 @@ def create_date_regex(date_text):
     return date_regex
 
 
-def create_silly_regex(date_text):
+def create_matching_everything_regex(date_text):
     return r".*"
