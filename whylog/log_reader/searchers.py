@@ -56,15 +56,6 @@ class BacktrackSearcher(AbstractSearcher):
             collector[parser_name] = [clue]
         return collector
 
-    def search(self, investigation_step):
-        # TODO should be one such function per log file <- what?!?
-        clues = {}
-        offset = self._deduce_offset(investigation_step.effect_time)
-        for line, actual_offset in self._reverse_from_offset(offset):
-            clues_from_line = investigation_step.get_clues(line, actual_offset)
-            clues = self._merge_clues(clues, clues_from_line)
-        return clues
-
     @classmethod
     def _decrease_actual_offset_properly(cls, actual_offset, drop_string):
         return actual_offset - len(drop_string) - 1
@@ -102,3 +93,12 @@ class BacktrackSearcher(AbstractSearcher):
                         yield line, actual_offset
             actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
             yield truncated, actual_offset
+
+    def search(self, investigation_step):
+        # TODO should be one such function per log file <- what?!?
+        clues = {}
+        offset = self._deduce_offset(investigation_step.effect_time)
+        for line, actual_offset in self._reverse_from_offset(offset):
+            clues_from_line = investigation_step.get_clues(line, actual_offset)
+            clues = self._merge_clues(clues, clues_from_line)
+        return clues
