@@ -24,7 +24,7 @@ class LogReader(AbstractLogReader):
         input_log_type = self.config.get_log_type(front_input)
         if not input_log_type:
             return None  # TODO information about no input_log_type must somehow be returned to the Front
-        investigation_plan = self.config.create_investigation_plan(front_input)  # TODO call it on input_log_type too
+        investigation_plan = self.config.create_investigation_plan(front_input, input_log_type)
         manager = SearchManager(investigation_plan)
         return manager.investigate()
 
