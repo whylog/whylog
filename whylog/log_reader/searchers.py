@@ -48,14 +48,21 @@ class BacktrackSearcher(AbstractSearcher):
         #         return line(1)
         return 69  # FIXME it is only mock for test 003
 
+    @classmethod
+    def _merge_clues(cls, collector, clues_from_line):
+        for parser_name, clue in clues_from_line.items():
+            if parser_name in collector:
+                collector[parser_name].append(clue)
+            collector[parser_name] = [clue]
+        return collector
+
     def search(self, investigation_step):
         # TODO should be one such function per log file <- what?!?
         clues = {}
         offset = self._deduce_offset(investigation_step.effect_time)
         for line, actual_offset in self._reverse_from_offset(offset):
-            one_clue_dict = investigation_step.get_clues(line, actual_offset)  # TODO check if line somehow fits
-            # TODO ^ contains dict
-            # TODO append information from clue to clues dict
+            clues_from_line = investigation_step.get_clues(line, actual_offset)
+            clues = self._merge_clues(clues, clues_from_line)
         return clues
 
     @classmethod
