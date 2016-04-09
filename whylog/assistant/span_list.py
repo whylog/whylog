@@ -1,8 +1,9 @@
 from operator import attrgetter
 from whylog.assistant.span import Span
+from whylog.exceptions import WhylogError
 
 
-class OverlappingSpansError(Exception):
+class OverlappingSpansError(WhylogError):
     def __init__(self, span1, span2):
         self.span1 = span1
         self.span2 = span2

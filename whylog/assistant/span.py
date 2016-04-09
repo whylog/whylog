@@ -4,9 +4,10 @@ Auxilary methods for Span
 """
 
 from whylog.assistant.const import DataType
+from whylog.exceptions import WhylogError
 
 
-class SpanConstructorParamsError(Exception):
+class SpanConstructorParamsError(WhylogError):
     def __init__(self, start, end):
         self.start = start
         self.end = end
@@ -15,7 +16,7 @@ class SpanConstructorParamsError(Exception):
         return 'Wrong Span constructor params. Should be: %s < %s' % (self.start, self.end)
 
 
-class UnableToCreatePatternError(Exception):
+class UnableToCreatePatternError(WhylogError):
     def __init__(self, start, end):
         self.start = start
         self.end = end
