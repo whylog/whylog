@@ -14,19 +14,27 @@ from whylog.front import FrontInput
 
 
 class TestBasic(TestCase):
+    def _verify_regex_success(self, regex, line, wanted_groups=None):
+        try:
+            groups = verify_regex(regex, line)
+            if wanted_groups is not None:
+                assert groups == wanted_groups
+        except NotMatchingRegexError as e:
+            self.fail(e)
+
+    def _verify_regex_fail(self, regex, line):
+        with self.assertRaises(NotMatchingRegexError):
+            verify_regex(regex, line)
+
     def test_verify_regex_success(self):
         line = r"2015-12-03 12:11:00 Data is missing on comp21"
         regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
-        matched, groups, errors = verify_regex(regex, line)
-        assert matched and not errors
-        assert groups == ('2015-12-03 12:11:00', 'comp21')
+        self._verify_regex_success(regex, line, ('2015-12-03 12:11:00', 'comp21'))
 
     def test_verify_regex_fail(self):
-        line2 = r"2015-12-03 12:11:00 Data is missing"
+        line = r"2015-12-03 12:11:00 Data is missing"
         regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
-        matched, groups, errors = verify_regex(regex, line2)
-        assert (matched, len(groups), len(errors)) == (False, 0, 1)
-        assert isinstance(errors[0], NotMatchingRegexError)
+        self._verify_regex_fail(regex, line)
 
     def test_create_obvious_regex(self):
         line = r".^$*x+x{5}?\*[x]x|y(x)(?iLmsux)(?:x)(?P<name>x)(?#x)(?<!x)\4\b\A"
@@ -35,28 +43,28 @@ class TestBasic(TestCase):
             obvious_regex == r"\.\^\$\*x\+x\{5\}\?\\\*\[x\]x\|y\(x\)\(\?iLmsux\)\(\?:x\)"
             r"\(\?P<name>x\)\(\?#x\)\(\?<!x\)\\4\\b\\A"
         )
-        matched, groups, errors = verify_regex(obvious_regex, line)
-        assert (matched, len(groups), len(errors)) == (True, 0, 0)
+
+        self._verify_regex_success(obvious_regex, line, ())
 
     def test_create_date_regex(self):
         date = '10/Oct/1999:21:15:05'
         regex = create_date_regex(date)
-        matched, groups, errors = verify_regex(regex, date)
-        assert (matched, len(groups), len(errors)) == (True, 0, 0)
+        self._verify_regex_success(regex, date, ())
+
         not_matching_dates = [
             date + " ", date + ":", "1" + date, '10/10/1999:21:15:05', '10/Oct/199:21:15:05',
             '10/Oct1/1999:21:15:05', '10/Oct/1999:21:15:05PM', '10/Oct/1999:021:15:05',
             '10\Oct\1999:21:15:05'
         ]
         for not_matching_date in not_matching_dates:
-            assert verify_regex(regex, not_matching_date)[0] is False
+            self._verify_regex_fail(regex, not_matching_date)
 
         matching_dates = [
             '1/Oct/1999:21:15:05', '10/October/1999:21:15:05', '10/Octyyy/1999:21:15:05',
             '10/O/1999:21:15:05', '1/Oct/1999:2:1:0'
         ]
         for matching_date in matching_dates:
-            assert verify_regex(regex, matching_date)[0] is True
+            self._verify_regex_success(regex, matching_date)
 
     def test_find_spans_by_regex(self):
         regexes = dict((re.compile(regex), regex) for regex in [r"\d+-\d+-\d\d", r"comp\d\d"])
@@ -100,16 +108,12 @@ class TestBasic(TestCase):
         ra.guess(line_id)
         regex = ra.regex_objects[line_id].regex
 
-        matched, groups, errors = verify_regex(regex, line)
-        assert not errors
-        assert groups == ('2015-12-03', '10/Oct/1999 21:15:05 +0500')
+        self._verify_regex_success(regex, line, ('2015-12-03', '10/Oct/1999 21:15:05 +0500'))
 
         similar_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "GET /index.html HTTP/1.0" 200 1043'
-        matched, groups, errors = verify_regex(regex, similar_line)
-        assert not errors
-        assert groups == ('2016-1-5', '11/September/2000 1:02:50 +0400')
+        self._verify_regex_success(
+            regex, similar_line, ('2016-1-5', '11/September/2000 1:02:50 +0400')
+        )
 
         fake_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "POST /index.html HTTP/1.0" 200 1043'
-        matched, groups, errors = verify_regex(regex, fake_line)
-        assert not groups and not matched
-        assert isinstance(errors[0], NotMatchingRegexError)
+        self._verify_regex_fail(regex, fake_line)

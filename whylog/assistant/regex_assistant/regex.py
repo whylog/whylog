@@ -14,21 +14,16 @@ def verify_regex(regex, text):
     """
     Verifies regex properties such as:
     - matching a whole text
-    If properties are not met, proper exceptions are returned.
+    If properties are not met, exception is raised.
     """
 
     # regex must match a whole text from its beginning to end.
     matcher = re.match('^%s$' % (regex,), text)
 
-    matched = False
-    groups = []
-    errors = []
-    if matcher is not None:
-        matched = True
-        groups = matcher.groups()
+    if matcher is None:
+        raise NotMatchingRegexError(text, regex)
     else:
-        errors.append(NotMatchingRegexError(text, regex))
-    return matched, groups, errors
+        return matcher.groups()
 
 
 def create_obvious_regex(text):
@@ -66,12 +61,12 @@ def create_date_regex(date_text):
             date_regex += "[a-zA-Z]+"
         elif char.isdigit():
             length = matcher.end(0) - matcher.start(0)
-            repetition_cnt = "+"
+            repetition_count = "+"
             if length <= 2:
-                repetition_cnt = "{1,2}"
+                repetition_count = "{1,2}"
             elif length == 4:
-                repetition_cnt = "{4}"
-            date_regex += "[0-9]" + repetition_cnt
+                repetition_count = "{4}"
+            date_regex += "[0-9]" + repetition_count
         else:
             date_regex += create_obvious_regex(matcher.group(0))
     return date_regex

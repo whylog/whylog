@@ -19,7 +19,7 @@ class SpanList(list):
     def sort_by_start(self):
         return SpanList(sorted(self, key=attrgetter('start')))
 
-    def sort_as_date(self):
+    def sort_reversed_by_length(self):
         # we prefer longer dates, because it is safer (date is different in each log)
         return SpanList(sorted(self, key=attrgetter('length'), reverse=True))
 

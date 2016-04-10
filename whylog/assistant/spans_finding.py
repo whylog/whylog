@@ -25,7 +25,7 @@ def find_date_spans(text, regexes=None):
 
     unique_spans = forced_date_spans.union(regex_date_spans)
 
-    ordered_date_spans = SpanList(unique_spans).sort_as_date()
+    ordered_date_spans = SpanList(unique_spans).sort_reversed_by_length()
 
     best_spans = SpanList.not_overlapping_spans(ordered_date_spans)
 
