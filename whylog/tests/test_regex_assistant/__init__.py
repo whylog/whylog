@@ -23,8 +23,7 @@ class TestBasic(TestCase):
             self.fail(e)
 
     def _verify_regex_fail(self, regex, line):
-        with self.assertRaises(NotMatchingRegexError):
-            verify_regex(regex, line)
+        self.assertRaises(NotMatchingRegexError, verify_regex, regex, line)
 
     def test_verify_regex_success(self):
         line = r"2015-12-03 12:11:00 Data is missing on comp21"
