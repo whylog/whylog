@@ -58,7 +58,6 @@ class RegexObject(object):
         Completely replaces group_spans to new_spans, updates regex
         :param new_spans: non-overlapping spans (if they overlaps error will be raised)
         """
-        print(new_spans)
         new_spans.overlapping_check()
         self.group_spans = new_spans
         self.regex = self._update_regex()
