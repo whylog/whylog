@@ -5,4 +5,5 @@ class LogType(object):
 
     #It will be generator
     def get_next_file_to_parse(self):
+        # TODO: remove mock
         return 'localhost', 'node_1.log'

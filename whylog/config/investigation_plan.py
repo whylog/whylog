@@ -9,14 +9,15 @@ class InvestigationPlan(object):
         self._investigation_metadata = investigation_metadata
 
     def get_next_investigation_step_with_log_type(self):
-        return self._investigation_metadata[0]
+        for meta_data in self._investigation_metadata:
+            yield meta_data
 
 
 class InvestigationStep(object):
     EARLIEST_DATE = datetime.min.replace(tzinfo=dateutil.tz.tzutc())
 
-    def __init__(self, concatenated_parser, effect_time, earliest_cause_time=EARLIEST_DATE):
-        self._concatenated_parser = concatenated_parser
+    def __init__(self, parser_subset, effect_time, earliest_cause_time=EARLIEST_DATE):
+        self._parser_subset = parser_subset
         self.effect_time = InvestigationStep.add_zero_timezone(effect_time)
         self.earliest_cause_time = InvestigationStep.add_zero_timezone(earliest_cause_time)
 
@@ -41,11 +42,7 @@ class InvestigationStep(object):
         }
 
     def get_clues(self, line, offset):
-        """
-        Basing on parsers creates clues in investigation
-        :param line: line from parsed file
-        :returns: list of created clues
-        """
+        # TODO: remove mock
         return self.mocked_clues()
 
 

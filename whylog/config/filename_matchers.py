@@ -20,4 +20,5 @@ class RegexFilenameMatcher(AbstractFilenameMatcher):
         self._path_regex = re.compile(path_pattern)
 
     def get_matched_logs(self):
+        # TODO: remove mock
         return ['node_1.log']

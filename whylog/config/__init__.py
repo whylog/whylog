@@ -80,6 +80,7 @@ class AbstractConfig(object):
         return InvestigationPlan([rule], [(default_investigation_step, default_log_type)])
 
     def create_investigation_plan(self, front_input):
+        #TODO: remove mock
         return self.mocked_investigation_plan()
 
     def _get_log_type(self, front_input):
@@ -116,10 +117,7 @@ class AbstractFileConfig(AbstractConfig):
         ]
 
     def _load_log_types(self):
-        # return [
-        #     LogTypeFactory.from_dao(serialized_log_type)
-        #     for serialized_log_type in self._load_file_with_config(self._log_type_path)
-        # ]
+        #TODO fix log types loading
         pass
 
     @abstractmethod
