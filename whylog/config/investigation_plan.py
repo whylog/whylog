@@ -1,4 +1,6 @@
 from datetime import datetime
+import dateutil.parser
+import dateutil.tz
 
 
 class InvestigationPlan(object):
@@ -10,25 +12,24 @@ class InvestigationPlan(object):
         return self._investigation_metadata[0]
 
 
-class RuleSubset(object):
-    def __init__(self, rule_dict):
-        pass
-
-    def get_logs_types(self):
-        pass
-
-    def get_rules_for_log_type(self, log_type):
-        pass
-
-    def get_parsers_for_log_type(self, log_type):
-        pass
-
-
 class InvestigationStep(object):
-    def __init__(self, concatenated_parser, effect_time, earliest_cause_time):
+    EARLIEST_DATE = datetime.min.replace(tzinfo=dateutil.tz.tzutc())
+
+    def __init__(self, concatenated_parser, effect_time, earliest_cause_time=EARLIEST_DATE):
         self._concatenated_parser = concatenated_parser
-        self.effect_time = effect_time
-        self.earliest_cause_time = earliest_cause_time
+        self.effect_time = InvestigationStep.add_zero_timezone(effect_time)
+        self.earliest_cause_time = InvestigationStep.add_zero_timezone(earliest_cause_time)
+
+    def is_line_in_time_range(self, line):
+        parsed_date = dateutil.parser.parse(line, fuzzy=True)
+        parsed_date = InvestigationStep.add_zero_timezone(parsed_date)
+        return self.effect_time >= parsed_date >= self.earliest_cause_time
+
+    @classmethod
+    def add_zero_timezone(cls, date):
+        if date.tzinfo is None:
+            return date.replace(tzinfo=dateutil.tz.tzutc())
+        return date
 
     # mocked Clue for second line in node_1.log for 003 test
     def mocked_clues(self):

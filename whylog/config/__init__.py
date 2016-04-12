@@ -5,7 +5,7 @@ import six
 import yaml
 
 from whylog.config.filename_matchers import RegexFilenameMatcher
-from whylog.config.investigation_plan import InvestigationPlan
+from whylog.config.investigation_plan import InvestigationPlan, InvestigationStep
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory, Rule
@@ -156,3 +156,17 @@ class YamlConfig(AbstractFileConfig):
 
     def _convert_parsers_to_file_form(self, parser_definitions):
         return yaml.safe_dump_all(parser_definitions, explicit_start=True)
+
+
+class RuleSubset(object):
+    def __init__(self, rule_dict):
+        pass
+
+    def get_logs_types(self):
+        pass
+
+    def get_rules_for_log_type(self, log_type):
+        pass
+
+    def get_parsers_for_log_type(self, log_type):
+        pass
