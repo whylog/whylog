@@ -9,6 +9,7 @@ class InvestigationPlan(object):
     Also contains all investigation steps and log types that are neccesary
     to make an investigation
     """
+
     def __init__(self, suspected_rules, investigation_metadata):
         self._suspected_rules = suspected_rules
         self._investigation_metadata = investigation_metadata
@@ -61,6 +62,7 @@ class Clue(object):
     Collects all the data that parser subset can extract from single log line.
     Also, contains parsed line and its source.
     """
+
     def __init__(self, regex_parameters, line_time, line_prefix_content, line_source):
         pass
 
