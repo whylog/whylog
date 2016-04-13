@@ -1,3 +1,7 @@
+class AssistantType:
+    REGEX = 'regex'
+
+
 class DataType:
     STRING = 'string'
     DATE = 'date'
