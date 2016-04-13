@@ -6,8 +6,9 @@ import dateutil.tz
 class InvestigationPlan(object):
     """
     Represents all rules that can be fulfilled in single investigation.
-    Also contains all investigation steps and log types that are neccesary
-    to make an investigation
+    Also contains all investigation metadata, what means all pairs
+    (investigationstep, logtype) neccesary for investigation
+    For single log type we have single investigation step.
     """
 
     def __init__(self, suspected_rules, investigation_metadata):
