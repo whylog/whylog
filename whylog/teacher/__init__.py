@@ -1,5 +1,4 @@
 from whylog.teacher.mock_outputs import create_sample_rule
-from whylog.teacher.user_intent import UserRuleIntent
 
 
 class Teacher(object):
@@ -7,20 +6,17 @@ class Teacher(object):
     Enable teaching new rule. One Teacher per one entering rule.
     """
 
-    def __init__(self, id_to_line_dict, effect_id, config, pattern_assistant):
-        self._lines = id_to_line_dict.copy()
-        self.rule_intent = UserRuleIntent(effect_id)
+    def __init__(self, config, pattern_assistant):
         self.config = config
         self.pattern_assistant = pattern_assistant
+        self._lines = {}  # line_id to line_object dict
+        self._constraints = {}  # constraint_id to constraint dict
 
-    def add_line(self, line_id, line_object):
-        self._lines[line_id] = line_object
+    def add_line(self, line_id, line_object, effect=False):
+        pass
 
     def remove_line(self, line_id):
-        del self._lines[line_id]
-        if line_id == self.effect_id:
-            # TODO: do something that represents warning "No effect line, remember to add it!"
-            pass
+        pass
 
     def update_pattern(self, line_id, proposed_pattern):
         """
@@ -28,9 +24,15 @@ class Teacher(object):
         """
         pass
 
-    def make_groups(self, groups):
+    def make_group(self, line_id, span):
         """
-        Improves text patterns by adding to them groups corresponding to params in text.
+        Improves text pattern by adding group corresponding to param in text.
+        """
+        pass
+
+    def remove_group(self, line_id, group_id):
+        """
+        Improves text pattern by removing group corresponding to param in text.
         """
         pass
 
@@ -40,10 +42,13 @@ class Teacher(object):
         """
         pass
 
-    def set_convertion(self, group, conversion):
+    def set_pattern_name(self, line_id, name):
         pass
 
-    def set_primary_key(self, groups):
+    def set_converter(self, line_id, group, converter):
+        pass
+
+    def set_primary_key(self, line_id, groups):
         pass
 
     def set_log_type(self, line_id, log_type):
@@ -66,6 +71,19 @@ class Teacher(object):
         """
         Verifies if text patterns and constraints meet all requirements.
         E.g it is required text pattern match its line in one way only.
+        """
+        pass
+
+    def get_rule(self):
+        """
+        Creates rule for Front, that will be shown to user
+        """
+        return create_sample_rule()
+        pass
+
+    def test_rule(self):
+        """
+        Simulates searching causes with alreday created rule.
         """
         pass
 
