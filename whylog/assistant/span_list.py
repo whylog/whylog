@@ -1,4 +1,5 @@
 from operator import attrgetter
+
 from whylog.assistant.span import Span
 from whylog.exceptions import WhylogError
 

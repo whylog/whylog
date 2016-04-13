@@ -9,7 +9,6 @@ from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import Group, UserConstraintIntent, UserParserIntent, UserRuleIntent
 
-
 # Constraint types
 identical_constr = "identical"
 different_constr = "different"

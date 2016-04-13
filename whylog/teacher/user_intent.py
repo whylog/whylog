@@ -6,8 +6,8 @@ class Group(object):
 
 class UserParserIntent(object):
     def __init__(
-        self, pattern_type, pattern_name, pattern, log_type_name, primary_key_groups, groups, line_content,
-        line_offset, line_resource_location
+        self, pattern_type, pattern_name, pattern, log_type_name, primary_key_groups, groups,
+        line_content, line_offset, line_resource_location
     ):
         self.pattern_type = pattern_type
         self.pattern_name = pattern_name
