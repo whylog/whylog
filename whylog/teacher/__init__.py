@@ -1,5 +1,4 @@
 from whylog.teacher.mock_outputs import create_sample_rule
-from whylog.teacher.user_intent import UserRuleIntent
 
 
 class Teacher(object):
