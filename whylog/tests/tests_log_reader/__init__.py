@@ -34,7 +34,7 @@ class TestBasic(TestCase):
         rules_path = os.path.join(path, 'rules.yaml')
         input_path = os.path.join(path, 'input.txt')
         output_path = os.path.join(path, 'expected_output.txt')
-        log_location_path = os.path.join(path, 'log_locations.yaml')
+        log_location_path = os.path.join(path, 'log_types.yaml')
 
         raise SkipTest("Functionality not implemented yet")
 

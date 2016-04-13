@@ -1,11 +1,14 @@
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
 
 import six
 import yaml
 
-from whylog.config.log_type import LogTypeFactory
-from whylog.config.parsers import RegexParserFactory
-from whylog.config.rule import RegexRuleFactory
+from whylog.config.filename_matchers import RegexFilenameMatcher
+from whylog.config.investigation_plan import InvestigationPlan, InvestigationStep
+from whylog.config.log_type import LogType
+from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
+from whylog.config.rule import RegexRuleFactory, Rule
 
 
 @six.add_metaclass(ABCMeta)
@@ -37,7 +40,7 @@ class AbstractConfig(object):
             self._parsers[parser.name] = parser
 
     def add_log_type(self, log_type):
-        #TODO Can assume that exists onlny one LogType object for one log type name
+        # TODO Can assume that exists only one LogType object for one log type name
         pass
 
     @abstractmethod
@@ -48,8 +51,38 @@ class AbstractConfig(object):
     def _save_parsers_definition(self, parser_definitions):
         pass
 
-    def create_investigation_plan(self, front_input):
-        pass
+    # mocked investigation plan for 003_match_time_range test
+    # TODO: remove mock
+    def mocked_investigation_plan(self):
+        matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
+        default_log_type = LogType('default', [matcher])
+        cause = RegexParser(
+            'cause', '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$', [1], 'default', {1: 'date'}
+        )
+        effect = RegexParser(
+            'effect', '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$', [1], 'default',
+            {1: 'date'}
+        )
+        concatenated = ConcatenatedRegexParser([cause])
+        effect_time = datetime(2015, 12, 3, 12, 8, 9)
+        earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)
+        default_investigation_step = InvestigationStep(
+            concatenated, effect_time, earliest_cause_time
+        )
+        rule = Rule(
+            [cause], effect, [
+                {
+                    'clues_groups': [[1, 1], [0, 1]],
+                    'name': 'time',
+                    'params': {'max_delta': 1}
+                }
+            ]
+        )
+        return InvestigationPlan([rule], [(default_investigation_step, default_log_type)])
+
+    def create_investigation_plan(self, front_input, log_type_name):
+        #TODO: remove mock
+        return self.mocked_investigation_plan()
 
     def _get_log_type(self, front_input):
         pass
@@ -85,10 +118,8 @@ class AbstractFileConfig(AbstractConfig):
         ]
 
     def _load_log_types(self):
-        return [
-            LogTypeFactory.from_dao(serialized_log_type)
-            for serialized_log_type in self._load_file_with_config(self._log_type_path)
-        ]
+        #TODO fix log types loading
+        pass
 
     @abstractmethod
     def _load_file_with_config(self, path):
@@ -126,14 +157,6 @@ class YamlConfig(AbstractFileConfig):
         return yaml.safe_dump_all(parser_definitions, explicit_start=True)
 
 
-class InvestigationPlan(object):
-    def __init__(self, front_input, rule_subset, log_location_dict):
-        pass
-
-    def get_next_investigation_step(self):
-        pass
-
-
 class RuleSubset(object):
     def __init__(self, rule_dict):
         pass
@@ -145,32 +168,4 @@ class RuleSubset(object):
         pass
 
     def get_parsers_for_log_type(self, log_type):
-        pass
-
-
-class InvestigationStep(object):
-    """
-    Represents rules, parsers and locations of logs which are necessary
-    to find and parse log files with potential causes.
-    """
-
-    def __init__(self, parsers, rules, log_location, effect_time):
-        pass
-
-    def get_clues(self, line):
-        """
-        Basing on parsers creates clues in investigation
-        :param line: line from parsed file
-        :returns: list of created clues
-        """
-        pass
-
-
-class Clue(object):
-    """
-    Collects all the data that parser can extract from single log line.
-    Also, contains parsed line and its source.
-    """
-
-    def __init__(self, regex_parameters, line_time, line_content, line_source):
         pass

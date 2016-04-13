@@ -1,3 +1,4 @@
+import re
 from abc import ABCMeta, abstractmethod
 
 import six
@@ -11,8 +12,13 @@ class AbstractFilenameMatcher(object):
 
 
 class RegexFilenameMatcher(AbstractFilenameMatcher):
-    def __init__(self, path_pattern):
-        pass
+    def __init__(self, host_pattern, path_pattern, log_type_name):
+        self.log_type_name = log_type_name
+        self._path_pattern = path_pattern
+        self._host_pattern = host_pattern
+        self._host_regex = re.compile(host_pattern)
+        self._path_regex = re.compile(path_pattern)
 
     def get_matched_logs(self):
-        pass
+        # TODO: remove mock
+        return ['node_1.log']

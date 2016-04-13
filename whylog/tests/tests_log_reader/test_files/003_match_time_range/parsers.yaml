@@ -1,10 +1,12 @@
 ---
 name: cause
-regex: ^(\d+) root cause
-params:
-    - {type: time, format: '%s'}
+regex_str: ^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$
+primary_key_groups: [1]
+log_type: default
+convertions: {1: date}
 ---
+primary_key_groups: [1]
+log_type: default
 name: effect
-regex: ^(\d+) visible effect$
-params:
-    - {type: time, format: '%s'}
+regex_str: ^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$
+convertions: {1: date}

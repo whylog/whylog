@@ -1,0 +1,5 @@
+---
+log_type_name: default
+matcher_class_name: RegexFilenameMatcher
+host_pattern: localhost
+path_pattern: node_1.log
