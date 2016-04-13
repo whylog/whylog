@@ -4,16 +4,25 @@ import dateutil.tz
 
 
 class InvestigationPlan(object):
+    """
+    Represents all rules that can be fulfilled in single investigation.
+    Also contains all investigation steps and log types that are neccesary
+    to make an investigation
+    """
     def __init__(self, suspected_rules, investigation_metadata):
         self._suspected_rules = suspected_rules
         self._investigation_metadata = investigation_metadata
 
     def get_next_investigation_step_with_log_type(self):
-        for meta_data in self._investigation_metadata:
-            yield meta_data
+        return (meta_data for meta_data in self._investigation_metadata)
 
 
 class InvestigationStep(object):
+    """
+    Contains all parsers for single log type that can be matched in actual investigation.
+    This class is responsible for finding all possible Clues from parsed logs.
+    Also controls searched time range in logs file.
+    """
     EARLIEST_DATE = datetime.min.replace(tzinfo=dateutil.tz.tzutc())
 
     def __init__(self, parser_subset, effect_time, earliest_cause_time=EARLIEST_DATE):
@@ -33,6 +42,7 @@ class InvestigationStep(object):
         return date
 
     # mocked Clue for second line in node_1.log for 003 test
+    #TODO: remove mock
     def mocked_clues(self):
         line_source = LineSource('localhost', 'node_1.log', 40)
         line_time = datetime(2015, 12, 3, 12, 8, 8)
@@ -48,10 +58,9 @@ class InvestigationStep(object):
 
 class Clue(object):
     """
-    Collects all the data that parser can extract from single log line.
+    Collects all the data that parser subset can extract from single log line.
     Also, contains parsed line and its source.
     """
-
     def __init__(self, regex_parameters, line_time, line_prefix_content, line_source):
         pass
 

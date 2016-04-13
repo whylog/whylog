@@ -52,6 +52,7 @@ class AbstractConfig(object):
         pass
 
     # mocked investigation plan for 003_match_time_range test
+    # TODO: remove mock
     def mocked_investigation_plan(self):
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         default_log_type = LogType('default', [matcher])
@@ -79,7 +80,7 @@ class AbstractConfig(object):
         )
         return InvestigationPlan([rule], [(default_investigation_step, default_log_type)])
 
-    def create_investigation_plan(self, front_input):
+    def create_investigation_plan(self, front_input, log_type_name):
         #TODO: remove mock
         return self.mocked_investigation_plan()
 
