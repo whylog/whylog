@@ -40,7 +40,7 @@ class SearchManager(object):
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
             clues = search_handler.investigate()
-            # TODO checking up the constraints should tahe place here
+            # TODO checking up the constraints should take place here
         return InvestigationResult()  # TODO of course return something with sense
 
 

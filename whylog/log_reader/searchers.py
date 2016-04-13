@@ -32,21 +32,13 @@ class BacktrackSearcher(AbstractSearcher):
     def __init__(self, file_path):
         self._file_path = file_path
 
-    @classmethod
-    def _extract_time_from_line(cls, line_str):
-        """
-        extracts time from line
-        """
-        pass  # TODO this function (or equivalent) should be written in config module
-
-    def _deduce_offset(self, time):
+    def _deduce_offset(self, investigation_step):
         """
         returns offset of the line with the specified time
         """
-        # for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
-        #     if self.get_time_from_line(line(0)) <= time:
-        #         return line(1)
-        return 69  # FIXME it is only mock for test 003
+        for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
+            if investigation_step.is_line_in_time_range(line):
+                return line[1]
 
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
@@ -97,7 +89,7 @@ class BacktrackSearcher(AbstractSearcher):
     def search(self, investigation_step):
         # TODO should be one such function per log file <- what?!?
         clues = {}
-        offset = self._deduce_offset(investigation_step.effect_time)
+        offset = self._deduce_offset(investigation_step)
         for line, actual_offset in self._reverse_from_offset(offset):
             clues_from_line = investigation_step.get_clues(line, actual_offset)
             clues = self._merge_clues(clues, clues_from_line)
