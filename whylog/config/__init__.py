@@ -84,8 +84,10 @@ class AbstractConfig(object):
         #TODO: remove mock
         return self.mocked_investigation_plan()
 
-    def _get_log_type(self, front_input):
-        pass
+    def get_log_type(self, front_input):
+        # TODO: remove mock
+        matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
+        return LogType('default', [matcher])
 
     def _find_matching_parsers(self, front_input, log_type):
         pass
