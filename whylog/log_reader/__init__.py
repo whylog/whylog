@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import six
 
 from whylog.log_reader.searchers import BacktrackSearcher
+from whylog.front import FrontInput
 
 
 @six.add_metaclass(ABCMeta)
@@ -41,7 +42,9 @@ class SearchManager(object):
             search_handler = SearchHandler(step, log_type)
             clues = search_handler.investigate()
             # TODO checking up the constraints should take place here
-        return InvestigationResult()  # TODO of course return something with sense
+        return FrontInput(
+            69, "2015-12-03 12:08:08 root cause", "node_1.log"
+        )  # TODO it's a mock! values should be returned basing on clues and constraints
 
 
 class SearchHandler(object):
