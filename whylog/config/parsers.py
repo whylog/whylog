@@ -28,8 +28,9 @@ class AbstractParser(object):
 
 
 class RegexParser(AbstractParser):
-    def __init__(self, name, regex_str, primary_key_groups, log_type, convertions):
+    def __init__(self, name, line_content, regex_str, primary_key_groups, log_type, convertions):
         self.name = name
+        self.line_content = line_content
         self.regex_str = regex_str
         self.regex = regex.compile(self.regex_str)
         self.primary_key_groups = primary_key_groups
@@ -71,7 +72,7 @@ class RegexParserFactory(object):
             (group_id, group.converter) for (group_id, group) in parser_intent.groups.items()
         )
         return RegexParser(
-            parser_intent.pattern_name, parser_intent.pattern, parser_intent.primary_key_groups,
+            parser_intent.pattern_name, parser_intent.line_content, parser_intent.pattern, parser_intent.primary_key_groups,
             parser_intent.log_type_name, convertions
         )
 
