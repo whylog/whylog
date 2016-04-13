@@ -1,5 +1,5 @@
 --- investigated item [node_1.log line 3]:
-3 visible effect
+2015-12-03 12:08:09 visible effect
 
 --- has been caused by [node_1.log line 2]:
-2 root cause
+2015-12-03 12:08:08 root cause
