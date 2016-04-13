@@ -2,7 +2,6 @@ import os.path
 from unittest import TestCase
 
 import yaml
-
 from nose.plugins.skip import SkipTest
 
 from whylog.assistant.const import AssistantType

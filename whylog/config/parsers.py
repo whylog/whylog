@@ -72,8 +72,8 @@ class RegexParserFactory(object):
             (group_id, group.converter) for (group_id, group) in parser_intent.groups.items()
         )
         return RegexParser(
-            parser_intent.pattern_name, parser_intent.line_content, parser_intent.pattern, parser_intent.primary_key_groups,
-            parser_intent.log_type_name, convertions
+            parser_intent.pattern_name, parser_intent.line_content, parser_intent.pattern,
+            parser_intent.primary_key_groups, parser_intent.log_type_name, convertions
         )
 
     @classmethod
