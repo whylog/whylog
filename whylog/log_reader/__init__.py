@@ -54,8 +54,8 @@ class SearchHandler(object):
         for host, path in self._log_type.get_next_file_to_parse():
             # TODO remember about not localhost case
             searcher = BacktrackSearcher(path)
-            clues += searcher.search(self._investigation_step)
-            # TODO add this ^ to dict, not simply append
+            clues.update(searcher.search(self._investigation_step))
+            # TODO is it a good way to update the dict of clues?
         return clues
 
 
