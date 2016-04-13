@@ -1,5 +1,5 @@
 from whylog.teacher.user_intent import Group, UserConstraintIntent, UserParserIntent, UserRuleIntent
-
+from whylog.assistant.const import AssistantType
 
 def create_sample_rule():
     identical_constr = "identical"
@@ -41,14 +41,16 @@ def create_sample_rule():
     resource_location2 = "serwer2"
     resource_location3 = "serwer3"
 
+    regex_type = AssistantType.REGEX
+
     parser_intent1 = UserParserIntent(
-        "connectionerror", regex1, "hydra", [1], groups1, sample_line1, 18, resource_location1
+        regex_type, "connectionerror", regex1, "hydra", [1], groups1, sample_line1, 18, resource_location1
     )
     parser_intent2 = UserParserIntent(
-        "datamigration", regex2, "hydra", [1], groups2, sample_line2, 9, resource_location2
+        regex_type, "datamigration", regex2, "hydra", [1], groups2, sample_line2, 9, resource_location2
     )
     parser_intent3 = UserParserIntent(
-        "lostdata", regex3, "filesystem", [1], groups3, sample_line3, 1994, resource_location3
+        regex_type, "lostdata", regex3, "filesystem", [1], groups3, sample_line3, 1994, resource_location3
     )
 
     parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}

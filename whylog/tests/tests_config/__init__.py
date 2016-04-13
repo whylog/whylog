@@ -3,10 +3,12 @@ from unittest import TestCase
 
 import yaml
 
+from whylog.assistant.const import AssistantType
 from whylog.config import YamlConfig
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import Group, UserConstraintIntent, UserParserIntent, UserRuleIntent
+
 
 # Constraint types
 identical_constr = "identical"
@@ -49,7 +51,10 @@ class TestBasic(TestCase):
             4: Group("host2", to_string)
         }
 
+        regex_type = AssistantType.REGEX
+
         cls.parser_intent1 = UserParserIntent(
+            regex_type,
             "connectionerror",
             cls.regex1,
             "hydra",
@@ -60,6 +65,7 @@ class TestBasic(TestCase):
             line_resource_location=None
         )
         cls.parser_intent2 = UserParserIntent(
+            regex_type,
             "datamigration",
             cls.regex2,
             "hydra",
@@ -70,6 +76,7 @@ class TestBasic(TestCase):
             line_resource_location=None
         )
         cls.parser_intent3 = UserParserIntent(
+            regex_type,
             "lostdata",
             cls.regex3,
             "filesystem",
