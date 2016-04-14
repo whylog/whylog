@@ -38,13 +38,14 @@ class SearchManager(object):
         self._investigation_plan = investigation_plan
 
     def investigate(self):
+        clues = {}
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
-            clues = search_handler.investigate()
-            # TODO checking up the constraints should take place here
-        return FrontInput(
+            clues.update(search_handler.investigate())
+        # TODO checking up the constraints should take place here
+        return [FrontInput(
             69, "2015-12-03 12:08:08 root cause", "node_1.log"
-        )  # TODO it's a mock! values should be returned basing on clues and constraints
+        )]  # TODO it's a mock! values should be returned basing on clues and constraints
 
 
 class SearchHandler(object):
