@@ -63,6 +63,7 @@ class SearchHandler(object):
                 searcher = BacktrackSearcher(path)
                 clues.update(searcher.search(self._investigation_step))
             else:
-                raise NotImplementedError("Cannot operate on %s which is different than %s" %
-                                          (host, "localhost"))
+                raise NotImplementedError(
+                    "Cannot operate on %s which is different than %s" % (host, "localhost")
+                )
         return clues
