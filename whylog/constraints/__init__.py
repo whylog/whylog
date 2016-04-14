@@ -14,6 +14,11 @@ class TimeConstraint(AbstractConstraint):
     def __init__(self, line_earlier, line_later, min_delta=None, max_delta=None):
         pass
 
+    @classmethod
+    def verify(cls, clues, min_delta, max_delta):
+        # TODO here the constraint verification should take place and bool should be returned
+        pass
+
 
 class IdenticalIntervals(AbstractConstraint):
     def __init__(self, intervals):
