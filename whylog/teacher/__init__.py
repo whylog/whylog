@@ -74,21 +74,22 @@ class Teacher(object):
         """
         pass
 
-    def get_rule(self):
-        """
-        Creates rule for Front, that will be shown to user
-        """
-        return create_sample_rule()
-        pass
-
     def test_rule(self):
         """
         Simulates searching causes with alreday created rule.
         """
         pass
 
+    def get_rule(self):
+        """
+        Creates rule for Front that will be shown to user
+        """
+        #TODO: remove mock
+        return create_sample_rule()
+
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
+        #TODO: remove mock
         self.config.add_rule(create_sample_rule())
