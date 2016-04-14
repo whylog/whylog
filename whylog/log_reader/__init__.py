@@ -56,10 +56,11 @@ class SearchHandler(object):
     def investigate(self):
         clues = {}
         for host, path in self._log_type.get_next_file_to_parse():
-            # TODO remember about not localhost case
-            searcher = BacktrackSearcher(path)
-            clues.update(searcher.search(self._investigation_step))
-            # TODO is it a good way to update the dict of clues?
+            if host == "localhost":
+                searcher = BacktrackSearcher(path)
+                clues.update(searcher.search(self._investigation_step))
+            else:
+                raise NotImplementedError("Cannot operate on %s which is different than %s" % (host, "localhost"))
         return clues
 
 
