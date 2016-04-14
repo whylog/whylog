@@ -24,7 +24,7 @@ class LogReader(AbstractLogReader):
     def get_causes(self, front_input):
         input_log_type = self.config.get_log_type(front_input)
         if not input_log_type:
-            return None  # TODO information about no input_log_type must somehow be returned to the Front
+            raise Exception('config did not match any log_type to the specified front_input; cannot investigate')
         investigation_plan = self.config.create_investigation_plan(front_input, input_log_type)
         manager = SearchManager(investigation_plan)
         return manager.investigate()
