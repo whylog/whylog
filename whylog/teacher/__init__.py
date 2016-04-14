@@ -74,13 +74,6 @@ class Teacher(object):
         """
         pass
 
-    def get_rule(self):
-        """
-        Creates rule for Front, that will be shown to user
-        """
-        return create_sample_rule()
-        pass
-
     def test_rule(self):
         """
         Simulates searching causes with alreday created rule.
