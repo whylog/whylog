@@ -14,8 +14,20 @@ path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
 @generator
 class TestBasic(TestCase):
-    def _line_offset(self, file_path):
-        return 42
+    def _get_cause_line_number(self, file_path):
+        """
+        returns number of line that should be used as get_causes input
+        according to information contained in 'input.txt' file
+        """
+        # it is reduced by 1 because auxiliary functions below use numerating from 0
+        return int(open(file_path).readline().split(":")[1].rstrip('\n'))-1
+
+    def _get_concrete_line_from_file(self, file_path, line_num):
+        return [line.rstrip('\n') for line in open(file_path)][line_num]
+
+    def _deduce_line_offset(self, file_path, line_no):
+        """ returns offset of line 'line_no' in file 'file_path' """
+        return sum([len(line) for line in open(file_path)][0:line_no])
 
     def _get_last_line_from_file(self, file_path):
         return [line.rstrip('\n') for line in open(file_path)][-1]
@@ -48,21 +60,19 @@ class TestBasic(TestCase):
             # TODO this 'if' is temporary, remove this later
             raise SkipTest("Functionality not implemented yet")
 
+        line_number = self._get_cause_line_number(input_path)
+        line_content = self._get_concrete_line_from_file(log_file, line_number)
+        effect_line_offset = self._deduce_line_offset(log_file, line_number)
+
         whylog_config = YamlConfig(
             parsers_path=parsers_path,
             rules_path=rules_path,
             log_type_path=log_type_path,
         )
-
         log_reader = LogReader(whylog_config)
-
-        with open(output_path, 'r') as f:
-            f.readline()
-            line_content = f.readline()
-            # ^ hack basing on that effect-line is in 2nd line in each expected_output.txt file
-
         line = FrontInput(
-            self._line_offset(log_file), line_content, prefix_path)  # TODO how to get right offset?
+            effect_line_offset, line_content, prefix_path)
+
         result = log_reader.get_causes(line)
 
         if test_name == '003_match_time_range':
