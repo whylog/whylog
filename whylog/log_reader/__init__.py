@@ -2,9 +2,9 @@ from abc import ABCMeta, abstractmethod
 
 import six
 
-from whylog.log_reader.searchers import BacktrackSearcher
 from whylog.front import FrontInput
 from whylog.log_reader.exceptions import NoLogTypeError
+from whylog.log_reader.searchers import BacktrackSearcher
 
 
 @six.add_metaclass(ABCMeta)
@@ -44,9 +44,11 @@ class SearchManager(object):
             search_handler = SearchHandler(step, log_type)
             clues.update(search_handler.investigate())
         # TODO checking up the constraints should take place here
-        return [FrontInput(
-            69, "2015-12-03 12:08:08 root cause", "node_1.log"
-        )]  # TODO it's a mock! values should be returned basing on clues and constraints
+        return [
+            FrontInput(
+                69, "2015-12-03 12:08:08 root cause", "node_1.log"
+            )
+        ]  # TODO it's a mock! values should be returned basing on clues and constraints
 
 
 class SearchHandler(object):
@@ -61,5 +63,6 @@ class SearchHandler(object):
                 searcher = BacktrackSearcher(path)
                 clues.update(searcher.search(self._investigation_step))
             else:
-                raise NotImplementedError("Cannot operate on %s which is different than %s" % (host, "localhost"))
+                raise NotImplementedError("Cannot operate on %s which is different than %s" %
+                                          (host, "localhost"))
         return clues

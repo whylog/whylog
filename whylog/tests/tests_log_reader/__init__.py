@@ -5,9 +5,9 @@ from generator import generate, generator
 from nose.plugins.skip import SkipTest
 
 from whylog.config import YamlConfig
+from whylog.front import FrontInput
 from whylog.log_reader import LogReader
 from whylog.tests.tests_log_reader.constants import TestPaths
-from whylog.front import FrontInput
 
 path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
@@ -20,7 +20,7 @@ class TestBasic(TestCase):
         according to information contained in 'input.txt' file
         """
         # it is reduced by 1 because auxiliary functions below use numerating from 0
-        return int(open(file_path).readline().split(":")[1].rstrip('\n'))-1
+        return int(open(file_path).readline().split(":")[1].rstrip('\n')) - 1
 
     def _get_concrete_line_from_file(self, file_path, line_num):
         return [line.rstrip('\n') for line in open(file_path)][line_num]
@@ -70,8 +70,7 @@ class TestBasic(TestCase):
             log_type_path=log_type_path,
         )
         log_reader = LogReader(whylog_config)
-        line = FrontInput(
-            effect_line_offset, line_content, prefix_path)
+        line = FrontInput(effect_line_offset, line_content, prefix_path)
 
         result = log_reader.get_causes(line)
 

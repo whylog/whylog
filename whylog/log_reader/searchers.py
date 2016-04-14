@@ -1,6 +1,5 @@
-from abc import ABCMeta, abstractmethod
-
 import os.path
+from abc import ABCMeta, abstractmethod
 from os import SEEK_SET
 
 import six

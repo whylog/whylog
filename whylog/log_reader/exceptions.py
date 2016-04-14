@@ -11,5 +11,5 @@ class NoLogTypeError(LogReaderError):
 
     def __str__(self):
         return 'Config did not match any log_type to the specified front_input: %s; cannot investigate' % (
-               self._front_input
+            self._front_input
         )
