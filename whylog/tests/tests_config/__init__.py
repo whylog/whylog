@@ -8,7 +8,9 @@ from whylog.assistant.const import AssistantType
 from whylog.config import YamlConfig
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
-from whylog.teacher.user_intent import Group, UserConstraintIntent, UserParserIntent, UserRuleIntent
+from whylog.teacher.user_intent import (
+    LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
+)
 
 # Constraint types
 identical_constr = "identical"
@@ -35,20 +37,20 @@ class TestBasic(TestCase):
         cls.regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
         cls.groups1 = {
-            1: Group("2016-04-12 23:54:45", to_date),
-            2: Group("comp1", to_string),
-            3: Group("host1", to_string)
+            1: LineParamGroup("2016-04-12 23:54:45", to_date),
+            2: LineParamGroup("comp1", to_string),
+            3: LineParamGroup("host1", to_string)
         }
         cls.groups2 = {
-            1: Group("2016-04-12 23:54:40", to_date),
-            2: Group("comp2", to_string),
-            3: Group("host2", to_string)
+            1: LineParamGroup("2016-04-12 23:54:40", to_date),
+            2: LineParamGroup("comp2", to_string),
+            3: LineParamGroup("host2", to_string)
         }
         cls.groups3 = {
-            1: Group("2016-04-12 23:54:43", to_date),
-            2: Group("comp2", to_string),
-            3: Group("150", to_int),
-            4: Group("host2", to_string)
+            1: LineParamGroup("2016-04-12 23:54:43", to_date),
+            2: LineParamGroup("comp2", to_string),
+            3: LineParamGroup("150", to_int),
+            4: LineParamGroup("host2", to_string)
         }
 
         regex_type = AssistantType.REGEX

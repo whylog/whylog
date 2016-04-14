@@ -91,10 +91,12 @@ class Teacher(object):
         """
         Creates rule for Front that will be shown to user
         """
+        #TODO: remove mock
         return create_sample_rule()
 
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
+        #TODO: remove mock
         self.config.add_rule(create_sample_rule())

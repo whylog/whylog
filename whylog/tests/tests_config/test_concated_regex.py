@@ -7,7 +7,7 @@ from nose.plugins.skip import SkipTest
 from whylog.assistant.const import AssistantType
 from whylog.config import RegexParserFactory
 from whylog.config.parsers import ConcatenatedRegexParser
-from whylog.teacher.user_intent import Group, UserParserIntent
+from whylog.teacher.user_intent import LineParamGroup, UserParserIntent
 
 # convertions
 to_date = "date"
@@ -34,9 +34,9 @@ class TestConcatedRegexParser(TestCase):
         regex6 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
         regex7 = "^dummy regex"
 
-        date_group = Group(None, to_date)
-        string_group = Group(None, to_string)
-        float_group = Group(None, to_float)
+        date_group = LineParamGroup(None, to_date)
+        string_group = LineParamGroup(None, to_string)
+        float_group = LineParamGroup(None, to_float)
 
         regex_type = AssistantType.REGEX
 
