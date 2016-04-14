@@ -76,7 +76,6 @@ class Teacher(object):
         """
         Improves text pattern by removing group corresponding to param in text.
         """
-
         pass
 
     def guess_pattern(self, line_id):
@@ -119,7 +118,7 @@ class Teacher(object):
                 (group, constr_id)
                 for (
                     group, constr_id
-                ) in self._group_and_constraint_matching if constr_id != removing_constr_id
+                ) in self._group_and_constraint_matching if not constr_id == removing_constr_id
             ]
         )
         del self._constraints[removing_constr_id]
@@ -130,9 +129,23 @@ class Teacher(object):
                 (group, constr_id)
                 for (
                     group, constr_id
-                ) in self._group_and_constraint_matching if group.line_id != line_id
+                ) in self._group_and_constraint_matching if not group.line_id == line_id
             ]
         )
+        self._update_constraint_dict()
+
+    def _remove_constraint_by_group(self, pattern_group):
+        self._group_and_constraint_matching = set(
+            [
+                (group, constr_id)
+                for (
+                    group, constr_id
+                ) in self._group_and_constraint_matching if not group == pattern_group
+            ]
+        )
+        self._update_constraint_dict()
+
+    def _update_constraint_dict(self):
         saved_constraints = set(
             [
                 constr_id for group, constr_id in self._group_and_constraint_matching
