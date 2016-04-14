@@ -63,8 +63,3 @@ class SearchHandler(object):
             else:
                 raise NotImplementedError("Cannot operate on %s which is different than %s" % (host, "localhost"))
         return clues
-
-
-class InvestigationResult(object):
-    pass  # TODO discuss with Front what should be returned and in what form
-    # TODO this class will be probably replaced with FrontInput
