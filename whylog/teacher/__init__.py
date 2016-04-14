@@ -20,7 +20,7 @@ class Teacher(object):
     """
     Enable teaching new rule. One Teacher per one entering rule.
 
-    :type _group_and_constraint_matching: set[(PatternGroup, int)]
+    :type _group_and_constraint_matching: list[(PatternGroup, int)]
     """
 
     def __init__(self, config, pattern_assistant):
@@ -113,36 +113,30 @@ class Teacher(object):
         self._group_and_constraint_matching.union([(group, constr_id) for group in pattern_groups])
 
     def remove_constraint(self, removing_constr_id):
-        self._group_and_constraint_matching = set(
-            [
-                (group, constr_id)
-                for (
-                    group, constr_id
-                ) in self._group_and_constraint_matching if not constr_id == removing_constr_id
-            ]
-        )
+        self._group_and_constraint_matching = [
+            (group, constr_id)
+            for (
+                group, constr_id
+            ) in self._group_and_constraint_matching if not constr_id == removing_constr_id
+        ]
         del self._constraints[removing_constr_id]
 
     def _remove_constraints_by_line(self, line_id):
-        self._group_and_constraint_matching = set(
-            [
-                (group, constr_id)
-                for (
-                    group, constr_id
-                ) in self._group_and_constraint_matching if not group.line_id == line_id
-            ]
-        )
+        self._group_and_constraint_matching = [
+            (group, constr_id)
+            for (
+                group, constr_id
+            ) in self._group_and_constraint_matching if not group.line_id == line_id
+        ]
         self._update_constraint_dict()
 
     def _remove_constraint_by_group(self, pattern_group):
-        self._group_and_constraint_matching = set(
-            [
-                (group, constr_id)
-                for (
-                    group, constr_id
-                ) in self._group_and_constraint_matching if not group == pattern_group
-            ]
-        )
+        self._group_and_constraint_matching = [
+            (group, constr_id)
+            for (
+                group, constr_id
+            ) in self._group_and_constraint_matching if not group == pattern_group
+        ]
         self._update_constraint_dict()
 
     def _update_constraint_dict(self):
