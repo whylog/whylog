@@ -69,12 +69,16 @@ class Teacher(object):
     def make_group(self, line_id, span):
         """
         Improves text pattern by adding group corresponding to param in text.
+
+        Updates or removes proper constraints related to groups in line with line_id
         """
         pass
 
     def remove_group(self, pattern_group):
         """
         Improves text pattern by removing group corresponding to param in text.
+
+        Updates or removes proper constraints related to groups in line with line_id
         """
         pass
 
