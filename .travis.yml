@@ -66,7 +66,8 @@ before_script:
   - if [ -n "$JYTHON" ]; then python -c "print ''"; else echo skip; fi
 
 script:
-  - if [ -n "$SCA" ]; then yapf --diff --recursive . || exit; else echo skip; fi
+  - if [ -n "$SCA" -a -n "$TRAVIS_COMMIT_RANGE" ]; then git diff --name-only "$TRAVIS_COMMIT_RANGE" | xargs yapf --diff --recursive || exit; else echo skip; fi
+  - if [ -n "$SCA" -a -z "$TRAVIS_COMMIT_RANGE" ]; then yapf --diff --recursive . || exit; else echo skip; fi
   - if [ -n "$SCA" ]; then pyflakes . || exit; else echo skip; fi
   - if [ -n "$SCA" ]; then isort --order-by-type --recursive --line-width 100 --diff --verbose --check-only || exit; else echo skip; fi
   - if [ -n "$SCA" ]; then grep -r '\_\_metaclass\_\_' whylog/ && exit 1 || true; else echo skip; fi
