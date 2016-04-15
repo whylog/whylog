@@ -16,7 +16,7 @@ class TestBasic(TestCase):
 
     def test_distinct_constraint_ids(self):
         constraint_links = ConstraintLinksBase(self.links)
-        assert constraint_links.distinct_constraint_ids() == set([100, 200])
+        assert set(constraint_links.distinct_constraint_ids()) == set([100, 200])
 
     def test_insert_links(self):
         constraint_links = ConstraintLinksBase(self.links)

@@ -16,7 +16,7 @@ class ConstraintLinksBase:
         return self.links
 
     def distinct_constraint_ids(self):
-        return set(zip(*self.links)[self.constr_id_position])
+        return set(list(zip(*self.links))[self.constr_id_position])
 
     def insert_links(self, links_list):
         self.links = list(set(self.links + links_list))
