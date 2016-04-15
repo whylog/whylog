@@ -1,8 +1,16 @@
+from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.mock_outputs import create_sample_rule
 
 
 class PatternGroup(object):
-    #TODO: comment
+    """
+    Keeps "coordinates" of group that represents param in text
+
+    :param line_id: id of line to which group belongs.
+    :param number: number of group in line.
+                   Groups don't overlap. Numeration from left, from 1.
+    """
+
     def __init__(self, line_id, group_number_in_line):
         self.line_id = line_id
         self.number = group_number_in_line
@@ -20,16 +28,21 @@ class Teacher(object):
     """
     Enable teaching new rule. One Teacher per one entering rule.
 
-    :type _group_and_constraint_matching: list[(PatternGroup, int)]
+    :type _parsers: dict[int, TeacherParser]
+    :type _constraint_base: dict[int, AbstractConstraint]
+    :param _constraint_links: Keeps links between constraints and groups.
+                              Link between constraint C and group G exists
+                              if C describes relation between G and other groups.
+    :type _constraint_links: ConstraintLinksBase
     """
 
     def __init__(self, config, pattern_assistant):
         self.config = config
         self.pattern_assistant = pattern_assistant
 
-        self._parsers = {}  # line_id to line_object dict
-        self._constraints = {}  # constraint_id to constraint dict
-        self._group_and_constraint_matching = None
+        self._parsers = {}
+        self._constraint_base = {}
+        self._constraint_links = ConstraintLinksBase()
         self.effect_id = None
         self.pair = None
 
@@ -39,6 +52,7 @@ class Teacher(object):
 
         If line_id already exists, old line is overwritten by new line
         and all constraints related to old line are removed.
+
         """
 
         if line_id in self._parsers.keys():
@@ -52,7 +66,7 @@ class Teacher(object):
         """
         Removes line from rule.
 
-        Assumption: line_id exists.
+        Assumption: line with line_id exists in rule.
         Removes also all constraints related to this line.
         """
 
@@ -70,7 +84,7 @@ class Teacher(object):
         """
         Improves text pattern by adding group corresponding to param in text.
 
-        Updates or removes proper constraints related to groups in line with line_id
+        Removes (or maybe updates) constraints related to groups in line with line_id
         """
         pass
 
@@ -78,7 +92,7 @@ class Teacher(object):
         """
         Improves text pattern by removing group corresponding to param in text.
 
-        Updates or removes proper constraints related to groups in line with line_id
+        Removes (or maybe updates) constraints related to groups in line with line_id
         """
         pass
 
@@ -111,47 +125,37 @@ class Teacher(object):
                                that are linked by constraint
         :type pattern_groups: PatternGroup list
         """
-        if constr_id in self._constraints.keys():
+        if constr_id in self._constraint_base.keys():
             self.remove_constraint(constr_id)
-        self._constraints[constr_id] = constraint
-        self._group_and_constraint_matching.union([(group, constr_id) for group in pattern_groups])
+
+        self._constraint_base[constr_id] = constraint
+        new_constraint_links = [
+            (group.line_id, group.number, constr_id) for group in pattern_groups
+        ]
+        self._constraint_links.insert_links(new_constraint_links)
 
     def remove_constraint(self, removing_constr_id):
-        self._group_and_constraint_matching = [
-            (group, constr_id)
-            for (
-                group, constr_id
-            ) in self._group_and_constraint_matching if not constr_id == removing_constr_id
-        ]
-        del self._constraints[removing_constr_id]
+        """
+        Removes constraint from rule.
+
+        Assumption: Constraint already exists in rule.
+        """
+        self._constraint_links.remove_links_where(constr_id=removing_constr_id)
+        del self._constraint_base[removing_constr_id]
 
     def _remove_constraints_by_line(self, line_id):
-        self._group_and_constraint_matching = [
-            (group, constr_id)
-            for (
-                group, constr_id
-            ) in self._group_and_constraint_matching if not group.line_id == line_id
-        ]
-        self._update_constraint_dict()
+        self._constraint_links.remove_links_where(line_id=line_id)
+        self._sync_constraint_base_with_links()
 
-    def _remove_constraint_by_group(self, pattern_group):
-        self._group_and_constraint_matching = [
-            (group, constr_id)
-            for (
-                group, constr_id
-            ) in self._group_and_constraint_matching if not group == pattern_group
-        ]
-        self._update_constraint_dict()
+    def _remove_constraint_by_group(self, group):
+        self._constraint_links.remove_links_where(line_id=group.line_id, group_no=group.number)
+        self._sync_constraint_base_with_links()
 
-    def _update_constraint_dict(self):
-        saved_constraints = set(
-            [
-                constr_id for group, constr_id in self._group_and_constraint_matching
-            ]
-        )
-        for constr_id in self._constraints.keys():
-            if constr_id not in saved_constraints:
-                del self._constraints[constr_id]
+    def _sync_constraint_base_with_links(self):
+        ids_from_links = self._constraint_links.distinct_constraint_ids()
+        for constr_id in self._constraint_base.keys():
+            if constr_id not in ids_from_links:
+                del self._constraint_base[constr_id]
 
     def set_causes_relation(self, relation):
         """
