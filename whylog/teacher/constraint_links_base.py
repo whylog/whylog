@@ -46,4 +46,3 @@ class ConstraintLinksBase:
         base_set = set(self.links)
         sub_base_set = set(base_to_remove.links)
         self.links = list(base_set.difference(sub_base_set))
-
