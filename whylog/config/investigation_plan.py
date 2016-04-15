@@ -11,9 +11,10 @@ class InvestigationPlan(object):
     For single log type we have single investigation step.
     """
 
-    def __init__(self, suspected_rules, investigation_metadata):
+    def __init__(self, suspected_rules, investigation_metadata, effect_clues):
         self._suspected_rules = suspected_rules
         self._investigation_metadata = investigation_metadata
+        self._effect_clues = effect_clues
 
     def get_next_investigation_step_with_log_type(self):
         return (meta_data for meta_data in self._investigation_metadata)

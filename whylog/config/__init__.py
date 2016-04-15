@@ -5,7 +5,7 @@ import six
 import yaml
 
 from whylog.config.filename_matchers import RegexFilenameMatcher
-from whylog.config.investigation_plan import InvestigationPlan, InvestigationStep
+from whylog.config.investigation_plan import InvestigationPlan, InvestigationStep, Clue, LineSource
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory, Rule
@@ -78,10 +78,12 @@ class AbstractConfig(object):
                 }
             ]
         )  # yapf: disable
-        return InvestigationPlan([rule], [(default_investigation_step, default_log_type)])
+        line_source = LineSource('localhost', 'node_1.log', 40)
+        effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
+        return InvestigationPlan([rule], [(default_investigation_step, default_log_type)], effect_clues)
 
     def create_investigation_plan(self, front_input, log_type_name):
-        #TODO: remove mock
+        # TODO: remove mock
         return self.mocked_investigation_plan()
 
     def get_log_type(self, front_input):
