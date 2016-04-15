@@ -36,7 +36,7 @@ class SpanList(list):
                     is_param=is_param
                 ) for start, end in ranges_list
             ]
-        )
+        )  # yapf: disable
         cls.overlapping_check(spans)
         return spans
 

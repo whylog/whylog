@@ -21,6 +21,7 @@ def create_sample_rule():
     regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
     regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
+    # yapf: disable
     groups1 = {
         1: LineParamGroup("2016-04-12 23:54:45", to_date),
         2: LineParamGroup("comp1", to_string),
@@ -58,6 +59,7 @@ def create_sample_rule():
         regex_type, "lostdata", regex3, "filesystem", [1], groups3, sample_line3, 1994,
         resource_location3
     )
+    # yapf: enable
 
     parsers = {0: parser_intent1, 1: parser_intent2, 2: parser_intent3}
     effect_id = 2
