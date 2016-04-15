@@ -59,3 +59,8 @@ class TestBasic(TestCase):
                 (2, 10, 200),
             ]
         )
+
+    def test_remove_by_constr_id(self):
+        constraint_links = ConstraintLinksBase(self.links)
+        constraint_links.remove_links_where(constr_id=100)
+        assert set(constraint_links.get_links()) == set([(1, 20, 200), (2, 10, 200), (2, 20, 200)])

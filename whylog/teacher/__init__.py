@@ -121,9 +121,8 @@ class Teacher(object):
         If constr_id already exists, constraint with this constr_id
         is overwritten by new constraint
 
-        :param pattern_groups: groups in pattern which contain text params
-                               that are linked by constraint
-        :type pattern_groups: PatternGroup list
+        :param pattern_groups: groups in pattern that are linked by constraint
+        :type pattern_groups: list[PatternGroup]
         """
         if constr_id in self._constraint_base.keys():
             self.remove_constraint(constr_id)
