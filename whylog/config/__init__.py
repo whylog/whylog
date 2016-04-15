@@ -5,7 +5,7 @@ from datetime import datetime
 import six
 import yaml
 
-from whylog.config.filename_matchers import RegexFilenameMatcher
+from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
@@ -126,11 +126,19 @@ class AbstractFileConfig(AbstractConfig):
         ]
 
     def _load_log_types(self):
-        log_types = defaultdict(list)
+        matchers = defaultdict(list)
         matcher_definitions = self._load_file_with_config(self._log_type_path)
-        print matcher_definitions
-        # for definition in matcher_definitions:
-        return {}
+        for definition in matcher_definitions:
+            if definition['matcher_class_name'] == 'RegexFilenameMatcher':
+                matcher = RegexFilenameMatcherFactory.from_dao(definition)
+                matchers[definition['log_type_name']].append(matcher)
+            else:
+                #TODO: place for other filename matchers
+                pass
+        return dict(
+            (log_type_name, LogType(log_type_name, log_type_matchers))
+            for log_type_name, log_type_matchers in matchers.items()
+        )
 
 
     @abstractmethod

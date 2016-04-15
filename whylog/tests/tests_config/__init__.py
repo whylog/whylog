@@ -106,6 +106,13 @@ class TestBasic(TestCase):
 
         cls.user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
+        path = os.path.join(*path_test_files)
+        parsers_path = os.path.join(path, 'parsers.yaml')
+        rules_path = os.path.join(path, 'rules.yaml')
+        log_type_path = os.path.join(path, 'log_types.yaml')
+
+        cls.config = YamlConfig(parsers_path, rules_path, log_type_path)
+
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
 
@@ -123,7 +130,7 @@ class TestBasic(TestCase):
         loaded_parsers = [
             RegexParserFactory.from_dao(dumped_parser)
             for dumped_parser in yaml.load_all(dumped_parsers)
-        ]
+            ]
         dumped_parsers_again = yaml.dump_all(
             [parser.serialize() for parser in loaded_parsers],
             explicit_start=True
@@ -132,30 +139,14 @@ class TestBasic(TestCase):
         assert dumped_parsers_again == dumped_parsers
 
     def test_loading_single_rule_its_parsers(self):
-        path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
-        log_type_path = os.path.join(path, 'log_types.yaml')
-
-        config = YamlConfig(parsers_path, rules_path, log_type_path)
-        assert len(config._rules) == 1
-        rule = config._rules[0]
+        assert len(self.config._rules) == 1
+        rule = self.config._rules[0]
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
-            parser.name for parser in config._parsers.values()
+            parser.name for parser in self.config._parsers.values()
         )
 
     def test_loading_log_types(self):
-        path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
-        log_type_path = os.path.join(path, 'log_types.yaml')
-
-        config = YamlConfig(parsers_path, rules_path, log_type_path)
-
-        assert len(config._log_types) == 2
-        assert sorted(config._log_types.keys()) == ['apache', 'default']
-        assert len(config._log_types['default']._filename_matchers) == 2
-        assert len(config._log_types['apache']._filename_matchers) == 1
-
-
-
+        assert len(self.config._log_types) == 2
+        assert sorted(self.config._log_types.keys()) == ['apache', 'default']
+        assert len(self.config._log_types['default']._filename_matchers) == 2
+        assert len(self.config._log_types['apache']._filename_matchers) == 1
