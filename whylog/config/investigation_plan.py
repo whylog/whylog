@@ -44,13 +44,13 @@ class InvestigationStep(object):
         return date
 
     # mocked Clue for second line in node_1.log for 003 test
-    #TODO: remove mock
+    # TODO: remove mock
     def mocked_clues(self):
         line_source = LineSource('localhost', 'node_1.log', 40)
         line_time = datetime(2015, 12, 3, 12, 8, 8)
-        regex_parametes = {'cause': (line_time,)}
+        regex_parameters = (line_time,)
         return {
-            'cause': Clue(regex_parametes, line_time, '2015-12-03 12:08:08 root cause', line_source)
+            'cause': Clue(regex_parameters, '2015-12-03 12:08:08 root cause', line_source),
         }
 
     def get_clues(self, line, offset):
@@ -64,8 +64,10 @@ class Clue(object):
     Also, contains parsed line and its source.
     """
 
-    def __init__(self, regex_parameters, line_time, line_prefix_content, line_source):
-        pass
+    def __init__(self, regex_parameters, line_prefix_content, line_source):
+        self.regex_parameters = regex_parameters
+        self.line_prefix_content = line_prefix_content
+        self.line_source = line_source
 
 
 class LineSource(object):
