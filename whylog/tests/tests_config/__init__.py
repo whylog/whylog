@@ -2,7 +2,6 @@ import os.path
 from unittest import TestCase
 
 import yaml
-from nose.plugins.skip import SkipTest
 
 from whylog.assistant.const import AssistantType
 from whylog.config import YamlConfig
@@ -144,3 +143,19 @@ class TestBasic(TestCase):
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
             parser.name for parser in config._parsers.values()
         )
+
+    def test_loading_log_types(self):
+        path = os.path.join(*path_test_files)
+        parsers_path = os.path.join(path, 'parsers.yaml')
+        rules_path = os.path.join(path, 'rules.yaml')
+        log_type_path = os.path.join(path, 'log_types.yaml')
+
+        config = YamlConfig(parsers_path, rules_path, log_type_path)
+
+        assert len(config._log_types) == 2
+        assert sorted(config._log_types.keys()) == ['apache', 'default']
+        assert len(config._log_types['default']._filename_matchers) == 2
+        assert len(config._log_types['apache']._filename_matchers) == 1
+
+
+

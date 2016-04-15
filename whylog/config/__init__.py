@@ -130,7 +130,7 @@ class AbstractFileConfig(AbstractConfig):
         matcher_definitions = self._load_file_with_config(self._log_type_path)
         print matcher_definitions
         # for definition in matcher_definitions:
-
+        return {}
 
 
     @abstractmethod
