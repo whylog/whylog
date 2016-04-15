@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
 from datetime import datetime
 
 import six
@@ -125,8 +126,12 @@ class AbstractFileConfig(AbstractConfig):
         ]
 
     def _load_log_types(self):
-        #TODO fix log types loading
-        pass
+        log_types = defaultdict(list)
+        matcher_definitions = self._load_file_with_config(self._log_type_path)
+        print matcher_definitions
+        # for definition in matcher_definitions:
+
+
 
     @abstractmethod
     def _load_file_with_config(self, path):

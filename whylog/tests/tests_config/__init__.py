@@ -114,8 +114,6 @@ class TestBasic(TestCase):
         assert sorted(cause.regex_str for cause in rule._causes) == [self.regex1, self.regex2]
 
     def test_parser_serialization(self):
-        #TODO: modify test if reviewers accept UserParserIntent changes
-        raise SkipTest
         parser1 = RegexParserFactory.create_from_intent(self.parser_intent1)
         parser2 = RegexParserFactory.create_from_intent(self.parser_intent2)
         parser3 = RegexParserFactory.create_from_intent(self.parser_intent3)
@@ -135,8 +133,6 @@ class TestBasic(TestCase):
         assert dumped_parsers_again == dumped_parsers
 
     def test_loading_single_rule_its_parsers(self):
-        #TODO: modify test if reviewers accept UserParserIntent changes
-        raise SkipTest
         path = os.path.join(*path_test_files)
         parsers_path = os.path.join(path, 'parsers.yaml')
         rules_path = os.path.join(path, 'rules.yaml')
