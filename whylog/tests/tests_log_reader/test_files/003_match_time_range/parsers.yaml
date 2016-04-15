@@ -4,9 +4,11 @@ regex_str: ^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$
 primary_key_groups: [1]
 log_type: default
 convertions: {1: date}
+line_content: 2015-12-03 12:08:08 root cause
 ---
 primary_key_groups: [1]
 log_type: default
 name: effect
 regex_str: ^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$
 convertions: {1: date}
+line_content: 2015-12-03 12:08:09 visible effect

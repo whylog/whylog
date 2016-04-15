@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import dateutil.parser
 import dateutil.tz
 
@@ -50,9 +51,7 @@ class InvestigationStep(object):
         line_source = LineSource('localhost', 'node_1.log', 40)
         line_time = datetime(2015, 12, 3, 12, 8, 8)
         regex_parameters = (line_time,)
-        return {
-            'cause': Clue(regex_parameters, '2015-12-03 12:08:08 root cause', line_source),
-        }
+        return {'cause': Clue(regex_parameters, '2015-12-03 12:08:08 root cause', line_source),}
 
     def get_clues(self, line, offset):
         # TODO: remove mock
