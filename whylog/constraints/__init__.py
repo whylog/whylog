@@ -15,9 +15,9 @@ class TimeConstraint(AbstractConstraint):
         pass
 
     @classmethod
-    def verify(cls, clues, min_delta, max_delta):
+    def verify(cls, effect, clues, constraint):
         # TODO here the constraint verification should take place and bool should be returned
-        pass
+        return True
 
 
 class IdenticalIntervals(AbstractConstraint):

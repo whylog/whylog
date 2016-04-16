@@ -4,6 +4,7 @@ from collections import defaultdict
 
 import six
 
+from whylog.constraints import TimeConstraint
 from whylog.front import FrontInput
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
@@ -52,16 +53,20 @@ class SearchManager(object):
         provides constraints verification basing on rules from investigation_plan
         and collected clues
         """
-        # effect_clues are accessible from investigation_plan._effect_clues
+        causes = []
         for rule in self._investigation_plan._suspected_rules:
             # FIXME eliminate protected field access
             for cause in rule._causes:
                 # FIXME eliminate protected field access
-                if cause in clues.keys():  # FIXME wrong checking (strings!)
-                    # TODO constraint type should be checked here
-                    # ('the great switch' or something similar)
-                    pass
-        # TODO what should be returned?
+                if cause.name in clues:
+                    for clue in clues[cause.name]:
+                        for constraint in rule._constraints:
+                            # TODO somehow it must be decided which constraint it is and method verify must be invoked
+                            # ConstraintsBase.all[constraint['name']].verify(effect, cause, constraint)
+                            # FIXME NOW I assume, that constraint['name'] == 'time'
+                            if TimeConstraint.verify(rule._effect, cause, constraint):
+                                causes.append(FrontInput(clue.line_source.offset, clue.line_prefix_content, clue.line_source.path))
+        return causes
 
     def investigate(self):
         """
@@ -75,13 +80,8 @@ class SearchManager(object):
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
             InvestigationUtils.merge_clue_dicts(clues_collector, search_handler.investigate())
-        # clues = self._save_clues_in_normal_dict(clues_collector)
-        # TODO checking up the constraints should take place here
-        return [
-            FrontInput(
-                69, "2015-12-03 12:08:08 root cause", "node_1.log"
-            )
-        ]  # TODO it's a mock! values should be returned basing on clues and constraints
+        clues = self._save_clues_in_normal_dict(clues_collector)
+        return self._constraints_verification(clues)
 
 
 class SearchHandler(object):
