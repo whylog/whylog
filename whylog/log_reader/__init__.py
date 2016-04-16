@@ -59,7 +59,7 @@ class SearchManager(object):
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
             self._merge_dicts(clues_collector, search_handler.investigate())
-        clues = self._save_clues_in_normal_dict(clues_collector)
+        # clues = self._save_clues_in_normal_dict(clues_collector)
         # TODO checking up the constraints should take place here
         return [
             FrontInput(
