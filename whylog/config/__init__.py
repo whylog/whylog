@@ -77,7 +77,7 @@ class AbstractConfig(object):
                     'params': {'max_delta': 1}
                 }
             ]
-        )
+        )  # yapf: disable
         return InvestigationPlan([rule], [(default_investigation_step, default_log_type)])
 
     def create_investigation_plan(self, front_input, log_type_name):

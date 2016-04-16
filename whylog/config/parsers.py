@@ -69,7 +69,7 @@ class RegexParserFactory(object):
     @classmethod
     def create_from_intent(cls, parser_intent):
         convertions = dict(
-            (group_id, group.converter) for (group_id, group) in parser_intent.groups.items()
+            (group_id, group.converter) for group_id, group in parser_intent.groups.items()
         )
         return RegexParser(
             parser_intent.pattern_name, parser_intent.line_content, parser_intent.pattern,

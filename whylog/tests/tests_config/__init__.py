@@ -36,6 +36,9 @@ class TestBasic(TestCase):
         cls.regex2 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$"
         cls.regex3 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$"
 
+        regex_type = AssistantType.REGEX
+
+        # yapf: disable
         cls.groups1 = {
             1: LineParamGroup("2016-04-12 23:54:45", to_date),
             2: LineParamGroup("comp1", to_string),
@@ -52,8 +55,6 @@ class TestBasic(TestCase):
             3: LineParamGroup("150", to_int),
             4: LineParamGroup("host2", to_string)
         }
-
-        regex_type = AssistantType.REGEX
 
         cls.parser_intent1 = UserParserIntent(
             regex_type,
@@ -100,6 +101,7 @@ class TestBasic(TestCase):
                 "different": 1
             }
         )
+        #  yapf: enable
 
         constraints = [constraint1, constraint2, constraint3, constraint4]
 

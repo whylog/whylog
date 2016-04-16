@@ -39,6 +39,7 @@ class TestConcatedRegexParser(TestCase):
 
         regex_type = AssistantType.REGEX
 
+        # yapf: disable
         parser_intent1 = UserParserIntent(
             regex_type, "connectionerror", regex1, "hydra", [1], {
                 1: date_group,
@@ -78,6 +79,7 @@ class TestConcatedRegexParser(TestCase):
         parser_intent7 = UserParserIntent(
             regex_type, "dummy", regex7, "filesystem", [], {}, cls.dummy_line, 7, "serwer7"
         )
+        # yapf: enable
 
         cls.connection_error = RegexParserFactory.create_from_intent(parser_intent1)
         cls.data_migration = RegexParserFactory.create_from_intent(parser_intent2)
