@@ -54,6 +54,7 @@ class SearchManager(object):
         and collected clues
         """
         causes = []
+        # effect_clues are accessible from investigation_plan._effect_clues
         for rule in self._investigation_plan._suspected_rules:
             # FIXME eliminate protected field access
             for cause in rule._causes:
