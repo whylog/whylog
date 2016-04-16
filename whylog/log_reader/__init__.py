@@ -6,12 +6,8 @@ import six
 
 from whylog.front import FrontInput
 from whylog.log_reader.exceptions import NoLogTypeError
+from whylog.log_reader.investiagtion_utils import InvestigationUtils
 from whylog.log_reader.searchers import BacktrackSearcher
-
-
-def merge_clue_dicts(collector, clues_dict):
-    for parser_name, clues_list in clues_dict.items():
-        collector[parser_name] = itertools.chain(collector[parser_name], clues_list)
 
 
 @six.add_metaclass(ABCMeta)
@@ -55,7 +51,7 @@ class SearchManager(object):
         clues_collector = defaultdict(itertools.chain)
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
-            merge_clue_dicts(clues_collector, search_handler.investigate())
+            InvestigationUtils.merge_clue_dicts(clues_collector, search_handler.investigate())
         # clues = self._save_clues_in_normal_dict(clues_collector)
         # TODO checking up the constraints should take place here
         return [
@@ -75,7 +71,9 @@ class SearchHandler(object):
         for host, path in self._log_type.get_next_file_to_parse():
             if host == "localhost":
                 searcher = BacktrackSearcher(path)
-                merge_clue_dicts(clues, searcher.search(self._investigation_step))
+                InvestigationUtils.merge_clue_dicts(
+                    clues, searcher.search(self._investigation_step)
+                )
             else:
                 raise NotImplementedError(
                     "Cannot operate on %s which is different than %s" % (host, "localhost")
