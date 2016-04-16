@@ -1,5 +1,6 @@
 import os.path
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
 from os import SEEK_SET
 
 import six
@@ -44,10 +45,7 @@ class BacktrackSearcher(AbstractSearcher):
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
         for parser_name, clue in clues_from_line.items():
-            if parser_name in collector:
-                collector[parser_name].append(clue)
-            collector[parser_name] = [clue]
-        return collector
+            collector[parser_name].append(clue)
 
     @classmethod
     def _decrease_actual_offset_properly(cls, actual_offset, drop_string):
@@ -88,10 +86,9 @@ class BacktrackSearcher(AbstractSearcher):
             yield truncated, actual_offset
 
     def search(self, investigation_step):
-        # TODO should be one such function per log file <- what?!?
-        clues = {}
+        clues = defaultdict(list)
         offset = self._deduce_offset(investigation_step)
         for line, actual_offset in self._reverse_from_offset(offset):
             clues_from_line = investigation_step.get_clues(line, actual_offset)
-            clues = self._merge_clues(clues, clues_from_line)
+            self._merge_clues(clues, clues_from_line)
         return clues
