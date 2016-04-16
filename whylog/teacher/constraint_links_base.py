@@ -1,7 +1,13 @@
+
+
 class ConstraintLinksBase:
     """
     Container for links between group and constraint
     """
+
+    LINE_ID_POSITION = 0
+    GROUP_NUMBER_POSITION = 1
+    CONSTRAINT_ID_POSITION = 2
 
     def __init__(self, links_list=None):
         """
@@ -10,15 +16,14 @@ class ConstraintLinksBase:
         :type links_list: list[(int, int, int)]
         """
         self.links = links_list or []
-        self.constr_id_position = 2
 
     def get_links(self):
         return self.links
 
     def distinct_constraint_ids(self):
-        return set(list(zip(*self.links))[self.constr_id_position])
+        return set(list(zip(*self.links))[self.CONSTRAINT_ID_POSITION])
 
-    def insert_links(self, links_list):
+    def add_links(self, links_list):
         self.links = list(set(self.links + links_list))
 
     def remove_links_where(self, line_id=None, group_no=None, constr_id=None):
