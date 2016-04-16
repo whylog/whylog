@@ -69,9 +69,17 @@ class Clue(object):
         self.line_prefix_content = line_prefix_content
         self.line_source = line_source
 
+    def __repr__(self):
+        return "(Clue: %s, %s, %s)" % (
+            self.regex_parameters, self.line_prefix_content, self.line_source
+        )
+
 
 class LineSource(object):
     def __init__(self, host, path, offset):
         self.host = host
         self.path = path
         self.offset = offset
+
+    def __repr__(self):
+        return "(LineSource: %s:%s:%s)" % (self.host, self.path, self.offset)
