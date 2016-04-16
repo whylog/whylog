@@ -1,11 +1,17 @@
 import itertools
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
 
 import six
 
 from whylog.front import FrontInput
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.searchers import BacktrackSearcher
+
+
+def merge_clue_dicts(collector, clues_dict):
+    for parser_name, clues_list in clues_dict.items():
+        collector[parser_name] = itertools.chain(collector[parser_name], clues_list)
 
 
 @six.add_metaclass(ABCMeta)
@@ -40,25 +46,16 @@ class SearchManager(object):
         self._investigation_plan = investigation_plan
 
     @classmethod
-    def _merge_dicts(cls, collector, clue_dict):
-        for parser_name, clues_list in clue_dict.items():
-            if parser_name in collector:
-                collector[parser_name] = itertools.chain(collector[parser_name], clues_list)
-            else:
-                collector[parser_name] = itertools.chain(clue_dict[parser_name])
-
-    @classmethod
     def _save_clues_in_normal_dict(cls, collector):
-        standard_dict = {}
-        for parser_name, clues_list in collector.items():
-            standard_dict[parser_name] = list(clues_list)
-        return standard_dict
+        return dict(
+            (parser_name, list(clues_iter)) for parser_name, clues_iter in collector.items()
+        )
 
     def investigate(self):
-        clues_collector = {}
+        clues_collector = defaultdict(itertools.chain)
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
-            self._merge_dicts(clues_collector, search_handler.investigate())
+            merge_clue_dicts(clues_collector, search_handler.investigate())
         # clues = self._save_clues_in_normal_dict(clues_collector)
         # TODO checking up the constraints should take place here
         return [
@@ -73,20 +70,12 @@ class SearchHandler(object):
         self._investigation_step = investigation_step
         self._log_type = log_type
 
-    @classmethod
-    def _merge_clue_dicts(cls, collector, dict_with_lists):
-        for parser_name, clues_list in dict_with_lists.items():
-            if parser_name in collector:
-                collector[parser_name] = itertools.chain(collector[parser_name], clues_list)
-            else:
-                collector[parser_name] = itertools.chain(dict_with_lists[parser_name])
-
     def investigate(self):
-        clues = {}
+        clues = defaultdict(itertools.chain)
         for host, path in self._log_type.get_next_file_to_parse():
             if host == "localhost":
                 searcher = BacktrackSearcher(path)
-                self._merge_clue_dicts(clues, searcher.search(self._investigation_step))
+                merge_clue_dicts(clues, searcher.search(self._investigation_step))
             else:
                 raise NotImplementedError(
                     "Cannot operate on %s which is different than %s" % (host, "localhost")
