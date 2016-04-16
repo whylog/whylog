@@ -1,5 +1,3 @@
-
-
 class ConstraintLinksBase:
     """
     Container for links between group and constraint
