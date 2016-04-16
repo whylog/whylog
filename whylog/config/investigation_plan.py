@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import dateutil.parser
 import dateutil.tz
 
@@ -11,9 +12,10 @@ class InvestigationPlan(object):
     For single log type we have single investigation step.
     """
 
-    def __init__(self, suspected_rules, investigation_metadata):
+    def __init__(self, suspected_rules, investigation_metadata, effect_clues):
         self._suspected_rules = suspected_rules
         self._investigation_metadata = investigation_metadata
+        self._effect_clues = effect_clues
 
     def get_next_investigation_step_with_log_type(self):
         return (meta_data for meta_data in self._investigation_metadata)
@@ -44,14 +46,12 @@ class InvestigationStep(object):
         return date
 
     # mocked Clue for second line in node_1.log for 003 test
-    #TODO: remove mock
+    # TODO: remove mock
     def mocked_clues(self):
         line_source = LineSource('localhost', 'node_1.log', 40)
         line_time = datetime(2015, 12, 3, 12, 8, 8)
-        regex_parametes = {'cause': (line_time,)}
-        return {
-            'cause': Clue(regex_parametes, line_time, '2015-12-03 12:08:08 root cause', line_source)
-        }
+        regex_parameters = (line_time,)
+        return {'cause': Clue(regex_parameters, '2015-12-03 12:08:08 root cause', line_source),}
 
     def get_clues(self, line, offset):
         # TODO: remove mock
@@ -64,8 +64,15 @@ class Clue(object):
     Also, contains parsed line and its source.
     """
 
-    def __init__(self, regex_parameters, line_time, line_prefix_content, line_source):
-        pass
+    def __init__(self, regex_parameters, line_prefix_content, line_source):
+        self.regex_parameters = regex_parameters
+        self.line_prefix_content = line_prefix_content
+        self.line_source = line_source
+
+    def __repr__(self):
+        return "(Clue: %s, %s, %s)" % (
+            self.regex_parameters, self.line_prefix_content, self.line_source
+        )
 
 
 class LineSource(object):
@@ -73,3 +80,6 @@ class LineSource(object):
         self.host = host
         self.path = path
         self.offset = offset
+
+    def __repr__(self):
+        return "(LineSource: %s:%s:%s)" % (self.host, self.path, self.offset)

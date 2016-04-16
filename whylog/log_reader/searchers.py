@@ -1,4 +1,6 @@
+import os.path
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
 from os import SEEK_SET
 
 import six
@@ -17,19 +19,32 @@ class AbstractSearcher(object):
 
 
 class IndexSearcher(AbstractSearcher):
-    pass
+    def search(self, search_data):
+        pass
 
 
 class DatabaseSearcher(AbstractSearcher):
-    pass
+    def search(self, search_data):
+        pass
 
 
 class BacktrackSearcher(AbstractSearcher):
     def __init__(self, file_path):
         self._file_path = file_path
 
-    def search(self, search_data):
-        pass
+    def _deduce_offset(self, investigation_step):
+        """
+        returns offset of the line with the specified time
+        """
+        for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
+            line_content, line_offset = line
+            if investigation_step.is_line_in_time_range(line_content):
+                return line_offset
+
+    @classmethod
+    def _merge_clues(cls, collector, clues_from_line):
+        for parser_name, clue in clues_from_line.items():
+            collector[parser_name].append(clue)
 
     @classmethod
     def _decrease_actual_offset_properly(cls, actual_offset, drop_string):
@@ -68,3 +83,11 @@ class BacktrackSearcher(AbstractSearcher):
                         yield line, actual_offset
             actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
             yield truncated, actual_offset
+
+    def search(self, investigation_step):
+        clues = defaultdict(list)
+        offset = self._deduce_offset(investigation_step)
+        for line, actual_offset in self._reverse_from_offset(offset):
+            clues_from_line = investigation_step.get_clues(line, actual_offset)
+            self._merge_clues(clues, clues_from_line)
+        return clues

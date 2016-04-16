@@ -5,7 +5,7 @@ import six
 import yaml
 
 from whylog.config.filename_matchers import RegexFilenameMatcher
-from whylog.config.investigation_plan import InvestigationPlan, InvestigationStep
+from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory, Rule
@@ -57,11 +57,12 @@ class AbstractConfig(object):
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         default_log_type = LogType('default', [matcher])
         cause = RegexParser(
-            'cause', '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$', [1], 'default', {1: 'date'}
+            'cause', '2015-12-03 12:08:08 root cause',
+            '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$', [1], 'default', {1: 'date'}
         )
         effect = RegexParser(
-            'effect', '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$', [1], 'default',
-            {1: 'date'}
+            'effect', '2015-12-03 12:08:09 visible effect',
+            '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$', [1], 'default', {1: 'date'}
         )
         concatenated = ConcatenatedRegexParser([cause])
         effect_time = datetime(2015, 12, 3, 12, 8, 9)
@@ -78,14 +79,20 @@ class AbstractConfig(object):
                 }
             ]
         )  # yapf: disable
-        return InvestigationPlan([rule], [(default_investigation_step, default_log_type)])
+        line_source = LineSource('localhost', 'node_1.log', 40)
+        effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
+        return InvestigationPlan(
+            [rule], [(default_investigation_step, default_log_type)], effect_clues
+        )
 
     def create_investigation_plan(self, front_input, log_type_name):
-        #TODO: remove mock
+        # TODO: remove mock
         return self.mocked_investigation_plan()
 
-    def _get_log_type(self, front_input):
-        pass
+    def get_log_type(self, front_input):
+        # TODO: remove mock
+        matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
+        return LogType('default', [matcher])
 
     def _find_matching_parsers(self, front_input, log_type):
         pass

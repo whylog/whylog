@@ -49,6 +49,7 @@ class RegexParser(AbstractParser):
             "primary_key_groups": self.primary_key_groups,
             "log_type": self.log_type,
             "convertions": self.convertions,
+            "line_content": self.line_content
         }
 
 
