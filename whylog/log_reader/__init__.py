@@ -47,6 +47,22 @@ class SearchManager(object):
             (parser_name, list(clues_iter)) for parser_name, clues_iter in six.iteritems(collector)
         )
 
+    def _constraints_verification(self, clues):
+        """
+        provides constraints verification basing on rules from investigation_plan
+        and collected clues
+        """
+        # effect_clues are accessible from investigation_plan._effect_clues
+        for rule in self._investigation_plan._suspected_rules:
+            # FIXME eliminate protected field access
+            for cause in rule._causes:
+                # FIXME eliminate protected field access
+                if cause in clues.keys():  # FIXME wrong checking (strings!)
+                    # TODO constraint type should be checked here
+                    # ('the great switch' or something similar)
+                    pass
+        # TODO what should be returned?
+
     def investigate(self):
         """
         this function collects clues from SearchHandlers
