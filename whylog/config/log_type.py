@@ -6,8 +6,8 @@ class LogType(object):
         self._name = name
         self._filename_matchers = filename_matchers
 
-    #It will be generator
-    def get_next_file_to_parse(self):
+    # It will be generator
+    def files_to_parse(self):
         # TODO: remove mock
         return [
             (
@@ -18,4 +18,4 @@ class LogType(object):
                     ]
                 )
             )
-        ]
+        ]  # yapf: disable

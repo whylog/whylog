@@ -48,6 +48,13 @@ class SearchManager(object):
         )
 
     def investigate(self):
+        """
+        this function collects clues from SearchHandlers
+        (each of them corresponds to one InvestigationStep)
+        in dictionary clues_collector
+        and then provide their verification with constraints
+        :return: list of FrontInput objects
+        """
         clues_collector = defaultdict(itertools.chain)
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
             search_handler = SearchHandler(step, log_type)
@@ -68,7 +75,7 @@ class SearchHandler(object):
 
     def investigate(self):
         clues = defaultdict(itertools.chain)
-        for host, path in self._log_type.get_next_file_to_parse():
+        for host, path in self._log_type.files_to_parse():
             if host == "localhost":
                 searcher = BacktrackSearcher(path)
                 InvestigationUtils.merge_clue_dicts(
