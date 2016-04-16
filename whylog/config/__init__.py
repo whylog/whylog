@@ -140,7 +140,6 @@ class AbstractFileConfig(AbstractConfig):
             for log_type_name, log_type_matchers in matchers.items()
         )
 
-
     @abstractmethod
     def _load_file_with_config(self, path):
         pass
