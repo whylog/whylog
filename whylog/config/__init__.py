@@ -103,8 +103,10 @@ class AbstractConfig(object):
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         return LogType('default', [matcher])
 
-    def _find_matching_parsers(self, front_input, log_type):
-        pass
+    def _find_matching_parsers(self, front_input, log_type_name):
+        matching_parsers = []
+        # for parser in
+        return matching_parsers
 
     def _filter_rule_set(self, parsers_list):
         pass
