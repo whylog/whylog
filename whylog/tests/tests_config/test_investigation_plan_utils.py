@@ -85,6 +85,7 @@ class TestBasic(TestCase):
 
         parsers, _ = self.complexed_config._find_matching_parsers(front_input, 'filesystem')
         rules = self.complexed_config._filter_rule_set(parsers)
+        rules = sorted(rules, key=lambda x: x._effect.name)
         assert len(rules) == 2
         assert rules[0]._effect.name == 'lostdata'
         assert rules[1]._effect.name == 'lostdatadate'
