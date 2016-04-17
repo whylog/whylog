@@ -21,10 +21,19 @@ class ConstraintLinksBase:
     def distinct_constraint_ids(self):
         return set(list(zip(*self.links))[self.CONSTRAINT_ID_POSITION])
 
-    def add_links(self, links_list):
-        self.links = list(set(self.links + links_list))
+    def add_links(self, links):
+        self.links = list(set(self.links).union(links))
 
-    def remove_links_where(self, line_id=None, group_no=None, constr_id=None):
+    def remove_links_by_line(self, line_id):
+        self._remove_links_where(line_id=line_id)
+
+    def remove_links_by_group(self, line_id, group_no):
+        self._remove_links_where(line_id=line_id, group_no=group_no)
+
+    def remove_links_by_constraint(self, constraint_id):
+        self._remove_links_where(constr_id=constraint_id)
+
+    def _remove_links_where(self, line_id=None, group_no=None, constr_id=None):
         base_to_remove = self._select(line_id, group_no, constr_id)
         self._remove_base(base_to_remove)
 

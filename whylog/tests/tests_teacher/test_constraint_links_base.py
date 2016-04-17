@@ -36,7 +36,7 @@ class TestBasic(TestCase):
         )
 
     def test_remove_by_line(self):
-        self.constraint_links.remove_links_where(line_id=1)
+        self.constraint_links.remove_links_by_line(1)
         assert set(self.constraint_links.get_links()) == set(
             [
                 (2, 10, 100),
@@ -47,7 +47,7 @@ class TestBasic(TestCase):
         )
 
     def test_remove_by_group(self):
-        self.constraint_links.remove_links_where(line_id=2, group_no=20)
+        self.constraint_links.remove_links_by_group(2, 20)
         assert set(self.constraint_links.get_links()) == set(
             [
                 (1, 10, 100),
@@ -57,8 +57,8 @@ class TestBasic(TestCase):
             ]
         )
 
-    def test_remove_by_constr_id(self):
-        self.constraint_links.remove_links_where(constr_id=100)
+    def test_remove_by_constraint(self):
+        self.constraint_links.remove_links_by_constraint(100)
         assert set(self.constraint_links.get_links()) == set(
             [
                 (1, 20, 200),
