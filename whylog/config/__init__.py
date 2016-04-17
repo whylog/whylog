@@ -105,8 +105,13 @@ class AbstractConfig(object):
 
     def _find_matching_parsers(self, front_input, log_type_name):
         matching_parsers = []
-        # for parser in
-        return matching_parsers
+        extracted_params = {}
+        for parser in self._parsers_grouped_by_log_type[log_type_name]:
+            params = parser.get_regex_params(front_input.line_content)
+            if params is not None:
+                extracted_params[parser.name] = params
+                matching_parsers.append(parser)
+        return matching_parsers, extracted_params
 
     def _filter_rule_set(self, parsers_list):
         pass
