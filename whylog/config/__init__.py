@@ -21,7 +21,6 @@ class AbstractConfig(object):
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
 
-
     @abstractmethod
     def _load_parsers(self):
         pass
@@ -104,7 +103,6 @@ class AbstractConfig(object):
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         return LogType('default', [matcher])
 
-
     def _find_matching_parsers(self, front_input, log_type):
         pass
 
@@ -130,10 +128,11 @@ class AbstractFileConfig(AbstractConfig):
         )
 
     def _load_rules(self):
-        return [
-            RegexRuleFactory.from_dao(serialized_rule, self._parsers)
-            for serialized_rule in self._load_file_with_config(self._rules_path)
-        ]
+        loaded_rules = defaultdict(list)
+        for serialized_rule in self._load_file_with_config(self._rules_path):
+            loaded_rule = RegexRuleFactory.from_dao(serialized_rule, self._parsers)
+            loaded_rules[serialized_rule["effect"]].append(loaded_rule)
+        return loaded_rules
 
     def _load_log_types(self):
         matchers = defaultdict(list)
