@@ -97,7 +97,7 @@ class AbstractConfig(object):
     def create_investigation_plan(self, front_input, log_type_name):
         effect_params, matches_parsers = self._find_matching_parsers(front_input, log_type_name)
         suspected_rules = self._filter_rule_set(matches_parsers)
-
+        concatenated_parsers = self._create_concatenated_parser_for_investigation(suspected_rules)
         # TODO: remove mock
         return self.mocked_investigation_plan()
 
@@ -137,9 +137,17 @@ class AbstractConfig(object):
             for log_type_name, parsers in grouped_parsers.items()
         )
 
-    def _get_locations_for_logs(self, logs_types_list):
-        pass
-
+    def _create_steps_in_investigation(self, concatenated_parsers, suspected_rules, effect_clues):
+        investigation_data = []
+        for log_type_name, parser, in concatenated_parsers.items():
+            log_type = self._log_types['log_type']
+            #TODO calculate effect time(or other primary key value) and earliest cause time
+            #TODO base on effect_clues and suspected_rules per log type
+            effect_time = datetime(2015, 12, 3, 12, 8, 9) #TODO remove mock
+            earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8) #TODO remove mock
+            investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
+            investigation_data.append((investigation_step, log_type))
+        return investigation_data
 
 @six.add_metaclass(ABCMeta)
 class AbstractFileConfig(AbstractConfig):
