@@ -17,8 +17,10 @@ from whylog.config.rule import RegexRuleFactory, Rule
 class AbstractConfig(object):
     def __init__(self):
         self._parsers = self._load_parsers()
+        self._parsers_grouped_by_log_type = self._group_parsers_by_log_type()
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
+
 
     @abstractmethod
     def _load_parsers(self):
@@ -31,6 +33,12 @@ class AbstractConfig(object):
     @abstractmethod
     def _load_log_types(self):
         pass
+
+    def _group_parsers_by_log_type(self):
+        grouped_parsers = defaultdict(list)
+        for parser in self._parsers.values():
+            grouped_parsers[parser.log_type].append(parser)
+        return grouped_parsers
 
     def add_rule(self, user_rule_intent):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
@@ -95,6 +103,7 @@ class AbstractConfig(object):
         # TODO: remove mock
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         return LogType('default', [matcher])
+
 
     def _find_matching_parsers(self, front_input, log_type):
         pass
