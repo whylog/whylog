@@ -1,7 +1,6 @@
 import os.path
 from unittest import TestCase
 
-
 from whylog.config import YamlConfig
 from whylog.front import FrontInput
 
@@ -20,10 +19,11 @@ class TestBasic(TestCase):
         cls.multiple_parsers_path = os.path.join(path, 'multiple_match_parsers.yaml')
         cls.rules_path = os.path.join(path, 'rules.yaml')
         cls.log_type_path = os.path.join(path, 'log_types.yaml')
+        cls.multiple_rules_path = os.path.join(path, 'multiple_rules.yaml')
 
     @classmethod
     def get_names_of_parsers(cls, parser_list):
-        return [parser.name for parser in parser_list]
+        return sorted([parser.name for parser in parser_list])
 
     def test_simple_parsers_filter(self):
         config = YamlConfig(self.parsers_path, self.rules_path, self.log_type_path)
@@ -47,7 +47,39 @@ class TestBasic(TestCase):
         front_input = FrontInput(None, self.lost_data_line, None)
 
         parsers, regex_params = config._find_matching_parsers(front_input, 'filesystem')
-        assert sorted(TestBasic.get_names_of_parsers(parsers)) == ['lostdata', 'lostdatadate']
+        assert TestBasic.get_names_of_parsers(parsers) == ['lostdata', 'lostdatadate']
         assert regex_params == {'lostdata': ('2016-04-12 23:54:43', 'comp2', '230', 'host2'),
-                                'lostdatadate': ('2016-04-12 23:54:43',) }
+                                'lostdatadate': ('2016-04-12 23:54:43',)}
+
+    def test_simple_rule_filter(self):
+        config = YamlConfig(self.parsers_path, self.rules_path, self.log_type_path)
+        front_input = FrontInput(None, self.lost_data_line, None)
+
+        parsers, _ = config._find_matching_parsers(front_input, 'filesystem')
+        rules = config._filter_rule_set(parsers)
+        assert len(rules) == 1
+        assert rules[0]._effect.name == 'lostdata'
+        assert TestBasic.get_names_of_parsers(rules[0]._causes) == ['connectionerror', 'datamigration']
+
+    def test_empty_rule_filter(self):
+        config = YamlConfig(self.parsers_path, self.rules_path, self.log_type_path)
+        front_input = FrontInput(None, self.connection_error_line, None)
+
+        parsers, _ = config._find_matching_parsers(front_input, 'hydra')
+        rules = config._filter_rule_set(parsers)
+        assert len(rules) == 0
+
+    def test_multiple_rule_filter(self):
+        config = YamlConfig(self.parsers_path, self.rules_path, self.log_type_path)
+        front_input = FrontInput(None, self.lost_data_line, None)
+
+        parsers, _ = config._find_matching_parsers(front_input, 'filesystem')
+        rules = config._filter_rule_set(parsers)
+        assert len(rules) == 2
+        assert rules[0]._effect.name == 'lostdata'
+        assert rules[1]._effect.name == 'lostdatadate'
+        assert TestBasic.get_names_of_parsers(rules[0]._causes) == ['connectionerror', 'datamigration']
+        assert TestBasic.get_names_of_parsers(rules[1]._causes) == ['connectionerror', 'datamigration']
+
+
 

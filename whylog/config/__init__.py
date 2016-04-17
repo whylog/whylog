@@ -114,7 +114,9 @@ class AbstractConfig(object):
         return matching_parsers, extracted_params
 
     def _filter_rule_set(self, parsers_list):
-        pass
+        suspected_rules = []
+        # for parser in parsers_list:
+        return []
 
     def _get_locations_for_logs(self, logs_types_list):
         pass
