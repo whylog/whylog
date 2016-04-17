@@ -23,9 +23,7 @@ def mocked_investigation_plan():
     concatenated = ConcatenatedRegexParser([cause])
     effect_time = datetime(2015, 12, 3, 12, 8, 9)
     earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)
-    default_investigation_step = InvestigationStep(
-        concatenated, effect_time, earliest_cause_time
-    )
+    default_investigation_step = InvestigationStep(concatenated, effect_time, earliest_cause_time)
     rule = Rule(
         [cause], effect, [
             {
@@ -37,6 +35,4 @@ def mocked_investigation_plan():
     )  # yapf: disable
     line_source = LineSource('localhost', 'node_1.log', 40)
     effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
-    return InvestigationPlan(
-        [rule], [(default_investigation_step, default_log_type)], effect_clues
-    )
+    return InvestigationPlan([rule], [(default_investigation_step, default_log_type)], effect_clues)

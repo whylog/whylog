@@ -1,5 +1,5 @@
-import os.path
 import itertools
+import os.path
 from unittest import TestCase
 
 from whylog.config import YamlConfig
@@ -23,8 +23,12 @@ class TestBasic(TestCase):
         cls.multiple_rules_path = os.path.join(path, 'multiple_rules.yaml')
 
         cls.simple_config = YamlConfig(cls.parsers_path, cls.rules_path, cls.log_type_path)
-        cls.multiple_parsers_config = YamlConfig(cls.multiple_parsers_path, cls.rules_path, cls.log_type_path)
-        cls.complexed_config = YamlConfig(cls.multiple_parsers_path, cls.multiple_rules_path, cls.log_type_path)
+        cls.multiple_parsers_config = YamlConfig(
+            cls.multiple_parsers_path, cls.rules_path, cls.log_type_path
+        )
+        cls.complexed_config = YamlConfig(
+            cls.multiple_parsers_path, cls.multiple_rules_path, cls.log_type_path
+        )
 
     @classmethod
     def get_names_of_parsers(cls, parser_list):
@@ -49,10 +53,14 @@ class TestBasic(TestCase):
     def test_multiple_parser_matching(self):
         front_input = FrontInput(None, self.lost_data_line, None)
 
-        parsers, regex_params = self.multiple_parsers_config._find_matching_parsers(front_input, 'filesystem')
+        parsers, regex_params = self.multiple_parsers_config._find_matching_parsers(
+            front_input, 'filesystem'
+        )
         assert TestBasic.get_names_of_parsers(parsers) == ['lostdata', 'lostdatadate']
-        assert regex_params == {'lostdata': ('2016-04-12 23:54:43', 'comp2', '230', 'host2'),
-                                'lostdatadate': ('2016-04-12 23:54:43',)}
+        assert regex_params == {
+            'lostdata': ('2016-04-12 23:54:43', 'comp2', '230', 'host2'),
+            'lostdatadate': ('2016-04-12 23:54:43',)
+        }
 
     def test_simple_rule_filter(self):
         front_input = FrontInput(None, self.lost_data_line, None)
@@ -61,7 +69,9 @@ class TestBasic(TestCase):
         rules = self.simple_config._filter_rule_set(parsers)
         assert len(rules) == 1
         assert rules[0]._effect.name == 'lostdata'
-        assert TestBasic.get_names_of_parsers(rules[0]._causes) == ['connectionerror', 'datamigration']
+        assert TestBasic.get_names_of_parsers(rules[0]._causes) == [
+            'connectionerror', 'datamigration'
+        ]
 
     def test_empty_rule_filter(self):
         front_input = FrontInput(None, self.connection_error_line, None)
@@ -78,8 +88,12 @@ class TestBasic(TestCase):
         assert len(rules) == 2
         assert rules[0]._effect.name == 'lostdata'
         assert rules[1]._effect.name == 'lostdatadate'
-        assert TestBasic.get_names_of_parsers(rules[0]._causes) == ['connectionerror', 'datamigration']
-        assert TestBasic.get_names_of_parsers(rules[1]._causes) == ['connectionerror', 'datamigration']
+        assert TestBasic.get_names_of_parsers(rules[0]._causes) == [
+            'connectionerror', 'datamigration'
+        ]
+        assert TestBasic.get_names_of_parsers(rules[1]._causes) == [
+            'connectionerror', 'datamigration'
+        ]
 
     @classmethod
     def creating_concatenated_parsers_parametrized(cls, config):

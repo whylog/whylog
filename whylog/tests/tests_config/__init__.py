@@ -126,7 +126,7 @@ class TestBasic(TestCase):
         loaded_parsers = [
             RegexParserFactory.from_dao(dumped_parser)
             for dumped_parser in yaml.load_all(dumped_parsers)
-            ]
+        ]
         dumped_parsers_again = yaml.dump_all(
             [parser.serialize() for parser in loaded_parsers],
             explicit_start=True

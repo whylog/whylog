@@ -9,8 +9,8 @@ from whylog.config.exceptions import UnsupportedFilenameMatcher
 from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
-from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
-from whylog.config.rule import RegexRuleFactory, Rule
+from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
+from whylog.config.rule import RegexRuleFactory
 
 
 @six.add_metaclass(ABCMeta)
@@ -69,7 +69,9 @@ class AbstractConfig(object):
         effect_time = datetime(2015, 12, 3, 12, 8, 9)
         line_source = LineSource('localhost', 'node_1.log', 40)
         effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
-        investigation_data = self._create_steps_in_investigation(concatenated_parsers, suspected_rules, effect_clues)
+        investigation_data = self._create_steps_in_investigation(
+            concatenated_parsers, suspected_rules, effect_clues
+        )
         return InvestigationPlan(suspected_rules, investigation_data, effect_clues)
 
     def get_log_type(self, front_input):
@@ -115,11 +117,12 @@ class AbstractConfig(object):
             #TODO mocked for 003_test
             #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
             #TODO base on effect_clues and suspected_rules per log type
-            effect_time = datetime(2015, 12, 3, 12, 8, 9) #TODO remove mock
-            earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8) #TODO remove mock
+            effect_time = datetime(2015, 12, 3, 12, 8, 9)  #TODO remove mock
+            earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)  #TODO remove mock
             investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
             investigation_data.append((investigation_step, log_type))
         return investigation_data
+
 
 @six.add_metaclass(ABCMeta)
 class AbstractFileConfig(AbstractConfig):
