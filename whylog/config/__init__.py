@@ -95,6 +95,9 @@ class AbstractConfig(object):
         )
 
     def create_investigation_plan(self, front_input, log_type_name):
+        effect_params, matches_parsers = self._find_matching_parsers(front_input, log_type_name)
+        suspected_rules = self._filter_rule_set(matches_parsers)
+
         # TODO: remove mock
         return self.mocked_investigation_plan()
 
@@ -119,6 +122,20 @@ class AbstractConfig(object):
             if self._rules.get(parser.name) is not None:
                 suspected_rules.extend(self._rules.get(parser.name))
         return suspected_rules
+
+    @classmethod
+    def _create_concatenated_parser_for_investigation(cls, rules):
+        grouped_parsers = defaultdict(list)
+        inserted_parsers = set([])
+        for suspected_rule in rules:
+            for parser in suspected_rule.get_causes_parsers():
+                if parser.name not in inserted_parsers:
+                    grouped_parsers[parser.log_type].append(parser)
+                    inserted_parsers.add(parser.name)
+        return dict(
+            (log_type_name, ConcatenatedRegexParser(parsers))
+            for log_type_name, parsers in grouped_parsers.items()
+        )
 
     def _get_locations_for_logs(self, logs_types_list):
         pass

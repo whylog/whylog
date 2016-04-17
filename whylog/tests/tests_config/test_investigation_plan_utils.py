@@ -1,4 +1,5 @@
 import os.path
+import itertools
 from unittest import TestCase
 
 from whylog.config import YamlConfig
@@ -81,5 +82,11 @@ class TestBasic(TestCase):
         assert TestBasic.get_names_of_parsers(rules[0]._causes) == ['connectionerror', 'datamigration']
         assert TestBasic.get_names_of_parsers(rules[1]._causes) == ['connectionerror', 'datamigration']
 
-
+    def test_creating_concatenated_parsers(self):
+        config = YamlConfig(self.parsers_path, self.rules_path, self.log_type_path)
+        rule_chain = itertools.chain(*config._rules.values())
+        concatenated_parsers = config._create_concatenated_parser_for_investigation(rule_chain)
+        assert len(concatenated_parsers) == 1
+        parser_list = concatenated_parsers['hydra']._parsers
+        assert TestBasic.get_names_of_parsers(parser_list) == ['connectionerror', 'datamigration']
 
