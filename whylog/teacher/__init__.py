@@ -126,7 +126,7 @@ class Teacher(object):
         self._constraint_base[constraint_id] = constraint
         new_constraint_links = [
             (group.line_id, group.number, constraint_id) for group in pattern_groups
-            ]
+        ]
         self._constraint_links.add_links(new_constraint_links)
 
     def remove_constraint(self, constraint_id):
