@@ -60,46 +60,17 @@ class AbstractConfig(object):
     def _save_parsers_definition(self, parser_definitions):
         pass
 
-    # mocked investigation plan for 003_match_time_range test
-    # TODO: remove mock
-    def mocked_investigation_plan(self):
-        matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
-        default_log_type = LogType('default', [matcher])
-        cause = RegexParser(
-            'cause', '2015-12-03 12:08:08 root cause',
-            '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$', [1], 'default', {1: 'date'}
-        )
-        effect = RegexParser(
-            'effect', '2015-12-03 12:08:09 visible effect',
-            '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$', [1], 'default', {1: 'date'}
-        )
-        concatenated = ConcatenatedRegexParser([cause])
-        effect_time = datetime(2015, 12, 3, 12, 8, 9)
-        earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)
-        default_investigation_step = InvestigationStep(
-            concatenated, effect_time, earliest_cause_time
-        )
-        rule = Rule(
-            [cause], effect, [
-                {
-                    'clues_groups': [[1, 1], [0, 1]],
-                    'name': 'time',
-                    'params': {'max_delta': 1}
-                }
-            ]
-        )  # yapf: disable
-        line_source = LineSource('localhost', 'node_1.log', 40)
-        effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
-        return InvestigationPlan(
-            [rule], [(default_investigation_step, default_log_type)], effect_clues
-        )
-
     def create_investigation_plan(self, front_input, log_type_name):
         effect_params, matches_parsers = self._find_matching_parsers(front_input, log_type_name)
         suspected_rules = self._filter_rule_set(matches_parsers)
         concatenated_parsers = self._create_concatenated_parser_for_investigation(suspected_rules)
-        # TODO: remove mock
-        return self.mocked_investigation_plan()
+        #TODO: creating clues base on effect_params
+        #TODO: remove mocks
+        effect_time = datetime(2015, 12, 3, 12, 8, 9)
+        line_source = LineSource('localhost', 'node_1.log', 40)
+        effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
+        investigation_data = self._create_steps_in_investigation(concatenated_parsers, suspected_rules, effect_clues)
+        return InvestigationPlan(suspected_rules, investigation_data, effect_clues)
 
     def get_log_type(self, front_input):
         # TODO: remove mock
@@ -141,7 +112,8 @@ class AbstractConfig(object):
         investigation_data = []
         for log_type_name, parser, in concatenated_parsers.items():
             log_type = self._log_types['log_type']
-            #TODO calculate effect time(or other primary key value) and earliest cause time
+            #TODO mocked for 003_test
+            #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
             #TODO base on effect_clues and suspected_rules per log type
             effect_time = datetime(2015, 12, 3, 12, 8, 9) #TODO remove mock
             earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8) #TODO remove mock
