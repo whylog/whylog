@@ -70,7 +70,7 @@ class TestBasic(TestCase):
         assert len(rules) == 0
 
     def test_multiple_rule_filter(self):
-        config = YamlConfig(self.parsers_path, self.rules_path, self.log_type_path)
+        config = YamlConfig(self.multiple_parsers_path, self.multiple_rules_path, self.log_type_path)
         front_input = FrontInput(None, self.lost_data_line, None)
 
         parsers, _ = config._find_matching_parsers(front_input, 'filesystem')

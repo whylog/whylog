@@ -115,8 +115,10 @@ class AbstractConfig(object):
 
     def _filter_rule_set(self, parsers_list):
         suspected_rules = []
-        # for parser in parsers_list:
-        return []
+        for parser in parsers_list:
+            if self._rules.get(parser.name) is not None:
+                suspected_rules.extend(self._rules.get(parser.name))
+        return suspected_rules
 
     def _get_locations_for_logs(self, logs_types_list):
         pass
