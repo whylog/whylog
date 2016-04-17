@@ -21,7 +21,16 @@ else
     master=`mktemp`
     git rev-list --first-parent HEAD > "$head"  # list of commits being a history of HEAD branch, but without commits merged from master after forking
     git rev-list origin/master > "$master"  # list of all commits on history of master
+
     base_commit=`diff -u "$head" "$master" | grep '^ ' | head -n 1 | cut -c 2-`  # the commit from which the master and topic (current) branch have diverged
+
+    # in below case, it would be E
+    #
+    #        A---B---C---I---K---L topic
+    #       /       /       /
+    #  D---E---F---G-------H---J master
+    #
+
     git diff --name-only "${base_commit}..HEAD" | grep '\.py$' | xargs yapf --in-place setup.py
 fi
 
