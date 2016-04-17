@@ -15,16 +15,18 @@ class TestBasic(TestCase):
         cls.data_migration_line = "2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2"
         cls.lost_data_line = "2016-04-12 23:54:43 Data is missing at comp2. Loss = 230 GB. Host name: host2"
 
+        path = os.path.join(*path_test_files)
+        cls.parsers_path = os.path.join(path, 'parsers.yaml')
+        cls.multiple_parsers_path = os.path.join(path, 'multiple_match_parsers.yaml')
+        cls.rules_path = os.path.join(path, 'rules.yaml')
+        cls.log_type_path = os.path.join(path, 'log_types.yaml')
+
     @classmethod
     def get_names_of_parsers(cls, parser_list):
         return [parser.name for parser in parser_list]
 
     def test_simple_parsers_filter(self):
-        path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
-        log_type_path = os.path.join(path, 'log_types.yaml')
-        config = YamlConfig(parsers_path, rules_path, log_type_path)
+        config = YamlConfig(self.parsers_path, self.rules_path, self.log_type_path)
         front_input = FrontInput(None, self.lost_data_line, None)
 
         parsers, regex_params = config._find_matching_parsers(front_input, 'filesystem')
@@ -40,4 +42,12 @@ class TestBasic(TestCase):
         assert TestBasic.get_names_of_parsers(parsers) == ['connectionerror']
         assert regex_params == {'connectionerror': ('2016-04-12 23:54:45', 'comp1', 'host1')}
 
-    def test_multiple_parser_matching(self, ):
+    def test_multiple_parser_matching(self):
+        config = YamlConfig(self.multiple_parsers_path, self.rules_path, self.log_type_path)
+        front_input = FrontInput(None, self.lost_data_line, None)
+
+        parsers, regex_params = config._find_matching_parsers(front_input, 'filesystem')
+        assert sorted(TestBasic.get_names_of_parsers(parsers)) == ['lostdata', 'lostdatadate']
+        assert regex_params == {'lostdata': ('2016-04-12 23:54:43', 'comp2', '230', 'host2'),
+                                'lostdatadate': ('2016-04-12 23:54:43',) }
+
