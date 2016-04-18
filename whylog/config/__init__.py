@@ -60,8 +60,8 @@ class AbstractConfig(object):
     def _save_parsers_definition(self, parser_definitions):
         pass
 
-    def create_investigation_plan(self, front_input, log_type_name):
-        effect_params, matches_parsers = self._find_matching_parsers(front_input, log_type_name)
+    def create_investigation_plan(self, front_input, log_type):
+        matches_parsers, effect_params = self._find_matching_parsers(front_input, log_type.name)
         suspected_rules = self._filter_rule_set(matches_parsers)
         concatenated_parsers = self._create_concatenated_parser_for_investigation(suspected_rules)
         #TODO: creating clues base on effect_params
@@ -113,7 +113,7 @@ class AbstractConfig(object):
     def _create_steps_in_investigation(self, concatenated_parsers, suspected_rules, effect_clues):
         investigation_data = []
         for log_type_name, parser, in concatenated_parsers.items():
-            log_type = self._log_types['log_type']
+            log_type = self._log_types[log_type_name]
             #TODO mocked for 003_test
             #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
             #TODO base on effect_clues and suspected_rules per log type

@@ -12,8 +12,8 @@ class TestBasic(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.connection_error_line = "2016-04-12 23:54:45 Connection error occurred on comp1. Host name: host1"
-        cls.data_migration_line = "2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2"
         cls.lost_data_line = "2016-04-12 23:54:43 Data is missing at comp2. Loss = 230 GB. Host name: host2"
+        cls.data_migration_line = "2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2"
 
         path = os.path.join(*path_test_files)
         cls.parsers_path = os.path.join(path, 'parsers.yaml')
