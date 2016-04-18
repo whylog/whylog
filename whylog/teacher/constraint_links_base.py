@@ -25,31 +25,42 @@ class ConstraintLinksBase:
         self.links = list(set(self.links).union(links))
 
     def remove_links_by_line(self, line_id):
-        self._remove_links_where(line_id=line_id)
+        self._remove_base(self._select_by_line(line_id))
 
     def remove_links_by_group(self, line_id, group_no):
-        self._remove_links_where(line_id=line_id, group_no=group_no)
+        self._remove_base(self._select_by_group(line_id, group_no))
 
     def remove_links_by_constraint(self, constraint_id):
-        self._remove_links_where(constr_id=constraint_id)
+        self._remove_base(self._select_by_constraint(constraint_id))
 
-    def _remove_links_where(self, line_id=None, group_no=None, constr_id=None):
-        base_to_remove = self._select(line_id, group_no, constr_id)
-        self._remove_base(base_to_remove)
+    def _select_by_line(self, select_line_id):
+        return ConstraintLinksBase(
+            [
+                (
+                    line_id, group_no, constr_id
+                ) for (line_id, group_no, constr_id) in self.links if line_id == select_line_id
+            ]
+        )
 
-    def _select(self, select_line_id=None, select_group_no=None, select_constr_id=None):
-        selected_base = [
-            (line_id, group_no, constr_id)
-            for (line_id, group_no, constr_id) in self.links
-            if (
-                (select_line_id is None or line_id == select_line_id) and (
-                    select_group_no is None or group_no == select_group_no
-                ) and (
-                    select_constr_id is None or constr_id == select_constr_id
-                )
-            )
-        ]
-        return ConstraintLinksBase(selected_base)
+    def _select_by_group(self, select_line_id, select_group_no):
+        return ConstraintLinksBase(
+            [
+                (line_id, group_no, constr_id)
+                for (
+                    line_id, group_no, constr_id
+                ) in self.links if line_id == select_line_id and group_no == select_group_no
+            ]
+        )
+
+    def _select_by_constraint(self, select_constraint_id):
+        return ConstraintLinksBase(
+            [
+                (line_id, group_no, constr_id)
+                for (
+                    line_id, group_no, constr_id
+                ) in self.links if constr_id == select_constraint_id
+            ]
+        )
 
     def _remove_base(self, base_to_remove):
         """
