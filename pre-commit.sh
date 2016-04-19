@@ -39,12 +39,12 @@ else
     else
         echo -n 'running yapf... '
 
-        echo "$files_to_check" | while read file
+        echo "$files_to_check" | (while read file
         do
             yapf --in-place "$file" &
         done
-
         wait
+        )
 
         echo 'done'
     fi
