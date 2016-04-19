@@ -1,5 +1,6 @@
 import os.path
 from unittest import TestCase
+import platform
 
 from generator import generate, generator
 from nose.plugins.skip import SkipTest
@@ -54,9 +55,14 @@ class TestBasic(TestCase):
         output_path = os.path.join(path, 'expected_output.txt')
         log_file = os.path.join(path, 'node_1.log')
 
+        # TODO this 'if' is temporary, remove this later
         if not test_name == '003_match_time_range':
-            # TODO this 'if' is temporary, remove this later
             raise SkipTest("Functionality not implemented yet")
+
+        if platform.system() == 'Windows':
+            log_type_path = os.path.join(path, 'windows_log_types.yaml')
+        else:
+            log_type_path = os.path.join(path, 'unix_log_types.yaml')
 
         line_number = self._get_cause_line_number(input_path)
         line_content = self._get_concrete_line_from_file(log_file, line_number)
