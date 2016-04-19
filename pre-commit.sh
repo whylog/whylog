@@ -31,9 +31,13 @@ else
     #  D---E---F---G-------H---J master
     #
 
-    files=`git diff --name-only "${base_commit}..HEAD" | grep '\.py$'`
-    if [ -n "$files" ]; then
-        echo "$files" | xargs yapf --in-place
+    changed_files=`git diff --name-only "${base_commit}..HEAD"`
+    dirty_files=`git ls-files -m`
+    files_to_check="$((echo "$changed_files"; echo "$dirty_files") | grep '\.py$')"
+    if [ -n "$files_to_check" ]; then
+        echo "$files_to_check" | xargs yapf --in-place
+    else
+        echo 'nothing to run yapf on after all'
     fi
 fi
 
