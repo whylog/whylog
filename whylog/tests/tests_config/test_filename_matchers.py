@@ -29,6 +29,5 @@ class TestBasic(TestCase):
         prefix_path = os.path.join(*path_test_files)
         path = os.path.join(prefix_path, test_name)
         matcher = WildCardFilenameMatcher('localhost', os.path.join(path, 'node_[123].log'), 'default')
-        print len(matcher.get_matched_files())
-
-    # def test_simple_wildcard_matcher(self):
+        # print matcher.get_matched_files()
+#
