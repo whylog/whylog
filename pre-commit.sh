@@ -31,7 +31,10 @@ else
     #  D---E---F---G-------H---J master
     #
 
-    git diff --name-only "${base_commit}..HEAD" | grep '\.py$' | xargs yapf --in-place setup.py
+    files=`git diff --name-only "${base_commit}..HEAD" | grep '\.py$'`
+    if [ -n "$files" ]; then
+        echo "$files" | xargs yapf --in-place
+    fi
 fi
 
 isort --order-by-type --recursive --line-width 100 --diff --verbose -y
