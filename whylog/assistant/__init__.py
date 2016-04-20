@@ -14,7 +14,7 @@ class AbstractAssistant(object):
         pass
 
     @abstractmethod
-    def guess(self, guess_base):
+    def guess(self, line_id):
         pass
 
     @abstractmethod

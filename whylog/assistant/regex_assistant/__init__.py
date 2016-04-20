@@ -1,4 +1,5 @@
 from whylog.assistant import AbstractAssistant
+from whylog.assistant.regex_assistant.regex import create_obvious_regex
 from whylog.assistant.regex_assistant.regex_object import RegexObject
 from whylog.assistant.spans_finding import find_date_spans
 
@@ -8,6 +9,8 @@ class RegexAssistant(AbstractAssistant):
     Responsible for creating regex for each line of Rule.
     RegexAssistant helps user to write regex, it can also propose regex.
     One RegexAssistant per one entering Rule.
+
+    :type regex_objects: dict[int, RegexObject]
     """
 
     def __init__(self):
@@ -58,3 +61,11 @@ class RegexAssistant(AbstractAssistant):
         date_spans = find_date_spans(regex_obj.line_text)
         group_spans = date_spans  #TODO: date_spans + other found spans
         regex_obj.update_forcefully(group_spans)
+
+        # TODO: rebuild this method and assistant logic:
+        # - update RegexObject.regex only on 'update' request but not while guessing
+        # - guessed regexes cached in RegexObject, don't guess them on every 'guess' call
+
+        obvious_regex = create_obvious_regex(self.regex_objects[line_id].line_text)
+
+        return [self.regex_objects[line_id].regex, obvious_regex]
