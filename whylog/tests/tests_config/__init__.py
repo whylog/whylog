@@ -21,8 +21,6 @@ to_date = "date"
 to_string = "string"
 to_int = "int"
 
-path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
-
 
 class TestBasic(TestCase):
     @classmethod
@@ -106,12 +104,17 @@ class TestBasic(TestCase):
 
         cls.user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
-        path = os.path.join(*path_test_files)
+        cls.path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
+
+        cls.config = YamlConfig(*TestBasic.get_path_to_config_files(cls.path_test_files))
+
+    @classmethod
+    def get_path_to_config_files(cls, directories_in_path):
+        path = os.path.join(*directories_in_path)
         parsers_path = os.path.join(path, 'parsers.yaml')
         rules_path = os.path.join(path, 'rules.yaml')
         log_type_path = os.path.join(path, 'log_types.yaml')
-
-        cls.config = YamlConfig(parsers_path, rules_path, log_type_path)
+        return [parsers_path, rules_path, log_type_path]
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
