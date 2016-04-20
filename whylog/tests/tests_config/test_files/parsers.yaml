@@ -5,7 +5,7 @@ name: lostdata
 primary_key_groups: [1]
 regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*)
   GB\. Host name: (.*)$'
-line_content: "2016-04-12 23:54:43 Data is missing at comp2. Loss = 150 GB. Host name: host2"
+line_content: '2016-04-12 23:54:43 Data is missing at comp2. Loss = (.*) GB. Host name: host2'
 ---
 convertions: {1: date}
 log_type: hydra
@@ -13,7 +13,7 @@ name: connectionerror
 primary_key_groups: [1]
 regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host
   name: (.*)$'
-line_content: "2016-04-12 23:54:45 Connection error occurred on comp1. Host name: host1"
+line_content: '2016-04-12 23:54:45 Connection error occurred on comp1. Host name: host1'
 ---
 convertions: {1: date}
 log_type: hydra
@@ -21,4 +21,4 @@ name: datamigration
 primary_key_groups: [1]
 regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\.
   Host name: (.*)$'
-line_content: "2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2"
+line_content: '2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2'

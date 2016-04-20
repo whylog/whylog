@@ -253,6 +253,12 @@ class AbstractConfig(object):
             steps.append((investigation_step, log_type))
         return steps
 
+    def is_free_parser_name(self, parser_name):
+        return parser_name not in self._parsers
+
+    def propose_parser_name(self, line, black_list):
+        pass
+
 
 @six.add_metaclass(ABCMeta)
 class AbstractFileConfig(AbstractConfig):
