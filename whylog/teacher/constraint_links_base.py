@@ -28,7 +28,7 @@ class ConstraintLinksBase:
         return set([link.constraint_id for link in self.links])
 
     def add_links(self, links):
-        constraint_links = [ConstraintLink(link[0], link[1], link[2]) for link in links]
+        constraint_links = [ConstraintLink(*link) for link in links]
         self.links = list(set(self.links).union(constraint_links))
 
     def remove_links_by_line(self, line_id):
@@ -55,5 +55,4 @@ class ConstraintLinksBase:
 
     def _remove_links(self, links):
         links_set = set(self.links)
-        links_to_remove_set = set(links)
-        self.links = list(links_set.difference(links_to_remove_set))
+        self.links = list(links_set.difference(links))
