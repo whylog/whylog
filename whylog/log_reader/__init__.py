@@ -66,7 +66,12 @@ class SearchManager(object):
                             # ConstraintsBase.all[constraint['name']].verify(effect, cause, constraint)
                             # FIXME NOW I assume, that constraint['name'] == 'time'
                             if TimeConstraint.verify(rule._effect, cause, constraint):
-                                causes.append(FrontInput(clue.line_source.offset, clue.line_prefix_content, clue.line_source.path))
+                                causes.append(
+                                    FrontInput(
+                                        clue.line_source.offset, clue.line_prefix_content,
+                                        clue.line_source.path
+                                    )
+                                )
         return causes
 
     def investigate(self):
