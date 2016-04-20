@@ -2,6 +2,7 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.mock_outputs import create_sample_rule
+from whylog.teacher.user_intent import LineParamGroup
 
 
 class PatternGroup(object):
@@ -19,14 +20,21 @@ class PatternGroup(object):
 
 
 class TeacherParser(object):
+    """
+    :type groups: list[LineParamGroup]
+    """
     def __init__(self, line_object):
         self.line = line_object
+        self.pattern_name = None
+        self.log_type = None
+        self.primary_keys = []
 
 
 class Teacher(object):
     """
     Enable teaching new rule. One Teacher per one entering rule.
 
+    :type pattern_assistant: AbstractAssistant
     :type _parsers: dict[int, TeacherParser]
     :type _constraint_base: dict[int, AbstractConstraint]
     :param _constraint_links: Keeps links between constraints and groups.
@@ -58,6 +66,7 @@ class Teacher(object):
             self.effect_id = line_id
         self.pattern_assistant.add_line(line_id, line_object)
         self._parsers[line_id] = TeacherParser(line_object)
+        #TODO: set default TeacherParser all fields
 
     def remove_line(self, line_id):
         """
@@ -75,6 +84,7 @@ class Teacher(object):
         """
         Loads text pattern proposed by user, verifies if it matches line text.
         """
+        #TODO update TeacherParser: pattern, primary_key, groups
         pass
 
     def make_group(self, line_id, span):
@@ -97,19 +107,24 @@ class Teacher(object):
         """
         Guess text pattern for line text.
         """
-        pass
+        return self.pattern_assistant.guess(line_id)
 
-    def set_pattern_name(self, line_id, name):
-        pass
+    def set_pattern_name(self, line_id, name=None):
+        if name:
+            # TODO: ask config if such a name already exists
+            self._parsers[line_id].pattern_name = name
+        else:
+            # TODO: ask config for unique name
+            self._parsers[line_id].pattern_name = "temporary_name"
 
     def set_converter(self, pattern_group, converter):
         pass
 
     def set_primary_key(self, line_id, group_numbers):
-        pass
+        self._parsers[line_id].primary_keys = group_numbers
 
     def set_log_type(self, line_id, log_type):
-        pass
+        self._parsers[line_id].log_type = log_type
 
     def register_constraint(self, constraint_id, pattern_groups, constraint):
         """
