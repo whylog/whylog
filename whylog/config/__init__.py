@@ -130,8 +130,13 @@ class AbstractFileConfig(AbstractConfig):
         matcher_definitions = self._load_file_with_config(self._log_type_path)
         matchers_factory_dict = {'RegexFilenameMatcher': RegexFilenameMatcherFactory}
         for definition in matcher_definitions:
-            matcher = matchers_factory_dict[definition['matcher_class_name']].from_dao(definition)
-            matchers[definition['log_type_name']].append(matcher)
+            try:
+                matcher = matchers_factory_dict[definition['matcher_class_name']].from_dao(
+                    definition
+                )
+                matchers[definition['log_type_name']].append(matcher)
+            except KeyError as e:
+                raise Exception('This whylog version do not handle ' + str(e) + ' class')
         return dict(
             (log_type_name, LogType(log_type_name, log_type_matchers))
             for log_type_name, log_type_matchers in matchers.items()

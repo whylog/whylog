@@ -10,6 +10,7 @@ from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
+from whylog.tests.utils import ConfigPathFactory
 
 # Constraint types
 identical_constr = "identical"
@@ -106,15 +107,7 @@ class TestBasic(TestCase):
 
         cls.path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
-        cls.config = YamlConfig(*TestBasic.get_path_to_config_files(cls.path_test_files))
-
-    @classmethod
-    def get_path_to_config_files(cls, directories_in_path):
-        path = os.path.join(*directories_in_path)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
-        log_type_path = os.path.join(path, 'log_types.yaml')
-        return [parsers_path, rules_path, log_type_path]
+        cls.config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(cls.path_test_files))
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)

@@ -1,3 +1,4 @@
+import itertools
 import os.path
 from unittest import TestCase
 
@@ -8,6 +9,7 @@ from whylog.config import YamlConfig
 from whylog.front import FrontInput
 from whylog.log_reader import LogReader
 from whylog.tests.tests_log_reader.constants import TestPaths
+from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
@@ -49,11 +51,8 @@ class TestBasic(TestCase):
     def test_one(self, test_name):
         prefix_path = os.path.join(*TestPaths.path_test_files)
         path = os.path.join(prefix_path, test_name)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
         input_path = os.path.join(path, 'input.txt')
         output_path = os.path.join(path, 'expected_output.txt')
-        log_type_path = os.path.join(path, 'log_types.yaml')
         log_file = os.path.join(path, 'node_1.log')
 
         if not test_name == '003_match_time_range':
@@ -64,11 +63,8 @@ class TestBasic(TestCase):
         line_content = self._get_concrete_line_from_file(log_file, line_number)
         effect_line_offset = self._deduce_line_offset(log_file, line_number)
 
-        whylog_config = YamlConfig(
-            parsers_path=parsers_path,
-            rules_path=rules_path,
-            log_type_path=log_type_path,
-        )
+        directories_in_path = itertools.chain(TestPaths.path_test_files, [test_name])
+        whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(directories_in_path))
         log_reader = LogReader(whylog_config)
         line = FrontInput(effect_line_offset, line_content, prefix_path)
 
