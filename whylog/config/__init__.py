@@ -133,11 +133,10 @@ class AbstractFileConfig(AbstractConfig):
         for definition in matcher_definitions:
             matcher_class_name = definition['matcher_class_name']
             factory_class = matchers_factory_dict.get(matcher_class_name)
-            if factory_class is not None:
-                matcher = factory_class.from_dao(definition)
-                matchers[definition['log_type_name']].append(matcher)
-            else:
+            if factory_class is None:
                 raise UnsupportedFilenameMatcher(matcher_class_name)
+            matcher = factory_class.from_dao(definition)
+            matchers[definition['log_type_name']].append(matcher)
         return dict(
             (log_type_name, LogType(log_type_name, log_type_matchers))
             for log_type_name, log_type_matchers in matchers.items()
