@@ -2,7 +2,6 @@ import os.path
 from unittest import TestCase
 
 import yaml
-from nose.plugins.skip import SkipTest
 
 from whylog.assistant.const import AssistantType
 from whylog.config import YamlConfig
@@ -11,6 +10,7 @@ from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
+from whylog.tests.utils import ConfigPathFactory
 
 # Constraint types
 identical_constr = "identical"
@@ -21,8 +21,6 @@ hetero_constr = "hetero"
 to_date = "date"
 to_string = "string"
 to_int = "int"
-
-path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
 
 class TestBasic(TestCase):
@@ -107,6 +105,10 @@ class TestBasic(TestCase):
 
         cls.user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
+        cls.path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
+        prefix_path = os.path.join(*cls.path_test_files)
+        cls.config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(prefix_path))
+
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
 
@@ -114,8 +116,6 @@ class TestBasic(TestCase):
         assert sorted(cause.regex_str for cause in rule._causes) == [self.regex1, self.regex2]
 
     def test_parser_serialization(self):
-        #TODO: modify test if reviewers accept UserParserIntent changes
-        raise SkipTest
         parser1 = RegexParserFactory.create_from_intent(self.parser_intent1)
         parser2 = RegexParserFactory.create_from_intent(self.parser_intent2)
         parser3 = RegexParserFactory.create_from_intent(self.parser_intent3)
@@ -135,16 +135,14 @@ class TestBasic(TestCase):
         assert dumped_parsers_again == dumped_parsers
 
     def test_loading_single_rule_its_parsers(self):
-        #TODO: modify test if reviewers accept UserParserIntent changes
-        raise SkipTest
-        path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
-        log_type_path = os.path.join(path, 'log_types.yaml')
-
-        config = YamlConfig(parsers_path, rules_path, log_type_path)
-        assert len(config._rules) == 1
-        rule = config._rules[0]
+        assert len(self.config._rules) == 1
+        rule = self.config._rules[0]
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
-            parser.name for parser in config._parsers.values()
+            parser.name for parser in self.config._parsers.values()
         )
+
+    def test_loading_log_types(self):
+        assert len(self.config._log_types) == 2
+        assert sorted(self.config._log_types.keys()) == ['apache', 'default']
+        assert len(self.config._log_types['default']._filename_matchers) == 2
+        assert len(self.config._log_types['apache']._filename_matchers) == 1

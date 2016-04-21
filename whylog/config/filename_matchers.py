@@ -22,3 +22,10 @@ class RegexFilenameMatcher(AbstractFilenameMatcher):
     def get_matched_logs(self):
         # TODO: remove mock
         return ['node_1.log']
+
+
+class RegexFilenameMatcherFactory(object):
+    @classmethod
+    def from_dao(cls, serialized):
+        del serialized['matcher_class_name']
+        return RegexFilenameMatcher(**serialized)

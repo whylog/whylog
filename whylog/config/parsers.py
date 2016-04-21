@@ -28,6 +28,16 @@ class AbstractParser(object):
 
 
 class RegexParser(AbstractParser):
+    """
+    Represents regular expression used for searching some data in log file.
+    RegexParser has an unique name. Some groups of regex can be signed as primary.
+    It means that log file which has line matched with this regex is order by values
+    of this group. Every regex belongs for single log type. Convertions in regex has a
+    knowledge about casting regex groups content. At last line content is a sample line
+    which matches with regex. It's used to show how concrete regex works. For example
+    which segments of line are catch by its groups.
+    """
+
     def __init__(self, name, line_content, regex_str, primary_key_groups, log_type, convertions):
         self.name = name
         self.line_content = line_content
