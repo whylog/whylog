@@ -1,4 +1,5 @@
 frozendict
+ordered-set
 python-dateutil
 pyyaml
 regex

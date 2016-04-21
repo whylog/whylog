@@ -1,5 +1,7 @@
+from ordered_set import OrderedSet
 import os.path
 from unittest import TestCase
+
 
 from whylog.config import YamlConfig
 
@@ -30,10 +32,11 @@ class TestBasic(TestCase):
         return proposed_name
 
     def test_simple_proposed_name(self):
-        black_list = set()
+        black_list = OrderedSet()
         assert self.create_proposed_name_request(black_list) == 'connection_error'
         assert self.create_proposed_name_request(black_list) == 'error_occurred'
         assert self.create_proposed_name_request(black_list) == 'occurred_on'
-        black_list = black_list.union(set(['on_host', 'host_name']))
+        black_list.add('on_host')
+        black_list.add('host_name')
         assert self.create_proposed_name_request(black_list) == 'connection_error1'
         assert self.create_proposed_name_request(black_list) == 'connection_error2'
