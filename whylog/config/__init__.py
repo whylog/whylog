@@ -1,13 +1,13 @@
 import os
+import re
+import uuid
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
-from ordered_set import OrderedSet
 
-import re
 import six
-import uuid
 import yaml
+from ordered_set import OrderedSet
 
 from whylog.assistant.exceptions import UnsupportedAssistantError
 from whylog.assistant.regex_assistant import RegexAssistant
@@ -283,7 +283,9 @@ class AbstractConfig(object):
             propsed_name = building_words[i] + '_' + building_words[i + 1]
             if self._is_unique_parser_name(propsed_name, black_list):
                 return propsed_name
-        return self._find_free_by_number_appending(building_words[0] + '_' + building_words[1], black_list)
+        return self._find_free_by_number_appending(
+            building_words[0] + '_' + building_words[1], black_list
+        )
 
     @classmethod
     def _get_building_words(cls, line, regex_str):

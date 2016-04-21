@@ -1,7 +1,7 @@
-from ordered_set import OrderedSet
 import os.path
 from unittest import TestCase
 
+from ordered_set import OrderedSet
 
 from whylog.config import YamlConfig
 
