@@ -4,7 +4,7 @@ from unittest import TestCase
 from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.regex_assistant.regex import (
-    create_date_regex, create_obvious_regex, verify_regex
+    create_date_regex, create_obvious_regex, group_spans_from_regex, verify_regex
 )
 from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
@@ -116,3 +116,23 @@ class TestBasic(TestCase):
 
         fake_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "POST /index.html HTTP/1.0" 200 1043'
         self._verify_regex_fail(regex, fake_line)
+
+    def test_group_spans_from_regex(self):
+        text = r'12:56:23 Error on comp12'
+        regex = r'^(\d\d:\d\d:\d\d) Error on (comp(\d+))$'
+        spans = group_spans_from_regex(regex, text)
+        assert set([(span.start, span.end, span.pattern) for span in spans]) == set(
+            [
+                (0, 8, '\d\d:\d\d:\d\d'), (18, 24, 'comp(\d+)'), (22, 24, '\d+')
+            ]
+        )
+
+    def test_update(self):
+        ra = RegexAssistant()
+        line = "Hello, Whylog guy!"
+        line_id = 1
+        ra.add_line(line_id, FrontInput(0, line, 0))
+        unlikely_regex = r'^Hello, (Whylog (team|guy)!)$'
+        assert not ra.regex_objects[line_id].regex == unlikely_regex
+        ra.update(line_id, unlikely_regex)
+        assert ra.regex_objects[line_id].regex == unlikely_regex

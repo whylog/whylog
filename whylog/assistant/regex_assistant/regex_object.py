@@ -1,4 +1,6 @@
-from whylog.assistant.regex_assistant.regex import create_obvious_regex
+from whylog.assistant.regex_assistant.regex import (
+    create_obvious_regex, group_spans_from_regex, verify_regex
+)
 from whylog.assistant.span_list import SpanList
 
 
@@ -68,9 +70,21 @@ class RegexObject(object):
     def replace_regex(self, new_regex):
         """
         Assigns self.regex to new_regex.
+
+        Throws NotMatchingRegexError if new_regex doesn't match self.line_text
+        If needed, improves new_regex: new_regex = '^' + new_regex + '$' (regex must match whole line)
         Updates self.group_spans so that they correspond to new_regex groups
         """
-        raise NotImplementedError
+
+        verify_regex(new_regex, self.line_text)
+
+        if not new_regex[0] == '^':
+            new_regex = '^' + new_regex
+        if not new_regex[-1] == '$':
+            new_regex += '$'
+
+        self.group_spans = group_spans_from_regex(new_regex, self.line_text)
+        self.regex = new_regex
 
     def verify(self):
         """

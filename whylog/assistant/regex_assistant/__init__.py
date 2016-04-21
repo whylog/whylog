@@ -27,7 +27,7 @@ class RegexAssistant(AbstractAssistant):
         """
         Loads regex proposed by user, verifies match.
         """
-        raise NotImplementedError
+        self.regex_objects[line_id].replace_regex(regex)
 
     def verify(self, line_id):
         """
