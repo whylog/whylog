@@ -32,9 +32,11 @@ class RegexObject(object):
         I.e having line_text of length 50 and group_spans corresponding to intervals: (1, 21), (30, 41),
         returns complementary spans corresponding to intervals (0, 1), (21, 30), (41, 50)
         """
-        compl_intervals = self.group_spans.complementary_intervals(0, len(self.line_text))
-        compl_spans = SpanList.from_ranges(compl_intervals, pattern_creator=create_obvious_regex)
-        return compl_spans
+        return self.group_spans.complementary_spans(
+            0,
+            len(self.line_text),
+            pattern_creator=create_obvious_regex
+        )
 
     def _update_regex(self, force=False):
         """
@@ -43,7 +45,7 @@ class RegexObject(object):
 
         hole_spans = self._hole_spans()
 
-        line_spans = (hole_spans + self.group_spans).sort_by_start()
+        line_spans = (hole_spans + self.group_spans).sort_by_start_and_end()
 
         regex = r""
         for span in line_spans:

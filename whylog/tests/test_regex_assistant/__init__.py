@@ -68,9 +68,9 @@ class TestBasic(TestCase):
     def test_find_spans_by_regex(self):
         regexes = dict((re.compile(regex), regex) for regex in [r"\d+-\d+-\d\d", r"comp\d\d"])
         text = r"2015-12-03 Data migration from comp36 to comp21 failed"
-        spans = _find_spans_by_regex(regexes, text)
+        spans = find_spans_by_regex(regexes, text)
         assert len(spans) == 3
-        spans = SpanList(spans).sort_by_start()
+        spans = SpanList(spans).sort_by_start_and_end()
         groups = [text[s.start:s.end] for s in spans]
         assert groups[0] == '2015-12-03'
         assert groups[1] == 'comp36'
@@ -80,7 +80,7 @@ class TestBasic(TestCase):
         text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         spans = _find_date_spans_by_force(text)
         assert len(spans) == 3
-        spans = SpanList(spans).sort_by_start()
+        spans = SpanList(spans).sort_by_start_and_end()
         dates = [text[s.start:s.end] for s in spans]
         assert dates[0] == '2015-12-03'
         assert dates[1] == '10/Oct/1999'
@@ -93,7 +93,7 @@ class TestBasic(TestCase):
         text = r'2015-12-03 or [10/Oct/1999:21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         spans = find_date_spans(text, date_regexes)
         assert len(spans) == 2
-        spans = spans.sort_by_start()
+        spans = spans.sort_by_start_and_end()
         dates = [text[s.start:s.end] for s in spans]
         assert dates[0] == '2015-12-03'
         assert dates[1] == '10/Oct/1999:21:15:05 +0500'
