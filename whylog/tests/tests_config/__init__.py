@@ -1,3 +1,4 @@
+import os.path
 from unittest import TestCase
 
 import yaml
@@ -105,8 +106,8 @@ class TestBasic(TestCase):
         cls.user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
         cls.path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
-
-        cls.config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(cls.path_test_files))
+        prefix_path = os.path.join(*cls.path_test_files)
+        cls.config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(prefix_path))
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
