@@ -5,6 +5,7 @@ from datetime import datetime
 import six
 import yaml
 
+from whylog.config.exceptions import UnsupportedFilenameMatcher
 from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
@@ -130,13 +131,13 @@ class AbstractFileConfig(AbstractConfig):
         matcher_definitions = self._load_file_with_config(self._log_type_path)
         matchers_factory_dict = {'RegexFilenameMatcher': RegexFilenameMatcherFactory}
         for definition in matcher_definitions:
-            try:
-                matcher = matchers_factory_dict[definition['matcher_class_name']].from_dao(
-                    definition
-                )
-                matchers[definition['log_type_name']].append(matcher)
-            except KeyError as e:
-                raise Exception('This whylog version do not handle ' + str(e) + ' class')
+                matcher_class_name = definition['matcher_class_name']
+                factory_class = matchers_factory_dict.get(matcher_class_name)
+                if factory_class is not None:
+                    matcher = factory_class.from_dao(definition)
+                    matchers[definition['log_type_name']].append(matcher)
+                else:
+                    raise UnsupportedFilenameMatcher(matcher_class_name)
         return dict(
             (log_type_name, LogType(log_type_name, log_type_matchers))
             for log_type_name, log_type_matchers in matchers.items()
