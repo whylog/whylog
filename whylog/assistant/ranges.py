@@ -2,6 +2,7 @@
 Methods on ranges (intervals)
 """
 
+
 def complementary_ranges(ranges, start_index, end_index):
     ranges_union = _ranges_union(ranges)
     complement_ranges = []

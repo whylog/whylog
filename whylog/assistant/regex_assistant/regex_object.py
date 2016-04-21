@@ -1,5 +1,5 @@
 from whylog.assistant.regex_assistant.regex import (
-    create_obvious_regex, group_spans_from_regex, verify_regex
+    create_obvious_regex, group_spans_from_regex, regex_from_group_spans, verify_regex
 )
 from whylog.assistant.span_list import SpanList
 
@@ -25,46 +25,20 @@ class RegexObject(object):
         self.group_spans = SpanList()
         self.regex = self._update_regex()
 
-    def _hole_spans(self):
-        """
-        Returns spans between group_spans in line_text
-
-        I.e having line_text of length 50 and group_spans corresponding to intervals: (1, 21), (30, 41),
-        returns complementary spans corresponding to intervals (0, 1), (21, 30), (41, 50)
-        """
-        return self.group_spans.complementary_spans(
-            0,
-            len(self.line_text),
-            pattern_creator=create_obvious_regex
-        )
-
-    def _update_regex(self, force=False):
+    def _update_regex(self):
         """
         Builds regex from spans
         """
-
-        hole_spans = self._hole_spans()
-
-        line_spans = (hole_spans + self.group_spans).sort_by_start_and_end()
-
-        regex = r""
-        for span in line_spans:
-            span.update_pattern(self.line_text, force)
-            span_pattern = span.pattern
-            if span.is_param:
-                span_pattern = "(" + span_pattern + ")"
-            regex += span_pattern
-        regex = "^" + regex + "$"
-        return regex
+        return regex_from_group_spans(self.group_spans, self.line_text)
 
     def update_forcefully(self, new_spans):
         """
         Completely replaces group_spans to new_spans, updates regex
         :param new_spans: non-overlapping spans (if they overlaps error will be raised)
         """
-        new_spans.overlapping_check()
+        # TODO: check if new_spans don't intersect
         self.group_spans = new_spans
-        self.regex = self._update_regex()
+        self.regex = regex_from_group_spans(self.group_spans, self.line_text)
 
     def update(self, spans_to_add, spans_to_remove):
         raise NotImplementedError

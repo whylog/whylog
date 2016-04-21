@@ -7,6 +7,7 @@ from collections import deque
 
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.span import Span
+from whylog.assistant.span_list import SpanList
 
 special_characters = frozenset('.^$*+{}?[]|()]')
 group_pattern = re.compile(r"[a-zA-Z]+|[0-9]+|\s+|[\W]+")
@@ -47,8 +48,29 @@ def group_spans_from_regex(regex, text):
             pattern=group_regex
         ) for (start, end), group_regex in zip(group_ranges_in_text, group_regexes)
     ]
+    #TODO: sort by start, end
+    return SpanList(group_spans)
 
-    return group_spans
+
+def regex_from_group_spans(group_spans, line_text):
+    sorted_group_spans = group_spans.sort_by_start_and_end()
+    # TODO:
+    # [(1,5), (2, 3)] -> [(1,5)]
+    # [(1,5), (3, 7)] -> Error somewhere
+    bigger_group_spans = SpanList.not_overlapping_spans(sorted_group_spans)
+    complement_spans = bigger_group_spans.complementary_spans(0, len(line_text),
+                                                              create_obvious_regex)
+    line_spans = (complement_spans + bigger_group_spans).sort_by_start_and_end()
+
+    regex = r""
+    for span in line_spans:
+        span.update_pattern(line_text)
+        span_pattern = span.pattern
+        if span.is_param:
+            span_pattern = "(" + span_pattern + ")"
+        regex += span_pattern
+    regex = "^" + regex + "$"
+    return regex
 
 
 def verify_regex(regex, text):

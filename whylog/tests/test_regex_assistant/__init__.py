@@ -4,7 +4,8 @@ from unittest import TestCase
 from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.regex_assistant.regex import (
-    create_date_regex, create_obvious_regex, group_spans_from_regex, verify_regex
+    create_date_regex, create_obvious_regex, group_spans_from_regex, regex_from_group_spans,
+    verify_regex
 )
 from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
@@ -136,3 +137,10 @@ class TestBasic(TestCase):
         assert not ra.regex_objects[line_id].regex == unlikely_regex
         ra.update(line_id, unlikely_regex)
         assert ra.regex_objects[line_id].regex == unlikely_regex
+
+    def text_regex_from_group_spans(self):
+        text = r'Error on comp21'
+        regex = r'^Error on (comp(\d\d))$'
+        group_spans = group_spans_from_regex(regex, text)
+        regex_from_groups = regex_from_group_spans(group_spans, text)
+        assert regex == regex_from_groups
