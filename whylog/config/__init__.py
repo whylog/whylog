@@ -2,6 +2,7 @@ import os
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
+from ordered_set import OrderedSet
 
 import re
 import six
@@ -126,6 +127,7 @@ class AbstractConfig(object):
                 self._parsers
             )
         )
+        self._parsers_name = self._get_parsers_name()
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
 
@@ -148,14 +150,21 @@ class AbstractConfig(object):
             grouped_parsers[parser.log_type].append(parser)
         return grouped_parsers
 
+    def _get_parsers_name(self):
+        parsers_name = OrderedSet()
+        for parser in self._parsers:
+            parsers_name.add(parser)
+        return parsers_name
+
     def add_rule(self, user_rule_intent):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
         self._save_rule_definition(created_rule.serialize())
-        created_parsers = created_rule.get_new_parsers(self._parsers)
+        created_parsers = created_rule.get_new_parsers(self._parsers_name)
         self._save_parsers_definition(parser.serialize() for parser in created_parsers)
         self._rules[created_rule.get_effect_name()].append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
+            self._parsers_name.add(parser.name)
 
     def add_log_type(self, log_type):
         # TODO Can assume that exists only one LogType object for one log type name
