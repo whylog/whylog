@@ -101,13 +101,14 @@ class Teacher(object):
     def set_pattern_name(self, line_id, name=None):
         if name:
             # TODO: ask config if such a name already exists
+            # TODO: blacklist
             self._parsers[line_id].pattern_name = name
         else:
             # TODO: ask config for unique name
             self._parsers[line_id].pattern_name = "temporary_name"
 
     def set_converter(self, pattern_group, converter):
-        pass
+        self.pattern_assistant.set_converter(pattern_group.line_id, pattern_group.number, converter)
 
     def set_primary_key(self, line_id, group_numbers):
         self._parsers[line_id].primary_keys = group_numbers
