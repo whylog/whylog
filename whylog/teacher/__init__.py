@@ -2,13 +2,11 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.mock_outputs import create_sample_rule
-from whylog.teacher.user_intent import LineParamGroup
 
 
 class PatternGroup(object):
     """
     Keeps "coordinates" of group that represents param in text
-
     :param line_id: id of line to which group belongs.
     :param number: number of group in line.
                    Groups don't overlap. Numeration from left, from 1.
@@ -20,21 +18,13 @@ class PatternGroup(object):
 
 
 class TeacherParser(object):
-    """
-    :type groups: list[LineParamGroup]
-    """
-
     def __init__(self, line_object):
         self.line = line_object
-        self.pattern_name = None
-        self.log_type = None
-        self.primary_keys = []
 
 
 class Teacher(object):
     """
     Enable teaching new rule. One Teacher per one entering rule.
-
     :type pattern_assistant: AbstractAssistant
     :type _parsers: dict[int, TeacherParser]
     :type _constraint_base: dict[int, AbstractConstraint]
@@ -56,10 +46,8 @@ class Teacher(object):
     def add_line(self, line_id, line_object, effect=False):
         """
         Adds new line to rule.
-
         If line_id already exists, old line is overwritten by new line
         and all constraints related to old line are removed.
-
         """
         if line_id in six.iterkeys(self._parsers):
             self.remove_line(line_id)
@@ -67,12 +55,10 @@ class Teacher(object):
             self.effect_id = line_id
         self.pattern_assistant.add_line(line_id, line_object)
         self._parsers[line_id] = TeacherParser(line_object)
-        #TODO: set default TeacherParser all fields
 
     def remove_line(self, line_id):
         """
         Removes line from rule.
-
         Assumption: line with line_id exists in rule.
         Removes also all constraints related to this line.
         """
@@ -85,7 +71,6 @@ class Teacher(object):
         """
         Loads text pattern proposed by user, verifies if it matches line text.
         """
-        #TODO update TeacherParser: pattern_name?, primary_key, groups
         self.pattern_assistant.update_by_pattern(line_id, pattern)
 
     def guess_pattern(self, line_id):
@@ -98,31 +83,23 @@ class Teacher(object):
     def choose_guessed_pattern(self, line_id, pattern_id):
         self.pattern_assistant.update_by_guessed_pattern_object(line_id, pattern_id)
 
-    def set_pattern_name(self, line_id, name=None):
-        if name:
-            # TODO: ask config if such a name already exists
-            # TODO: blacklist
-            self._parsers[line_id].pattern_name = name
-        else:
-            # TODO: ask config for unique name
-            self._parsers[line_id].pattern_name = "temporary_name"
+    def set_pattern_name(self, line_id, name):
+        pass
 
     def set_converter(self, pattern_group, converter):
-        self.pattern_assistant.set_converter(pattern_group.line_id, pattern_group.number, converter)
+        pass
 
     def set_primary_key(self, line_id, group_numbers):
-        self._parsers[line_id].primary_keys = group_numbers
+        pass
 
     def set_log_type(self, line_id, log_type):
-        self._parsers[line_id].log_type = log_type
+        pass
 
     def register_constraint(self, constraint_id, pattern_groups, constraint):
         """
         Adds new constraint to rule.
-
         If constraint_id already exists, constraint with this constraint_id
         is overwritten by new constraint
-
         :param pattern_groups: groups in pattern that are linked by constraint
         :type pattern_groups: list[PatternGroup]
         """
@@ -132,13 +109,12 @@ class Teacher(object):
         self._constraint_base[constraint_id] = constraint
         new_constraint_links = [
             (group.line_id, group.number, constraint_id) for group in pattern_groups
-        ]
+            ]
         self._constraint_links.add_links(new_constraint_links)
 
     def remove_constraint(self, constraint_id):
         """
         Removes constraint from rule.
-
         Assumption: Constraint already exists in rule.
         """
         self._constraint_links.remove_links_by_constraint(constraint_id)
@@ -168,7 +144,6 @@ class Teacher(object):
     def make_group(self, line_id, span):
         """
         Improves text pattern by adding group corresponding to param in text.
-
         Removes (or maybe updates) constraints related to groups in line with line_id
         """
         pass
@@ -176,7 +151,6 @@ class Teacher(object):
     def remove_group(self, pattern_group):
         """
         Improves text pattern by removing group corresponding to param in text.
-
         Removes (or maybe updates) constraints related to groups in line with line_id
         """
         pass
@@ -198,12 +172,12 @@ class Teacher(object):
         """
         Creates rule for Front that will be shown to user
         """
-        #TODO: remove mock
+        # TODO: remove mock
         return create_sample_rule()
 
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
-        #TODO: remove mock
+        # TODO: remove mock
         self.config.add_rule(create_sample_rule())
