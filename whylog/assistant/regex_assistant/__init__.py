@@ -22,11 +22,22 @@ class RegexAssistant(AbstractAssistant):
     def remove_line(self, line_id):
         del self.regex_objects[line_id]
 
-    def update(self, line_id, regex):
-        """
-        Loads regex proposed by user, verifies match.
-        """
-        self.regex_objects[line_id].update_by_regex(regex)
+    def get_pattern_object(self, line_id):
+        regex_object = self.regex_objects[line_id]
+        return regex_object.convert_to_pattern_object()
+
+    def update_by_pattern(self, line_id, pattern):
+        self.regex_objects[line_id].update_by_regex(pattern)
+
+    def update_by_guessed_pattern_object(self, line_id, regex_id):
+        self.regex_objects[line_id].update_by_guessed_regex(regex_id)
+
+    def guess_pattern_objects(self, line_id):
+        regex_object = self.regex_objects[line_id]
+        return regex_object.guessed_regex_objects
+
+    def set_converter(self, line_id, group_no, converter):
+        self.regex_objects[line_id].set_converter(group_no, converter)
 
     def verify(self, line_id):
         """
@@ -52,6 +63,3 @@ class RegexAssistant(AbstractAssistant):
         """
         raise NotImplementedError
 
-    def guess(self, line_id):
-        regex_object = self.regex_objects[line_id]
-        return regex_object.guessed_regex_objects

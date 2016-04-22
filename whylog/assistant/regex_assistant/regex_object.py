@@ -1,7 +1,7 @@
 from whylog.assistant.regex_assistant.guessing import guess_regex_objects
 from whylog.assistant.regex_assistant.regex import create_obvious_regex, verify_regex
 from whylog.assistant.const import DataType
-from whylog.assistant.pattern_object import ParamGroup
+from whylog.assistant.pattern_object import ParamGroup, PatternObject
 
 
 class RegexObject(object):
@@ -28,6 +28,9 @@ class RegexObject(object):
 
         self.guessed_regex_objects = dict()
         self._guess_regexes()
+
+    def convert_to_pattern_object(self):
+        return PatternObject(self.line_text, self.regex, self.param_groups)
 
     def update_by_regex(self, new_regex):
         """

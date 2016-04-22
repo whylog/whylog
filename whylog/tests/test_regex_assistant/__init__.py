@@ -105,7 +105,7 @@ class TestBasic(TestCase):
         line_id = 1
         ra = RegexAssistant()
         ra.add_line(line_id, front_input)
-        pattern_objects = ra.guess(line_id)
+        pattern_objects = ra.guess_pattern_objects(line_id)
         assert pattern_objects
         guessed_regexes = [pattern_object.pattern for pattern_object in pattern_objects.values()]
         for guessed_regex in guessed_regexes:
@@ -128,7 +128,7 @@ class TestBasic(TestCase):
         ra.add_line(line_id, FrontInput(0, line, 0))
         unlikely_regex = r'^Hello, (Whylog (team|guy)!)$'
         assert not ra.regex_objects[line_id].regex == unlikely_regex
-        ra.update(line_id, unlikely_regex)
+        ra.update_by_pattern(line_id, unlikely_regex)
         assert ra.regex_objects[line_id].regex == unlikely_regex
 
     def test_regex_from_group_spans(self):

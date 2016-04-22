@@ -108,7 +108,7 @@ class Teacher(object):
         """
         Guess text pattern for line text.
         """
-        return self.pattern_assistant.guess(line_id)
+        return self.pattern_assistant.guess_pattern_objects(line_id)
 
     def set_pattern_name(self, line_id, name=None):
         if name:
