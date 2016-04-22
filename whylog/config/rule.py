@@ -27,7 +27,7 @@ class Rule(object):
         return new_parsers
 
     def get_causes_parsers(self):
-        return (parser for parser in self._causes)
+        return self._causes
 
 
 @six.add_metaclass(ABCMeta)

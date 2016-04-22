@@ -8,6 +8,13 @@ regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss 
 line_content: "2016-04-12 23:54:43 Data is missing at comp2. Loss = 150 GB. Host name: host2"
 ---
 convertions: {1: date}
+log_type: filesystem
+name: lostdatadate
+primary_key_groups: [1]
+regex_str: '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at .*$'
+line_content: "2016-04-12 23:54:43 Data is missing at comp2. Loss = 150 GB. Host name: host2"
+---
+convertions: {1: date}
 log_type: hydra
 name: connectionerror
 primary_key_groups: [1]

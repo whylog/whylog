@@ -4,8 +4,9 @@ from unittest import TestCase
 
 from whylog.config import YamlConfig
 from whylog.front import FrontInput
+from whylog.tests.utils import ConfigPathFactory
 
-path_test_files = ['whylog', 'tests', 'tests_config', 'test_files', 'test_investigation_plan_files']
+path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
 
 class TestBasic(TestCase):
@@ -16,18 +17,14 @@ class TestBasic(TestCase):
         cls.data_migration_line = "2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2"
 
         path = os.path.join(*path_test_files)
-        cls.parsers_path = os.path.join(path, 'parsers.yaml')
-        cls.multiple_parsers_path = os.path.join(path, 'multiple_match_parsers.yaml')
-        cls.rules_path = os.path.join(path, 'rules.yaml')
-        cls.log_type_path = os.path.join(path, 'log_types.yaml')
-        cls.multiple_rules_path = os.path.join(path, 'multiple_rules.yaml')
+        multiple_path = os.path.join(path, 'test_investigation_plan_files')
+        parsers_path, rules_path, log_types_path = ConfigPathFactory.get_path_to_config_files(path)
+        multiple_parsers_path, multiple_rules_path, _ = ConfigPathFactory.get_path_to_config_files(multiple_path)
 
-        cls.simple_config = YamlConfig(cls.parsers_path, cls.rules_path, cls.log_type_path)
-        cls.multiple_parsers_config = YamlConfig(
-            cls.multiple_parsers_path, cls.rules_path, cls.log_type_path
-        )
+        cls.simple_config = YamlConfig(parsers_path, rules_path, log_types_path)
+        cls.multiple_parsers_config = YamlConfig(multiple_parsers_path, rules_path, log_types_path)
         cls.complexed_config = YamlConfig(
-            cls.multiple_parsers_path, cls.multiple_rules_path, cls.log_type_path
+            multiple_parsers_path, multiple_rules_path, log_types_path
         )
 
     @classmethod
