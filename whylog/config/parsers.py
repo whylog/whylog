@@ -3,6 +3,9 @@ from abc import ABCMeta, abstractmethod
 import six
 from frozendict import frozendict
 
+from whylog.converters import DateConverter, IntConverter
+from whylog.converters.exceptions import UnsupportedConverter
+
 IMPORTED_RE = False
 
 try:
@@ -62,6 +65,19 @@ class RegexParser(AbstractParser):
             "line_content": self.line_content
         }
 
+    def convert_params(self, params):
+        converted_params = []
+        convertions_dict = {'date': DateConverter, 'int': IntConverter}
+        for i in range(len(params)):
+            group_type = self.convertions.get(i + 1)
+            if group_type is not None:
+                converter = convertions_dict.get(group_type)
+                if converter is None:
+                    raise UnsupportedConverter(group_type)
+                converted_params.append(converter.convert(params[i]))
+            else:
+                converted_params.append(params[i])
+        return tuple(converted_params)
 
 @six.add_metaclass(ABCMeta)
 class AbstractParserFactory(object):
@@ -113,6 +129,7 @@ class ConcatenatedRegexParser(AbstractParserSubset):
 
     def __init__(self, parser_list):
         self._parsers = parser_list
+        self._parsers_dict = dict((parser.name, parser) for parser in self._parsers)
         if IMPORTED_RE:
             return
         forward, backward = self._create_concatenated_regexes()
@@ -161,6 +178,13 @@ class ConcatenatedRegexParser(AbstractParserSubset):
         for name, indexes in parsers_indexes.items():
             index_to_regex[indexes[0]] = name
         return index_to_regex
+
+    def get_clues_from_matched_line(self, line):
+        params_dict = self.get_extracted_parsers_params(line)
+        converted_params = {}
+        for parser_name, parser in params_dict.items():
+            converted_params[parser_name] = self._parsers_dict[parser_name].convert_params(parser)
+        return converted_params
 
     def get_extracted_parsers_params(self, line):
         """
@@ -262,3 +286,4 @@ class ConcatenatedRegexParser(AbstractParserSubset):
             match = self._parsers[i].get_regex_params(line)
             if match is not None:
                 extracted_regex_params[self._parsers[i].name] = match
+

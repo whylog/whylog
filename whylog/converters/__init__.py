@@ -19,7 +19,7 @@ class IntConverter(AbstractConverter):
         return int(pattern_group)
 
 
-# Simple date convertion replace for concreate
+# Simple date convertion will replace for concreate date format converter in the future
 class DateConverter(AbstractConverter):
     @classmethod
     @abstractmethod
