@@ -73,9 +73,9 @@ class AbstractConfig(object):
         concatenated_parsers = self._create_concatenated_parsers_for_investigation(suspected_rules)
         #TODO: creating clues base on effect_params
         #TODO: remove mocks
+        line_source = LineSource('localhost', 'node_1.log')
         effect_time = datetime(2015, 12, 3, 12, 8, 9)
-        line_source = LineSource('localhost', 'node_1.log', 40)
-        effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
+        effect_clues = {'effect': Clue((effect_time,), 'node_1.log', 40, line_source)}
         steps = self._create_steps_in_investigation(
             concatenated_parsers, suspected_rules, effect_clues
         )

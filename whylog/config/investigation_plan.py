@@ -45,17 +45,13 @@ class InvestigationStep(object):
             return date.replace(tzinfo=dateutil.tz.tzutc())
         return date
 
-    # mocked Clue for second line in node_1.log for 003 test
-    # TODO: remove mock
-    def mocked_clues(self):
-        line_source = LineSource('localhost', 'node_1.log', 40)
-        line_time = datetime(2015, 12, 3, 12, 8, 8)
-        regex_parameters = (line_time,)
-        return {'cause': Clue(regex_parameters, '2015-12-03 12:08:08 root cause', line_source),}
-
-    def get_clues(self, line, offset):
-        # TODO: remove mock
-        return self.mocked_clues()
+    def get_clues(self, line, offset, line_source=None):
+        line_source = LineSource('localhost', 'node_1.log')
+        converted_params = self._parser_subset.get_clues_from_matched_line(line)
+        return dict(
+            (parser_name, Clue(converted_groups, line, offset, line_source))
+            for parser_name, converted_groups in converted_params.items()
+        )
 
 
 class Clue(object):
@@ -64,9 +60,10 @@ class Clue(object):
     Also, contains parsed line and its source.
     """
 
-    def __init__(self, regex_parameters, line_prefix_content, line_source):
+    def __init__(self, regex_parameters, line_prefix_content, line_offset, line_source):
         self.regex_parameters = regex_parameters
         self.line_prefix_content = line_prefix_content
+        self.line_offset = line_offset
         self.line_source = line_source
 
     def __repr__(self):
@@ -76,10 +73,9 @@ class Clue(object):
 
 
 class LineSource(object):
-    def __init__(self, host, path, offset):
+    def __init__(self, host, path):
         self.host = host
         self.path = path
-        self.offset = offset
 
     def __repr__(self):
-        return "(LineSource: %s:%s:%s)" % (self.host, self.path, self.offset)
+        return "(LineSource: %s:%s)" % (self.host, self.path)
