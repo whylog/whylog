@@ -1,8 +1,6 @@
 import os.path
 from unittest import TestCase
 
-from ordered_set import OrderedSet
-
 from whylog.config import YamlConfig
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
@@ -24,8 +22,8 @@ class TestBasic(TestCase):
         cls.config = YamlConfig(parsers_path, rules_path, log_type_path)
 
     def test_is_free_parser_name(self):
-        #This names aren't free because come from parsers.yaml file
-        black_list = OrderedSet()
+        #These names aren't free because come from parsers.yaml file
+        black_list = set()
         assert not self.config.is_free_parser_name('lostdata', black_list)
         assert not self.config.is_free_parser_name('connectionerror', black_list)
         assert not self.config.is_free_parser_name('datamigration', black_list)
@@ -36,7 +34,7 @@ class TestBasic(TestCase):
         return proposed_name
 
     def test_simple_proposed_name(self):
-        black_list = OrderedSet()
+        black_list = set()
         assert self._create_proposed_name_request(
             self.sample_line1, self.regex1, black_list
         ) == 'connection_error'
@@ -48,7 +46,7 @@ class TestBasic(TestCase):
         ) == 'connection_error2'
 
     def test_empty_building_words(self):
-        black_list = OrderedSet()
+        black_list = set()
         assert self._create_proposed_name_request(
             self.sample_line2, self.regex2, black_list
         ) == 'parser_name1'
