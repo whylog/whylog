@@ -49,8 +49,15 @@ class RegexObject(object):
             new_regex += '$'
 
         default_converter = DataType.STRING
-        self.param_groups = dict([(key + 1, ParamGroup(content, default_converter))
-                                  for key, content in zip(range(len(groups)), groups)])
+        self.param_groups = dict(
+            [
+                (
+                    key + 1, ParamGroup(content, default_converter)
+                ) for key, content in zip(
+                    range(len(groups)), groups
+                )
+            ]
+        )
         self.regex = new_regex
 
     def update_by_regex_object(self, regex_object):
@@ -64,9 +71,11 @@ class RegexObject(object):
         guessed_objects = guess_regex_objects(self.line_text)
         guessed_dict = dict(
             [
-                (key, regex_object)
-                for key, regex_object in zip(
-                    range(len(guessed_objects)), guessed_objects)
+                (
+                    key, regex_object
+                ) for key, regex_object in zip(
+                    range(len(guessed_objects)), guessed_objects
+                )
             ]
         )
         self.guessed_regex_objects = guessed_dict

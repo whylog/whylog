@@ -9,5 +9,3 @@ class PatternObject(object):
         self.line_text = line_text
         self.pattern = pattern
         self.param_groups = param_groups
-
-

@@ -62,4 +62,3 @@ class RegexAssistant(AbstractAssistant):
         :param groups: pairs (line_id, group_id)
         """
         raise NotImplementedError
-
