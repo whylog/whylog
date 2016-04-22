@@ -12,6 +12,7 @@ class TestBasic(TestCase):
         cls.parser_name = 'commited_transaction'
         cls.simple_pattern = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Commited transaction number (.*)\. Host name: (.*)$"
         cls.simple_line = "2015-12-03 12:10:10 Commited transaction number 2100. Host name: postgres_db"
+        cls.dummy_line = "dummy line"
 
     def test_simple_convertion(self):
         convertions = {1: 'date', 2: 'int', 3: 'string'}
@@ -20,6 +21,7 @@ class TestBasic(TestCase):
         assert concatenated.get_clues_from_matched_line(self.simple_line) == {
             'commited_transaction': (datetime(2015, 12, 3, 12, 10, 10), 2100, 'postgres_db')
         }
+        assert concatenated.get_clues_from_matched_line(self.dummy_line) == {}
 
     def test_unsupported_converter(self):
         convertions = {1: 'date', 2: 'int', 3: 'unsupported_type'}

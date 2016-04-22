@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import dateutil.parser
+from frozendict import frozendict
 
 import six
 
@@ -32,3 +33,18 @@ class DateConverter(AbstractConverter):
     @abstractmethod
     def convert(cls, pattern_group):
         return dateutil.parser.parse(pattern_group, fuzzy=True)
+
+STRING = 'string'
+CONVERTION_MAPPING = frozendict({'date': DateConverter, 'int': IntConverter, 'float': FloatConverter})
+
+
+
+
+
+
+
+
+
+
+
+
