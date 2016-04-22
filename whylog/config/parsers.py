@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 import six
 from frozendict import frozendict
 
-from whylog.converters import CONVERTION_MAPPING, DateConverter, IntConverter, FloatConverter, STRING
+from whylog.converters import CONVERTION_MAPPING, STRING
 from whylog.converters.exceptions import UnsupportedConverter
 
 IMPORTED_RE = False
