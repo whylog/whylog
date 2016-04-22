@@ -19,10 +19,10 @@ class Rule(object):
             "constraints": self._constraints,
         }
 
-    def get_new_parsers(self, old_parsers):
+    def get_new_parsers(self, parser_name_generator):
         new_parsers = []
         for parser in itertools.chain([self._effect], self._causes):
-            if parser.name not in old_parsers:
+            if parser_name_generator.is_free_parser_name(parser.name):
                 new_parsers.append(parser)
         return new_parsers
 

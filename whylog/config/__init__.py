@@ -4,10 +4,10 @@ import uuid
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
+from ordered_set import OrderedSet
 
 import six
 import yaml
-from ordered_set import OrderedSet
 
 from whylog.assistant.exceptions import UnsupportedAssistantError
 from whylog.assistant.regex_assistant import RegexAssistant
@@ -17,6 +17,9 @@ from whylog.config.investigation_plan import Clue, InvestigationPlan, Investigat
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
+from whylog.config.parser_name_manager import ParserNameManager
+from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
+from whylog.config.rule import RegexRuleFactory, Rule
 
 
 class AbstractConfigFactory(object):
@@ -128,6 +131,7 @@ class AbstractConfig(object):
             )
         )
         self._parsers_name = self._get_parsers_name()
+        self._parser_name_generator = ParserNameManager(self._parsers)
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
 
@@ -159,12 +163,12 @@ class AbstractConfig(object):
     def add_rule(self, user_rule_intent):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
         self._save_rule_definition(created_rule.serialize())
-        created_parsers = created_rule.get_new_parsers(self._parsers_name)
+        created_parsers = created_rule.get_new_parsers(self._parser_name_generator)
         self._save_parsers_definition(parser.serialize() for parser in created_parsers)
         self._rules[created_rule.get_effect_name()].append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
-            self._parsers_name.add(parser.name)
+            self._parser_name_generator.add_new_parser_name(parser.name)
 
     def add_log_type(self, log_type):
         # TODO Can assume that exists only one LogType object for one log type name
@@ -265,44 +269,10 @@ class AbstractConfig(object):
         return steps
 
     def is_free_parser_name(self, parser_name):
-        return parser_name not in self._parsers
-
-    def _is_unique_parser_name(self, parser_name, black_list):
-        return self.is_free_parser_name(parser_name) and (parser_name not in black_list)
+        return self._parser_name_generator.is_free_parser_name(parser_name)
 
     def propose_parser_name(self, line, regex_str, black_list):
-        building_words = AbstractConfig._get_building_words(line, regex_str)
-        if not building_words:
-            return uuid.uuid4()
-        if len(building_words) == 1:
-            if self._is_unique_parser_name(building_words[0], black_list):
-                return building_words[0]
-            else:
-                return self._find_free_by_number_appending(building_words[0], black_list)
-        for i in range(len(building_words) - 1):
-            propsed_name = building_words[i] + '_' + building_words[i + 1]
-            if self._is_unique_parser_name(propsed_name, black_list):
-                return propsed_name
-        return self._find_free_by_number_appending(
-            building_words[0] + '_' + building_words[1], black_list
-        )
-
-    @classmethod
-    def _get_building_words(cls, line, regex_str):
-        regex = re.compile(regex_str)
-        matched = regex.match(line)
-        if matched is not None:
-            groups = matched.groups()
-            for i in six.moves.range(len(groups)):
-                line = line.replace(groups[i], '')
-        line = re.sub('[,.;:]', '', line)
-        return [word.lower() for word in line.split()]
-
-    def _find_free_by_number_appending(self, word, black_list):
-        for i in six.moves.range(len(black_list) + 1):
-            propsed_name = word + str(i + 1)
-            if self._is_unique_parser_name(propsed_name, black_list):
-                return propsed_name
+        return self._parser_name_generator.propose_parser_name(line, regex_str, black_list)
 
 
 @six.add_metaclass(ABCMeta)
