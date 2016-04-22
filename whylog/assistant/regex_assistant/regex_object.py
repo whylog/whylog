@@ -1,7 +1,7 @@
-from whylog.assistant.regex_assistant.regex import (
-    create_obvious_regex, group_spans_from_regex, regex_from_group_spans, verify_regex
-)
-from whylog.assistant.span_list import SpanList
+from whylog.assistant.regex_assistant.guessing import guess_regex_objects
+from whylog.assistant.regex_assistant.regex import create_obvious_regex, verify_regex
+from whylog.assistant.const import DataType
+from whylog.assistant.pattern_object import ParamGroup
 
 
 class RegexObject(object):
@@ -10,40 +10,26 @@ class RegexObject(object):
     Supports interactive updates like adding/removing groups to regex, replacing regex
     Keeps own data integrity - especially consistency between regex and groups (group_spans).
     Verifies updates.
-    Not responsible for guessing where are groups in regex
     """
 
     def __init__(self, line_object):
+        #TODO: update comment
         """
-        :param FrontInput line_object: object that represents line
+        :param line_object: object that represents line
         :param line_text: line text (raw string)
         :param regex: regex corresponding to line_text
-        :param [Span] group_spans: represents regex groups, not overlapping each other
+        :param groups: represents regex groups
         """
-        self.line = line_object
         self.line_text = line_object.line_content
-        self.group_spans = SpanList()
-        self.regex = self._update_regex()
+        self.param_groups = dict()
 
-    def _update_regex(self):
-        """
-        Builds regex from spans
-        """
-        return regex_from_group_spans(self.group_spans, self.line_text)
+        self.regex = None
+        self.update_by_regex(create_obvious_regex(self.line_text))
 
-    def update_forcefully(self, new_spans):
-        """
-        Completely replaces group_spans to new_spans, updates regex
-        :param new_spans: non-overlapping spans (if they overlaps error will be raised)
-        """
-        # TODO: check if new_spans don't intersect
-        self.group_spans = new_spans
-        self.regex = regex_from_group_spans(self.group_spans, self.line_text)
+        self.guessed_regex_objects = dict()
+        self._guess_regexes()
 
-    def update(self, spans_to_add, spans_to_remove):
-        raise NotImplementedError
-
-    def replace_regex(self, new_regex):
+    def update_by_regex(self, new_regex):
         """
         Assigns self.regex to new_regex.
 
@@ -52,15 +38,21 @@ class RegexObject(object):
         Updates self.group_spans so that they correspond to new_regex groups
         """
 
-        verify_regex(new_regex, self.line_text)
+        groups = verify_regex(new_regex, self.line_text)
 
         if not new_regex[0] == '^':
             new_regex = '^' + new_regex
         if not new_regex[-1] == '$':
             new_regex += '$'
 
-        self.group_spans = group_spans_from_regex(new_regex, self.line_text)
+        default_converter = DataType.STRING
+        self.param_groups = dict([(key + 1, ParamGroup(content, default_converter))
+                                  for key, content in zip(range(len(groups)), groups)])
         self.regex = new_regex
+
+    def update_by_regex_object(self, regex_object):
+        self.regex = regex_object.pattern
+        self.param_groups = regex_object.param_groups
 
     def verify(self):
         """

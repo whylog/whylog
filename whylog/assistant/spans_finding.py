@@ -34,7 +34,7 @@ def find_date_spans(text, regexes=None):
 
 
 def _find_date_spans_by_regex(regexes, text):
-    return _find_spans_by_regex(
+    return find_spans_by_regex(
         regexes,
         text,
         pattern_creator=create_date_regex,
@@ -72,7 +72,7 @@ def _find_date_spans_by_force(text):
     return date_spans
 
 
-def _find_spans_by_regex(regexes, text, pattern_creator=None, converter=DataType.STRING):
+def find_spans_by_regex(regexes, text, pattern_creator=None, converter=DataType.STRING):
     spans = set()
     for compiled_regex, regex in six.iteritems(regexes):
         for match in re.finditer(compiled_regex, text):

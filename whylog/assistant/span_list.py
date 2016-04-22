@@ -41,7 +41,6 @@ class SpanList(list):
                 ) for start, end in ranges_list
             ]
         )  # yapf: disable
-        cls.overlapping_check(spans)
         return spans
 
     @classmethod

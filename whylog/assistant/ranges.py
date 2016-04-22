@@ -9,7 +9,7 @@ def complementary_ranges(ranges, start_index, end_index):
 
     # edge cases
     if not ranges:
-        return []
+        return [(start_index, end_index)]
     first_start, _ = ranges_union[0]
     if start_index < first_start:
         complement_ranges.append((start_index, first_start))

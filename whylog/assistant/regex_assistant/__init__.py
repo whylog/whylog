@@ -1,7 +1,6 @@
 from whylog.assistant import AbstractAssistant
-from whylog.assistant.regex_assistant.regex import create_obvious_regex
+from whylog.assistant.regex_assistant.regex import create_obvious_regex, regex_from_group_spans
 from whylog.assistant.regex_assistant.regex_object import RegexObject
-from whylog.assistant.spans_finding import find_date_spans
 
 
 class RegexAssistant(AbstractAssistant):
@@ -27,7 +26,7 @@ class RegexAssistant(AbstractAssistant):
         """
         Loads regex proposed by user, verifies match.
         """
-        self.regex_objects[line_id].replace_regex(regex)
+        self.regex_objects[line_id].update_by_regex(regex)
 
     def verify(self, line_id):
         """

@@ -23,6 +23,7 @@ class TeacherParser(object):
     """
     :type groups: list[LineParamGroup]
     """
+
     def __init__(self, line_object):
         self.line = line_object
         self.pattern_name = None

@@ -9,7 +9,7 @@ from whylog.assistant.regex_assistant.regex import (
 )
 from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
-    _find_date_spans_by_force, _find_spans_by_regex, find_date_spans
+    _find_date_spans_by_force, find_spans_by_regex, find_date_spans
 )
 from whylog.front.utils import FrontInput
 
@@ -138,7 +138,7 @@ class TestBasic(TestCase):
         ra.update(line_id, unlikely_regex)
         assert ra.regex_objects[line_id].regex == unlikely_regex
 
-    def text_regex_from_group_spans(self):
+    def test_regex_from_group_spans(self):
         text = r'Error on comp21'
         regex = r'^Error on (comp(\d\d))$'
         group_spans = group_spans_from_regex(regex, text)
