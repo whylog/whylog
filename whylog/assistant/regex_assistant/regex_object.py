@@ -54,6 +54,25 @@ class RegexObject(object):
         self.regex = regex_object.pattern
         self.param_groups = regex_object.param_groups
 
+    def update_by_guessed_regex(self, regex_id):
+        self.update_by_regex_object(self.guessed_regex_objects[regex_id])
+
+    def _guess_regexes(self):
+        guessed_objects = guess_regex_objects(self.line_text)
+        guessed_dict = dict(
+            [
+                (key, regex_object)
+                for key, regex_object in zip(
+                    range(len(guessed_objects)), guessed_objects)
+            ]
+        )
+        self.guessed_regex_objects = guessed_dict
+        self.update_by_guessed_regex(regex_id=0)
+
+    def set_converter(self, group_no, converter):
+        #TODO: some verification
+        self.param_groups[group_no].converter = converter
+
     def verify(self):
         """
         Verifies properties such as:

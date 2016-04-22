@@ -105,18 +105,11 @@ class TestBasic(TestCase):
         line_id = 1
         ra = RegexAssistant()
         ra.add_line(line_id, front_input)
-        ra.guess(line_id)
-        regex = ra.regex_objects[line_id].regex
-
-        self._verify_regex_success(regex, line, ('2015-12-03', '10/Oct/1999 21:15:05 +0500'))
-
-        similar_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "GET /index.html HTTP/1.0" 200 1043'
-        self._verify_regex_success(
-            regex, similar_line, ('2016-1-5', '11/September/2000 1:02:50 +0400')
-        )
-
-        fake_line = r'2016-1-5 or [11/September/2000 1:02:50 +0400] "POST /index.html HTTP/1.0" 200 1043'
-        self._verify_regex_fail(regex, fake_line)
+        pattern_objects = ra.guess(line_id)
+        assert pattern_objects
+        guessed_regexes = [pattern_object.pattern for pattern_object in pattern_objects.values()]
+        for guessed_regex in guessed_regexes:
+            self._verify_regex_success(guessed_regex, line)
 
     def test_group_spans_from_regex(self):
         text = r'12:56:23 Error on comp12'

@@ -53,18 +53,5 @@ class RegexAssistant(AbstractAssistant):
         raise NotImplementedError
 
     def guess(self, line_id):
-        """
-        Guess regex. It includes guessing date and other regex groups.
-        """
-        regex_obj = self.regex_objects[line_id]
-        date_spans = find_date_spans(regex_obj.line_text)
-        group_spans = date_spans  #TODO: date_spans + other found spans
-        regex_obj.update_forcefully(group_spans)
-
-        # TODO: rebuild this method and assistant logic:
-        # - update RegexObject.regex only on 'update' request but not while guessing
-        # - guessed regexes cached in RegexObject, don't guess them on every 'guess' call
-
-        obvious_regex = create_obvious_regex(self.regex_objects[line_id].line_text)
-
-        return [self.regex_objects[line_id].regex, obvious_regex]
+        regex_object = self.regex_objects[line_id]
+        return regex_object.guessed_regex_objects
