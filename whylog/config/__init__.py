@@ -61,35 +61,44 @@ class AbstractConfig(object):
         pass
 
     def create_investigation_plan(self, front_input, log_type):
-        matches_parsers, effect_params = self._find_matching_parsers(front_input, log_type.name)
-        suspected_rules = self._filter_rule_set(matches_parsers)
-        concatenated_parsers = self._create_concatenated_parser_for_investigation(suspected_rules)
+        matching_parsers, effect_params = self._find_matching_parsers(
+            front_input.line_content, log_type.name
+        )
+        suspected_rules = self._filter_rule_set(matching_parsers)
+        concatenated_parsers = self._create_concatenated_parsers_for_investigation(suspected_rules)
         #TODO: creating clues base on effect_params
         #TODO: remove mocks
         effect_time = datetime(2015, 12, 3, 12, 8, 9)
         line_source = LineSource('localhost', 'node_1.log', 40)
         effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
-        investigation_data = self._create_steps_in_investigation(
+        steps = self._create_steps_in_investigation(
             concatenated_parsers, suspected_rules, effect_clues
         )
-        return InvestigationPlan(suspected_rules, investigation_data, effect_clues)
+        return InvestigationPlan(suspected_rules, steps, effect_clues)
 
     def get_log_type(self, front_input):
         # TODO: remove mock
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         return LogType('default', [matcher])
 
-    def _find_matching_parsers(self, front_input, log_type_name):
+    def _find_matching_parsers(self, effect_line_content, log_type_name):
+        """
+        This method finding all parsers from Config base which matching with effect_line_content
+        """
         matching_parsers = []
         extracted_params = {}
         for parser in self._parsers_grouped_by_log_type[log_type_name]:
-            params = parser.get_regex_params(front_input.line_content)
+            params = parser.get_regex_params(effect_line_content)
             if params is not None:
                 extracted_params[parser.name] = params
                 matching_parsers.append(parser)
         return matching_parsers, extracted_params
 
     def _filter_rule_set(self, parsers_list):
+        """
+        This method finding all rules from Config base which can be fulfilled in
+        single investigation base on parsers_list found by _find_matching_parsers
+        """
         suspected_rules = []
         for parser in parsers_list:
             if self._rules.get(parser.name) is not None:
@@ -97,7 +106,11 @@ class AbstractConfig(object):
         return suspected_rules
 
     @classmethod
-    def _create_concatenated_parser_for_investigation(cls, rules):
+    def _create_concatenated_parsers_for_investigation(cls, rules):
+        """
+        Create concatenated parser for all log types which participate in given investigation based
+        on suspected rules found by _filter_rule_set
+        """
         grouped_parsers = defaultdict(list)
         inserted_parsers = set([])
         for suspected_rule in rules:
@@ -111,8 +124,8 @@ class AbstractConfig(object):
         )
 
     def _create_steps_in_investigation(self, concatenated_parsers, suspected_rules, effect_clues):
-        investigation_data = []
-        for log_type_name, parser, in concatenated_parsers.items():
+        steps = []
+        for log_type_name, parser in concatenated_parsers.items():
             log_type = self._log_types[log_type_name]
             #TODO mocked for 003_test
             #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
@@ -120,8 +133,8 @@ class AbstractConfig(object):
             effect_time = datetime(2015, 12, 3, 12, 8, 9)  #TODO remove mock
             earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)  #TODO remove mock
             investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
-            investigation_data.append((investigation_step, log_type))
-        return investigation_data
+            steps.append((investigation_step, log_type))
+        return steps
 
 
 @six.add_metaclass(ABCMeta)
@@ -141,8 +154,8 @@ class AbstractFileConfig(AbstractConfig):
     def _load_rules(self):
         loaded_rules = defaultdict(list)
         for serialized_rule in self._load_file_with_config(self._rules_path):
-            loaded_rule = RegexRuleFactory.from_dao(serialized_rule, self._parsers)
-            loaded_rules[serialized_rule["effect"]].append(loaded_rule)
+            rule = RegexRuleFactory.from_dao(serialized_rule, self._parsers)
+            loaded_rules[serialized_rule["effect"]].append(rule)
         return loaded_rules
 
     def _load_log_types(self):
