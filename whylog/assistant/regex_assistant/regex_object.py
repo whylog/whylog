@@ -10,23 +10,23 @@ class RegexObject(object):
     Supports interactive updates like adding/removing groups to regex, replacing regex
     Keeps own data integrity - especially consistency between regex and groups (group_spans).
     Verifies updates.
+
+    :param line_text: line text (raw string)
+    :param param_groups: represents params from text (catched by regex groups)
+    :param regex: regex matching to line_text
+    :param guessed_pattern_objects: keeps guessed regexes that match to line_text
+    :type param_groups: dict[int, ParamGroup]
+    :type guessed_pattern_objects: dict[int, PatternObject]
     """
 
     def __init__(self, line_object):
-        #TODO: update comment
-        """
-        :param line_object: object that represents line
-        :param line_text: line text (raw string)
-        :param regex: regex corresponding to line_text
-        :param groups: represents regex groups
-        """
         self.line_text = line_object.line_content
         self.param_groups = dict()
 
         self.regex = None
         self.update_by_regex(create_obvious_regex(self.line_text))
 
-        self.guessed_regex_objects = dict()
+        self.guessed_pattern_objects = dict()
         self._guess_regexes()
 
     def convert_to_pattern_object(self):
@@ -38,7 +38,7 @@ class RegexObject(object):
 
         Throws NotMatchingRegexError if new_regex doesn't match self.line_text
         If needed, improves new_regex: new_regex = '^' + new_regex + '$' (regex must match whole line)
-        Updates self.group_spans so that they correspond to new_regex groups
+        Updates self.param_groups so that they correspond to new_regex groups
         """
 
         groups = verify_regex(new_regex, self.line_text)
@@ -65,7 +65,7 @@ class RegexObject(object):
         self.param_groups = regex_object.param_groups
 
     def update_by_guessed_regex(self, regex_id):
-        self.update_by_regex_object(self.guessed_regex_objects[regex_id])
+        self.update_by_regex_object(self.guessed_pattern_objects[regex_id])
 
     def _guess_regexes(self):
         guessed_objects = guess_regex_objects(self.line_text)
@@ -78,11 +78,11 @@ class RegexObject(object):
                 )
             ]
         )
-        self.guessed_regex_objects = guessed_dict
+        self.guessed_pattern_objects = guessed_dict
         self.update_by_guessed_regex(regex_id=0)
 
     def set_converter(self, group_no, converter):
-        #TODO: some verification
+        #TODO: verify converter
         self.param_groups[group_no].converter = converter
 
     def verify(self):

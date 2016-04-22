@@ -34,7 +34,7 @@ class RegexAssistant(AbstractAssistant):
 
     def guess_pattern_objects(self, line_id):
         regex_object = self.regex_objects[line_id]
-        return regex_object.guessed_regex_objects
+        return regex_object.guessed_pattern_objects
 
     def set_converter(self, line_id, group_no, converter):
         self.regex_objects[line_id].set_converter(group_no, converter)

@@ -1,9 +1,17 @@
 """
-Methods on ranges (intervals)
+Auxiliary methods on ranges (intervals)
 """
 
 
 def complementary_ranges(ranges, start_index, end_index):
+    """
+    Returns complementary ranges from range (start_index, end_index)
+    For start_index = 0, end_index = 20 goes as follows:
+    ranges -> complementary_ranges
+    [(1, 5), (10, 15)] -> [(0, 1), (5, 10), (15, 20)]
+    [(1, 5), (2, 5)] -> [(0, 1), (5, 20)]
+    [(1, 5), (2, 10)] -> [(0, 1), (10, 20)]
+    """
     ranges_union = _ranges_union(ranges)
     complement_ranges = []
 
