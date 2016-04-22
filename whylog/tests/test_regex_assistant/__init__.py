@@ -9,7 +9,7 @@ from whylog.assistant.regex_assistant.regex import (
 )
 from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
-    _find_date_spans_by_force, find_spans_by_regex, find_date_spans
+    _find_date_spans_by_force, find_date_spans, find_spans_by_regex
 )
 from whylog.front.utils import FrontInput
 

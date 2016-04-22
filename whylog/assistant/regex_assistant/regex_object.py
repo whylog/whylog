@@ -1,7 +1,7 @@
-from whylog.assistant.regex_assistant.guessing import guess_regex_objects
-from whylog.assistant.regex_assistant.regex import create_obvious_regex, verify_regex
 from whylog.assistant.const import DataType
 from whylog.assistant.pattern_object import ParamGroup, PatternObject
+from whylog.assistant.regex_assistant.guessing import guess_regex_objects
+from whylog.assistant.regex_assistant.regex import create_obvious_regex, verify_regex
 
 
 class RegexObject(object):

@@ -1,5 +1,4 @@
 from whylog.assistant import AbstractAssistant
-from whylog.assistant.regex_assistant.regex import create_obvious_regex, regex_from_group_spans
 from whylog.assistant.regex_assistant.regex_object import RegexObject
 
 

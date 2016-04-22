@@ -1,9 +1,9 @@
 import re
 
+from whylog.assistant.pattern_object import ParamGroup, PatternObject
 from whylog.assistant.regex_assistant.regex import (
     create_obvious_regex, regex_from_group_spans, verify_regex
 )
-from whylog.assistant.pattern_object import ParamGroup, PatternObject
 from whylog.assistant.spans_finding import find_date_spans
 
 
