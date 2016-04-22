@@ -81,34 +81,22 @@ class Teacher(object):
         self.pattern_assistant.remove_line(line_id)
         del self._parsers[line_id]
 
-    def update_pattern(self, line_id, proposed_pattern):
+    def update_pattern(self, line_id, pattern):
         """
         Loads text pattern proposed by user, verifies if it matches line text.
         """
-        #TODO update TeacherParser: pattern, primary_key, groups
-        pass
-
-    def make_group(self, line_id, span):
-        """
-        Improves text pattern by adding group corresponding to param in text.
-
-        Removes (or maybe updates) constraints related to groups in line with line_id
-        """
-        pass
-
-    def remove_group(self, pattern_group):
-        """
-        Improves text pattern by removing group corresponding to param in text.
-
-        Removes (or maybe updates) constraints related to groups in line with line_id
-        """
-        pass
+        #TODO update TeacherParser: pattern_name?, primary_key, groups
+        self.pattern_assistant.update_by_pattern(line_id, pattern)
 
     def guess_pattern(self, line_id):
         """
-        Guess text pattern for line text.
+        Returns list of guessed patterns for a line.
         """
-        return self.pattern_assistant.guess_pattern_objects(line_id)
+        pattern_objects = self.pattern_assistant.guess_pattern_objects(line_id)
+        return [pattern_object.pattern for pattern_object in pattern_objects]
+
+    def choose_guessed_pattern(self, line_id, pattern_id):
+        self.pattern_assistant.update_by_guessed_pattern_object(line_id, pattern_id)
 
     def set_pattern_name(self, line_id, name=None):
         if name:
@@ -173,6 +161,22 @@ class Teacher(object):
         """
         Determines which combinations of causes can cause effect.
         :param relation: kind of sentence made of AND, OR, brackets and cause symbols.
+        """
+        pass
+
+    def make_group(self, line_id, span):
+        """
+        Improves text pattern by adding group corresponding to param in text.
+
+        Removes (or maybe updates) constraints related to groups in line with line_id
+        """
+        pass
+
+    def remove_group(self, pattern_group):
+        """
+        Improves text pattern by removing group corresponding to param in text.
+
+        Removes (or maybe updates) constraints related to groups in line with line_id
         """
         pass
 
