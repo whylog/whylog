@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 import six
 from frozendict import frozendict
 
-from whylog.converters import DateConverter, IntConverter
+from whylog.converters import DateConverter, IntConverter, FloatConverter
 from whylog.converters.exceptions import UnsupportedConverter
 
 IMPORTED_RE = False
@@ -67,10 +67,10 @@ class RegexParser(AbstractParser):
 
     def convert_params(self, params):
         converted_params = []
-        convertions_dict = {'date': DateConverter, 'int': IntConverter}
+        convertions_dict = {'date': DateConverter, 'int': IntConverter, 'float': FloatConverter}
         for i in range(len(params)):
-            group_type = self.convertions.get(i + 1)
-            if group_type is not None:
+            group_type = self.convertions.get(i + 1, 'string')
+            if group_type != 'string':
                 converter = convertions_dict.get(group_type)
                 if converter is None:
                     raise UnsupportedConverter(group_type)
