@@ -46,6 +46,7 @@ class InvestigationStep(object):
         return date
 
     def get_clues(self, line, offset, line_source=None):
+        #TODO: remove mock
         line_source = LineSource('localhost', 'node_1.log')
         converted_params = self._parser_subset.get_clues_from_matched_line(line)
         return dict(
@@ -67,8 +68,8 @@ class Clue(object):
         self.line_source = line_source
 
     def __repr__(self):
-        return "(Clue: %s, %s, %s)" % (
-            self.regex_parameters, self.line_prefix_content, self.line_source
+        return "(Clue: %s, %s, %s, %s)" % (
+            self.regex_parameters, self.line_prefix_content, self.line_offset, self.line_source
         )
 
 

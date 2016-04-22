@@ -286,4 +286,3 @@ class ConcatenatedRegexParser(AbstractParserSubset):
             match = self._parsers[i].get_regex_params(line)
             if match is not None:
                 extracted_regex_params[self._parsers[i].name] = match
-

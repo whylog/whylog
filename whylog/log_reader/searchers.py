@@ -88,6 +88,7 @@ class BacktrackSearcher(AbstractSearcher):
         clues = defaultdict(list)
         offset = self._deduce_offset(investigation_step)
         for line, actual_offset in self._reverse_from_offset(offset):
+            #TODO: passing to get_clues invocation line source
             clues_from_line = investigation_step.get_clues(line, actual_offset)
             self._merge_clues(clues, clues_from_line)
         return clues
