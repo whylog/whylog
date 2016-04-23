@@ -4,8 +4,7 @@ from collections import defaultdict
 
 import six
 
-from whylog.constraints import Verifier
-from whylog.front import FrontInput
+from whylog.constraints.verifier import Verifier
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
 from whylog.log_reader.searchers import BacktrackSearcher
