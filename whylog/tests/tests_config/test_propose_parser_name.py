@@ -49,7 +49,7 @@ class TestBasic(TestCase):
         black_list = set()
         assert self._create_proposed_name_request(
             self.sample_line2, self.regex2, black_list
-        ) == 'parser_name1'
+        ) == 'parser_name'
         assert self._create_proposed_name_request(
             self.sample_line2, self.regex2, black_list
-        ) == 'parser_name2'
+        ) == 'parser_name1'

@@ -1,5 +1,7 @@
 import re
 
+WORDS_IN_NAME = 2
+
 
 class ParserNameManager(object):
     def __init__(self, parsers):
@@ -13,19 +15,18 @@ class ParserNameManager(object):
     def is_free_parser_name(self, parser_name, black_list):
         return (parser_name not in self._parsers_name) and (parser_name not in black_list)
 
-    def _try_get_simple_name_else_append_number(self, word, black_list):
-        if self.is_free_parser_name(word, black_list):
-            return word
-        return self._find_free_by_number_appending(word, black_list)
+    def _create_name_from_words(self, words, words_in_name, black_list):
+        if len(words) <= words_in_name:
+            proposed_name = '_'.join(words)
+        else:
+            proposed_name = '_'.join(words[i] for i in range(words_in_name))
+        if self.is_free_parser_name(proposed_name, black_list):
+            return proposed_name
+        return self._find_free_by_number_appending(proposed_name, black_list)
 
     def propose_parser_name(self, line, regex_str, black_list):
-        building_words = ParserNameManager._get_building_words(line, regex_str)
-        if not building_words:
-            return self._find_free_by_number_appending('parser_name', black_list)
-        if len(building_words) == 1:
-            self._try_get_simple_name_else_append_number(building_words[0], black_list)
-        proposed_name = building_words[0] + '_' + building_words[1]
-        return self._try_get_simple_name_else_append_number(proposed_name, black_list)
+        building_words = ParserNameManager._get_building_words(line, regex_str) or ['parser_name']
+        return self._create_name_from_words(building_words, WORDS_IN_NAME, black_list)
 
     @classmethod
     def _get_building_words(cls, line, pattern_str):
