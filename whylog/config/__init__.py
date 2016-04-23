@@ -63,15 +63,28 @@ class ConfigFactory(object):
                 return directory
 
     @classmethod
-    def _creatie_new_config_dir(cls):
-        
+    def _create_empty_file(cls, path):
+        open(path, 'w').close()
+
+    @classmethod
+    def _create_new_config_dir(cls):
+        path = os.path.join(os.getcwd(), '.whylog')
+        os.mkdir(path, 0755)
+        files_names = {'parsers_path': 'parsers.yaml', 'rules_path': 'rules.yaml', 'log_types_path': 'log_types.yaml'}
+        config_paths = {}
+        for key, file_name in files_names.items():
+            path = os.path.join('.whylog', file_name)
+            ConfigFactory._create_empty_file(path)
+            config_paths[key] = os.path.join(os.getcwd(), path)
+        with open(os.path.join(os.getcwd(), '.whylog', 'config.yaml'), 'w') as config_file:
+            config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
 
     @classmethod
     def get_config(cls):
         path = ConfigFactory._find_path_to_config()
         if path is not None:
             return os.path.join(path, 'config.yaml')
-
+        
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
