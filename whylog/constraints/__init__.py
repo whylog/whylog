@@ -11,37 +11,36 @@ class AbstractConstraint(object):
 
 
 class TimeConstraint(AbstractConstraint):
-    def __init__(self, line_earlier, line_later, min_delta=None, max_delta=None):
+    def __init__(self, params):
         pass
 
     @classmethod
-    def verify(cls, effect, clues, constraint):
-        # TODO here the constraint verification should take place and bool should be returned
-        return True
+    def verify(cls, param_dict, group_contents):
+        return len(set(group_contents)) == 1
 
 
 class IdenticalIntervals(AbstractConstraint):
-    def __init__(self, intervals):
+    def __init__(self, params):
         pass
 
 
 class AnyValueIntervals(AbstractConstraint):
-    def __init__(self, intervals):
+    def __init__(self, params):
         pass
 
 
 class DifferentValueIntervals(AbstractConstraint):
-    def __init__(self, intervals):
+    def __init__(self, params):
         pass
 
 
 class ConstIntervals(AbstractConstraint):
-    def __init__(self, intervals):
+    def __init__(self, params):
         pass
 
 
 class ValueDeltaIntervals(AbstractConstraint):
-    def __init__(self, interval_lower, interval_greater, min_delta=None, max_delta=None):
+    def __init__(self, params):
         """
         Sets Minimum and maximum difference between values of params (if values are numbers).
         """
