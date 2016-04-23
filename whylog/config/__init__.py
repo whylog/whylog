@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
 
+import glob
 import six
 import yaml
 
@@ -11,6 +12,14 @@ from whylog.config.investigation_plan import Clue, InvestigationPlan, Investigat
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
+
+
+class ConfigFactory(object):
+    @classmethod
+    @abstractmethod
+    def load_config(cls):
+        # assert glob.glob('*.whylog/config.yaml') != []
+        print glob.glob('*.whylog/config.yaml')
 
 
 @six.add_metaclass(ABCMeta)

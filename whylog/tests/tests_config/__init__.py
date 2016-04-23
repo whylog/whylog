@@ -4,7 +4,7 @@ from unittest import TestCase
 import yaml
 
 from whylog.assistant.const import AssistantType
-from whylog.config import YamlConfig
+from whylog.config import ConfigFactory, YamlConfig
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
@@ -145,3 +145,5 @@ class TestBasic(TestCase):
         assert sorted(self.config._log_types.keys()) == ['apache', 'default']
         assert len(self.config._log_types['default']._filename_matchers) == 2
         assert len(self.config._log_types['apache']._filename_matchers) == 1
+
+        ConfigFactory.load_config()
