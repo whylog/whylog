@@ -2,7 +2,6 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
 
-import glob
 import itertools
 import os
 import six
@@ -31,11 +30,9 @@ class ConfigFactory(object):
             return YamlConfig(**config_paths), assistant_class
 
     @classmethod
-    def _search_in_parents_directories(cls):
-        current_path = os.getcwd()
+    def _search_in_parents_directories(cls, path):
         if os.path.isdir('.whylog'):
-            return current_path
-        path = current_path
+            return path
         for i in itertools.cycle([1]):
             path, suffix = os.path.split(path)
             if suffix == '':
@@ -44,11 +41,36 @@ class ConfigFactory(object):
             if os.path.isdir('.whylog'):
                 return path
 
+    @classmethod
+    def _check_concrete_directory(cls, path):
+        if os.path.isdir(path):
+            return True
+        return False
+
+    @classmethod
+    def _find_path_to_config(cls):
+        current_path = os.getcwd()
+        path = ConfigFactory._search_in_parents_directories(current_path)
+        if path is not None:
+            os.chdir(current_path)
+            return os.path.join(path, '.whylog')
+        dir_to_check = [
+            os.path.join(os.path.expanduser("~"), '.whylog'),
+            os.path.join("/etc", '.whylog')
+        ]
+        for directory in dir_to_check:
+            if ConfigFactory._check_concrete_directory(directory):
+                return directory
+
+    @classmethod
+    def _creatie_new_config_dir(cls):
+        
 
     @classmethod
     def get_config(cls):
-        # assert glob.glob('*.whylog/config.yaml') != []
-        print glob.glob('*.whylog/config.yaml')
+        path = ConfigFactory._find_path_to_config()
+        if path is not None:
+            return os.path.join(path, 'config.yaml')
 
 
 @six.add_metaclass(ABCMeta)
