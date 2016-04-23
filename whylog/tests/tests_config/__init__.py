@@ -146,4 +146,4 @@ class TestBasic(TestCase):
         assert len(self.config._log_types['default']._filename_matchers) == 2
         assert len(self.config._log_types['apache']._filename_matchers) == 1
 
-        ConfigFactory.load_config()
+        ConfigFactory.load_config('whylog/tests/tests_config/test_files/.whylog/config.yaml')

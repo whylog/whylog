@@ -6,6 +6,8 @@ import glob
 import six
 import yaml
 
+from whylog.assistant.exceptions import UnsupportedAssistantError
+from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.config.exceptions import UnsupportedFilenameMatcher
 from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
@@ -17,7 +19,20 @@ from whylog.config.rule import RegexRuleFactory
 class ConfigFactory(object):
     @classmethod
     @abstractmethod
-    def load_config(cls):
+    def load_config(cls, path):
+        with open(path, "r") as config_file:
+            config_paths = yaml.load(config_file)
+            assistants_dict = {'regex': RegexAssistant}
+            assistant_name = config_paths.pop('pattern_assistant')
+            assistant_class = assistants_dict[assistant_name]
+            if assistant_class is None:
+                raise UnsupportedAssistantError(assistant_name)
+            print config_paths
+            return YamlConfig(**config_paths), assistant_class
+
+    @classmethod
+    @abstractmethod
+    def get_config(cls):
         # assert glob.glob('*.whylog/config.yaml') != []
         print glob.glob('*.whylog/config.yaml')
 
@@ -211,8 +226,8 @@ class AbstractFileConfig(AbstractConfig):
 
 
 class YamlConfig(AbstractFileConfig):
-    def __init__(self, parsers_path, rules_path, log_type_path):
-        super(YamlConfig, self).__init__(parsers_path, rules_path, log_type_path)
+    def __init__(self, parsers_path, rules_path, log_types_path):
+        super(YamlConfig, self).__init__(parsers_path, rules_path, log_types_path)
 
     def _load_file_with_config(self, path):
         with open(path, "r") as config_file:

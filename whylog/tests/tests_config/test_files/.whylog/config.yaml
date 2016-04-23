@@ -1,0 +1,4 @@
+parsers_path: whylog/tests/tests_config/test_files/parsers.yaml
+rules_path: whylog/tests/tests_config/test_files/rules.yaml
+log_types_path: whylog/tests/tests_config/test_files/log_types.yaml
+pattern_assistant: regex
