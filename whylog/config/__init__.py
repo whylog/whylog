@@ -36,10 +36,12 @@ class ConfigFactory(object):
 
     @classmethod
     def _search_in_parents_directories(cls, path):
+        print path
         if os.path.isdir(ConfigFactory.WHYLOG_DIR):
             return path
         for i in itertools.cycle([1]):
             path, suffix = os.path.split(path)
+            print path
             if suffix == '':
                 return None
             if os.path.isdir(os.path.join(path, ConfigFactory.WHYLOG_DIR)):
@@ -47,6 +49,7 @@ class ConfigFactory(object):
 
     @classmethod
     def _check_concrete_directory(cls, path):
+        print path
         if os.path.isdir(path):
             return True
         return False
