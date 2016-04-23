@@ -36,12 +36,10 @@ class ConfigFactory(object):
 
     @classmethod
     def _search_in_parents_directories(cls, path):
-        print path
         if os.path.isdir(ConfigFactory.WHYLOG_DIR):
             return path
         for i in itertools.cycle([1]):
             path, suffix = os.path.split(path)
-            print path
             if suffix == '':
                 return None
             if os.path.isdir(os.path.join(path, ConfigFactory.WHYLOG_DIR)):
@@ -49,7 +47,6 @@ class ConfigFactory(object):
 
     @classmethod
     def _check_concrete_directory(cls, path):
-        print path
         if os.path.isdir(path):
             return True
         return False
@@ -72,17 +69,17 @@ class ConfigFactory(object):
         open(path, 'w').close()
 
     @classmethod
-    def _create_new_config_dir(cls):
-        path = os.path.join(os.getcwd(), ConfigFactory.WHYLOG_DIR)
+    def _create_new_config_dir(cls, base_path):
+        path = os.path.join(base_path, ConfigFactory.WHYLOG_DIR)
         os.mkdir(path, 0o755)
         files_names = {'parsers_path': 'parsers.yaml', 'rules_path': 'rules.yaml', 'log_types_path': 'log_types.yaml'}
         config_paths = {}
         for key, file_name in files_names.items():
             path = os.path.join(ConfigFactory.WHYLOG_DIR, file_name)
             ConfigFactory._create_empty_file(path)
-            config_paths[key] = os.path.join(os.getcwd(), path)
+            config_paths[key] = os.path.join(base_path, path)
         config_paths['pattern_assistant'] = 'regex'
-        path_to_config = os.path.join(os.getcwd(), ConfigFactory.WHYLOG_DIR, ConfigFactory.CONFIG_PATHS_FILE)
+        path_to_config = os.path.join(base_path, ConfigFactory.WHYLOG_DIR, ConfigFactory.CONFIG_PATHS_FILE)
         with open(path_to_config, 'w') as config_file:
             config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
         return path_to_config
@@ -93,7 +90,7 @@ class ConfigFactory(object):
         if path is not None:
             path_to_config = os.path.join(path, 'config.yaml')
             return ConfigFactory.load_config(path_to_config)
-        path_to_config = ConfigFactory._create_new_config_dir()
+        path_to_config = ConfigFactory._create_new_config_dir(os.getcwd())
         ConfigFactory.load_config(path_to_config)
 
 
