@@ -4,7 +4,7 @@ from collections import defaultdict
 
 import six
 
-from whylog.constraints import TimeConstraint
+from whylog.constraints import Verifier
 from whylog.front import FrontInput
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
@@ -57,21 +57,13 @@ class SearchManager(object):
         # effect_clues are accessible from investigation_plan._effect_clues
         for rule in self._investigation_plan._suspected_rules:
             # FIXME eliminate protected field access
+            clues_lists = []
             for cause in rule._causes:
                 # FIXME eliminate protected field access
                 if cause.name in clues:
-                    for clue in clues[cause.name]:
-                        for constraint in rule._constraints:
-                            # TODO somehow it must be decided which constraint it is and method verify must be invoked
-                            # ConstraintsBase.all[constraint['name']].verify(effect, cause, constraint)
-                            # FIXME NOW I assume, that constraint['name'] == 'time'
-                            if TimeConstraint.verify(rule._effect, cause, constraint):
-                                causes.append(
-                                    FrontInput(
-                                        clue.line_source.offset, clue.line_prefix_content,
-                                        clue.line_source.path
-                                    )
-                                )
+                    clues_lists.append(clues[cause.name])
+            Verifier.constraints_and(clues_lists, rule._constraints)
+            # FIXME objects with wrong type are being passed to constraints_and
         return causes
 
     def investigate(self):
