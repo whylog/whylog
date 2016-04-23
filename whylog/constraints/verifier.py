@@ -26,3 +26,23 @@ class Verifier(object):
                     yield subset
         else:
             yield collected_subset
+
+    @classmethod
+    def constraints_and(cls, clues_lists, constraints):
+        clues_lists = filter(lambda x: x, clues_lists)
+        causes = []
+        for combination in cls._clues_combinations(clues_lists):
+            if all(constraint.verify(*combination) for constraint in constraints):
+                # FIXME verify has not established signature yet
+                causes.append(combination)
+        return causes
+
+    @classmethod
+    def constraints_or(cls, clues_lists, constraints):
+        clues_lists = filter(lambda x: x, clues_lists)
+        causes = []
+        for combination in cls._clues_combinations(clues_lists):
+            if any(constraint.verify(*combination) for constraint in constraints):
+                # FIXME verify has not established signature yet
+                causes.append(combination)
+        return causes
