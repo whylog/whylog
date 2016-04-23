@@ -76,15 +76,20 @@ class ConfigFactory(object):
             path = os.path.join('.whylog', file_name)
             ConfigFactory._create_empty_file(path)
             config_paths[key] = os.path.join(os.getcwd(), path)
-        with open(os.path.join(os.getcwd(), '.whylog', 'config.yaml'), 'w') as config_file:
+        config_paths['pattern_assistant'] = 'regex'
+        path_to_config = os.path.join(os.getcwd(), '.whylog', 'config.yaml')
+        with open(path_to_config, 'w') as config_file:
             config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
+        return path_to_config
 
     @classmethod
     def get_config(cls):
         path = ConfigFactory._find_path_to_config()
         if path is not None:
-            return os.path.join(path, 'config.yaml')
-        
+            path_to_config = os.path.join(path, 'config.yaml')
+            return ConfigFactory.load_config(path_to_config)
+        path_to_config = ConfigFactory._create_new_config_dir()
+        ConfigFactory.load_config(path_to_config)
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
