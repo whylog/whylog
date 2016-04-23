@@ -71,7 +71,7 @@ class ConfigFactory(object):
     @classmethod
     def _create_new_config_dir(cls):
         path = os.path.join(os.getcwd(), ConfigFactory.WHYLOG_DIR)
-        os.mkdir(path, 0755)
+        os.mkdir(path, 0o755)
         files_names = {'parsers_path': 'parsers.yaml', 'rules_path': 'rules.yaml', 'log_types_path': 'log_types.yaml'}
         config_paths = {}
         for key, file_name in files_names.items():
