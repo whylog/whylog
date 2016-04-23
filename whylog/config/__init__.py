@@ -18,6 +18,11 @@ from whylog.config.rule import RegexRuleFactory
 
 
 class ConfigFactory(object):
+    WHYLOG_DIR = '.whylog'
+    HOME_DIR = os.path.expanduser("~")
+    ETC_DIR = '/etc'
+    CONFIG_PATHS_FILE = 'config.yaml'
+
     @classmethod
     def load_config(cls, path):
         with open(path, "r") as config_file:
@@ -31,14 +36,13 @@ class ConfigFactory(object):
 
     @classmethod
     def _search_in_parents_directories(cls, path):
-        if os.path.isdir('.whylog'):
+        if os.path.isdir(ConfigFactory.WHYLOG_DIR):
             return path
         for i in itertools.cycle([1]):
             path, suffix = os.path.split(path)
             if suffix == '':
                 return None
-            os.chdir(path)
-            if os.path.isdir('.whylog'):
+            if os.path.isdir(os.path.join(path, ConfigFactory.WHYLOG_DIR)):
                 return path
 
     @classmethod
@@ -49,14 +53,12 @@ class ConfigFactory(object):
 
     @classmethod
     def _find_path_to_config(cls):
-        current_path = os.getcwd()
-        path = ConfigFactory._search_in_parents_directories(current_path)
+        path = ConfigFactory._search_in_parents_directories(os.getcwd())
         if path is not None:
-            os.chdir(current_path)
-            return os.path.join(path, '.whylog')
+            return os.path.join(path, ConfigFactory.WHYLOG_DIR)
         dir_to_check = [
-            os.path.join(os.path.expanduser("~"), '.whylog'),
-            os.path.join("/etc", '.whylog')
+            os.path.join(ConfigFactory.HOME_DIR, ConfigFactory.WHYLOG_DIR),
+            os.path.join(ConfigFactory.ETC_DIR, ConfigFactory.WHYLOG_DIR)
         ]
         for directory in dir_to_check:
             if ConfigFactory._check_concrete_directory(directory):
@@ -68,16 +70,16 @@ class ConfigFactory(object):
 
     @classmethod
     def _create_new_config_dir(cls):
-        path = os.path.join(os.getcwd(), '.whylog')
+        path = os.path.join(os.getcwd(), ConfigFactory.WHYLOG_DIR)
         os.mkdir(path, 0755)
         files_names = {'parsers_path': 'parsers.yaml', 'rules_path': 'rules.yaml', 'log_types_path': 'log_types.yaml'}
         config_paths = {}
         for key, file_name in files_names.items():
-            path = os.path.join('.whylog', file_name)
+            path = os.path.join(ConfigFactory.WHYLOG_DIR, file_name)
             ConfigFactory._create_empty_file(path)
             config_paths[key] = os.path.join(os.getcwd(), path)
         config_paths['pattern_assistant'] = 'regex'
-        path_to_config = os.path.join(os.getcwd(), '.whylog', 'config.yaml')
+        path_to_config = os.path.join(os.getcwd(), ConfigFactory.WHYLOG_DIR, ConfigFactory.CONFIG_PATHS_FILE)
         with open(path_to_config, 'w') as config_file:
             config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
         return path_to_config
@@ -90,6 +92,7 @@ class ConfigFactory(object):
             return ConfigFactory.load_config(path_to_config)
         path_to_config = ConfigFactory._create_new_config_dir()
         ConfigFactory.load_config(path_to_config)
+
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
