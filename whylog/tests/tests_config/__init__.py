@@ -4,13 +4,12 @@ from unittest import TestCase
 import yaml
 
 from whylog.assistant.const import AssistantType
-from whylog.config import ConfigFactory, YamlConfig
+from whylog.config import ConfigFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
-from whylog.tests.utils import ConfigPathFactory
 
 # Constraint types
 identical_constr = "identical"
@@ -105,9 +104,9 @@ class TestBasic(TestCase):
 
         cls.user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
-        cls.path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
-        prefix_path = os.path.join(*cls.path_test_files)
-        cls.config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(prefix_path))
+        path_config = ['whylog', 'tests', 'tests_config', 'test_files', '.whylog', 'config.yaml']
+        path = os.path.join(*path_config)
+        cls.config, _ = ConfigFactory.load_config(path)
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
@@ -145,5 +144,3 @@ class TestBasic(TestCase):
         assert sorted(self.config._log_types.keys()) == ['apache', 'default']
         assert len(self.config._log_types['default']._filename_matchers) == 2
         assert len(self.config._log_types['apache']._filename_matchers) == 1
-
-        ConfigFactory.load_config('whylog/tests/tests_config/test_files/.whylog/config.yaml')

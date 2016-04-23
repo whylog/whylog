@@ -3,6 +3,8 @@ from collections import defaultdict
 from datetime import datetime
 
 import glob
+import itertools
+import os
 import six
 import yaml
 
@@ -18,20 +20,32 @@ from whylog.config.rule import RegexRuleFactory
 
 class ConfigFactory(object):
     @classmethod
-    @abstractmethod
     def load_config(cls, path):
         with open(path, "r") as config_file:
             config_paths = yaml.load(config_file)
             assistants_dict = {'regex': RegexAssistant}
             assistant_name = config_paths.pop('pattern_assistant')
-            assistant_class = assistants_dict[assistant_name]
+            assistant_class = assistants_dict.get(assistant_name)
             if assistant_class is None:
                 raise UnsupportedAssistantError(assistant_name)
-            print config_paths
             return YamlConfig(**config_paths), assistant_class
 
     @classmethod
-    @abstractmethod
+    def _search_in_parents_directories(cls):
+        current_path = os.getcwd()
+        if os.path.isdir('.whylog'):
+            return current_path
+        path = current_path
+        for i in itertools.cycle([1]):
+            path, suffix = os.path.split(path)
+            if suffix == '':
+                return None
+            os.chdir(path)
+            if os.path.isdir('.whylog'):
+                return path
+
+
+    @classmethod
     def get_config(cls):
         # assert glob.glob('*.whylog/config.yaml') != []
         print glob.glob('*.whylog/config.yaml')
