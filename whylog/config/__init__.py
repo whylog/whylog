@@ -88,10 +88,10 @@ class ConfigFactory(object):
     def get_config(cls):
         path = ConfigFactory._find_path_to_config()
         if path is not None:
-            path_to_config = os.path.join(path, 'config.yaml')
+            path_to_config = os.path.join(path, ConfigFactory.CONFIG_PATHS_FILE)
             return ConfigFactory.load_config(path_to_config)
         path_to_config = ConfigFactory._create_new_config_dir(os.getcwd())
-        ConfigFactory.load_config(path_to_config)
+        return ConfigFactory.load_config(path_to_config)
 
 
 @six.add_metaclass(ABCMeta)
