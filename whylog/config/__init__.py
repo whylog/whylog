@@ -162,7 +162,7 @@ class AbstractConfig(object):
         self._save_rule_definition(created_rule.serialize())
         created_parsers = created_rule.get_new_parsers(self._parsers)
         self._save_parsers_definition(parser.serialize() for parser in created_parsers)
-        self._rules.append(created_rule)
+        self._rules[created_rule.get_effect_name()].append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
 

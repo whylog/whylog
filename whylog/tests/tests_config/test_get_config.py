@@ -61,4 +61,3 @@ class TestBasic(TestCase):
         config_dir = os.path.join(path, YamlConfigFactory.WHYLOG_DIR)
         if os.path.isdir(config_dir):
             cls.remove_temp_directory(config_dir)
-
