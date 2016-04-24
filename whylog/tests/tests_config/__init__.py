@@ -4,7 +4,7 @@ from unittest import TestCase
 import yaml
 
 from whylog.assistant.const import AssistantType
-from whylog.config import ConfigFactory
+from whylog.config import YamlConfigFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
@@ -106,7 +106,7 @@ class TestBasic(TestCase):
 
         path_config = ['whylog', 'tests', 'tests_config', 'test_files', '.whylog', 'config.yaml']
         path = os.path.join(*path_config)
-        cls.config, _ = ConfigFactory.load_config(path)
+        cls.config, _ = YamlConfigFactory.load_config(path)
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)

@@ -17,11 +17,87 @@ from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 
 
-class ConfigFactory(object):
+class AbstractConfigFactory(object):
     WHYLOG_DIR = '.whylog'
-    HOME_DIR = os.path.expanduser("~")
+    HOME_DIR = os.path.expanduser('~')
     ETC_DIR = '/etc'
+
+    @classmethod
+    @abstractmethod
+    def load_config(cls, path):
+        raise NotImplementedError
+
+    @classmethod
+    def _search_in_parents_directories(cls, path):
+        if os.path.isdir(cls.WHYLOG_DIR):
+            return path
+        for i in itertools.cycle([1]):
+            path, suffix = os.path.split(path)
+            if suffix == '':
+                return None
+            if os.path.isdir(os.path.join(path, cls.WHYLOG_DIR)):
+                return path
+
+    @classmethod
+    def _check_concrete_directory(cls, path):
+        if os.path.isdir(path):
+            return True
+        return False
+
+    @classmethod
+    def _find_path_to_config(cls):
+        path = cls._search_in_parents_directories(os.getcwd())
+        if path is not None:
+            return os.path.join(path, cls.WHYLOG_DIR)
+        dir_to_check = [
+            os.path.join(cls.HOME_DIR, cls.WHYLOG_DIR),
+            os.path.join(cls.ETC_DIR, cls.WHYLOG_DIR)
+        ]
+        for directory in dir_to_check:
+            if cls._check_concrete_directory(directory):
+                return directory
+
+    @classmethod
+    def _create_empty_file(cls, path):
+        open(path, 'w').close()
+
+    @classmethod
+    def _create_new_config_dir(cls, base_path):
+        path = os.path.join(base_path, cls.WHYLOG_DIR)
+        os.mkdir(path, 0o755)
+        config_paths = {}
+        for key, file_name in six.iteritems(cls.FILES_NAMES):
+            path = os.path.join(base_path, cls.WHYLOG_DIR, file_name)
+            cls._create_empty_file(path)
+            config_paths[key] = os.path.join(base_path, path)
+        config_paths['pattern_assistant'] = 'regex'
+        path_to_config = os.path.join(
+            base_path, cls.WHYLOG_DIR, cls.CONFIG_PATHS_FILE
+        )
+        return cls.create_file_with_config_paths(config_paths, path_to_config)
+
+    @classmethod
+    @abstractmethod
+    def create_file_with_config_paths(cls, config_paths, path_to_config):
+        raise NotImplementedError
+
+    @classmethod
+    def get_config(cls):
+        path = cls._find_path_to_config()
+        if path is not None:
+            path_to_config = os.path.join(path, cls.CONFIG_PATHS_FILE)
+            return cls.load_config(path_to_config)
+        path_to_config = cls._create_new_config_dir(os.getcwd())
+        return cls.load_config(path_to_config)
+
+
+class YamlConfigFactory(AbstractConfigFactory):
     CONFIG_PATHS_FILE = 'config.yaml'
+    FILES_NAMES = {
+        'parsers_path': 'parsers.yaml',
+        'rules_path': 'rules.yaml',
+        'log_types_path': 'log_types.yaml'
+    }
 
     @classmethod
     def load_config(cls, path):
@@ -35,69 +111,10 @@ class ConfigFactory(object):
             return YamlConfig(**config_paths), assistant_class
 
     @classmethod
-    def _search_in_parents_directories(cls, path):
-        if os.path.isdir(ConfigFactory.WHYLOG_DIR):
-            return path
-        for i in itertools.cycle([1]):
-            path, suffix = os.path.split(path)
-            if suffix == '':
-                return None
-            if os.path.isdir(os.path.join(path, ConfigFactory.WHYLOG_DIR)):
-                return path
-
-    @classmethod
-    def _check_concrete_directory(cls, path):
-        if os.path.isdir(path):
-            return True
-        return False
-
-    @classmethod
-    def _find_path_to_config(cls):
-        path = ConfigFactory._search_in_parents_directories(os.getcwd())
-        if path is not None:
-            return os.path.join(path, ConfigFactory.WHYLOG_DIR)
-        dir_to_check = [
-            os.path.join(ConfigFactory.HOME_DIR, ConfigFactory.WHYLOG_DIR),
-            os.path.join(ConfigFactory.ETC_DIR, ConfigFactory.WHYLOG_DIR)
-        ]
-        for directory in dir_to_check:
-            if ConfigFactory._check_concrete_directory(directory):
-                return directory
-
-    @classmethod
-    def _create_empty_file(cls, path):
-        open(path, 'w').close()
-
-    @classmethod
-    def _create_new_config_dir(cls, base_path):
-        path = os.path.join(base_path, ConfigFactory.WHYLOG_DIR)
-        os.mkdir(path, 0o755)
-        files_names = {
-            'parsers_path': 'parsers.yaml',
-            'rules_path': 'rules.yaml',
-            'log_types_path': 'log_types.yaml'
-        }
-        config_paths = {}
-        for key, file_name in files_names.items():
-            path = os.path.join(base_path, ConfigFactory.WHYLOG_DIR, file_name)
-            ConfigFactory._create_empty_file(path)
-            config_paths[key] = os.path.join(base_path, path)
-        config_paths['pattern_assistant'] = 'regex'
-        path_to_config = os.path.join(
-            base_path, ConfigFactory.WHYLOG_DIR, ConfigFactory.CONFIG_PATHS_FILE
-        )
+    def create_file_with_config_paths(cls, config_paths, path_to_config):
         with open(path_to_config, 'w') as config_file:
             config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
         return path_to_config
-
-    @classmethod
-    def get_config(cls):
-        path = ConfigFactory._find_path_to_config()
-        if path is not None:
-            path_to_config = os.path.join(path, ConfigFactory.CONFIG_PATHS_FILE)
-            return ConfigFactory.load_config(path_to_config)
-        path_to_config = ConfigFactory._create_new_config_dir(os.getcwd())
-        return ConfigFactory.load_config(path_to_config)
 
 
 @six.add_metaclass(ABCMeta)
