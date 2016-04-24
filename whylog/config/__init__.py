@@ -59,10 +59,7 @@ class AbstractConfigFactory(object):
         path = cls._search_in_parents_directories(os.getcwd())
         if path is not None:
             return cls._attach_whylog_dir(path)
-        dir_to_check = [
-            cls._attach_whylog_dir(cls.HOME_DIR),
-            cls._attach_whylog_dir(cls.ETC_DIR)
-        ]
+        dir_to_check = [cls._attach_whylog_dir(cls.HOME_DIR), cls._attach_whylog_dir(cls.ETC_DIR)]
         for directory in dir_to_check:
             if cls._check_concrete_directory(directory):
                 return directory
@@ -81,9 +78,7 @@ class AbstractConfigFactory(object):
             cls._create_empty_file(path)
             config_paths[key] = path
         config_paths['pattern_assistant'] = 'regex'
-        path_to_config = os.path.join(
-            whylog_dir, cls.CONFIG_PATHS_FILE
-        )
+        path_to_config = os.path.join(whylog_dir, cls.CONFIG_PATHS_FILE)
         return cls.create_file_with_config_paths(config_paths, path_to_config)
 
     @classmethod

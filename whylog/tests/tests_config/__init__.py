@@ -152,6 +152,7 @@ class TestBasic(TestCase):
         whylog_dir = YamlConfigFactory._attach_whylog_dir(os.getcwd())
         config.add_rule(self.user_intent)
         self.check_loaded_config(config, whylog_dir)
+
         config, _ = YamlConfigFactory.get_config()
         self.check_loaded_config(config, whylog_dir)
         shutil.rmtree(whylog_dir)
@@ -167,4 +168,3 @@ class TestBasic(TestCase):
         ordered = [parser.name for parser in added_rule.get_causes_parsers()]
         ordered.sort()
         assert ordered == ["connectionerror", "datamigration"]
-
