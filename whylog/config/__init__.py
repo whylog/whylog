@@ -1,9 +1,9 @@
+import itertools
+import os
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
 
-import itertools
-import os
 import six
 import yaml
 
@@ -72,14 +72,20 @@ class ConfigFactory(object):
     def _create_new_config_dir(cls, base_path):
         path = os.path.join(base_path, ConfigFactory.WHYLOG_DIR)
         os.mkdir(path, 0o755)
-        files_names = {'parsers_path': 'parsers.yaml', 'rules_path': 'rules.yaml', 'log_types_path': 'log_types.yaml'}
+        files_names = {
+            'parsers_path': 'parsers.yaml',
+            'rules_path': 'rules.yaml',
+            'log_types_path': 'log_types.yaml'
+        }
         config_paths = {}
         for key, file_name in files_names.items():
             path = os.path.join(base_path, ConfigFactory.WHYLOG_DIR, file_name)
             ConfigFactory._create_empty_file(path)
             config_paths[key] = os.path.join(base_path, path)
         config_paths['pattern_assistant'] = 'regex'
-        path_to_config = os.path.join(base_path, ConfigFactory.WHYLOG_DIR, ConfigFactory.CONFIG_PATHS_FILE)
+        path_to_config = os.path.join(
+            base_path, ConfigFactory.WHYLOG_DIR, ConfigFactory.CONFIG_PATHS_FILE
+        )
         with open(path_to_config, 'w') as config_file:
             config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
         return path_to_config

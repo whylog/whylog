@@ -1,7 +1,6 @@
-from unittest import TestCase
-
 import os
 import shutil
+from unittest import TestCase
 
 from whylog.config import ConfigFactory
 
@@ -11,7 +10,9 @@ class TestBasic(TestCase):
     def validate_created_config(cls, config, predicted_dir_path):
         assert os.path.isdir(predicted_dir_path)
         assert config._parsers_path == os.path.join(predicted_dir_path, 'parsers.yaml')
-        assert sorted(os.listdir(predicted_dir_path)) == ['config.yaml', 'log_types.yaml', 'parsers.yaml', 'rules.yaml']
+        assert sorted(os.listdir(predicted_dir_path)) == [
+            'config.yaml', 'log_types.yaml', 'parsers.yaml', 'rules.yaml'
+        ]
 
     def test_creating_new_config_dir(self):
         assert ConfigFactory._find_path_to_config() is None
@@ -52,5 +53,4 @@ class TestBasic(TestCase):
     def remove_config_dir(cls, path):
         config_dir = os.path.join(path, ConfigFactory.WHYLOG_DIR)
         if os.path.isdir(config_dir):
-            print config_dir
             shutil.rmtree(config_dir)
