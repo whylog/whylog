@@ -9,14 +9,19 @@ from whylog.config.exceptions import UnsupportedFilenameMatcher
 from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
-from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
-from whylog.config.rule import RegexRuleFactory, Rule
+from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
+from whylog.config.rule import RegexRuleFactory
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
     def __init__(self):
         self._parsers = self._load_parsers()
+        self._parsers_grouped_by_log_type = self._index_parsers_by_log_type(
+            six.itervalues(
+                self._parsers
+            )
+        )
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
 
@@ -31,6 +36,13 @@ class AbstractConfig(object):
     @abstractmethod
     def _load_log_types(self):
         pass
+
+    @classmethod
+    def _index_parsers_by_log_type(cls, parsers):
+        grouped_parsers = defaultdict(list)
+        for parser in parsers:
+            grouped_parsers[parser.log_type].append(parser)
+        return grouped_parsers
 
     def add_rule(self, user_rule_intent):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
@@ -53,57 +65,82 @@ class AbstractConfig(object):
     def _save_parsers_definition(self, parser_definitions):
         pass
 
-    # mocked investigation plan for 003_match_time_range test
-    # TODO: remove mock
-    def mocked_investigation_plan(self):
-        matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
-        default_log_type = LogType('default', [matcher])
-        cause = RegexParser(
-            'cause', '2015-12-03 12:08:08 root cause',
-            '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) root cause$', [1], 'default', {1: 'date'}
+    def create_investigation_plan(self, front_input, log_type):
+        matching_parsers, effect_params = self._find_matching_parsers(
+            front_input.line_content, log_type.name
         )
-        effect = RegexParser(
-            'effect', '2015-12-03 12:08:09 visible effect',
-            '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) visible effect$', [1], 'default', {1: 'date'}
-        )
-        concatenated = ConcatenatedRegexParser([cause])
+        suspected_rules = self._filter_rule_set(matching_parsers)
+        concatenated_parsers = self._create_concatenated_parsers_for_investigation(suspected_rules)
+        #TODO: creating clues base on effect_params
+        #TODO: remove mocks
         effect_time = datetime(2015, 12, 3, 12, 8, 9)
-        earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)
-        default_investigation_step = InvestigationStep(
-            concatenated, effect_time, earliest_cause_time
-        )
-        rule = Rule(
-            [cause], effect, [
-                {
-                    'clues_groups': [[1, 1], [0, 1]],
-                    'name': 'time',
-                    'params': {'max_delta': 1}
-                }
-            ]
-        )  # yapf: disable
         line_source = LineSource('localhost', 'node_1.log', 40)
         effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
-        return InvestigationPlan(
-            [rule], [(default_investigation_step, default_log_type)], effect_clues
+        steps = self._create_steps_in_investigation(
+            concatenated_parsers, suspected_rules, effect_clues
         )
-
-    def create_investigation_plan(self, front_input, log_type_name):
-        # TODO: remove mock
-        return self.mocked_investigation_plan()
+        return InvestigationPlan(suspected_rules, steps, effect_clues)
 
     def get_log_type(self, front_input):
         # TODO: remove mock
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         return LogType('default', [matcher])
 
-    def _find_matching_parsers(self, front_input, log_type):
-        pass
+    def _find_matching_parsers(self, effect_line_content, log_type_name):
+        """
+        This method finding all parsers from Config base which matching with effect_line_content
+        """
+        matching_parsers = []
+        extracted_params = {}
+        for parser in self._parsers_grouped_by_log_type[log_type_name]:
+            params = parser.get_regex_params(effect_line_content)
+            if params is not None:
+                extracted_params[parser.name] = params
+                matching_parsers.append(parser)
+        return matching_parsers, extracted_params
 
     def _filter_rule_set(self, parsers_list):
-        pass
+        """
+        This method finding all rules from Config base which can be fulfilled in
+        single investigation base on parsers_list found by _find_matching_parsers
+        """
+        suspected_rules = []
+        for parser in parsers_list:
+            rules = self._rules.get(parser.name)
+            if rules is not None:
+                suspected_rules.extend(rules)
+        return suspected_rules
 
-    def _get_locations_for_logs(self, logs_types_list):
-        pass
+    @classmethod
+    def _create_concatenated_parsers_for_investigation(cls, rules):
+        """
+        Create concatenated parser for all log types which participate in given investigation based
+        on suspected rules found by _filter_rule_set
+        """
+        grouped_parsers = defaultdict(list)
+        inserted_parsers = set()
+        for suspected_rule in rules:
+            for parser in suspected_rule.get_causes_parsers():
+                if parser.name not in inserted_parsers:
+                    grouped_parsers[parser.log_type].append(parser)
+                    inserted_parsers.add(parser.name)
+        return dict(
+            (log_type_name, ConcatenatedRegexParser(parsers))
+            for log_type_name, parsers in six.iteritems(grouped_parsers)
+        )
+
+    def _create_steps_in_investigation(self, concatenated_parsers, suspected_rules, effect_clues):
+        steps = []
+        for log_type_name, parser in six.iteritems(concatenated_parsers):
+            log_type = self._log_types[log_type_name]
+            #TODO mocked for 003_test
+            #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
+            #TODO base on effect_clues and suspected_rules per log type
+            effect_time = datetime(2015, 12, 3, 12, 8, 9)  #TODO remove mock
+            earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)  #TODO remove mock
+            investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
+            steps.append((investigation_step, log_type))
+        return steps
 
 
 @six.add_metaclass(ABCMeta)
@@ -121,10 +158,11 @@ class AbstractFileConfig(AbstractConfig):
         )
 
     def _load_rules(self):
-        return [
-            RegexRuleFactory.from_dao(serialized_rule, self._parsers)
-            for serialized_rule in self._load_file_with_config(self._rules_path)
-        ]
+        loaded_rules = defaultdict(list)
+        for serialized_rule in self._load_file_with_config(self._rules_path):
+            rule = RegexRuleFactory.from_dao(serialized_rule, self._parsers)
+            loaded_rules[serialized_rule["effect"]].append(rule)
+        return loaded_rules
 
     def _load_log_types(self):
         matchers = defaultdict(list)

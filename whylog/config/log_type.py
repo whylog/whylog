@@ -3,7 +3,7 @@ import os.path
 
 class LogType(object):
     def __init__(self, name, filename_matchers):
-        self._name = name
+        self.name = name
         self._filename_matchers = filename_matchers
 
     # It will be generator

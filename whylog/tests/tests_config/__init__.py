@@ -135,8 +135,7 @@ class TestBasic(TestCase):
         assert dumped_parsers_again == dumped_parsers
 
     def test_loading_single_rule_its_parsers(self):
-        assert len(self.config._rules) == 1
-        rule = self.config._rules[0]
+        rule = self.config._rules['lostdata'][0]
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
             parser.name for parser in self.config._parsers.values()
         )
