@@ -18,9 +18,15 @@ from whylog.config.rule import RegexRuleFactory
 
 
 class AbstractConfigFactory(object):
+    """
+    This factory is responsible for finding .whylog directory (whylog config directory) and basing on
+    found content directory creating object of subclass AbstractConfig. If not found then it creates minimal
+    .whylog version in current directory.
+    """
     WHYLOG_DIR = '.whylog'
     HOME_DIR = os.path.expanduser('~')
     ETC_DIR = '/etc'
+    ASSISTANTS_DICT = {'regex': RegexAssistant}
 
     @classmethod
     @abstractmethod
@@ -28,14 +34,19 @@ class AbstractConfigFactory(object):
         raise NotImplementedError
 
     @classmethod
+    def _attach_whylog_dir(cls, path):
+        return os.path.join(path, cls.WHYLOG_DIR)
+
+    @classmethod
     def _search_in_parents_directories(cls, path):
         if os.path.isdir(cls.WHYLOG_DIR):
+            #current directory
             return path
-        for i in itertools.cycle([1]):
+        while True:
             path, suffix = os.path.split(path)
             if suffix == '':
                 return None
-            if os.path.isdir(os.path.join(path, cls.WHYLOG_DIR)):
+            if os.path.isdir(cls._attach_whylog_dir(path)):
                 return path
 
     @classmethod
@@ -48,10 +59,10 @@ class AbstractConfigFactory(object):
     def _find_path_to_config(cls):
         path = cls._search_in_parents_directories(os.getcwd())
         if path is not None:
-            return os.path.join(path, cls.WHYLOG_DIR)
+            return cls._attach_whylog_dir(path)
         dir_to_check = [
-            os.path.join(cls.HOME_DIR, cls.WHYLOG_DIR),
-            os.path.join(cls.ETC_DIR, cls.WHYLOG_DIR)
+            cls._attach_whylog_dir(cls.HOME_DIR),
+            cls._attach_whylog_dir(cls.ETC_DIR)
         ]
         for directory in dir_to_check:
             if cls._check_concrete_directory(directory):
@@ -63,16 +74,16 @@ class AbstractConfigFactory(object):
 
     @classmethod
     def _create_new_config_dir(cls, base_path):
-        path = os.path.join(base_path, cls.WHYLOG_DIR)
-        os.mkdir(path, 0o755)
+        whylog_dir = cls._attach_whylog_dir(base_path)
+        os.mkdir(whylog_dir, 0o755)
         config_paths = {}
         for key, file_name in six.iteritems(cls.FILES_NAMES):
-            path = os.path.join(base_path, cls.WHYLOG_DIR, file_name)
+            path = os.path.join(whylog_dir, file_name)
             cls._create_empty_file(path)
-            config_paths[key] = os.path.join(base_path, path)
+            config_paths[key] = path
         config_paths['pattern_assistant'] = 'regex'
         path_to_config = os.path.join(
-            base_path, cls.WHYLOG_DIR, cls.CONFIG_PATHS_FILE
+            whylog_dir, cls.CONFIG_PATHS_FILE
         )
         return cls.create_file_with_config_paths(config_paths, path_to_config)
 
@@ -103,9 +114,8 @@ class YamlConfigFactory(AbstractConfigFactory):
     def load_config(cls, path):
         with open(path, "r") as config_file:
             config_paths = yaml.load(config_file)
-            assistants_dict = {'regex': RegexAssistant}
             assistant_name = config_paths.pop('pattern_assistant')
-            assistant_class = assistants_dict.get(assistant_name)
+            assistant_class = cls.ASSISTANTS_DICT.get(assistant_name)
             if assistant_class is None:
                 raise UnsupportedAssistantError(assistant_name)
             return YamlConfig(**config_paths), assistant_class
