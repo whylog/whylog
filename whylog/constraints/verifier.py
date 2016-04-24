@@ -1,3 +1,20 @@
+from whylog.constraints import *
+from whylog.exceptions import WhylogError
+
+
+class ConstraintManager(object):
+    @classmethod
+    def get_constraint_by_type(cls, constraint_data):
+        constraints = {
+            'identical':    IdenticalIntervals({}),
+            'time':         TimeConstraint(constraint_data)
+            # register your constraint here
+        }
+        if constraint_data['name'] in constraints:
+            return constraints[constraint_data['name']]
+        raise WhylogError("No such constraint (%s) registered" % constraint_data['name'])
+
+
 class Verifier(object):
     def verify_rule(self, rule, clues):
         pass
@@ -32,7 +49,8 @@ class Verifier(object):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            if all(constraint.verify(*combination) for constraint in constraints):
+            if all(ConstraintManager.get_constraint_by_type(constraint).verify(constraint['params'], combination)
+                   for constraint in constraints):
                 # FIXME verify has not established signature yet
                 causes.append(combination)
         return causes
@@ -42,7 +60,8 @@ class Verifier(object):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            if any(constraint.verify(*combination) for constraint in constraints):
+            if any(ConstraintManager.get_constraint_by_type(constraint).verify(constraint['params'], combination)
+                   for constraint in constraints):
                 # FIXME verify has not established signature yet
                 causes.append(combination)
         return causes
