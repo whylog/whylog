@@ -1,4 +1,3 @@
-import itertools
 import os
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
