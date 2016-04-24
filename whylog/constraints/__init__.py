@@ -5,9 +5,7 @@ import six
 
 @six.add_metaclass(ABCMeta)
 class AbstractConstraint(object):
-    @abstractmethod
-    def save(self, rulebase_rule):
-        pass
+    pass
 
 
 class TimeConstraint(AbstractConstraint):
@@ -16,12 +14,16 @@ class TimeConstraint(AbstractConstraint):
 
     @classmethod
     def verify(cls, param_dict, group_contents):
-        return len(set(group_contents)) == 1
+        return True
 
 
 class IdenticalIntervals(AbstractConstraint):
     def __init__(self, params):
         pass
+
+    @classmethod
+    def verify(cls, param_dict, group_contents):
+        return len(set(group_contents)) == 1
 
 
 class AnyValueIntervals(AbstractConstraint):
