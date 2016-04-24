@@ -30,32 +30,34 @@ class TestBasic(TestCase):
 
     @classmethod
     def get_names_of_parsers(cls, parser_list):
-        return sorted([parser.name for parser in parser_list])
+        ordered = [parser.name for parser in parser_list]
+        ordered.sort()
+        return ordered
 
     def test_simple_parsers_filter(self):
         parsers, regex_params = self.simple_config._find_matching_parsers(
             self.lost_data_line, 'filesystem'
         )
-        assert TestBasic.get_names_of_parsers(parsers) == ['lostdata']
+        assert self.get_names_of_parsers(parsers) == ['lostdata']
         assert regex_params == {'lostdata': ('2016-04-12 23:54:43', 'comp2', '230', 'host2')}
 
         parsers, regex_params = self.simple_config._find_matching_parsers(
             self.lost_data_line, 'dummy'
         )
-        assert TestBasic.get_names_of_parsers(parsers) == []
+        assert self.get_names_of_parsers(parsers) == []
         assert regex_params == {}
 
         parsers, regex_params = self.simple_config._find_matching_parsers(
             self.connection_error_line, 'hydra'
         )
-        assert TestBasic.get_names_of_parsers(parsers) == ['connectionerror']
+        assert self.get_names_of_parsers(parsers) == ['connectionerror']
         assert regex_params == {'connectionerror': ('2016-04-12 23:54:45', 'comp1', 'host1')}
 
     def test_multiple_parser_matching(self):
         parsers, regex_params = self.multiple_parsers_config._find_matching_parsers(
             self.lost_data_line, 'filesystem'
         )
-        assert TestBasic.get_names_of_parsers(parsers) == ['lostdata', 'lostdatadate']
+        assert self.get_names_of_parsers(parsers) == ['lostdata', 'lostdatadate']
         assert regex_params == {
             'lostdata': ('2016-04-12 23:54:43', 'comp2', '230', 'host2'),
             'lostdatadate': ('2016-04-12 23:54:43',)
@@ -66,9 +68,7 @@ class TestBasic(TestCase):
         rules = self.simple_config._filter_rule_set(parsers)
         assert len(rules) == 1
         assert rules[0]._effect.name == 'lostdata'
-        assert TestBasic.get_names_of_parsers(rules[0]._causes) == [
-            'connectionerror', 'datamigration'
-        ]
+        assert self.get_names_of_parsers(rules[0]._causes) == ['connectionerror', 'datamigration']
 
     def test_empty_rule_filter(self):
         parsers, _ = self.simple_config._find_matching_parsers(self.connection_error_line, 'hydra')
@@ -78,16 +78,19 @@ class TestBasic(TestCase):
     def test_multiple_rule_filter(self):
         parsers, _ = self.complexed_config._find_matching_parsers(self.lost_data_line, 'filesystem')
         rules = self.complexed_config._filter_rule_set(parsers)
-        rules = sorted(rules, key=lambda x: x._effect.name)
+        rules.sort(key=lambda x: x._effect.name)
         assert len(rules) == 2
         assert rules[0]._effect.name == 'lostdata'
         assert rules[1]._effect.name == 'lostdatadate'
-        assert TestBasic.get_names_of_parsers(rules[0]._causes) == [
-            'connectionerror', 'datamigration'
-        ]
-        assert TestBasic.get_names_of_parsers(rules[1]._causes) == [
-            'connectionerror', 'datamigration'
-        ]
+        assert self.get_names_of_parsers(rules[0]._causes) == ['connectionerror', 'datamigration']
+        assert self.get_names_of_parsers(rules[1]._causes) == ['connectionerror', 'datamigration']
+
+    @classmethod
+    def check_all_subparsers_have_same_log_type(cls, parser_list):
+        log_types = [parser.log_type for parser in parser_list]
+        distinct = list(set(log_types))
+        assert len(distinct) == 1
+        assert distinct == ['hydra']
 
     @classmethod
     def creating_concatenated_parsers_parametrized(cls, config):
@@ -95,8 +98,9 @@ class TestBasic(TestCase):
         concatenated_parsers = config._create_concatenated_parsers_for_investigation(rule_chain)
         assert len(concatenated_parsers) == 1
         parser_list = concatenated_parsers['hydra']._parsers
-        assert TestBasic.get_names_of_parsers(parser_list) == ['connectionerror', 'datamigration']
+        cls.check_all_subparsers_have_same_log_type(parser_list)
+        assert cls.get_names_of_parsers(parser_list) == ['connectionerror', 'datamigration']
 
     def test_creating_concatenated_parsers(self):
-        TestBasic.creating_concatenated_parsers_parametrized(self.simple_config)
-        TestBasic.creating_concatenated_parsers_parametrized(self.complexed_config)
+        self.creating_concatenated_parsers_parametrized(self.simple_config)
+        self.creating_concatenated_parsers_parametrized(self.complexed_config)

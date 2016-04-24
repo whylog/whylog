@@ -17,7 +17,11 @@ from whylog.config.rule import RegexRuleFactory
 class AbstractConfig(object):
     def __init__(self):
         self._parsers = self._load_parsers()
-        self._parsers_grouped_by_log_type = self._group_parsers_by_log_type()
+        self._parsers_grouped_by_log_type = self._index_parsers_by_log_type(
+            six.itervalues(
+                self._parsers
+            )
+        )
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
 
@@ -33,9 +37,10 @@ class AbstractConfig(object):
     def _load_log_types(self):
         pass
 
-    def _group_parsers_by_log_type(self):
+    @classmethod
+    def _index_parsers_by_log_type(cls, parsers):
         grouped_parsers = defaultdict(list)
-        for parser in self._parsers.values():
+        for parser in parsers:
             grouped_parsers[parser.log_type].append(parser)
         return grouped_parsers
 
@@ -101,8 +106,9 @@ class AbstractConfig(object):
         """
         suspected_rules = []
         for parser in parsers_list:
-            if self._rules.get(parser.name) is not None:
-                suspected_rules.extend(self._rules.get(parser.name))
+            rules = self._rules.get(parser.name)
+            if rules is not None:
+                suspected_rules.extend(rules)
         return suspected_rules
 
     @classmethod
@@ -112,7 +118,7 @@ class AbstractConfig(object):
         on suspected rules found by _filter_rule_set
         """
         grouped_parsers = defaultdict(list)
-        inserted_parsers = set([])
+        inserted_parsers = set()
         for suspected_rule in rules:
             for parser in suspected_rule.get_causes_parsers():
                 if parser.name not in inserted_parsers:
@@ -120,12 +126,12 @@ class AbstractConfig(object):
                     inserted_parsers.add(parser.name)
         return dict(
             (log_type_name, ConcatenatedRegexParser(parsers))
-            for log_type_name, parsers in grouped_parsers.items()
+            for log_type_name, parsers in six.iteritems(grouped_parsers)
         )
 
     def _create_steps_in_investigation(self, concatenated_parsers, suspected_rules, effect_clues):
         steps = []
-        for log_type_name, parser in concatenated_parsers.items():
+        for log_type_name, parser in six.iteritems(concatenated_parsers):
             log_type = self._log_types[log_type_name]
             #TODO mocked for 003_test
             #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
