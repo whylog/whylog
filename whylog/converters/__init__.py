@@ -10,7 +10,7 @@ class AbstractConverter(object):
     @classmethod
     @abstractmethod
     def convert(cls, pattern_group):
-        pass
+        raise NotImplementedError
 
 
 class IntConverter(AbstractConverter):

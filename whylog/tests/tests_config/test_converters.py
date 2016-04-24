@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest import TestCase
 
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParser
-from whylog.converters.exceptions import UnsupportedConverter
+from whylog.converters.exceptions import UnsupportedConverterError
 
 
 class TestBasic(TestCase):
@@ -19,10 +19,10 @@ class TestBasic(TestCase):
             self.parser_name, self.simple_line, self.simple_pattern, [1], 'default', convertions
         )
         concatenated = ConcatenatedRegexParser([parser])
-        assert concatenated.get_clues_from_matched_line(self.simple_line) == {
+        assert concatenated.convert_parsers_groups_from_matched_line(self.simple_line) == {
             'commited_transaction': (datetime(2015, 12, 3, 12, 10, 10), 2100, 'postgres_db')
         }
-        assert concatenated.get_clues_from_matched_line(self.dummy_line) == {}
+        assert concatenated.convert_parsers_groups_from_matched_line(self.dummy_line) == {}
 
     def test_unsupported_converter(self):
         convertions = {1: 'date', 2: 'int', 3: 'unsupported_type'}
@@ -31,5 +31,6 @@ class TestBasic(TestCase):
         )
         concatenated = ConcatenatedRegexParser([parser])
         self.assertRaises(
-            UnsupportedConverter, concatenated.get_clues_from_matched_line, self.simple_line
+            UnsupportedConverterError, concatenated.convert_parsers_groups_from_matched_line,
+            self.simple_line
         )

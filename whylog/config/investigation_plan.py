@@ -45,10 +45,8 @@ class InvestigationStep(object):
             return date.replace(tzinfo=dateutil.tz.tzutc())
         return date
 
-    def get_clues(self, line, offset, line_source=None):
-        #TODO: remove mock
-        line_source = LineSource('localhost', 'node_1.log')
-        converted_params = self._parser_subset.get_clues_from_matched_line(line)
+    def get_clues(self, line, offset, line_source):
+        converted_params = self._parser_subset.convert_parsers_groups_from_matched_line(line)
         return dict(
             (parser_name, Clue(converted_groups, line, offset, line_source))
             for parser_name, converted_groups in converted_params.items()

@@ -75,7 +75,6 @@ class AbstractConfig(object):
         steps = self._create_steps_in_investigation(
             concatenated_parsers, suspected_rules, effect_clues
         )
-        print effect_clues
         return InvestigationPlan(suspected_rules, steps, effect_clues)
 
     def get_log_type(self, front_input):
@@ -89,7 +88,10 @@ class AbstractConfig(object):
         line_source = LineSource('localhost', 'node_1.log')
         for parser_name, params in six.iteritems(effect_params):
             parser = self._parsers[parser_name]
-            clue = Clue(parser.convert_params(params), front_input.line_content, front_input.offset, line_source)
+            clue = Clue(
+                parser.convert_params(params), front_input.line_content, front_input.offset,
+                line_source
+            )
             effect_clues[parser_name] = clue
         return effect_clues
 

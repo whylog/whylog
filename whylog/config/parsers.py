@@ -4,7 +4,7 @@ import six
 from frozendict import frozendict
 
 from whylog.converters import CONVERTION_MAPPING, STRING
-from whylog.converters.exceptions import UnsupportedConverter
+from whylog.converters.exceptions import UnsupportedConverterError
 
 IMPORTED_RE = False
 
@@ -66,13 +66,19 @@ class RegexParser(AbstractParser):
         }
 
     def convert_params(self, params):
+        """
+        Converts single parser tuple groups to tuple with converted elems
+        Sample convertion:
+            params: ('2015-12-03 12:10:10', '2100', 'postgres_db')
+            return: (datetime(2015, 12, 3, 12, 10, 10), 2100, 'postgres_db')
+        """
         converted_params = []
         for i in range(len(params)):
             group_type = self.convertions.get(i + 1, STRING)
             if group_type != STRING:
                 converter = CONVERTION_MAPPING.get(group_type)
                 if converter is None:
-                    raise UnsupportedConverter(group_type)
+                    raise UnsupportedConverterError(group_type)
                 converted_params.append(converter.convert(params[i]))
             else:
                 converted_params.append(params[i])
@@ -179,7 +185,21 @@ class ConcatenatedRegexParser(AbstractParserSubset):
             index_to_regex[indexes[0]] = name
         return index_to_regex
 
-    def get_clues_from_matched_line(self, line):
+    def convert_parsers_groups_from_matched_line(self, line):
+        """
+        Converts extracted parsers groups dict, where groups are strings to dict where groups
+        was converted to proper type, which is defined in parser object.
+        Params come from only one line from logs.
+        Sample convertion:
+            line: "2015-12-03 12:10:10 Commited transaction number 2100. Host name: postgres_db"
+            params_dict : {
+                'commited_transaction' : ('2015-12-03 12:10:10', '2100', 'postgres_db')
+            }
+            return: {
+                'commited_transaction': (datetime(2015, 12, 3, 12, 10, 10), 2100, 'postgres_db')
+            }
+            commited_transaction is sample parser name which matches with line
+        """
         params_dict = self.get_extracted_parsers_params(line)
         converted_params = {}
         for parser_name, parser in params_dict.items():

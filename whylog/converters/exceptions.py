@@ -1,7 +1,7 @@
 from whylog.exceptions import WhylogError
 
 
-class UnsupportedConverter(WhylogError):
+class UnsupportedConverterError(WhylogError):
     def __init__(self, converter_class_name):
         self.converter_class_name = converter_class_name
 
