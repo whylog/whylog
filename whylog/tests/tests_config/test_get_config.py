@@ -7,19 +7,19 @@ from whylog.config import ConfigFactory
 
 class TestBasic(TestCase):
     @classmethod
+    def setUpClass(cls):
+        #This change was caused by fails os.names() for new directories.
+        #Renaming was necessary to avoid conflicts between test config directories
+        #and orginal independent non tests config directories
+        ConfigFactory.WHYLOG_DIR = '.whylog_test'
+
+    @classmethod
     def validate_created_config(cls, config, predicted_dir_path):
         assert os.path.isdir(predicted_dir_path)
         assert config._parsers_path == os.path.join(predicted_dir_path, 'parsers.yaml')
         assert sorted(os.listdir(predicted_dir_path)) == [
             'config.yaml', 'log_types.yaml', 'parsers.yaml', 'rules.yaml'
         ]
-
-    def test_creating_new_config_dir(self):
-        assert ConfigFactory._find_path_to_config() is None
-        config, _ = ConfigFactory.get_config()
-        predicted_dir_path = os.path.join(os.getcwd(), ConfigFactory.WHYLOG_DIR)
-        TestBasic.validate_created_config(config, predicted_dir_path)
-        shutil.rmtree(predicted_dir_path)
 
     @classmethod
     def find_config_in_parent_dir(cls, path):
@@ -41,13 +41,14 @@ class TestBasic(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        #clean test .whylog directories if some tests fail.
+        #Removed test config directories if test failed
         path = os.getcwd()
         TestBasic.remove_config_dir(path)
         for i in range(2):
             path, _ = os.path.split(path)
             TestBasic.remove_config_dir(path)
         TestBasic.remove_config_dir(ConfigFactory.HOME_DIR)
+        ConfigFactory.WHYLOG_DIR = '.whylog'
 
     @classmethod
     def remove_config_dir(cls, path):
