@@ -71,7 +71,7 @@ class TestBasic(TestCase):
         if test_name == '003_match_time_range':
             # TODO this 'if' is temporary, remove this later
             assert result
-            assert result[0].line_content == self._get_last_line_from_file(output_path)
+            assert result[0][0].line_content == self._get_last_line_from_file(output_path)
             # ^ hack basing on that for test 003 last line of expected_output.txt is a cause line
             # FIXME it is not appropriate for each test
             # FIXME checking up correctness should be more advanced for more advanced tests
