@@ -75,7 +75,7 @@ class ConfigFactory(object):
         files_names = {'parsers_path': 'parsers.yaml', 'rules_path': 'rules.yaml', 'log_types_path': 'log_types.yaml'}
         config_paths = {}
         for key, file_name in files_names.items():
-            path = os.path.join(ConfigFactory.WHYLOG_DIR, file_name)
+            path = os.path.join(base_path, ConfigFactory.WHYLOG_DIR, file_name)
             ConfigFactory._create_empty_file(path)
             config_paths[key] = os.path.join(base_path, path)
         config_paths['pattern_assistant'] = 'regex'
