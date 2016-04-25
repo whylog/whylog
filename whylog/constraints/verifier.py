@@ -75,3 +75,12 @@ class Verifier(object):
                 # FIXME verify has not established signature yet
                 causes.append(combination)
         return causes
+
+
+class InvestigationResult(object):
+    def __init__(self, lines, constraint):
+        self.lines = lines
+        self.constraint = constraint
+
+    def __repr__(self):
+        return "(result lines: %s; due to constraint: %s)" % (self.lines, self.constraint)
