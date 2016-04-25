@@ -70,7 +70,6 @@ class TestBasic(TestCase):
 
         if test_name == '003_match_time_range':
             # TODO this 'if' is temporary, remove this later
-            print "\nInvResults: %s" % result
             assert result
             assert result[0].lines[0].line_content == self._get_last_line_from_file(output_path)
             # ^ hack basing on that for test 003 last line of expected_output.txt is a cause line
