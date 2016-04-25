@@ -156,7 +156,6 @@ class TestBasic(TestCase):
         config, _ = YamlConfigFactory.get_config()
         self.check_loaded_config(config, whylog_dir)
         shutil.rmtree(whylog_dir)
-        YamlConfigFactory.WHYLOG_DIR = '.whylog'
 
     @classmethod
     def check_loaded_config(cls, config, whylog_dir):

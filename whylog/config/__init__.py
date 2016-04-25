@@ -30,7 +30,7 @@ class AbstractConfigFactory(object):
     @classmethod
     @abstractmethod
     def load_config(cls, path):
-        raise NotImplementedError
+        pass
 
     @classmethod
     def _attach_whylog_dir(cls, path):
@@ -49,19 +49,13 @@ class AbstractConfigFactory(object):
                 return path
 
     @classmethod
-    def _check_concrete_directory(cls, path):
-        if os.path.isdir(path):
-            return True
-        return False
-
-    @classmethod
     def _find_path_to_config(cls):
         path = cls._search_in_parents_directories(os.getcwd())
         if path is not None:
             return cls._attach_whylog_dir(path)
         dir_to_check = [cls._attach_whylog_dir(cls.HOME_DIR), cls._attach_whylog_dir(cls.ETC_DIR)]
         for directory in dir_to_check:
-            if cls._check_concrete_directory(directory):
+            if os.path.isdir(directory):
                 return directory
 
     @classmethod
@@ -84,7 +78,7 @@ class AbstractConfigFactory(object):
     @classmethod
     @abstractmethod
     def create_file_with_config_paths(cls, config_paths, path_to_config):
-        raise NotImplementedError
+        pass
 
     @classmethod
     def get_config(cls):
