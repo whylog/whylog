@@ -5,6 +5,7 @@ from os import SEEK_SET
 
 import six
 
+from whylog.config.investigation_plan import LineSource
 from whylog.log_reader.const import BufsizeConsts
 
 
@@ -88,6 +89,9 @@ class BacktrackSearcher(AbstractSearcher):
         clues = defaultdict(list)
         offset = self._deduce_offset(investigation_step)
         for line, actual_offset in self._reverse_from_offset(offset):
-            clues_from_line = investigation_step.get_clues(line, actual_offset)
+            # TODO: line_source object should be also passed into get_clues function
+            # TODO: remove mock
+            line_source = LineSource('localhost', 'node_1.log')
+            clues_from_line = investigation_step.get_clues(line, actual_offset, line_source)
             self._merge_clues(clues, clues_from_line)
         return clues

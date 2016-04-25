@@ -3,6 +3,9 @@ from abc import ABCMeta, abstractmethod
 import six
 from frozendict import frozendict
 
+from whylog.converters import CONVERTION_MAPPING, STRING
+from whylog.converters.exceptions import UnsupportedConverterError
+
 IMPORTED_RE = False
 
 try:
@@ -12,7 +15,7 @@ except ImportError:
 
     IMPORTED_RE = True
 """
-This handling of import regex error does not really means that
+This handling of import regex error does not really mean that
 we are able to work without regex being installed. It means that
 whylog can work with these python versions, which don't handle
 regex module(like pypy, pypy3). So if you use cpython 2.5-3.5
@@ -61,6 +64,25 @@ class RegexParser(AbstractParser):
             "convertions": self.convertions,
             "line_content": self.line_content
         }
+
+    def convert_params(self, params):
+        """
+        Converts single parser tuple groups to tuple with converted elems
+        Sample convertion:
+            params: ('2015-12-03 12:10:10', '2100', 'postgres_db')
+            return: (datetime(2015, 12, 3, 12, 10, 10), 2100, 'postgres_db')
+        """
+        converted_params = []
+        for i in six.moves.range(len(params)):
+            group_type = self.convertions.get(i + 1, STRING)
+            if group_type == STRING:
+                converted_params.append(params[i])
+                continue
+            converter = CONVERTION_MAPPING.get(group_type)
+            if converter is None:
+                raise UnsupportedConverterError(group_type)
+            converted_params.append(converter.convert(params[i]))
+        return tuple(converted_params)
 
 
 @six.add_metaclass(ABCMeta)
@@ -113,6 +135,7 @@ class ConcatenatedRegexParser(AbstractParserSubset):
 
     def __init__(self, parser_list):
         self._parsers = parser_list
+        self._parsers_dict = dict((parser.name, parser) for parser in self._parsers)
         if IMPORTED_RE:
             return
         forward, backward = self._create_concatenated_regexes()
@@ -161,6 +184,27 @@ class ConcatenatedRegexParser(AbstractParserSubset):
         for name, indexes in parsers_indexes.items():
             index_to_regex[indexes[0]] = name
         return index_to_regex
+
+    def convert_parsers_groups_from_matched_line(self, line):
+        """
+        Converts extracted parsers groups dict, where groups are strings to dict where groups
+        was converted to proper type, which is defined in parser object.
+        Params come from only one line from logs.
+        Sample convertion:
+            line: "2015-12-03 12:10:10 Commited transaction number 2100. Host name: postgres_db"
+            params_dict : {
+                'commited_transaction' : ('2015-12-03 12:10:10', '2100', 'postgres_db')
+            }
+            return: {
+                'commited_transaction': (datetime(2015, 12, 3, 12, 10, 10), 2100, 'postgres_db')
+            }
+            commited_transaction is sample parser name which matches with line
+        """
+        params_dict = self.get_extracted_parsers_params(line)
+        converted_params = {}
+        for parser_name, parser in six.iteritems(params_dict):
+            converted_params[parser_name] = self._parsers_dict[parser_name].convert_params(parser)
+        return converted_params
 
     def get_extracted_parsers_params(self, line):
         """

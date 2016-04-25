@@ -173,11 +173,7 @@ class AbstractConfig(object):
         )
         suspected_rules = self._filter_rule_set(matching_parsers)
         concatenated_parsers = self._create_concatenated_parsers_for_investigation(suspected_rules)
-        #TODO: creating clues base on effect_params
-        #TODO: remove mocks
-        effect_time = datetime(2015, 12, 3, 12, 8, 9)
-        line_source = LineSource('localhost', 'node_1.log', 40)
-        effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
+        effect_clues = self._create_effect_clues(effect_params, front_input)
         steps = self._create_steps_in_investigation(
             concatenated_parsers, suspected_rules, effect_clues
         )
@@ -187,6 +183,19 @@ class AbstractConfig(object):
         # TODO: remove mock
         matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
         return LogType('default', [matcher])
+
+    def _create_effect_clues(self, effect_params, front_input):
+        effect_clues = {}
+        # TODO: remove mocks line source should come from front_input
+        line_source = LineSource('localhost', 'node_1.log')
+        for parser_name, params in six.iteritems(effect_params):
+            parser = self._parsers[parser_name]
+            clue = Clue(
+                parser.convert_params(params), front_input.line_content, front_input.offset,
+                line_source
+            )
+            effect_clues[parser_name] = clue
+        return effect_clues
 
     def _find_matching_parsers(self, effect_line_content, log_type_name):
         """
