@@ -21,6 +21,14 @@ class Verifier(object):
         pass
 
     @classmethod
+    def _verify_constraint(cls, combination, constraint):
+        constraint_verifier = ConstraintManager.get_constraint_by_type(constraint)
+        return constraint_verifier.verify(
+            constraint['params'],
+            [clue.regex_parameters for clue in combination]
+        )
+
+    @classmethod
     def _clues_combinations(cls, clues_lists, collected_subset=[]):
         """
         recursive generator that returns all combinations
@@ -50,13 +58,7 @@ class Verifier(object):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            if all(
-                ConstraintManager.get_constraint_by_type(constraint).verify(
-                    constraint['params'], [
-                        clue.regex_parameters for clue in combination
-                    ]
-                ) for constraint in constraints
-            ):
+            if all(cls._verify_constraint(combination, constraint) for constraint in constraints):
                 causes.append(
                     InvestigationResult(
                         [
@@ -73,13 +75,7 @@ class Verifier(object):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            if any(
-                ConstraintManager.get_constraint_by_type(constraint).verify(
-                    constraint['params'], [
-                        clue.regex_parameters for clue in combination
-                    ]
-                ) for constraint in constraints
-            ):
+            if any(cls._verify_constraint(combination, constraint) for constraint in constraints):
                 # FIXME only constraints that matched should be appended
                 causes.append(InvestigationResult(combination, constraints))
         return causes
