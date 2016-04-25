@@ -17,9 +17,6 @@ class ConstraintManager(object):
 
 
 class Verifier(object):
-    def verify_rule(self, rule, clues):
-        pass
-
     @classmethod
     def _front_input_from_clue(cls, clue):
         return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)
@@ -63,7 +60,7 @@ class Verifier(object):
 
     @classmethod
     def constraints_and(cls, clues_lists, effect, constraints):
-        clues_lists = filter(lambda x: x, clues_lists)
+        clues_lists = list(filter(lambda x: x, clues_lists))
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(
@@ -79,12 +76,14 @@ class Verifier(object):
 
     @classmethod
     def constraints_or(cls, clues_lists, effect, constraints):
-        clues_lists = filter(lambda x: x, clues_lists)
+        clues_lists = list(filter(lambda x: x, clues_lists))
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            verified_constraints = filter(
-                lambda constraint: cls._verify_constraint(combination, effect, constraint),
-                constraints
+            verified_constraints = list(
+                filter(
+                    lambda constraint: cls._verify_constraint(combination, effect, constraint),
+                    constraints
+                )
             )
             if len(verified_constraints) > 0:
                 causes.append(

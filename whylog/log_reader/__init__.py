@@ -55,10 +55,8 @@ class SearchManager(object):
         causes = []
         # effect_clues are accessible from self._investigation_plan._effect_clues
         for rule in self._investigation_plan._suspected_rules:
-            # FIXME eliminate protected field access
-            clues_lists = []  # FIXME what about effect?
+            clues_lists = []
             for cause in rule._causes:
-                # FIXME eliminate protected field access
                 if cause.name in clues:
                     clues_lists.append(clues[cause.name])
             effect_clue = self._investigation_plan._effect_clues[rule._effect.name]

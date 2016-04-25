@@ -9,7 +9,14 @@ class TestBasic(TestCase):
     def test_clues_combinations_basic(self):
         xs = [[1, 2, 3], [4, 5], [6]]
         combinations = list(Verifier._clues_combinations(xs))
-        assert combinations == [[1, 4, 6], [1, 5, 6], [2, 4, 6], [2, 5, 6], [3, 4, 6], [3, 5, 6]]
+        assert combinations == [
+            [1, 4, 6],
+            [1, 5, 6],
+            [2, 4, 6],
+            [2, 5, 6],
+            [3, 4, 6],
+            [3, 5, 6]
+        ]  # yapf: disable
 
     def test_constraints_or_basic(self):
         line_source = LineSource('localhost', 'node_0.log')
@@ -45,13 +52,13 @@ class TestBasic(TestCase):
                 ('Chocolate', 2), 'Chocolate, 2 times', 100, line_source)),
             Verifier._front_input_from_clue(Clue(
                 ('Banana', 2), 'Banana, 2 times', 1050, line_source))
-        ]
+        ]  # yapf: disable
         assert causes[1].lines == [
             Verifier._front_input_from_clue(Clue(
                 ('Banana', 1), 'Banana, 1 times', 150, line_source)),
             Verifier._front_input_from_clue(Clue(
                 ('Banana', 2), 'Banana, 2 times', 1050, line_source))
-        ]
+        ]  # yapf: disable
 
     def test_constraints_and_basic(self):
         line_source = LineSource('localhost', 'node_0.log')
@@ -64,8 +71,8 @@ class TestBasic(TestCase):
             ], [
                 Clue(('Pear', 2), 'Pear, 2 times', 1050, line_source),
                 Clue(('Milk', 1), 'Milk, 2 times', 1100, line_source)
-            ]  # yapf: disable
-        ]
+            ]
+        ]  # yapf: disable
         constraints = [
             {
                 'clues_groups': [[0, 1], [1, 1], [2, 1]],
@@ -86,4 +93,4 @@ class TestBasic(TestCase):
                 ('Pear', 2), 'Pear, 2 times', 150, line_source)),
             Verifier._front_input_from_clue(Clue(
                 ('Pear', 2), 'Pear, 2 times', 1050, line_source))
-        ]
+        ]  # yapf: disable
