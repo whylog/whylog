@@ -2,6 +2,7 @@ from datetime import datetime
 
 import dateutil.parser
 import dateutil.tz
+import six
 
 
 class InvestigationPlan(object):
@@ -49,7 +50,7 @@ class InvestigationStep(object):
         converted_params = self._parser_subset.convert_parsers_groups_from_matched_line(line)
         return dict(
             (parser_name, Clue(converted_groups, line, offset, line_source))
-            for parser_name, converted_groups in converted_params.items()
+            for parser_name, converted_groups in six.iteritems(converted_params)
         )
 
 

@@ -15,7 +15,7 @@ except ImportError:
 
     IMPORTED_RE = True
 """
-This handling of import regex error does not really means that
+This handling of import regex error does not really mean that
 we are able to work without regex being installed. It means that
 whylog can work with these python versions, which don't handle
 regex module(like pypy, pypy3). So if you use cpython 2.5-3.5
@@ -73,15 +73,15 @@ class RegexParser(AbstractParser):
             return: (datetime(2015, 12, 3, 12, 10, 10), 2100, 'postgres_db')
         """
         converted_params = []
-        for i in range(len(params)):
+        for i in six.moves.range(len(params)):
             group_type = self.convertions.get(i + 1, STRING)
-            if group_type != STRING:
-                converter = CONVERTION_MAPPING.get(group_type)
-                if converter is None:
-                    raise UnsupportedConverterError(group_type)
-                converted_params.append(converter.convert(params[i]))
-            else:
+            if group_type == STRING:
                 converted_params.append(params[i])
+                continue
+            converter = CONVERTION_MAPPING.get(group_type)
+            if converter is None:
+                raise UnsupportedConverterError(group_type)
+            converted_params.append(converter.convert(params[i]))
         return tuple(converted_params)
 
 
@@ -202,7 +202,7 @@ class ConcatenatedRegexParser(AbstractParserSubset):
         """
         params_dict = self.get_extracted_parsers_params(line)
         converted_params = {}
-        for parser_name, parser in params_dict.items():
+        for parser_name, parser in six.iteritems(params_dict):
             converted_params[parser_name] = self._parsers_dict[parser_name].convert_params(parser)
         return converted_params
 

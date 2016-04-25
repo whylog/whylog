@@ -15,22 +15,19 @@ class AbstractConverter(object):
 
 class IntConverter(AbstractConverter):
     @classmethod
-    @abstractmethod
     def convert(cls, pattern_group):
         return int(pattern_group)
 
 
 class FloatConverter(AbstractConverter):
     @classmethod
-    @abstractmethod
     def convert(cls, pattern_group):
         return float(pattern_group)
 
 
-# Simple date convertion will replace for concreate date format converter in the future
+#TODO: Simple date convertion will replace for concreate date format converter in the future
 class DateConverter(AbstractConverter):
     @classmethod
-    @abstractmethod
     def convert(cls, pattern_group):
         return dateutil.parser.parse(pattern_group, fuzzy=True)
 

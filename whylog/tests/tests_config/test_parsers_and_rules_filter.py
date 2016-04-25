@@ -1,8 +1,10 @@
 import itertools
 import os.path
+from datetime import datetime
 from unittest import TestCase
 
 from whylog.config import YamlConfig
+from whylog.front import FrontInput
 from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
@@ -104,3 +106,15 @@ class TestBasic(TestCase):
     def test_creating_concatenated_parsers(self):
         self.creating_concatenated_parsers_parametrized(self.simple_config)
         self.creating_concatenated_parsers_parametrized(self.complexed_config)
+
+    def test_creatig_effect_clues(self):
+        #TODO: add some line source assert when FrontInput will contains LineSource or something like that
+        offset = 42
+        front_input = FrontInput(offset, self.lost_data_line, None)
+        effect_params = {'lostdata': ("2015-12-03 12:11:00", "alfa21", "567.02", "101")}
+        clues = self.simple_config._create_effect_clues(effect_params, front_input)
+        assert len(clues) == 1
+        clue = clues['lostdata']
+        assert clue.regex_parameters == (datetime(2015, 12, 3, 12, 11), 'alfa21', '567.02', '101')
+        assert clue.line_offset == offset
+        assert clue.line_prefix_content == self.lost_data_line
