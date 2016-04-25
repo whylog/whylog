@@ -1,6 +1,6 @@
-from whylog.constraints import TimeConstraint, IdenticalIntervals
-from whylog.front import FrontInput
+from whylog.constraints import IdenticalIntervals, TimeConstraint
 from whylog.exceptions import WhylogError
+from whylog.front import FrontInput
 
 
 class ConstraintManager(object):
@@ -8,7 +8,7 @@ class ConstraintManager(object):
     def get_constraint_by_type(cls, constraint_data):
         constraints = {
             'identical': IdenticalIntervals({}),
-            'time': TimeConstraint(constraint_data)
+            'time': TimeConstraint({})
             # register your constraint here
         }
         if constraint_data['name'] in constraints:
@@ -87,7 +87,13 @@ class Verifier(object):
                 constraints
             )
             if len(verified_constraints) > 0:
-                causes.append(InvestigationResult(combination, verified_constraints))
+                causes.append(
+                    InvestigationResult(
+                        [
+                            cls._front_input_from_clue(clue) for clue in combination
+                        ], verified_constraints
+                    )
+                )
         return causes
 
 
@@ -100,3 +106,6 @@ class InvestigationResult(object):
         return "\n(\n    result lines: %s;\n    due to constraints: %s\n)" % (
             self.lines, self.constraints
         )
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
