@@ -21,11 +21,14 @@ class Verifier(object):
         pass
 
     @classmethod
+    def _front_input_from_clue(cls, clue):
+        return FrontInput(clue.line_source.offset, clue.line_prefix_content, clue.line_source)
+
+    @classmethod
     def _verify_constraint(cls, combination, constraint):
         constraint_verifier = ConstraintManager.get_constraint_by_type(constraint)
         return constraint_verifier.verify(
-            constraint['params'],
-            [clue.regex_parameters for clue in combination]
+            constraint['params'], [clue.regex_parameters for clue in combination]
         )
 
     @classmethod
@@ -61,11 +64,7 @@ class Verifier(object):
             if all(cls._verify_constraint(combination, constraint) for constraint in constraints):
                 causes.append(
                     InvestigationResult(
-                        [
-                            FrontInput(
-                                clue.line_source.offset, clue.line_prefix_content, clue.line_source
-                            ) for clue in combination
-                        ], constraints
+                        [cls._front_input_from_clue(clue) for clue in combination], constraints
                     )
                 )
         return causes
@@ -75,9 +74,11 @@ class Verifier(object):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            if any(cls._verify_constraint(combination, constraint) for constraint in constraints):
-                # FIXME only constraints that matched should be appended
-                causes.append(InvestigationResult(combination, constraints))
+            verified_constraints = filter(
+                lambda constraint: cls._verify_constraint(combination, constraint), constraints
+            )
+            if len(verified_constraints) > 0:
+                causes.append(InvestigationResult(combination, verified_constraints))
         return causes
 
 
