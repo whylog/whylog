@@ -1,3 +1,4 @@
+import os
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
@@ -5,12 +6,113 @@ from datetime import datetime
 import six
 import yaml
 
+from whylog.assistant.exceptions import UnsupportedAssistantError
+from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.config.exceptions import UnsupportedFilenameMatcher
 from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
+
+
+class AbstractConfigFactory(object):
+    """
+    This factory is responsible for finding .whylog directory (whylog config directory) and basing on
+    found content directory creating object of subclass AbstractConfig. If not found then it creates minimal
+    .whylog version in current directory.
+    """
+    WHYLOG_DIR = '.whylog'
+    HOME_DIR = os.path.expanduser('~')
+    ETC_DIR = '/etc'
+    ASSISTANTS_DICT = {'regex': RegexAssistant}
+
+    @classmethod
+    @abstractmethod
+    def load_config(cls, path):
+        pass
+
+    @classmethod
+    def _attach_whylog_dir(cls, path):
+        return os.path.join(path, cls.WHYLOG_DIR)
+
+    @classmethod
+    def _search_in_parents_directories(cls, path):
+        if os.path.isdir(cls.WHYLOG_DIR):
+            #current directory
+            return path
+        while True:
+            path, suffix = os.path.split(path)
+            if suffix == '':
+                return None
+            if os.path.isdir(cls._attach_whylog_dir(path)):
+                return path
+
+    @classmethod
+    def _find_path_to_config(cls):
+        path = cls._search_in_parents_directories(os.getcwd())
+        if path is not None:
+            return cls._attach_whylog_dir(path)
+        dir_to_check = [cls._attach_whylog_dir(cls.HOME_DIR), cls._attach_whylog_dir(cls.ETC_DIR)]
+        for directory in dir_to_check:
+            if os.path.isdir(directory):
+                return directory
+
+    @classmethod
+    def _create_empty_file(cls, path):
+        open(path, 'w').close()
+
+    @classmethod
+    def _create_new_config_dir(cls, base_path):
+        whylog_dir = cls._attach_whylog_dir(base_path)
+        os.mkdir(whylog_dir, 0o755)
+        config_paths = {}
+        for key, file_name in six.iteritems(cls.FILES_NAMES):
+            path = os.path.join(whylog_dir, file_name)
+            cls._create_empty_file(path)
+            config_paths[key] = path
+        config_paths['pattern_assistant'] = 'regex'
+        path_to_config = os.path.join(whylog_dir, cls.CONFIG_PATHS_FILE)
+        return cls.create_file_with_config_paths(config_paths, path_to_config)
+
+    @classmethod
+    @abstractmethod
+    def create_file_with_config_paths(cls, config_paths, path_to_config):
+        pass
+
+    @classmethod
+    def get_config(cls):
+        path = cls._find_path_to_config()
+        if path is not None:
+            path_to_config = os.path.join(path, cls.CONFIG_PATHS_FILE)
+            return cls.load_config(path_to_config)
+        path_to_config = cls._create_new_config_dir(os.getcwd())
+        return cls.load_config(path_to_config)
+
+
+class YamlConfigFactory(AbstractConfigFactory):
+    CONFIG_PATHS_FILE = 'config.yaml'
+    FILES_NAMES = {
+        'parsers_path': 'parsers.yaml',
+        'rules_path': 'rules.yaml',
+        'log_types_path': 'log_types.yaml'
+    }
+
+    @classmethod
+    def load_config(cls, path):
+        with open(path, "r") as config_file:
+            config_paths = yaml.load(config_file)
+            assistant_name = config_paths.pop('pattern_assistant')
+            assistant_class = cls.ASSISTANTS_DICT.get(assistant_name)
+            if assistant_class is None:
+                raise UnsupportedAssistantError(assistant_name)
+            return YamlConfig(**config_paths), assistant_class
+
+    @classmethod
+    def create_file_with_config_paths(cls, config_paths, path_to_config):
+        with open(path_to_config, 'w') as config_file:
+            config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
+        return path_to_config
 
 
 @six.add_metaclass(ABCMeta)
@@ -49,7 +151,7 @@ class AbstractConfig(object):
         self._save_rule_definition(created_rule.serialize())
         created_parsers = created_rule.get_new_parsers(self._parsers)
         self._save_parsers_definition(parser.serialize() for parser in created_parsers)
-        self._rules.append(created_rule)
+        self._rules[created_rule.get_effect_name()].append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
 
@@ -202,8 +304,8 @@ class AbstractFileConfig(AbstractConfig):
 
 
 class YamlConfig(AbstractFileConfig):
-    def __init__(self, parsers_path, rules_path, log_type_path):
-        super(YamlConfig, self).__init__(parsers_path, rules_path, log_type_path)
+    def __init__(self, parsers_path, rules_path, log_types_path):
+        super(YamlConfig, self).__init__(parsers_path, rules_path, log_types_path)
 
     def _load_file_with_config(self, path):
         with open(path, "r") as config_file:

@@ -1,16 +1,16 @@
 import os.path
+import shutil
 from unittest import TestCase
 
 import yaml
 
 from whylog.assistant.const import AssistantType
-from whylog.config import YamlConfig
+from whylog.config import YamlConfigFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
-from whylog.tests.utils import ConfigPathFactory
 
 # Constraint types
 identical_constr = "identical"
@@ -105,9 +105,9 @@ class TestBasic(TestCase):
 
         cls.user_intent = UserRuleIntent(effect_id, parsers, constraints)
 
-        cls.path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
-        prefix_path = os.path.join(*cls.path_test_files)
-        cls.config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(prefix_path))
+        path_config = ['whylog', 'tests', 'tests_config', 'test_files', '.whylog', 'config.yaml']
+        path = os.path.join(*path_config)
+        cls.config, _ = YamlConfigFactory.load_config(path)
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
@@ -145,3 +145,25 @@ class TestBasic(TestCase):
         assert sorted(self.config._log_types.keys()) == ['apache', 'default']
         assert len(self.config._log_types['default']._filename_matchers) == 2
         assert len(self.config._log_types['apache']._filename_matchers) == 1
+
+    def test_add_new_rule_to_empty_config(self):
+        YamlConfigFactory.WHYLOG_DIR = '.test_whylog'
+        config, _ = YamlConfigFactory.get_config()
+        whylog_dir = YamlConfigFactory._attach_whylog_dir(os.getcwd())
+        config.add_rule(self.user_intent)
+        self.check_loaded_config(config, whylog_dir)
+
+        config, _ = YamlConfigFactory.get_config()
+        self.check_loaded_config(config, whylog_dir)
+        shutil.rmtree(whylog_dir)
+
+    @classmethod
+    def check_loaded_config(cls, config, whylog_dir):
+        assert config._parsers_path == os.path.join(whylog_dir, 'parsers.yaml')
+        assert len(config._rules) == 1
+        assert len(config._rules['lostdata']) == 1
+        added_rule = config._rules['lostdata'][0]
+        assert added_rule.get_effect_name() == 'lostdata'
+        ordered = [parser.name for parser in added_rule.get_causes_parsers()]
+        ordered.sort()
+        assert ordered == ["connectionerror", "datamigration"]

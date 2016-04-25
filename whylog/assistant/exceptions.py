@@ -26,3 +26,11 @@ class NoDateGroupError(WhylogAssistantError):
         return 'No date group in regex, regex: %s line content: %s' % (
             self.regex, self.line_content
         )
+
+
+class UnsupportedAssistantError(WhylogAssistantError):
+    def __init__(self, assistant_class_name):
+        self.assistant_class_name = assistant_class_name
+
+    def __str__(self):
+        return 'This whylog version do not handle %s. Please upgrade Whylog' % self.assistant_class_name

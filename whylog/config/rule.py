@@ -29,6 +29,9 @@ class Rule(object):
     def get_causes_parsers(self):
         return self._causes
 
+    def get_effect_name(self):
+        return self._effect.name
+
 
 @six.add_metaclass(ABCMeta)
 class AbstractRuleFactory(object):
