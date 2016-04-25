@@ -5,7 +5,6 @@ from collections import defaultdict
 import six
 
 from whylog.constraints.verifier import Verifier
-from whylog.front import FrontInput
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
 from whylog.log_reader.searchers import BacktrackSearcher
@@ -62,14 +61,8 @@ class SearchManager(object):
                 # FIXME eliminate protected field access
                 if cause.name in clues:
                     clues_lists.append(clues[cause.name])
-            results_lists = Verifier.constraints_and(clues_lists, rule._constraints)
-            prepared_results = [
-                [
-                    FrontInput(clue.line_source.offset, clue.line_prefix_content, clue.line_source)
-                    for clue in combination
-                ] for combination in results_lists
-            ]
-            causes.extend(prepared_results)
+            results_list = Verifier.constraints_and(clues_lists, rule._constraints)
+            causes.extend(results_list)
         return causes
 
     def investigate(self):
@@ -78,7 +71,7 @@ class SearchManager(object):
         (each of them corresponds to one InvestigationStep)
         in dictionary clues_collector
         and then provide their verification with constraints
-        :return: list of FrontInput objects
+        :return: list of InvestigationResults
         """
         clues_collector = defaultdict(itertools.chain)
         for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():

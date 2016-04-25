@@ -3,3 +3,6 @@ class FrontInput(object):
         self.offset = offset
         self.line_content = line_content
         self.resource_location = resource_location
+
+    def __repr__(self):
+        return "FrontInput(%s:%s: %s)" % (self.resource_location, self.offset, self.line_content)

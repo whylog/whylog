@@ -1,4 +1,5 @@
 from whylog.constraints import TimeConstraint, IdenticalIntervals
+from whylog.front import FrontInput
 from whylog.exceptions import WhylogError
 
 
@@ -56,8 +57,15 @@ class Verifier(object):
                     ]
                 ) for constraint in constraints
             ):
-                # FIXME verify has not established signature yet
-                causes.append(combination)
+                causes.append(
+                    InvestigationResult(
+                        [
+                            FrontInput(
+                                clue.line_source.offset, clue.line_prefix_content, clue.line_source
+                            ) for clue in combination
+                        ], constraints
+                    )
+                )
         return causes
 
     @classmethod
@@ -72,15 +80,17 @@ class Verifier(object):
                     ]
                 ) for constraint in constraints
             ):
-                # FIXME verify has not established signature yet
-                causes.append(combination)
+                # FIXME only constraints that matched should be appended
+                causes.append(InvestigationResult(combination, constraints))
         return causes
 
 
 class InvestigationResult(object):
-    def __init__(self, lines, constraint):
+    def __init__(self, lines, constraints):
         self.lines = lines
-        self.constraint = constraint
+        self.constraints = constraints
 
     def __repr__(self):
-        return "(result lines: %s; due to constraint: %s)" % (self.lines, self.constraint)
+        return "\n(\n    result lines: %s;\n    due to constraints: %s\n)" % (
+            self.lines, self.constraints
+        )
