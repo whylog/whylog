@@ -22,6 +22,7 @@ class Rule(object):
     def get_new_parsers(self, parser_name_generator):
         new_parsers = []
         for parser in itertools.chain([self._effect], self._causes):
+            #TODO: Refactor if teachers are mulithreding
             if parser_name_generator.is_free_parser_name(parser.name, set()):
                 new_parsers.append(parser)
         return new_parsers

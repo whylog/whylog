@@ -24,6 +24,17 @@ class TestBasic(TestCase):
     def test_is_free_parser_name(self):
         #These names aren't free because come from parsers.yaml file
         black_list = set()
+        self.check_names_from_config(black_list)
+
+        black_list = set(['in_black_list'])
+        self.check_names_from_config(black_list)
+        assert self.config.is_free_parser_name('in_black_list1', black_list)
+        assert not self.config.is_free_parser_name('in_black_list', black_list)
+        black_list.add('in_black_list1')
+        assert not self.config.is_free_parser_name('in_black_list1', black_list)
+        assert self.config.is_free_parser_name('in_black_list2', black_list)
+
+    def check_names_from_config(self, black_list):
         assert not self.config.is_free_parser_name('lostdata', black_list)
         assert not self.config.is_free_parser_name('connectionerror', black_list)
         assert not self.config.is_free_parser_name('datamigration', black_list)
@@ -37,13 +48,13 @@ class TestBasic(TestCase):
         black_list = set()
         assert self._create_proposed_name_request(
             self.sample_line1, self.regex1, black_list
-        ) == 'connection_error'
+        ) == 'connection_error_occurred_on'
         assert self._create_proposed_name_request(
             self.sample_line1, self.regex1, black_list
-        ) == 'connection_error1'
+        ) == 'connection_error_occurred_on1'
         assert self._create_proposed_name_request(
             self.sample_line1, self.regex1, black_list
-        ) == 'connection_error2'
+        ) == 'connection_error_occurred_on2'
 
     def test_empty_building_words(self):
         black_list = set()
