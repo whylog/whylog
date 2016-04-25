@@ -53,7 +53,7 @@ class SearchManager(object):
         and collected clues
         """
         causes = []
-        # effect_clues are accessible from investigation_plan._effect_clues
+        # effect_clues are accessible from self._investigation_plan._effect_clues
         for rule in self._investigation_plan._suspected_rules:
             # FIXME eliminate protected field access
             clues_lists = []  # FIXME what about effect?
@@ -61,7 +61,8 @@ class SearchManager(object):
                 # FIXME eliminate protected field access
                 if cause.name in clues:
                     clues_lists.append(clues[cause.name])
-            results_list = Verifier.constraints_and(clues_lists, rule._constraints)
+            effect_clue = self._investigation_plan._effect_clues[rule._effect.name]
+            results_list = Verifier.constraints_and(clues_lists, effect_clue, rule._constraints)
             causes.extend(results_list)
         return causes
 

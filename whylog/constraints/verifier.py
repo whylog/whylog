@@ -25,11 +25,16 @@ class Verifier(object):
         return FrontInput(clue.line_source.offset, clue.line_prefix_content, clue.line_source)
 
     @classmethod
-    def _verify_constraint(cls, combination, constraint):
+    def _verify_constraint(cls, combination, effect, constraint):
         constraint_verifier = ConstraintManager.get_constraint_by_type(constraint)
-        return constraint_verifier.verify(
-            constraint['params'], [clue.regex_parameters for clue in combination]
-        )
+        groups = []
+        for group_info in constraint['clues_groups']:
+            parser_num, group_num = group_info[0], group_info[1]
+            if parser_num == 0:
+                groups.append(effect.regex_parameters[group_num - 1])
+            else:
+                groups.append(combination[parser_num - 1].regex_parameters[group_num - 1])
+        return constraint_verifier.verify(constraint['params'], groups)
 
     @classmethod
     def _clues_combinations(cls, clues_lists, collected_subset=[]):
@@ -57,11 +62,11 @@ class Verifier(object):
             yield collected_subset
 
     @classmethod
-    def constraints_and(cls, clues_lists, constraints):
+    def constraints_and(cls, clues_lists, effect, constraints):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            if all(cls._verify_constraint(combination, constraint) for constraint in constraints):
+            if all(cls._verify_constraint(combination, effect, constraint) for constraint in constraints):
                 causes.append(
                     InvestigationResult(
                         [cls._front_input_from_clue(clue) for clue in combination], constraints
@@ -70,12 +75,12 @@ class Verifier(object):
         return causes
 
     @classmethod
-    def constraints_or(cls, clues_lists, constraints):
+    def constraints_or(cls, clues_lists, effect, constraints):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             verified_constraints = filter(
-                lambda constraint: cls._verify_constraint(combination, constraint), constraints
+                lambda constraint: cls._verify_constraint(combination, effect, constraint), constraints
             )
             if len(verified_constraints) > 0:
                 causes.append(InvestigationResult(combination, verified_constraints))
