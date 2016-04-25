@@ -22,7 +22,7 @@ class Verifier(object):
 
     @classmethod
     def _front_input_from_clue(cls, clue):
-        return FrontInput(clue.line_source.offset, clue.line_prefix_content, clue.line_source)
+        return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)
 
     @classmethod
     def _verify_constraint(cls, combination, effect, constraint):
@@ -66,7 +66,10 @@ class Verifier(object):
         clues_lists = filter(lambda x: x, clues_lists)
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            if all(cls._verify_constraint(combination, effect, constraint) for constraint in constraints):
+            if all(
+                cls._verify_constraint(combination, effect, constraint)
+                for constraint in constraints
+            ):
                 causes.append(
                     InvestigationResult(
                         [cls._front_input_from_clue(clue) for clue in combination], constraints
@@ -80,7 +83,8 @@ class Verifier(object):
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             verified_constraints = filter(
-                lambda constraint: cls._verify_constraint(combination, effect, constraint), constraints
+                lambda constraint: cls._verify_constraint(combination, effect, constraint),
+                constraints
             )
             if len(verified_constraints) > 0:
                 causes.append(InvestigationResult(combination, verified_constraints))
