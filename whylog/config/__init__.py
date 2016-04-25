@@ -73,11 +73,11 @@ class AbstractConfigFactory(object):
             config_paths[key] = path
         config_paths['pattern_assistant'] = 'regex'
         path_to_config = os.path.join(whylog_dir, cls.CONFIG_PATHS_FILE)
-        return cls.create_file_with_config_paths(config_paths, path_to_config)
+        return cls._create_file_with_config_paths(config_paths, path_to_config)
 
     @classmethod
     @abstractmethod
-    def create_file_with_config_paths(cls, config_paths, path_to_config):
+    def _create_file_with_config_paths(cls, config_paths, path_to_config):
         pass
 
     @classmethod
@@ -109,10 +109,22 @@ class YamlConfigFactory(AbstractConfigFactory):
             return YamlConfig(**config_paths), assistant_class
 
     @classmethod
-    def create_file_with_config_paths(cls, config_paths, path_to_config):
+    def _create_file_with_config_paths(cls, config_paths, path_to_config):
         with open(path_to_config, 'w') as config_file:
             config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
         return path_to_config
+
+
+class ConfigFactorySelector(object):
+    SUPPORTED_TYPES = {'yaml': YamlConfigFactory}
+
+    @classmethod
+    def get_config(cls):
+        return cls.SUPPORTED_TYPES['yaml'].get_config()
+
+    @classmethod
+    def load_config(cls, path):
+        return cls.SUPPORTED_TYPES['yaml'].load_config(path)
 
 
 @six.add_metaclass(ABCMeta)
