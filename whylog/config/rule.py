@@ -1,3 +1,4 @@
+import itertools
 from abc import ABCMeta, abstractmethod
 
 import six
@@ -20,13 +21,8 @@ class Rule(object):
 
     def get_new_parsers(self, parser_name_generator):
         new_parsers = []
-# <<<<<<< HEAD
         for parser in itertools.chain([self._effect], self._causes):
             if parser_name_generator.is_free_parser_name(parser.name, set()):
-# =======
-#         for parser in self._causes + [self._effect]:
-            # if parser_name_generator.is_free_parser_name(parser.name):
-# >>>>>>> Refactored name generating
                 new_parsers.append(parser)
         return new_parsers
 

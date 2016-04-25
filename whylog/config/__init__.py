@@ -1,6 +1,4 @@
 import os
-import re
-import uuid
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
@@ -16,10 +14,8 @@ from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameM
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
-from whylog.config.rule import RegexRuleFactory
 from whylog.config.parser_name_manager import ParserNameManager
-from whylog.config.parsers import ConcatenatedRegexParser, RegexParser, RegexParserFactory
-from whylog.config.rule import RegexRuleFactory, Rule
+from whylog.config.rule import RegexRuleFactory
 
 
 class AbstractConfigFactory(object):
