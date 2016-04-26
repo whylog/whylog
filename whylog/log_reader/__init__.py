@@ -54,7 +54,7 @@ class SearchManager(object):
         """
         causes = []
         # effect_clues are accessible from self._investigation_plan._effect_clues
-        for rule in self._investigation_plan._suspected_rules:
+        for rule in self._investigation_plan.suspected_rules():
             clues_lists = []
             for cause in rule._causes:
                 if cause.name in clues:

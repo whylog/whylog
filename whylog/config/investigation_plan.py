@@ -21,6 +21,10 @@ class InvestigationPlan(object):
     def get_next_investigation_step_with_log_type(self):
         return (meta_data for meta_data in self._investigation_metadata)
 
+    def suspected_rules(self):
+        for rule in self._suspected_rules:
+            yield rule
+
 
 class InvestigationStep(object):
     """

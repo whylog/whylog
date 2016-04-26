@@ -23,7 +23,9 @@ class IdenticalIntervals(AbstractConstraint):
 
     @classmethod
     def verify(cls, param_dict, group_contents):
-        return len(set(group_contents)) == 1
+        if not group_contents:
+            return False
+        return all(group_contents[0] == group for group in group_contents)
 
 
 class AnyValueIntervals(AbstractConstraint):

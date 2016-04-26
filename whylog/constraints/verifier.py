@@ -1,5 +1,5 @@
 from whylog.constraints import IdenticalIntervals, TimeConstraint
-from whylog.exceptions import WhylogError
+from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 from whylog.front import FrontInput
 
 
@@ -13,7 +13,7 @@ class ConstraintManager(object):
         }
         if constraint_data['name'] in constraints:
             return constraints[constraint_data['name']]
-        raise WhylogError("No such constraint (%s) registered" % constraint_data['name'])
+        raise UnsupportedConstraintTypeError(constraint_data)
 
 
 class Verifier(object):
@@ -22,11 +22,17 @@ class Verifier(object):
         return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)
 
     @classmethod
+    def _create_investigation_result(cls, clues_combination, constraints):
+        return InvestigationResult(
+            [cls._front_input_from_clue(clue) for clue in clues_combination], constraints
+        )
+
+    @classmethod
     def _verify_constraint(cls, combination, effect, constraint):
         constraint_verifier = ConstraintManager.get_constraint_by_type(constraint)
         groups = []
         for group_info in constraint['clues_groups']:
-            parser_num, group_num = group_info[0], group_info[1]
+            parser_num, group_num = group_info
             if parser_num == 0:
                 groups.append(effect.regex_parameters[group_num - 1])
             else:
@@ -67,11 +73,7 @@ class Verifier(object):
                 cls._verify_constraint(combination, effect, constraint)
                 for constraint in constraints
             ):
-                causes.append(
-                    InvestigationResult(
-                        [cls._front_input_from_clue(clue) for clue in combination], constraints
-                    )
-                )
+                causes.append(cls._create_investigation_result(combination, constraints))
         return causes
 
     @classmethod
@@ -79,20 +81,13 @@ class Verifier(object):
         clues_lists = list(filter(lambda x: x, clues_lists))
         causes = []
         for combination in cls._clues_combinations(clues_lists):
-            verified_constraints = list(
-                filter(
-                    lambda constraint: cls._verify_constraint(combination, effect, constraint),
-                    constraints
-                )
-            )
+            verified_constraints = [
+                constraint
+                for constraint in constraints
+                if cls._verify_constraint(combination, effect, constraint)
+            ]
             if len(verified_constraints) > 0:
-                causes.append(
-                    InvestigationResult(
-                        [
-                            cls._front_input_from_clue(clue) for clue in combination
-                        ], verified_constraints
-                    )
-                )
+                causes.append(cls._create_investigation_result(combination, verified_constraints))
         return causes
 
 
