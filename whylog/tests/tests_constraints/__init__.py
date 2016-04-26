@@ -120,6 +120,7 @@ class TestBasic(TestCase):
                 'params': {}
             }
         ]
+
         # testing 'or'
         causes = Verifier.constraints_or(clues_lists, effect, constraints)
         assert len(causes) == 1
@@ -166,6 +167,7 @@ class TestBasic(TestCase):
                 'params': {}
             }
         ]
+
         # testing 'and'
         causes = Verifier.constraints_and(clues_lists, effect, constraints)
         assert not causes
