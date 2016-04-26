@@ -76,7 +76,7 @@ class Verifier(object):
 
     @classmethod
     def constraints_and(cls, clues_lists, effect, constraints):
-        clues_lists = [clues if clues else Verifier.UNMATCHED for clues in clues_lists]
+        clues_lists = [clues if clues else [Verifier.UNMATCHED] for clues in clues_lists]
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(

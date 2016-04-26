@@ -28,7 +28,7 @@ class TestBasic(TestCase):
                 Clue(('Banana', 1), 'Banana, 1 times', 150, line_source)
             ], [
                 Clue(('Banana', 2), 'Banana, 2 times', 1050, line_source),
-                Clue(('Milk', 1), 'Milk, 2 times', 1100, line_source)
+                Clue(('Milk', 1), 'Milk, 1 times', 1100, line_source)
             ]
         ]  # yapf: disable
         constraints = [
@@ -70,7 +70,7 @@ class TestBasic(TestCase):
                 Clue(('Pear', 2), 'Pear, 2 times', 150, line_source)
             ], [
                 Clue(('Pear', 2), 'Pear, 2 times', 1050, line_source),
-                Clue(('Milk', 1), 'Milk, 2 times', 1100, line_source)
+                Clue(('Milk', 1), 'Milk, 1 times', 1100, line_source)
             ]
         ]  # yapf: disable
         constraints = [
@@ -99,7 +99,7 @@ class TestBasic(TestCase):
         unmatched_clue = Clue(None, None, None, None)
         assert unmatched_clue == Verifier.UNMATCHED
 
-    def test_constraints_or_when_one_unmatched(self):
+    def test_constraints_when_one_unmatched(self):
         line_source = LineSource('localhost', 'node_0.log')
         effect = Clue(('Banana', 2), 'Banana, 2 times', 3000, line_source)
         clues_lists = [
@@ -120,6 +120,7 @@ class TestBasic(TestCase):
                 'params': {}
             }
         ]
+        # testing 'or'
         causes = Verifier.constraints_or(clues_lists, effect, constraints)
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
@@ -136,3 +137,82 @@ class TestBasic(TestCase):
                 'params': {}
             }
         ]
+
+        # testing 'and'
+        causes = Verifier.constraints_and(clues_lists, effect, constraints)
+        assert not causes
+
+    def test_constraints_and_verification_failed_when_or_succeeded(self):
+        line_source = LineSource('localhost', 'node_0.log')
+        effect = Clue(('Banana', 44), 'Banana, 44 times', 3000, line_source)
+        clues_lists = [
+            [
+                Clue(('Milk', 3), 'Milk, 3 times', 50, line_source),
+                Clue(('Chocolate', 4), 'Chocolate, 4 times', 100, line_source),
+                Clue(('Pear', 2), 'Pear, 2 times', 150, line_source)                # <- should be found (parser 1)
+            ], [
+                Clue(('Pineapple', 2), 'Pineapple, 2 times', 1050, line_source),    # <- should be found (parser 2)
+                Clue(('Milk', 1), 'Milk, 1 times', 1100, line_source)
+            ]
+        ]  # yapf: disable
+        constraints = [
+            {
+                'clues_groups': [[0, 1], [1, 1], [2, 1]],
+                'name': 'identical',
+                'params': {}
+            }, {
+                'clues_groups': [[1, 2], [2, 2]],
+                'name': 'identical',
+                'params': {}
+            }
+        ]
+        # testing 'and'
+        causes = Verifier.constraints_and(clues_lists, effect, constraints)
+        assert not causes
+
+        # testing 'or'
+        causes = Verifier.constraints_or(clues_lists, effect, constraints)
+        assert len(causes) == 1
+        assert all(isinstance(cause, InvestigationResult) for cause in causes)
+        assert all(isinstance(line, FrontInput) for line in causes[0].lines)
+
+        assert causes[0].lines == [
+            Verifier._front_input_from_clue(Clue(
+                ('Pear', 2), 'Pear, 2 times', 150, line_source)),
+            Verifier._front_input_from_clue(Clue(
+                ('Pineapple', 2), 'Pineapple, 2 times', 1050, line_source))
+        ]  # yapf: disable
+        assert causes[0].constraints == [
+            {
+                'clues_groups': [[1, 2], [2, 2]],
+                'name': 'identical',
+                'params': {}
+            }
+        ]
+
+    def test_constraints_or_verification_failed(self):
+        line_source = LineSource('localhost', 'node_0.log')
+        effect = Clue(('Pineapple', 44), 'Pineapple, 44 times', 3000, line_source)
+        clues_lists = [
+            [
+                Clue(('Milk', 3), 'Milk, 3 times', 50, line_source),
+                Clue(('Chocolate', 2), 'Chocolate, 2 times', 100, line_source),
+                Clue(('Banana', 1), 'Banana, 1 times', 150, line_source)
+            ], [
+                Clue(('Banana', 2), 'Banana, 2 times', 1050, line_source),
+                Clue(('Milk', 1), 'Milk, 2 times', 1100, line_source)
+            ]
+        ]  # yapf: disable
+        constraints = [
+            {
+                'clues_groups': [[0, 1], [1, 1], [2, 1]],
+                'name': 'identical',
+                'params': {}
+            }, {
+                'clues_groups': [[0, 2], [1, 2], [2, 2]],
+                'name': 'identical',
+                'params': {}
+            }
+        ]
+        causes = Verifier.constraints_or(clues_lists, effect, constraints)
+        assert not causes
