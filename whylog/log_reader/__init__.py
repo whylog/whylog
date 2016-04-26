@@ -4,7 +4,6 @@ from collections import defaultdict
 
 import six
 
-from whylog.constraints.verifier import Verifier
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
 from whylog.log_reader.searchers import BacktrackSearcher
@@ -49,19 +48,15 @@ class SearchManager(object):
 
     def _constraints_verification(self, clues):
         """
-        provides constraints verification basing on rules from investigation_plan
-        and collected clues
+        provides constraints verification basing on
+        rules from investigation_plan and collected clues
         """
         causes = []
-        # effect_clues are accessible from self._investigation_plan._effect_clues
         for rule in self._investigation_plan.suspected_rules():
-            clues_lists = []
-            for cause in rule._causes:
-                if cause.name in clues:
-                    clues_lists.append(clues[cause.name])
-            effect_clue = self._investigation_plan._effect_clues[rule._effect.name]
-            results_list = Verifier.constraints_and(clues_lists, effect_clue, rule._constraints)
-            causes.extend(results_list)
+            results_from_rule = rule.constraints_check(
+                clues, self._investigation_plan.get_effect_clues()
+            )
+            causes.extend(results_from_rule)
         return causes
 
     def investigate(self):

@@ -25,6 +25,9 @@ class InvestigationPlan(object):
         for rule in self._suspected_rules:
             yield rule
 
+    def get_effect_clues(self):
+        return self._effect_clues
+
 
 class InvestigationStep(object):
     """

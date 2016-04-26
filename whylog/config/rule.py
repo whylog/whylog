@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 import six
 
 from whylog.config.parsers import RegexParserFactory
+from whylog.constraints.verifier import Verifier
 
 
 class Rule(object):
@@ -34,6 +35,16 @@ class Rule(object):
 
     def get_effect_name(self):
         return self._effect.name
+
+    def constraints_check(self, clues, effect_clues_dict):
+        """
+        check if given clues satisfy rule
+        basing on its causes, effect and constraints.
+        returns list of InvestigationResult objects
+        """
+        clues_lists = [clues[cause.name] for cause in self._causes if cause.name in clues]
+        effect_clue = effect_clues_dict[self._effect.name]
+        return Verifier.constraints_and(clues_lists, effect_clue, self._constraints)
 
 
 @six.add_metaclass(ABCMeta)

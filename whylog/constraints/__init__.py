@@ -14,6 +14,7 @@ class TimeConstraint(AbstractConstraint):
 
     @classmethod
     def verify(cls, param_dict, group_contents):
+        # TODO remove mock
         return True
 
 
