@@ -248,6 +248,7 @@ class AbstractSettingsFactory(object):
     settings settings.yaml file. Which has all data that enable creating subclass AbstractConfig object and
     subclass AbstractAssistant. No matter what kind of config was saved in settings.yaml.
     """
+    DEFAULT_PATTERN_ASSISTANT = 'regex'
 
     @classmethod
     def create_new_settings_dir(cls, base_path):
@@ -287,7 +288,7 @@ class YamlSettingsFactory(AbstractSettingsFactory):
             path = os.path.join(whylog_dir, file_name)
             cls._create_empty_file(path)
             settings[key] = path
-        settings['pattern_assistant'] = 'regex'
+        settings['pattern_assistant'] = cls.DEFAULT_PATTERN_ASSISTANT
         settings['config_type'] = 'yaml'
         return settings
 
