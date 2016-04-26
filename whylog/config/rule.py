@@ -7,6 +7,8 @@ from whylog.config.parsers import RegexParserFactory
 
 
 class Rule(object):
+    EMPTY_BLACK_LIST = frozenset()
+
     def __init__(self, causes, effect, constraints):
         self._causes = causes
         self._effect = effect
@@ -23,7 +25,7 @@ class Rule(object):
         new_parsers = []
         for parser in itertools.chain([self._effect], self._causes):
             #TODO: Refactor if teachers are mulithreding
-            if parser_name_generator.is_free_parser_name(parser.name, set()):
+            if parser_name_generator.is_free_parser_name(parser.name, self.EMPTY_BLACK_LIST):
                 new_parsers.append(parser)
         return new_parsers
 
