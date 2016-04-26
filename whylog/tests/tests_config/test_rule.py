@@ -36,8 +36,8 @@ class TestBasic(TestCase):
                 Clue((52,), '52 broccoli', 140, self.line_source)
             ],
             'dummy': [
-                Clue((98,), '98 foo bar', 980, self.line_source),
-                Clue((99,), '99 foo bar', 990, self.line_source)
+                Clue((42,), '42 foo bar', 980, self.line_source),
+                Clue((84,), '84 foo bar', 990, self.line_source)
             ]
         }  # yapf: disable
         results = rule.constraints_check(clues, effect_clues_dict)
@@ -82,4 +82,40 @@ class TestBasic(TestCase):
         assert results[0].lines == [
             Verifier._front_input_from_clue(
                 Clue((42,), '42 carrots', 420, self.line_source))
+        ]  # yapf: disable
+
+    def test_constraints_check_two_same_parsers(self):
+        rule = Rule(
+            [self.cause_a, self.cause_a], self.effect, [
+                {
+                    'clues_groups': [[0, 1], [1, 1], [2, 1]],
+                    'name': 'identical',
+                    'params': {}
+                }
+            ]
+        )  # yapf: disable
+        effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
+        clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
+            'cause_a': [
+                Clue((40,), '40 carrots', 400, self.line_source),
+                Clue((42,), '42 carrots', 420, self.line_source),
+                Clue((44,), '44 carrots', 440, self.line_source),
+                Clue((42,), '42 carrots', 460, self.line_source),
+                Clue((40,), '40 carrots', 480, self.line_source),
+            ],
+            'dummy': [
+                Clue((98,), '98 foo bar', 980, self.line_source),
+                Clue((99,), '99 foo bar', 990, self.line_source)
+            ]
+        }  # yapf: disable
+        results = rule.constraints_check(clues, effect_clues_dict)
+
+        assert len(results) == 1
+        assert all(isinstance(cause, InvestigationResult) for cause in results)
+        assert all(isinstance(line, FrontInput) for line in results[0].lines)
+        assert results[0].lines == [
+            Verifier._front_input_from_clue(
+                Clue((42,), '42 carrots', 420, self.line_source)),
+            Verifier._front_input_from_clue(
+                Clue((42,), '42 carrots', 460, self.line_source))
         ]  # yapf: disable

@@ -36,13 +36,26 @@ class Rule(object):
     def get_effect_name(self):
         return self._effect.name
 
+    def _gather_causes_frequency_information(self):
+        causes_with_frequency_info = [(self._causes[0].name, 0)]
+        for cause in self._causes:
+            if cause.name == causes_with_frequency_info[-1][0]:
+                causes_with_frequency_info[-1] = (cause.name, causes_with_frequency_info[-1][1] + 1)
+            else:
+                causes_with_frequency_info.append((cause.name, 1))
+        return causes_with_frequency_info
+
     def constraints_check(self, clues, effect_clues_dict):
         """
         check if given clues satisfy rule
         basing on its causes, effect and constraints.
         returns list of InvestigationResult objects
         """
-        clues_lists = [clues[cause.name] for cause in self._causes if cause.name in clues]
+        causes_with_freq_info = self._gather_causes_frequency_information()
+        clues_lists = [
+            (clues[cause_with_info[0]], cause_with_info[1])
+            for cause_with_info in causes_with_freq_info if cause_with_info[0] in clues
+        ]
         effect_clue = effect_clues_dict[self._effect.name]
         return Verifier.constraints_and(clues_lists, effect_clue, self._constraints)
 

@@ -1,3 +1,5 @@
+import itertools
+
 from whylog.config import Clue
 from whylog.constraints import IdenticalIntervals, TimeConstraint
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
@@ -50,33 +52,39 @@ class Verifier(object):
         return constraint_verifier.verify(constraint['params'], groups)
 
     @classmethod
-    def _clues_combinations(cls, clues_lists, collected_subset=[]):
+    def _clues_combinations(cls, clues_tuples, collected_subset=[]):
         """
         recursive generator that returns all combinations
         of elements from lists contained in clues_lists
         example:
-        >>> xs = [[1, 2, 3], [4, 5], [6]]
+        >>> xs = [([1, 2, 3], 2), ([4, 5], 1)]
         >>> for l in Verifier._clues_combinations(xs):
         >>>     print l
-        [1, 4, 6]
-        [1, 5, 6]
-        [2, 4, 6]
-        [2, 5, 6]
-        [3, 4, 6]
-        [3, 5, 6]
+        [1, 2, 4]
+        [1, 2, 5]
+        [1, 3, 4]
+        [1, 3, 5]
+        [2, 3, 4]
+        [2, 3, 5]
         it always should be called with empty accumulator,
         that is collected_subset=[]
         """
-        if len(clues_lists) != 0:
-            for clue in clues_lists[0]:
-                for subset in cls._clues_combinations(clues_lists[1:], collected_subset + [clue]):
+        if len(clues_tuples) != 0:
+            first_list, repetitions_number = clues_tuples[0]
+            for clues in itertools.combinations(first_list, repetitions_number):
+                for subset in cls._clues_combinations(
+                    clues_tuples[1:], collected_subset + list(clues)
+                ):
                     yield subset
         else:
             yield collected_subset
 
     @classmethod
     def constraints_and(cls, clues_lists, effect, constraints):
-        clues_lists = [clues if clues else [Verifier.UNMATCHED] for clues in clues_lists]
+        clues_lists = [
+            clues_tuple if clues_tuple[0] else ([Verifier.UNMATCHED], clues_tuple[1])
+            for clues_tuple in clues_lists
+        ]
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(
@@ -88,7 +96,10 @@ class Verifier(object):
 
     @classmethod
     def constraints_or(cls, clues_lists, effect, constraints):
-        clues_lists = [clues if clues else [Verifier.UNMATCHED] for clues in clues_lists]
+        clues_lists = [
+            clues_tuple if clues_tuple[0] else ([Verifier.UNMATCHED], clues_tuple[1])
+            for clues_tuple in clues_lists
+        ]
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             verified_constraints = [
