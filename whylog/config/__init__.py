@@ -16,45 +16,6 @@ from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 
 
-class AbstractConfigFactory(object):
-    @classmethod
-    @abstractmethod
-    def create_new_config_dir(cls, base_path):
-        pass
-
-
-class YamlConfigFactory(AbstractConfigFactory):
-    FILES_NAMES = {
-        'parsers_path': 'parsers.yaml',
-        'rules_path': 'rules.yaml',
-        'log_types_path': 'log_types.yaml'
-    }
-
-    @classmethod
-    def create_new_config_dir(cls, base_path):
-        whylog_dir = os.path.join(base_path, ConfigFactorySelector.WHYLOG_DIR)
-        os.mkdir(whylog_dir, 0o755)
-        config_paths = {}
-        for key, file_name in six.iteritems(cls.FILES_NAMES):
-            path = os.path.join(whylog_dir, file_name)
-            cls._create_empty_file(path)
-            config_paths[key] = path
-        config_paths['pattern_assistant'] = 'regex'
-        config_paths['config_type'] = 'yaml'
-        path_to_config = os.path.join(whylog_dir, ConfigFactorySelector.CONFIG_PATHS_FILE)
-        return cls._create_file_with_config_paths(config_paths, path_to_config)
-
-    @classmethod
-    def _create_empty_file(cls, path):
-        open(path, 'w').close()
-
-    @classmethod
-    def _create_file_with_config_paths(cls, config_paths, path_to_config):
-        with open(path_to_config, 'w') as config_file:
-            config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
-        return path_to_config
-
-
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
     def __init__(self):
@@ -281,22 +242,61 @@ class RuleSubset(object):
         pass
 
 
-class ConfigFactorySelector(object):
+class AbstractSettingsFactory(object):
+    @classmethod
+    @abstractmethod
+    def create_new_settings_dir(cls, base_path):
+        pass
+
+
+class YamlSettingsFactory(AbstractSettingsFactory):
+    FILES_NAMES = {
+        'parsers_path': 'parsers.yaml',
+        'rules_path': 'rules.yaml',
+        'log_types_path': 'log_types.yaml'
+    }
+
+    @classmethod
+    def create_new_settings_dir(cls, base_path):
+        whylog_dir = os.path.join(base_path, SettingsFactorySelector.WHYLOG_DIR)
+        os.mkdir(whylog_dir, 0o755)
+        settings = {}
+        for key, file_name in six.iteritems(cls.FILES_NAMES):
+            path = os.path.join(whylog_dir, file_name)
+            cls._create_empty_file(path)
+            settings[key] = path
+        settings['pattern_assistant'] = 'regex'
+        settings['config_type'] = 'yaml'
+        path_to_settings = os.path.join(whylog_dir, SettingsFactorySelector.CONFIG_SETTINGS_FILE)
+        return cls._create_settings_file(settings, path_to_settings)
+
+    @classmethod
+    def _create_empty_file(cls, path):
+        open(path, 'w').close()
+
+    @classmethod
+    def _create_settings_file(cls, config_paths, path_to_config):
+        with open(path_to_config, 'w') as config_file:
+            config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
+        return path_to_config
+
+
+class SettingsFactorySelector(object):
     """
-    This class is responsible for finding .whylog directory (whylog config directory) and basing on
-    found content directory creating object of subclass AbstractConfig. If not found then it creates minimal
+    This class is responsible for finding .whylog directory (whylog settings directory) and basing on
+    found content directory creating settings. If not found then it creates minimal
     .whylog version in current directory.
     """
     WHYLOG_DIR = '.whylog'
-    CONFIG_PATHS_FILE = 'settings.yaml'
+    CONFIG_SETTINGS_FILE = 'settings.yaml'
     HOME_DIR = os.path.expanduser('~')
     ETC_DIR = '/etc'
     ASSISTANTS_DICT = {'regex': RegexAssistant}
     SUPPORTED_TYPES = {'yaml': YamlConfig}
-    DEFAULT_CONFIG_FACTORY_TYPE = YamlConfigFactory
+    DEFAULT_SETTINGS_FACTORY_TYPE = YamlSettingsFactory
 
     @classmethod
-    def load_config(cls, path):
+    def load_settings(cls, path):
         with open(path, "r") as config_file:
             whylog_settings = yaml.load(config_file)
             assistant_name = whylog_settings.pop('pattern_assistant')
@@ -310,16 +310,16 @@ class ConfigFactorySelector(object):
             return {'config': config_class(**whylog_settings), 'assistant': assistant_class}
 
     @classmethod
-    def get_config(cls):
-        path = cls._find_path_to_config()
+    def get_settings(cls):
+        path = cls._find_path_to_settings()
         if path is not None:
-            path_to_config = os.path.join(path, cls.CONFIG_PATHS_FILE)
-            return cls.load_config(path_to_config)
-        path_to_config = cls.DEFAULT_CONFIG_FACTORY_TYPE.create_new_config_dir(os.getcwd())
-        return cls.load_config(path_to_config)
+            path_to_settings = os.path.join(path, cls.CONFIG_SETTINGS_FILE)
+            return cls.load_settings(path_to_settings)
+        path_to_settings = cls.DEFAULT_SETTINGS_FACTORY_TYPE.create_new_settings_dir(os.getcwd())
+        return cls.load_settings(path_to_settings)
 
     @classmethod
-    def _find_path_to_config(cls):
+    def _find_path_to_settings(cls):
         path = cls._search_in_parents_directories(os.getcwd())
         if path is not None:
             return cls._attach_whylog_dir(path)

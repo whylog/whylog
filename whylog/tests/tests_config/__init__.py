@@ -5,7 +5,7 @@ from unittest import TestCase
 import yaml
 
 from whylog.assistant.const import AssistantType
-from whylog.config import ConfigFactorySelector, YamlConfigFactory
+from whylog.config import SettingsFactorySelector, YamlSettingsFactory
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
@@ -107,7 +107,7 @@ class TestBasic(TestCase):
 
         path_config = ['whylog', 'tests', 'tests_config', 'test_files', '.whylog', 'config.yaml']
         path = os.path.join(*path_config)
-        cls.config = ConfigFactorySelector.load_config(path)['config']
+        cls.config = SettingsFactorySelector.load_settings(path)['config']
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
@@ -147,13 +147,13 @@ class TestBasic(TestCase):
         assert len(self.config._log_types['apache']._filename_matchers) == 1
 
     def test_add_new_rule_to_empty_config(self):
-        YamlConfigFactory.WHYLOG_DIR = '.test_whylog'
-        config = ConfigFactorySelector.get_config()['config']
-        whylog_dir = ConfigFactorySelector._attach_whylog_dir(os.getcwd())
+        YamlSettingsFactory.WHYLOG_DIR = '.test_whylog'
+        config = SettingsFactorySelector.get_settings()['config']
+        whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
         config.add_rule(self.user_intent)
         self.check_loaded_config(config, whylog_dir)
 
-        config = ConfigFactorySelector.get_config()['config']
+        config = SettingsFactorySelector.get_settings()['config']
         self.check_loaded_config(config, whylog_dir)
         shutil.rmtree(whylog_dir)
 
