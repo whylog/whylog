@@ -73,9 +73,14 @@ class Clue(object):
         self.line_source = line_source
 
     def __repr__(self):
+        if all(elem is None for elem in self.__dict__.values()):
+            return "(Clue: UNMATCHED)"
         return "(Clue: %s, %s, %s, %s)" % (
             self.regex_parameters, self.line_prefix_content, self.line_offset, self.line_source
         )
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 
 class LineSource(object):

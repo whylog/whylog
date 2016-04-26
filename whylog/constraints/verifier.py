@@ -1,3 +1,4 @@
+from whylog.config import Clue
 from whylog.constraints import IdenticalIntervals, TimeConstraint
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 from whylog.front import FrontInput
@@ -17,6 +18,8 @@ class ConstraintManager(object):
 
 
 class Verifier(object):
+    UNMATCHED = Clue(None, None, None, None)
+
     @classmethod
     def _front_input_from_clue(cls, clue):
         return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)
@@ -29,6 +32,11 @@ class Verifier(object):
 
     @classmethod
     def _verify_constraint(cls, combination, effect, constraint):
+        """
+        checks if specified clues (which represents parsers: 1,2,.. for some rule) and
+        effect (which represents parser 0 from this rule) satisfy one given constraint.
+        returns True if so, or False otherwise
+        """
         constraint_verifier = ConstraintManager.get_constraint_by_type(constraint)
         groups = []
         for group_info in constraint['clues_groups']:
@@ -36,6 +44,8 @@ class Verifier(object):
             if parser_num == 0:
                 groups.append(effect.regex_parameters[group_num - 1])
             else:
+                if combination[parser_num - 1] == Verifier.UNMATCHED:
+                    return False
                 groups.append(combination[parser_num - 1].regex_parameters[group_num - 1])
         return constraint_verifier.verify(constraint['params'], groups)
 
@@ -66,7 +76,7 @@ class Verifier(object):
 
     @classmethod
     def constraints_and(cls, clues_lists, effect, constraints):
-        clues_lists = list(filter(lambda x: x, clues_lists))
+        clues_lists = [clues if clues else Verifier.UNMATCHED for clues in clues_lists]
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(
@@ -78,7 +88,7 @@ class Verifier(object):
 
     @classmethod
     def constraints_or(cls, clues_lists, effect, constraints):
-        clues_lists = list(filter(lambda x: x, clues_lists))
+        clues_lists = [clues if clues else [Verifier.UNMATCHED] for clues in clues_lists]
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             verified_constraints = [
@@ -87,7 +97,13 @@ class Verifier(object):
                 if cls._verify_constraint(combination, effect, constraint)
             ]
             if len(verified_constraints) > 0:
-                causes.append(cls._create_investigation_result(combination, verified_constraints))
+                causes.append(
+                    cls._create_investigation_result(
+                        [
+                            clue for clue in combination if not clue == Verifier.UNMATCHED
+                        ], verified_constraints
+                    )
+                )
         return causes
 
 
