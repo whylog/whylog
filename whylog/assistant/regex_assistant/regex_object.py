@@ -66,13 +66,7 @@ class RegexObject(object):
 
     def _guess_regexes(self):
         guessed_objects = guess_regex_objects(self.line_text)
-        guessed_dict = dict(
-            [
-                (
-                    key, guessed_objects[key]
-                ) for key in range(len(guessed_objects))
-            ]
-        )
+        guessed_dict = dict([(key, guessed_objects[key]) for key in range(len(guessed_objects))])
         self.guessed_regex_objects = guessed_dict
         self.update_by_guessed_regex(regex_id=0)
 

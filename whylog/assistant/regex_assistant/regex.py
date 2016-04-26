@@ -43,7 +43,9 @@ def group_spans_from_regex(regex, text):
     group_regexes = [regex[start + 1:end] for start, end in group_ranges_in_regex]
     group_spans = [
         Span(
-            start, end, pattern=group_regex
+            start,
+            end,
+            pattern=group_regex
         ) for (start, end), group_regex in zip(group_ranges_in_text, group_regexes)
     ]
     return SpanList(group_spans).sort_by_start_and_end()

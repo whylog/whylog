@@ -35,7 +35,9 @@ def find_date_spans(text, regexes=None):
 
 def _find_date_spans_by_regex(regexes, text):
     return find_spans_by_regex(
-        regexes, text, pattern_creator=create_date_regex,
+        regexes,
+        text,
+        pattern_creator=create_date_regex,
         converter=DataType.DATE
     )  # yapf: disable
 
