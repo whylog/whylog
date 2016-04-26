@@ -118,6 +118,8 @@ class YamlConfigFactory(AbstractConfigFactory):
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
+    WORDS_COUNT_IN_NAME = 4
+
     def __init__(self):
         self._parsers = self._load_parsers()
         self._parsers_grouped_by_log_type = self._index_parsers_by_log_type(
@@ -259,7 +261,9 @@ class AbstractConfig(object):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
 
     def propose_parser_name(self, line, regex_str, black_list):
-        return self._parser_name_generator.propose_parser_name(line, regex_str, black_list)
+        return self._parser_name_generator.propose_parser_name(
+            line, regex_str, black_list, self.WORDS_COUNT_IN_NAME
+        )
 
 
 @six.add_metaclass(ABCMeta)
