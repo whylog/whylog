@@ -243,30 +243,17 @@ class RuleSubset(object):
 
 
 class AbstractSettingsFactory(object):
-    @classmethod
-    @abstractmethod
-    def create_new_settings_dir(cls, base_path):
-        pass
-
-
-class YamlSettingsFactory(AbstractSettingsFactory):
-    FILES_NAMES = {
-        'parsers_path': 'parsers.yaml',
-        'rules_path': 'rules.yaml',
-        'log_types_path': 'log_types.yaml'
-    }
+    """
+    Note: This class use yaml format. Here is assumption that in every .whylog dir we have a
+    settings settings.yaml file. Which has all data that enable creating subclass AbstractConfig object and
+    subclass AbstractAssistant. No matter what kind of config was saved in settings.yaml.
+    """
 
     @classmethod
     def create_new_settings_dir(cls, base_path):
         whylog_dir = os.path.join(base_path, SettingsFactorySelector.WHYLOG_DIR)
         os.mkdir(whylog_dir, 0o755)
-        settings = {}
-        for key, file_name in six.iteritems(cls.FILES_NAMES):
-            path = os.path.join(whylog_dir, file_name)
-            cls._create_empty_file(path)
-            settings[key] = path
-        settings['pattern_assistant'] = 'regex'
-        settings['config_type'] = 'yaml'
+        settings = cls._create_settings_dict(whylog_dir)
         path_to_settings = os.path.join(whylog_dir, SettingsFactorySelector.CONFIG_SETTINGS_FILE)
         return cls._create_settings_file(settings, path_to_settings)
 
@@ -279,6 +266,30 @@ class YamlSettingsFactory(AbstractSettingsFactory):
         with open(path_to_config, 'w') as config_file:
             config_file.write(yaml.safe_dump(config_paths, explicit_start=True))
         return path_to_config
+
+    @classmethod
+    @abstractmethod
+    def _create_settings_dict(cls, whylog_dir):
+        pass
+
+
+class YamlSettingsFactory(AbstractSettingsFactory):
+    FILES_NAMES = {
+        'parsers_path': 'parsers.yaml',
+        'rules_path': 'rules.yaml',
+        'log_types_path': 'log_types.yaml'
+    }
+
+    @classmethod
+    def _create_settings_dict(cls, whylog_dir):
+        settings = {}
+        for key, file_name in six.iteritems(cls.FILES_NAMES):
+            path = os.path.join(whylog_dir, file_name)
+            cls._create_empty_file(path)
+            settings[key] = path
+        settings['pattern_assistant'] = 'regex'
+        settings['config_type'] = 'yaml'
+        return settings
 
 
 class SettingsFactorySelector(object):
