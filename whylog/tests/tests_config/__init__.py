@@ -107,7 +107,7 @@ class TestBasic(TestCase):
 
         path_config = ['whylog', 'tests', 'tests_config', 'test_files', '.whylog', 'config.yaml']
         path = os.path.join(*path_config)
-        cls.config, _ = ConfigFactorySelector.load_config(path)
+        cls.config = ConfigFactorySelector.load_config(path)['config']
 
     def test_simple_transform(self):
         rule = RegexRuleFactory.create_from_intent(self.user_intent)
@@ -148,12 +148,12 @@ class TestBasic(TestCase):
 
     def test_add_new_rule_to_empty_config(self):
         YamlConfigFactory.WHYLOG_DIR = '.test_whylog'
-        config, _ = ConfigFactorySelector.get_config()
-        whylog_dir = YamlConfigFactory._attach_whylog_dir(os.getcwd())
+        config = ConfigFactorySelector.get_config()['config']
+        whylog_dir = ConfigFactorySelector._attach_whylog_dir(os.getcwd())
         config.add_rule(self.user_intent)
         self.check_loaded_config(config, whylog_dir)
 
-        config, _ = ConfigFactorySelector.get_config()
+        config = ConfigFactorySelector.get_config()['config']
         self.check_loaded_config(config, whylog_dir)
         shutil.rmtree(whylog_dir)
 
