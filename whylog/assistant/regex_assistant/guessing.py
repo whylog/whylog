@@ -8,9 +8,10 @@ from whylog.assistant.spans_finding import find_date_spans
 
 
 def guess_regex_objects(text):
-    regex_with_dates = guess_regex_object_with_dates(text)
-    obvious_regex = guess_obvious_regex_object(text)
-    return [regex_with_dates, obvious_regex]
+    regex_object_with_dates = guess_regex_object_with_dates(text)
+    obvious_regex_object = guess_obvious_regex_object(text)
+    #TODO: following list will be longer if we guess more regexes.
+    return [regex_object_with_dates, obvious_regex_object]
 
 
 def guess_regex_object_with_dates(text):

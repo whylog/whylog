@@ -83,6 +83,12 @@ def verify_regex(regex, text):
 
     if matcher is None:
         raise NotMatchingRegexError(text, regex)
+
+
+def regex_groups(regex, text):
+    matcher = re.match('^%s$' % (regex,), text)
+    if matcher is None:
+        raise NotMatchingRegexError(text, regex)
     else:
         return matcher.groups()
 

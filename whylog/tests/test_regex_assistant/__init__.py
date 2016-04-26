@@ -5,7 +5,7 @@ from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.regex_assistant.regex import (
     create_date_regex, create_obvious_regex, group_spans_from_regex, regex_from_group_spans,
-    verify_regex
+    regex_groups, verify_regex
 )
 from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
@@ -14,20 +14,20 @@ from whylog.assistant.spans_finding import (
 from whylog.front.utils import FrontInput
 
 
-def verify_regex_success(test_instance, regex, line, wanted_groups=None):
-    try:
-        groups = verify_regex(regex, line)
-        if wanted_groups is not None:
-            assert groups == wanted_groups
-    except NotMatchingRegexError as e:
-        test_instance.fail(e)
+class TestBase(TestCase):
+    def verify_regex_match(self, regex, line, wanted_groups=None):
+        try:
+            groups = regex_groups(regex, line)
+            if wanted_groups is not None:
+                assert groups == wanted_groups
+        except NotMatchingRegexError as e:
+            self.fail(e)
+
+    def verify_regex_not_match(self, regex, line):
+        self.assertRaises(NotMatchingRegexError, verify_regex, regex, line)
 
 
-def verify_regex_fail(test_instance, regex, line):
-    test_instance.assertRaises(NotMatchingRegexError, verify_regex, regex, line)
-
-
-class TestRegexAssistant(TestCase):
+class TestRegexAssistant(TestBase):
     def test_guess_pattern_objects(self):
         line = r'2015-12-03 or [10/Oct/1999 21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         front_input = FrontInput(0, line, 0)
@@ -38,7 +38,7 @@ class TestRegexAssistant(TestCase):
         assert pattern_objects
         guessed_regexes = [pattern_object.pattern for pattern_object in pattern_objects.values()]
         for guessed_regex in guessed_regexes:
-            verify_regex_success(self, guessed_regex, line)
+            self.verify_regex_match(guessed_regex, line)
 
     def test_update_by_pattern(self):
         ra = RegexAssistant()
@@ -51,16 +51,16 @@ class TestRegexAssistant(TestCase):
         assert ra.regex_objects[line_id].regex == unlikely_regex
 
 
-class TestBasic(TestCase):
+class TestBasic(TestBase):
     def test_verify_regex_success(self):
         line = r"2015-12-03 12:11:00 Data is missing on comp21"
         regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
-        verify_regex_success(self, regex, line, ('2015-12-03 12:11:00', 'comp21'))
+        self.verify_regex_match(regex, line, ('2015-12-03 12:11:00', 'comp21'))
 
     def test_verify_regex_fail(self):
         line = r"2015-12-03 12:11:00 Data is missing"
         regex = r"^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing on (.*)$"
-        verify_regex_fail(self, regex, line)
+        self.verify_regex_not_match(regex, line)
 
     def test_create_obvious_regex(self):
         line = r".^$*x+x{5}?\*[x]x|y(x)(?iLmsux)(?:x)(?P<name>x)(?#x)(?<!x)\4\b\A"
@@ -70,12 +70,12 @@ class TestBasic(TestCase):
             r"\(\?P<name>x\)\(\?#x\)\(\?<!x\)\\4\\b\\A"
         )
 
-        verify_regex_success(self, obvious_regex, line, ())
+        self.verify_regex_match(obvious_regex, line, ())
 
     def test_create_date_regex(self):
         date = '10/Oct/1999:21:15:05'
         regex = create_date_regex(date)
-        verify_regex_success(self, regex, date, ())
+        self.verify_regex_match(regex, date, ())
 
         not_matching_dates = [
             date + " ", date + ":", "1" + date, '10/10/1999:21:15:05', '10/Oct/199:21:15:05',
@@ -83,14 +83,14 @@ class TestBasic(TestCase):
             '10\Oct\1999:21:15:05'
         ]
         for not_matching_date in not_matching_dates:
-            verify_regex_fail(self, regex, not_matching_date)
+            self.verify_regex_not_match(regex, not_matching_date)
 
         matching_dates = [
             '1/Oct/1999:21:15:05', '10/October/1999:21:15:05', '10/Octyyy/1999:21:15:05',
             '10/O/1999:21:15:05', '1/Oct/1999:2:1:0'
         ]
         for matching_date in matching_dates:
-            verify_regex_success(self, regex, matching_date)
+            self.verify_regex_match(regex, matching_date)
 
     def test_find_spans_by_regex(self):
         regexes = dict((re.compile(regex), regex) for regex in [r"\d+-\d+-\d\d", r"comp\d\d"])
