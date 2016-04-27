@@ -17,6 +17,10 @@ class Rule(object):
         self._frequency_information = self._gather_causes_frequency_information()
 
     def _gather_causes_frequency_information(self):
+        """
+        basing on self._causes and assumption that causes are sorted,
+        produces list of pairs: (parser name, number of occurrences of this parser)
+        """
         causes_with_frequency_info = [(self._causes[0].name, 0)]
         for cause in self._causes:
             if cause.name == causes_with_frequency_info[-1][0]:
