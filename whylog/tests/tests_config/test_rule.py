@@ -1,8 +1,10 @@
 from unittest import TestCase
 
+import six
+
 from whylog.config.investigation_plan import Clue, LineSource
 from whylog.config.parsers import RegexParser
-from whylog.config.rule import Rule
+from whylog.config.rule import RegexRuleFactory, Rule
 from whylog.constraints.verifier import InvestigationResult, Verifier
 from whylog.front import FrontInput
 
@@ -12,6 +14,56 @@ class TestBasic(TestCase):
     cause_b = RegexParser('cause_b', '79 broccoli', '^(\d\d) broccoli$', [1], 'default', {1: 'int'})
     effect = RegexParser('effect', '53 dinners', '^(\d\d) carrots$', [1], 'default', {1: 'int'})
     line_source = LineSource('localhost', 'node_1.log')
+
+    def test_order_causes_list(self):
+        cause_1 = RegexParser('cause_a', None, '', None, None, None)
+        cause_2 = RegexParser('cause_b', None, '', None, None, None)
+        cause_3 = RegexParser('cause_c', None, '', None, None, None)
+
+        causes = [cause_2, cause_3, cause_2, cause_1]
+        constraints = [
+            {
+                'clues_groups': [[0, 1], [1, 3], [2, 4], [3, 7], [4, 2]],
+                'name': 'identical',
+                'params': {}
+            }, {
+                'clues_groups': [[0, 1], [4, 2]],
+                'name': 'identical',
+                'params': {}
+            }
+        ]
+
+        sorted_causes, modified_constrains = RegexRuleFactory._order_causes_list(
+            causes, constraints
+        )
+
+        option_1 = [
+            {
+                'clues_groups': [[0, 1], [2, 3], [4, 4], [3, 7], [1, 2]],
+                'name': 'identical',
+                'params': {}
+            }, {
+                'clues_groups': [[0, 1], [1, 2]],
+                'name': 'identical',
+                'params': {}
+            }
+        ]
+        option_2 = [
+            {
+                'clues_groups': [[0, 1], [3, 3], [4, 4], [2, 7], [1, 2]],
+                'name': 'identical',
+                'params': {}
+            }, {
+                'clues_groups': [[0, 1], [1, 2]],
+                'name': 'identical',
+                'params': {}
+            }
+        ]
+        assert all(
+            sorted_causes[i].name <= sorted_causes[i + 1].name
+            for i in six.moves.range(len(sorted_causes) - 1)
+        )
+        assert modified_constrains == option_1 or modified_constrains == option_2
 
     def test_constraints_check_basic(self):
         rule = Rule(

@@ -74,7 +74,24 @@ class AbstractRuleFactory(object):
             parsers_dict, user_rule_intent
         )
         constraints = cls._create_constraints_list(parser_ids_mapper, user_rule_intent)
-        return Rule(causes, effect, constraints)
+        ordered_causes, modified_constraints = cls._order_causes_list(causes, constraints)
+        return Rule(ordered_causes, effect, modified_constraints)
+
+    @classmethod
+    def _order_causes_list(cls, causes, constraints):
+        causes_with_indexes = [(causes[i], i + 1) for i in six.moves.range(len(causes))]
+        causes_with_indexes.sort(key=lambda x: x[0].name)
+        ordered_causes = []
+        parser_index_mapping = {}
+        for i in six.moves.range(len(causes_with_indexes)):
+            parser, old_index = causes_with_indexes[i]
+            ordered_causes.append(parser)
+            parser_index_mapping[old_index] = i + 1
+        for constraint in constraints:
+            for clue_group in constraint['clues_groups']:
+                if clue_group[0] != 0:
+                    clue_group[0] = parser_index_mapping[clue_group[0]]
+        return ordered_causes, constraints
 
     @classmethod
     @abstractmethod
@@ -99,7 +116,7 @@ class AbstractRuleFactory(object):
             clues = []
             for parser_id, group in constraint_intent.groups:
                 cause_id = parser_ids_mapper[parser_id]
-                clues.append((cause_id, group))
+                clues.append([cause_id, group])
             constraint_dict = {
                 "name": constraint_intent.type,
                 "clues_groups": clues,
