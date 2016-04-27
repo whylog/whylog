@@ -167,3 +167,10 @@ class TestBasic(TestCase):
         ordered = [parser.name for parser in added_rule.get_causes_parsers()]
         ordered.sort()
         assert ordered == ["connectionerror", "datamigration"]
+
+    @classmethod
+    def tearDownClass(cls):
+        #remove .test_directory if test test_add_new_rule_to_empty_config failed
+        test_whylog_dir = YamlConfigFactory._attach_whylog_dir(os.getcwd())
+        if os.path.isdir(test_whylog_dir):
+            shutil.rmtree(test_whylog_dir)

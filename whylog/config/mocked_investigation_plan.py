@@ -33,6 +33,6 @@ def mocked_investigation_plan():
             }
         ]
     )  # yapf: disable
-    line_source = LineSource('localhost', 'node_1.log', 40)
-    effect_clues = {'effect': Clue((effect_time,), 'node_1.log', line_source)}
+    line_source = LineSource('localhost', 'node_1.log')
+    effect_clues = {'effect': Clue((effect_time,), 'visible effect', 40, line_source)}
     return InvestigationPlan([rule], [(default_investigation_step, default_log_type)], effect_clues)

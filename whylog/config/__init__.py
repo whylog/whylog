@@ -12,12 +12,15 @@ from whylog.config.exceptions import UnsupportedConfigType, UnsupportedFilenameM
 from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
+from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
+    words_count_in_name = 4
+
     def __init__(self):
         self._parsers = self._load_parsers()
         self._parsers_grouped_by_log_type = self._index_parsers_by_log_type(
@@ -25,6 +28,7 @@ class AbstractConfig(object):
                 self._parsers
             )
         )
+        self._parser_name_generator = ParserNameGenerator(self._parsers)
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
 
@@ -50,7 +54,7 @@ class AbstractConfig(object):
     def add_rule(self, user_rule_intent):
         created_rule = RegexRuleFactory.create_from_intent(user_rule_intent)
         self._save_rule_definition(created_rule.serialize())
-        created_parsers = created_rule.get_new_parsers(self._parsers)
+        created_parsers = created_rule.get_new_parsers(self._parser_name_generator)
         self._save_parsers_definition(parser.serialize() for parser in created_parsers)
         self._rules[created_rule.get_effect_name()].append(created_rule)
         for parser in created_parsers:
@@ -153,6 +157,14 @@ class AbstractConfig(object):
             investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
             steps.append((investigation_step, log_type))
         return steps
+
+    def is_free_parser_name(self, parser_name, black_list):
+        return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
+
+    def propose_parser_name(self, line, regex_str, black_list):
+        return self._parser_name_generator.propose_parser_name(
+            line, regex_str, black_list, self.words_count_in_name
+        )
 
 
 @six.add_metaclass(ABCMeta)
