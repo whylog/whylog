@@ -31,7 +31,7 @@ class Verifier(object):
         """
         basing on clues combination and constraints,
         returns appropriate InvestigationResult object
-        which does not collect information about lines
+        which collects information about lines
         (FrontInput objects) instead of Clues
         """
         return InvestigationResult(
