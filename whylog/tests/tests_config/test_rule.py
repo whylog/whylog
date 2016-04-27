@@ -110,12 +110,18 @@ class TestBasic(TestCase):
         }  # yapf: disable
         results = rule.constraints_check(clues, effect_clues_dict)
 
-        assert len(results) == 1
+        assert len(results) == 2
         assert all(isinstance(cause, InvestigationResult) for cause in results)
-        assert all(isinstance(line, FrontInput) for line in results[0].lines)
+        assert all(isinstance(line, FrontInput) for line in results[0].lines + results[1].lines)
         assert results[0].lines == [
             Verifier._front_input_from_clue(
                 Clue((42,), '42 carrots', 420, self.line_source)),
             Verifier._front_input_from_clue(
                 Clue((42,), '42 carrots', 460, self.line_source))
+        ]  # yapf: disable
+        assert results[1].lines == [
+            Verifier._front_input_from_clue(
+                Clue((42,), '42 carrots', 460, self.line_source)),
+            Verifier._front_input_from_clue(
+                Clue((42,), '42 carrots', 420, self.line_source))
         ]  # yapf: disable

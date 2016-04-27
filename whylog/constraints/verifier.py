@@ -54,8 +54,10 @@ class Verifier(object):
     @classmethod
     def _clues_combinations(cls, clues_tuples, collected_subset=[]):
         """
-        recursive generator that returns all combinations
-        of elements from lists contained in clues_lists
+        recursive generator that returns all permutations according to schema:
+        from each pair (list, number) from clues_tuples,
+        producing permutations with size 'number' from 'list's elements
+        and concatenates it with _clues_combinations on the rest of clues_tuples.
         example:
         >>> xs = [([1, 2, 3], 2), ([4, 5], 1)]
         >>> for l in Verifier._clues_combinations(xs):
@@ -64,14 +66,20 @@ class Verifier(object):
         [1, 2, 5]
         [1, 3, 4]
         [1, 3, 5]
+        [2, 1, 4]
+        [2, 1, 5]
         [2, 3, 4]
         [2, 3, 5]
+        [3, 1, 4]
+        [3, 1, 5]
+        [3, 2, 4]
+        [3, 2, 5]
         it always should be called with empty accumulator,
         that is collected_subset=[]
         """
         if len(clues_tuples) != 0:
             first_list, repetitions_number = clues_tuples[0]
-            for clues in itertools.combinations(first_list, repetitions_number):
+            for clues in itertools.permutations(first_list, repetitions_number):
                 for subset in cls._clues_combinations(
                     clues_tuples[1:], collected_subset + list(clues)
                 ):
