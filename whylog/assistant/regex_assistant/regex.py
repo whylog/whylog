@@ -28,7 +28,6 @@ def group_spans_from_regex(regex, text):
     matcher = re.match(re.compile(regex), text)
     groups_count = len(matcher.groups())
     group_ranges_in_text = [matcher.span(group_no + 1) for group_no in range(groups_count)]
-    group_ranges_in_text = [(start, end) for start, end in group_ranges_in_text]
 
     group_ranges_in_regex = []
     parenthesis_stack = deque()
