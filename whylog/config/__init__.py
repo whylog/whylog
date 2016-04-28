@@ -10,9 +10,7 @@ from whylog.assistant.exceptions import UnsupportedAssistantError
 from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.config.consts import YamlFileNames
 from whylog.config.exceptions import UnsupportedConfigType, UnsupportedFilenameMatcher
-from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
-from whylog.config.filename_matchers import RegexFilenameMatcher
-from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory, WildCardFilenameMatcherFactory
+from whylog.config.filename_matchers import WildCardFilenameMatcher, WildCardFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
 from whylog.config.parser_name_generator import ParserNameGenerator
@@ -89,7 +87,7 @@ class AbstractConfig(object):
 
     def get_log_type(self, front_input):
         # TODO: remove mock
-        matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
+        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
         return LogType('default', [matcher])
 
     def _create_effect_clues(self, effect_params, front_input):
@@ -194,8 +192,7 @@ class AbstractFileConfig(AbstractConfig):
     def _load_log_types(self):
         matchers = defaultdict(list)
         matcher_definitions = self._load_file_with_config(self._log_type_path)
-        matchers_factory_dict = {'RegexFilenameMatcher': RegexFilenameMatcherFactory,
-                                 'WildCardFilenameMatcher': WildCardFilenameMatcherFactory}
+        matchers_factory_dict = {'WildCardFilenameMatcher': WildCardFilenameMatcherFactory}
         for definition in matcher_definitions:
             matcher_class_name = definition['matcher_class_name']
             factory_class = matchers_factory_dict.get(matcher_class_name)

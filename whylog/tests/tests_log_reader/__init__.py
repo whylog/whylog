@@ -54,15 +54,14 @@ class TestBasic(TestCase):
         input_path = os.path.join(path, 'input.txt')
         output_path = os.path.join(path, 'expected_output.txt')
         log_file = os.path.join(path, 'node_1.log')
+        log_type_path = os.path.join(path, 'log_types.yaml')
 
         # TODO this 'if' is temporary, remove this later
         if not test_name == '003_match_time_range':
             raise SkipTest("Functionality not implemented yet")
 
         if platform.system() == 'Windows':
-            log_type_path = os.path.join(path, 'windows_log_types.yaml')
-        else:
-            log_type_path = os.path.join(path, 'log_types.yaml')
+            log_type_path = log_type_path.replace('/', '\\')
 
         line_number = self._get_cause_line_number(input_path)
         line_content = self._get_concrete_line_from_file(log_file, line_number)

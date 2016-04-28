@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from whylog.config.filename_matchers import RegexFilenameMatcher
+from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
 from whylog.config.parsers import ConcatenatedRegexParser, RegexParser
@@ -10,7 +10,7 @@ from whylog.config.rule import Rule
 # mocked investigation plan for 003_match_time_range test
 # TODO: remove mock
 def mocked_investigation_plan():
-    matcher = RegexFilenameMatcher('localhost', 'node_1.log', 'default')
+    matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
     default_log_type = LogType('default', [matcher])
     cause = RegexParser(
         'cause', '2015-12-03 12:08:08 root cause',
