@@ -175,4 +175,3 @@ class TestBasic(TestCase):
         test_whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
         if os.path.isdir(test_whylog_dir):
             shutil.rmtree(test_whylog_dir)
-

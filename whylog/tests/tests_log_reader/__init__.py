@@ -62,7 +62,7 @@ class TestBasic(TestCase):
         if platform.system() == 'Windows':
             log_type_path = os.path.join(path, 'windows_log_types.yaml')
         else:
-            log_type_path = os.path.join(path, 'unix_log_types.yaml')
+            log_type_path = os.path.join(path, 'log_types.yaml')
 
         line_number = self._get_cause_line_number(input_path)
         line_content = self._get_concrete_line_from_file(log_file, line_number)

@@ -5,5 +5,6 @@ class LogType(object):
 
     def files_to_parse(self):
         for matcher in self.filename_matchers:
+            print matcher.get_matched_files
             for host, path in matcher.get_matched_files():
                 yield host, path

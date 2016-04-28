@@ -22,7 +22,8 @@ class RegexFilenameMatcher(AbstractFilenameMatcher):
 
     def get_matched_files(self):
         # TODO: remove mock
-        return ['node_1.log']
+        return ((host, path) for host, path in
+                [('localhost', 'whylog/tests/tests_log_reader/test_files/003_match_time_range/node_1.log')])
 
 
 class RegexFilenameMatcherFactory(object):
@@ -43,8 +44,11 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
             for path in glob.glob(self.path_pattern):
                 yield 'localhost', path
         else:
-            #TODO: finding files in others hosts
-            pass
+            # TODO: finding files in others hosts
+            raise NotImplementedError
+
+    def __repr__(self):
+        return "(WildCardFilenameMatcher: %s, %s, %s)" % (self.log_type_name, self.path_pattern, self.host_pattern)
 
 
 class WildCardFilenameMatcherFactory(object):
