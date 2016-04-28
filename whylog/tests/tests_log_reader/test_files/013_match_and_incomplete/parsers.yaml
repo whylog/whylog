@@ -1,12 +1,29 @@
 ---
 name: cause1
-regex: ^root cause1
+regex_str: ^root cause1$
+log_type: default
+primary_key_groups: []
+convertions: {}
+line_content: root cause1
 ---
 name: cause2
-regex: ^root cause2
+regex_str: ^root cause2$
+log_type: default
+primary_key_groups: []
+convertions: {}
+line_content: root cause2
 ---
 name: cause3
-regex: ^root cause3
+regex_str: ^root cause3$
+log_type: default
+primary_key_groups: []
+convertions: {}
+line_content: root cause3
+
 ---
 name: effect
-regex: ^visible effect$
+regex_str: ^visible effect$
+log_type: default
+primary_key_groups: []
+convertions: {}
+line_content: visible effect

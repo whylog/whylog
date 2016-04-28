@@ -2,4 +2,8 @@
 causes: [cause]
 effect: effect
 constraints:
-    - {type: parameter, name: item}
+- clues_groups:
+  - [1, 1]
+  - [0, 1]
+  name: identical
+  params: {}
