@@ -52,10 +52,8 @@ class SearchManager(object):
         rules from investigation_plan and collected clues
         """
         causes = []
-        for rule in self._investigation_plan.suspected_rules():
-            results_from_rule = rule.constraints_check(
-                clues, self._investigation_plan.get_effect_clues()
-            )
+        for rule in self._investigation_plan.suspected_rules:
+            results_from_rule = rule.constraints_check(clues, self._investigation_plan.effect_clues)
             causes.extend(results_from_rule)
         return causes
 
@@ -68,7 +66,7 @@ class SearchManager(object):
         :return: list of InvestigationResults
         """
         clues_collector = defaultdict(itertools.chain)
-        for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
+        for step, log_type in self._investigation_plan.investigation_steps_with_log_types:
             search_handler = SearchHandler(step, log_type)
             InvestigationUtils.merge_clue_dicts(clues_collector, search_handler.investigate())
         clues = self._save_clues_in_normal_dict(clues_collector)

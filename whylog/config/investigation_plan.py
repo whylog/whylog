@@ -18,14 +18,16 @@ class InvestigationPlan(object):
         self._investigation_metadata = investigation_metadata
         self._effect_clues = effect_clues
 
-    def get_next_investigation_step_with_log_type(self):
-        return (meta_data for meta_data in self._investigation_metadata)
+    @property
+    def investigation_steps_with_log_types(self):
+        return self._investigation_metadata
 
+    @property
     def suspected_rules(self):
-        for rule in self._suspected_rules:
-            yield rule
+        return self._suspected_rules
 
-    def get_effect_clues(self):
+    @property
+    def effect_clues(self):
         return self._effect_clues
 
 
