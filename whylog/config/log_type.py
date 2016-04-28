@@ -5,5 +5,4 @@ class LogType(object):
 
     def files_to_parse(self):
         for matcher in self.filename_matchers:
-            for host, path in matcher.get_matched_files():
-                yield host, path
+            return matcher.get_matched_files()

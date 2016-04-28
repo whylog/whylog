@@ -1,5 +1,5 @@
-from abc import ABCMeta, abstractmethod
 import glob
+from abc import ABCMeta, abstractmethod
 
 import six
 
@@ -26,7 +26,9 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
             raise NotImplementedError
 
     def __repr__(self):
-        return "(WildCardFilenameMatcher: %s, %s, %s)" % (self.log_type_name, self.path_pattern, self.host_pattern)
+        return "(WildCardFilenameMatcher: %s, %s, %s)" % (
+            self.log_type_name, self.path_pattern, self.host_pattern
+        )
 
 
 class WildCardFilenameMatcherFactory(object):

@@ -291,7 +291,7 @@ class YamlSettingsFactory(AbstractSettingsFactory):
     FILES_NAMES = {
         'parsers_path': YamlFileNames.parsers,
         'rules_path': YamlFileNames.rules,
-        'log_types_path': YamlFileNames.log_types,
+        'log_types_path': YamlFileNames.default_log_types,
     }
 
     @classmethod
