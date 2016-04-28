@@ -75,14 +75,24 @@ class Clue(object):
         self.line_source = line_source
 
     def __repr__(self):
-        if all(elem is None for elem in self.__dict__.values()):
+        if all(
+            elem is None
+            for elem in [
+                self.regex_parameters, self.line_prefix_content, self.line_offset, self.line_source
+            ]
+        ):
             return "(Clue: UNMATCHED)"
         return "(Clue: %s, %s, %s, %s)" % (
             self.regex_parameters, self.line_prefix_content, self.line_offset, self.line_source
         )
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        return all([
+            self.regex_parameters == other.regex_parameters,
+            self.line_prefix_content == other.line_prefix_content,
+            self.line_offset == other.line_offset,
+            self.line_source == other.line_source
+        ])  # yapf: disable
 
 
 class LineSource(object):

@@ -21,13 +21,7 @@ class Rule(object):
         basing on self._causes and assumption that causes are sorted,
         produces list of pairs: (parser name, number of occurrences of this parser)
         """
-        causes_with_frequency_info = [(self._causes[0].name, 0)]
-        for cause in self._causes:
-            if cause.name == causes_with_frequency_info[-1][0]:
-                causes_with_frequency_info[-1] = (cause.name, causes_with_frequency_info[-1][1] + 1)
-            else:
-                causes_with_frequency_info.append((cause.name, 1))
-        return causes_with_frequency_info
+        return [(elem.name, len(list(group))) for elem, group in itertools.groupby(self._causes)]
 
     def serialize(self):
         return {

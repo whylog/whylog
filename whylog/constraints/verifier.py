@@ -155,4 +155,7 @@ class InvestigationResult(object):
         )
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        return all([
+            self.lines == other.lines,
+            self.constraints == other.constraints
+        ])  # yapf: disable
