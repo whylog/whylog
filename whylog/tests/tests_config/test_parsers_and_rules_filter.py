@@ -19,7 +19,9 @@ class TestBasic(TestCase):
 
         path = os.path.join(*path_test_files)
         multiple_path = os.path.join(path, 'test_investigation_plan_files')
-        parsers_path, rules_path, log_types_path = ConfigPathFactory.get_path_to_config_files(path)
+        parsers_path, rules_path, log_types_path = ConfigPathFactory.get_path_to_config_files(
+            path, False
+        )
         multiple_parsers_path, multiple_rules_path, _ = ConfigPathFactory.get_path_to_config_files(
             multiple_path
         )

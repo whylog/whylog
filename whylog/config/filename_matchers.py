@@ -13,9 +13,9 @@ class AbstractFilenameMatcher(object):
 
 class WildCardFilenameMatcher(AbstractFilenameMatcher):
     def __init__(self, host_pattern, path_pattern, log_type_name):
-        self.log_type_name = log_type_name
-        self.path_pattern = path_pattern
         self.host_pattern = host_pattern
+        self.path_pattern = path_pattern
+        self.log_type_name = log_type_name
 
     def get_matched_files(self):
         if self.host_pattern == 'localhost':
