@@ -8,6 +8,7 @@ import yaml
 
 from whylog.assistant.exceptions import UnsupportedAssistantError
 from whylog.assistant.regex_assistant import RegexAssistant
+from whylog.config.consts import YamlFileNames
 from whylog.config.exceptions import UnsupportedConfigType, UnsupportedFilenameMatcher
 from whylog.config.filename_matchers import RegexFilenameMatcher, RegexFilenameMatcherFactory
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
@@ -288,9 +289,9 @@ class AbstractSettingsFactory(object):
 
 class YamlSettingsFactory(AbstractSettingsFactory):
     FILES_NAMES = {
-        'parsers_path': 'parsers.yaml',
-        'rules_path': 'rules.yaml',
-        'log_types_path': 'log_types.yaml'
+        'parsers_path': YamlFileNames.parsers,
+        'rules_path': YamlFileNames.rules,
+        'log_types_path': YamlFileNames.log_types,
     }
 
     @classmethod
@@ -312,7 +313,7 @@ class SettingsFactorySelector(object):
     .whylog version in current directory.
     """
     WHYLOG_DIR = '.whylog'
-    CONFIG_SETTINGS_FILE = 'settings.yaml'
+    CONFIG_SETTINGS_FILE = YamlFileNames.settings
     HOME_DIR = os.path.expanduser('~')
     ETC_DIR = '/etc'
     ASSISTANTS_DICT = {'regex': RegexAssistant}

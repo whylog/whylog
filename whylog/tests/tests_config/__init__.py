@@ -6,6 +6,7 @@ import yaml
 
 from whylog.assistant.const import AssistantType
 from whylog.config import SettingsFactorySelector, YamlSettingsFactory
+from whylog.config.consts import YamlFileNames
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
@@ -159,7 +160,7 @@ class TestBasic(TestCase):
 
     @classmethod
     def check_loaded_config(cls, config, whylog_dir):
-        assert config._parsers_path == os.path.join(whylog_dir, 'parsers.yaml')
+        assert config._parsers_path == os.path.join(whylog_dir, YamlFileNames.parsers)
         assert len(config._rules) == 1
         assert len(config._rules['lostdata']) == 1
         added_rule = config._rules['lostdata'][0]

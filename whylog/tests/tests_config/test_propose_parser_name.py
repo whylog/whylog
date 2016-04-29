@@ -2,6 +2,7 @@ import os.path
 from unittest import TestCase
 
 from whylog.config import YamlConfig
+from whylog.config.consts import YamlFileNames
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files']
 
@@ -10,9 +11,9 @@ class TestBasic(TestCase):
     @classmethod
     def setUpClass(cls):
         path = os.path.join(*path_test_files)
-        parsers_path = os.path.join(path, 'parsers.yaml')
-        rules_path = os.path.join(path, 'rules.yaml')
-        log_type_path = os.path.join(path, 'log_types.yaml')
+        parsers_path = os.path.join(path, YamlFileNames.parsers)
+        rules_path = os.path.join(path, YamlFileNames.rules)
+        log_type_path = os.path.join(path, YamlFileNames.log_types)
 
         cls.sample_line1 = "2016-04-12 23:54:45 Connection error occurred on comp1. Host name: host1"
         cls.sample_line2 = "2016-04-12 23:54:45 comp1 host1"

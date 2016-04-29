@@ -3,6 +3,7 @@ import shutil
 from unittest import TestCase
 
 from whylog.config import SettingsFactorySelector, YamlSettingsFactory
+from whylog.config.consts import YamlFileNames
 
 
 class TestBasic(TestCase):
@@ -16,12 +17,12 @@ class TestBasic(TestCase):
     @classmethod
     def validate_created_config(cls, config, predicted_dir_path):
         assert os.path.isdir(predicted_dir_path)
-        assert config._parsers_path == os.path.join(predicted_dir_path, 'parsers.yaml')
+        assert config._parsers_path == os.path.join(predicted_dir_path, YamlFileNames.parsers)
         assert sorted(os.listdir(predicted_dir_path)) == [
-            'log_types.yaml',
-            'parsers.yaml',
-            'rules.yaml',
-            'settings.yaml',
+            YamlFileNames.log_types,
+            YamlFileNames.parsers,
+            YamlFileNames.rules,
+            YamlFileNames.settings,
         ]
 
     @classmethod
