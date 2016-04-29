@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 import six
 
 from whylog.config.parsers import RegexParserFactory
-from whylog.constraints.verifier import Verifier
+from whylog.constraints.verifier import ConstraintManager, Verifier
 
 
 class Rule(object):
@@ -55,7 +55,11 @@ class Rule(object):
             for parser_name, occurrences in self._frequency_information if parser_name in clues
         ]
         effect_clue = effect_clues_dict[self._effect.name]
-        return Verifier.constraints_and(clues_lists, effect_clue, self._constraints)
+        constraint_manager = ConstraintManager()
+        # TODO check basing on improved rule what should be used: and, or, not
+        return Verifier.constraints_and(
+            clues_lists, effect_clue, self._constraints, constraint_manager
+        )
 
 
 @six.add_metaclass(ABCMeta)

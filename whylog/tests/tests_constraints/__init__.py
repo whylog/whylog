@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from whylog.config.investigation_plan import Clue, LineSource
-from whylog.constraints.verifier import InvestigationResult, Verifier
+from whylog.constraints.verifier import ConstraintManager, InvestigationResult, Verifier
 from whylog.front import FrontInput
 
 
@@ -48,7 +48,7 @@ class TestBasic(TestCase):
                 'params': {}
             }
         ]
-        causes = Verifier.constraints_or(clues_lists, effect, constraints)
+        causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 2
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
         assert all(isinstance(line, FrontInput) for line in causes[0].lines + causes[1].lines)
@@ -90,7 +90,7 @@ class TestBasic(TestCase):
                 'params': {}
             }
         ]
-        causes = Verifier.constraints_and(clues_lists, effect, constraints)
+        causes = Verifier.constraints_and(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
@@ -128,7 +128,7 @@ class TestBasic(TestCase):
         ]
 
         # testing 'or'
-        causes = Verifier.constraints_or(clues_lists, effect, constraints)
+        causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
         assert all(isinstance(line, FrontInput) for line in causes[0].lines)
@@ -146,7 +146,7 @@ class TestBasic(TestCase):
         ]
 
         # testing 'and'
-        causes = Verifier.constraints_and(clues_lists, effect, constraints)
+        causes = Verifier.constraints_and(clues_lists, effect, constraints, ConstraintManager())
         assert not causes
 
     def test_constraints_and_verification_failed_when_or_succeeded(self):
@@ -175,11 +175,11 @@ class TestBasic(TestCase):
         ]
 
         # testing 'and'
-        causes = Verifier.constraints_and(clues_lists, effect, constraints)
+        causes = Verifier.constraints_and(clues_lists, effect, constraints, ConstraintManager())
         assert not causes
 
         # testing 'or'
-        causes = Verifier.constraints_or(clues_lists, effect, constraints)
+        causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
         assert all(isinstance(line, FrontInput) for line in causes[0].lines)
@@ -222,5 +222,5 @@ class TestBasic(TestCase):
                 'params': {}
             }
         ]
-        causes = Verifier.constraints_or(clues_lists, effect, constraints)
+        causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert not causes
