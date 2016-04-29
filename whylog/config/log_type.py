@@ -5,8 +5,8 @@ class LogType(object):
 
     def files_to_parse(self):
         """
-        Gets all possible distinct pairs (host, file_name) belongs to single log type
-        It's information for LogReader which files should be parsed by its.
+        Gets all possible distinct pairs (host, file_name) belonging to single log type
+        It's information which files should be parsed by LogReader.
         """
         parsed_files = set()
         for matcher in self.filename_matchers:

@@ -62,7 +62,7 @@ class TestBasic(TestCase):
         line_content = self._get_concrete_line_from_file(log_file, line_number)
         effect_line_offset = self._deduce_line_offset(log_file, line_number)
 
-        whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path, True))
+        whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         log_reader = LogReader(whylog_config)
         line = FrontInput(effect_line_offset, line_content, prefix_path)
 
