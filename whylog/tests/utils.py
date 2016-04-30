@@ -1,9 +1,9 @@
-import os.path
+import os
 import platform
 
-import os
 import shutil
 from unittest import TestCase
+
 from whylog.config import SettingsFactorySelector
 from whylog.config.consts import YamlFileNames
 from whylog.tests.consts import TestPaths

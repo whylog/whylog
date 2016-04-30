@@ -1,4 +1,5 @@
 from functools import partial
+
 from whylog.config import SettingsFactorySelector
 from whylog.log_reader import LogReader
 from whylog.teacher import Teacher
