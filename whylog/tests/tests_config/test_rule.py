@@ -177,3 +177,49 @@ class TestBasic(TestCase):
             Verifier._front_input_from_clue(
                 Clue((42,), '42 carrots', 420, self.line_source))
         ]  # yapf: disable
+
+    def test_empty_clues_going_to_verify(self):
+        rule = Rule(
+            [self.cause_a, self.cause_a], self.effect, [
+                {
+                    'clues_groups': [[0, 1], [1, 1], [2, 1]],
+                    'name': 'identical',
+                    'params': {}
+                }
+            ]
+        )  # yapf: disable
+        effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
+        clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
+            'cause_a': [],
+            'dummy': [
+                Clue((98,), '98 foo bar', 980, self.line_source),
+                Clue((99,), '99 foo bar', 990, self.line_source)
+            ]
+        }  # yapf: disable
+        results = rule.constraints_check(clues, effect_clues_dict)
+        assert not results
+
+    def test_one_matched_line_when_two_occurrences_requested(self):
+        rule = Rule(
+            [self.cause_a, self.cause_a], self.effect, [
+                {
+                    'clues_groups': [[0, 1], [1, 1], [2, 1]],
+                    'name': 'identical',
+                    'params': {}
+                }
+            ]
+        )  # yapf: disable
+        effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
+        clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
+            'cause_a': [
+                Clue((42,), '42 carrots', 420, self.line_source),
+            ],
+            'dummy': [
+                Clue((98,), '98 foo bar', 980, self.line_source),
+                Clue((99,), '99 foo bar', 990, self.line_source)
+            ]
+        }  # yapf: disable
+        results = rule.constraints_check(clues, effect_clues_dict)
+        assert effect_clues_dict['effect'].regex_parameters[0] == \
+            clues['cause_a'][0].regex_parameters[0]
+        assert not results
