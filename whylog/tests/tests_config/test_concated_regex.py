@@ -4,7 +4,8 @@ from unittest import TestCase
 import six
 
 from whylog.assistant.const import AssistantType
-from whylog.config.parsers import ConcatenatedRegexParser, RegexParserFactory
+from whylog.config.parser_subset import ConcatenatedRegexParser
+from whylog.config.parsers import RegexParserFactory
 from whylog.teacher.user_intent import LineParamGroup, UserParserIntent
 
 # convertions
