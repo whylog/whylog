@@ -66,7 +66,11 @@ class RegexMatch():
 
     def _guess_regexes(self):
         guessed_pattern_matches = guess_pattern_match(self.line_text)
-        guessed_dict = dict([(key, guessed_pattern_matches[key]) for key in range(len(guessed_pattern_matches))])
+        guessed_dict = dict(
+            [
+                (key, guessed_pattern_matches[key]) for key in range(len(guessed_pattern_matches))
+            ]
+        )
         self.guessed_pattern_matches = guessed_dict
         self.update_by_guessed_regex(regex_id=0)
 

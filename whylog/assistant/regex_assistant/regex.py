@@ -2,9 +2,10 @@
 Regex verification and creating (but not finding groups in regex)
 """
 
-import six
 import re
 from collections import deque
+
+import six
 
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.span import Span
