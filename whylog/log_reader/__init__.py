@@ -44,7 +44,7 @@ class SearchManager(object):
     @classmethod
     def _save_clues_in_normal_dict(cls, collector):
         return dict(
-            (parser_name, list(clues_iter)) for parser_name, clues_iter in collector.items()
+            (parser_name, list(clues_iter)) for parser_name, clues_iter in six.iteritems(collector)
         )
 
     def investigate(self):

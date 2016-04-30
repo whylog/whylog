@@ -44,7 +44,7 @@ class BacktrackSearcher(AbstractSearcher):
 
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
-        for parser_name, clue in clues_from_line.items():
+        for parser_name, clue in six.iteritems(clues_from_line):
             collector[parser_name].append(clue)
 
     @classmethod

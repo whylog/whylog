@@ -58,7 +58,7 @@ class AbstractRuleFactory(object):
         parser_ids_mapper = {user_rule_intent.effect_id: 0}
         free_clue_index = 1
         causes = []
-        for intent_id, parser in parsers_dict.items():
+        for intent_id, parser in six.iteritems(parsers_dict):
             causes.append(parser)
             parser_ids_mapper[intent_id] = free_clue_index
             free_clue_index += 1
@@ -94,5 +94,5 @@ class RegexRuleFactory(AbstractRuleFactory):
         return dict(
             (
                 intent_id, RegexParserFactory.create_from_intent(parser_intent)
-            ) for intent_id, parser_intent in user_rule_intent.parsers.items()
+            ) for intent_id, parser_intent in six.iteritems(user_rule_intent.parsers)
         )

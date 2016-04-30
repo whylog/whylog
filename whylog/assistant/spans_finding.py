@@ -6,6 +6,7 @@ Some heuristic included.
 import re
 from datetime import datetime
 
+import six
 from dateutil.parser import parse as date_parse
 
 from whylog.assistant.const import DataType, DateParams
@@ -73,7 +74,7 @@ def _find_date_spans_by_force(text):
 
 def _find_spans_by_regex(regexes, text, pattern_creator=None, converter=DataType.STRING):
     spans = set()
-    for compiled_regex, regex in regexes.items():
+    for compiled_regex, regex in six.iteritems(regexes):
         for match in re.finditer(compiled_regex, text):
             new_span = Span(match.start(0), match.end(0), regex, pattern_creator, converter)
             spans.add(new_span)
