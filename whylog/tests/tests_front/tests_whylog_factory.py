@@ -1,6 +1,6 @@
 from whylog.config.investigation_plan import LineSource
-from whylog.front.whylog_factory import whylog_factory
 from whylog.front.utils import FrontInput
+from whylog.front.whylog_factory import whylog_factory
 from whylog.tests.utils import TestRemovingSettings
 
 
