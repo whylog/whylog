@@ -1,8 +1,6 @@
 from whylog.config.investigation_plan import LineSource
 from whylog.front.whylog_factory import whylog_factory
 from whylog.front.utils import FrontInput
-from whylog.log_reader import LogReader
-from whylog.teacher import Teacher
 from whylog.tests.utils import TestRemovingSettings
 
 
