@@ -67,7 +67,7 @@ class Teacher(object):
         """
 
         self._remove_constraints_by_line(line_id)
-        self.pattern_assistant.remove(line_id)
+        self.pattern_assistant.remove_line(line_id)
         del self._parsers[line_id]
 
     def update_pattern(self, line_id, proposed_pattern):
