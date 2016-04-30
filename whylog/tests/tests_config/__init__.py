@@ -148,7 +148,7 @@ class TestBasic(TestCase):
         assert len(self.config._log_types['apache'].filename_matchers) == 1
 
     def test_add_new_rule_to_empty_config(self):
-        YamlSettingsFactory.WHYLOG_DIR = '.test_whylog'
+        SettingsFactorySelector.WHYLOG_DIR = '.whylog_test'
         config = SettingsFactorySelector.get_settings()['config']
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
         config.add_rule(self.user_intent)
