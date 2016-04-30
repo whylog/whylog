@@ -44,8 +44,9 @@ class SettingsFactorySelector(object):
         if path is not None:
             path_to_settings = os.path.join(path, cls.SETTINGS_FILE)
             return cls.load_settings(path_to_settings)
-        path_to_settings = cls.DEFAULT_SETTINGS_FACTORY_TYPE.create_new_settings_dir(os.getcwd(), cls.WHYLOG_DIR,
-                                                                                     cls.SETTINGS_FILE)
+        path_to_settings = cls.DEFAULT_SETTINGS_FACTORY_TYPE.create_new_settings_dir(
+            os.getcwd(), cls.WHYLOG_DIR, cls.SETTINGS_FILE
+        )
         return cls.load_settings(path_to_settings)
 
     @classmethod

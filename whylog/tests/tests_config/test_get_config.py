@@ -5,9 +5,9 @@ from unittest import TestCase
 import six
 
 from whylog.config import SettingsFactorySelector
-from whylog.config.settings_factory import YamlSettingsFactory
 from whylog.config.consts import YamlFileNames
 from whylog.tests.consts import TestPaths
+from whylog.config.settings_factory import YamlSettingsFactory
 
 
 class TestBasic(TestCase):
@@ -31,8 +31,9 @@ class TestBasic(TestCase):
 
     @classmethod
     def find_config_in_parent_dir(cls, path):
-        YamlSettingsFactory.create_new_settings_dir(path, SettingsFactorySelector.WHYLOG_DIR,
-                                                    SettingsFactorySelector.SETTINGS_FILE)
+        YamlSettingsFactory.create_new_settings_dir(
+            path, SettingsFactorySelector.WHYLOG_DIR, SettingsFactorySelector.SETTINGS_FILE
+        )
         config = SettingsFactorySelector.get_settings()['config']
         expected_path = SettingsFactorySelector._attach_whylog_dir(path)
         cls.validate_created_config(config, expected_path)
