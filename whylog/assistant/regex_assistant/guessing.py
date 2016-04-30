@@ -1,29 +1,29 @@
 import re
 
-from whylog.assistant.pattern_object import ParamGroup, PatternObject
+from whylog.assistant.pattern_match import ParamGroup, PatternMatch
 from whylog.assistant.regex_assistant.regex import (
     create_obvious_regex, regex_from_group_spans, verify_regex
 )
 from whylog.assistant.spans_finding import find_date_spans
 
 
-def guess_regex_objects(text):
-    regex_object_with_dates = guess_regex_object_with_dates(text)
-    obvious_regex_object = guess_obvious_regex_object(text)
+def guess_pattern_match(text):
+    pattern_match_with_dates = guess_pattern_match_with_dates(text)
+    obvious_pattern_match = guess_obvious_pattern_match(text)
     #TODO: following list will be longer if we guess more regexes.
-    return [regex_object_with_dates, obvious_regex_object]
+    return [pattern_match_with_dates, obvious_pattern_match]
 
 
-def guess_regex_object_with_dates(text):
+def guess_pattern_match_with_dates(text):
     group_spans = find_date_spans(text)
     regex = regex_from_group_spans(group_spans, text)
     groups = _groups_from_spans(group_spans, regex, text)
-    return PatternObject(text, regex, groups)
+    return PatternMatch(text, regex, groups)
 
 
-def guess_obvious_regex_object(text):
+def guess_obvious_pattern_match(text):
     regex = create_obvious_regex(text)
-    return PatternObject(text, regex, list())
+    return PatternMatch(text, regex, list())
 
 
 def _groups_from_spans(spans, regex, text):

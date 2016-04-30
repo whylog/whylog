@@ -28,15 +28,15 @@ class TestBase(TestCase):
 
 
 class TestRegexAssistant(TestBase):
-    def test_guess_pattern_objects(self):
+    def test_guess_pattern_matches(self):
         line = r'2015-12-03 or [10/Oct/1999 21:15:05 +0500] "GET /index.html HTTP/1.0" 200 1043'
         front_input = FrontInput(0, line, 0)
         line_id = 1
         ra = RegexAssistant()
         ra.add_line(line_id, front_input)
-        pattern_objects = ra.guess_pattern_objects(line_id)
-        assert pattern_objects
-        guessed_regexes = [pattern_object.pattern for pattern_object in pattern_objects.values()]
+        pattern_matches = ra.guess_pattern_matches(line_id)
+        assert pattern_matches
+        guessed_regexes = [pattern_match.pattern for pattern_match in pattern_matches.values()]
         for guessed_regex in guessed_regexes:
             self.verify_regex_match(guessed_regex, line)
 
@@ -46,9 +46,9 @@ class TestRegexAssistant(TestBase):
         line_id = 1
         ra.add_line(line_id, FrontInput(0, line, 0))
         unlikely_regex = r'^Hello, (Whylog (team|guy)!)$'
-        assert not ra.regex_objects[line_id].regex == unlikely_regex
+        assert not ra.regex_matches[line_id].regex == unlikely_regex
         ra.update_by_pattern(line_id, unlikely_regex)
-        assert ra.regex_objects[line_id].regex == unlikely_regex
+        assert ra.regex_matches[line_id].regex == unlikely_regex
 
 
 class TestBasic(TestBase):

@@ -77,11 +77,11 @@ class Teacher(object):
         """
         Returns list of guessed patterns for a line.
         """
-        pattern_objects = self.pattern_assistant.guess_pattern_objects(line_id)
-        return [pattern_object.pattern for pattern_object in pattern_objects]
+        pattern_matches = self.pattern_assistant.guess_pattern_matches(line_id)
+        return [pattern_match.pattern for pattern_match in pattern_matches]
 
     def choose_guessed_pattern(self, line_id, pattern_id):
-        self.pattern_assistant.update_by_guessed_pattern_object(line_id, pattern_id)
+        self.pattern_assistant.update_by_guessed_pattern_match(line_id, pattern_id)
 
     def set_pattern_name(self, line_id, name):
         pass

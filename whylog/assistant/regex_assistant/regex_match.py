@@ -1,10 +1,10 @@
 from whylog.assistant.const import DataType
-from whylog.assistant.pattern_object import ParamGroup, PatternObject
-from whylog.assistant.regex_assistant.guessing import guess_regex_objects
+from whylog.assistant.pattern_match import ParamGroup, PatternMatch
+from whylog.assistant.regex_assistant.guessing import guess_pattern_match
 from whylog.assistant.regex_assistant.regex import create_obvious_regex, regex_groups
 
 
-class RegexObject(object):
+class RegexMatch():
     """
     Container for information about line and corresponding regex
     Keeps own data integrity - especially consistency between regex and groups (param_groups).
@@ -13,9 +13,9 @@ class RegexObject(object):
     :param line_text: raw string of the line
     :param param_groups: represents params from text (catched by regex groups)
     :param regex: regex matching to line_text
-    :param guessed_pattern_objects: keeps guessed regexes that match to line_text
+    :param guessed_pattern_matches: keeps guessed regexes that match to line_text
     :type param_groups: dict[int, ParamGroup]
-    :type guessed_regex_objects: dict[int, PatternObject]
+    :type guessed_pattern_matches: dict[int, PatternMatch]
     """
 
     def __init__(self, line_object):
@@ -25,11 +25,11 @@ class RegexObject(object):
         self.regex = None
         self.update_by_regex(create_obvious_regex(self.line_text))
 
-        self.guessed_regex_objects = dict()
+        self.guessed_pattern_matches = dict()
         self._guess_regexes()
 
-    def convert_to_pattern_object(self):
-        return PatternObject(self.line_text, self.regex, self.param_groups)
+    def convert_to_pattern_match(self):
+        return PatternMatch(self.line_text, self.regex, self.param_groups)
 
     def update_by_regex(self, new_regex):
         """
@@ -57,17 +57,17 @@ class RegexObject(object):
         )
         self.regex = new_regex
 
-    def update_by_regex_object(self, regex_object):
-        self.regex = regex_object.pattern
-        self.param_groups = regex_object.param_groups
+    def update_by_pattern_match(self, pattern_match):
+        self.regex = pattern_match.pattern
+        self.param_groups = pattern_match.param_groups
 
     def update_by_guessed_regex(self, regex_id):
-        self.update_by_regex_object(self.guessed_regex_objects[regex_id])
+        self.update_by_pattern_match(self.guessed_pattern_matches[regex_id])
 
     def _guess_regexes(self):
-        guessed_objects = guess_regex_objects(self.line_text)
-        guessed_dict = dict([(key, guessed_objects[key]) for key in range(len(guessed_objects))])
-        self.guessed_regex_objects = guessed_dict
+        guessed_pattern_matches = guess_pattern_match(self.line_text)
+        guessed_dict = dict([(key, guessed_pattern_matches[key]) for key in range(len(guessed_pattern_matches))])
+        self.guessed_pattern_matches = guessed_dict
         self.update_by_guessed_regex(regex_id=0)
 
     def set_converter(self, group_no, converter):

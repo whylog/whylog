@@ -2,6 +2,7 @@
 Regex verification and creating (but not finding groups in regex)
 """
 
+import six
 import re
 from collections import deque
 
@@ -31,7 +32,7 @@ def group_spans_from_regex(regex, text):
 
     group_ranges_in_regex = []
     parenthesis_stack = deque()
-    for pos in range(1, len(regex)):
+    for pos in six.moves.range(1, len(regex)):
         if not regex[pos - 1] == '\\':
             if regex[pos] == '(':
                 parenthesis_stack.append(pos)
