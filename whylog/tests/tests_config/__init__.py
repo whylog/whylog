@@ -2,6 +2,7 @@ import os.path
 import shutil
 from unittest import TestCase
 
+import six
 import yaml
 
 from whylog.assistant.const import AssistantType
@@ -138,7 +139,7 @@ class TestBasic(TestCase):
     def test_loading_single_rule_its_parsers(self):
         rule = self.config._rules['lostdata'][0]
         assert sorted([cause.name for cause in rule._causes] + [rule._effect.name]) == sorted(
-            parser.name for parser in self.config._parsers.values()
+            parser.name for parser in six.itervalues(self.config._parsers)
         )
 
     def test_loading_log_types(self):
