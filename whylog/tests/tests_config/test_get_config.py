@@ -4,7 +4,8 @@ from unittest import TestCase
 
 import six
 
-from whylog.config import SettingsFactorySelector, YamlSettingsFactory
+from whylog.config import SettingsFactorySelector
+from whylog.config.settings_factory import YamlSettingsFactory
 from whylog.config.consts import YamlFileNames
 from whylog.tests.consts import TestPaths
 
@@ -12,9 +13,9 @@ from whylog.tests.consts import TestPaths
 class TestBasic(TestCase):
     @classmethod
     def setUpClass(cls):
-        #This change was caused by fails os.names() for new directories.
-        #Renaming was necessary to avoid conflicts between test config directories
-        #and orginal independent non tests config directories
+        # This change was caused by fails os.names() for new directories.
+        # Renaming was necessary to avoid conflicts between test config directories
+        # and orginal independent non tests config directories
         SettingsFactorySelector.WHYLOG_DIR = TestPaths.WHYLOG_DIR
 
     @classmethod
@@ -30,7 +31,8 @@ class TestBasic(TestCase):
 
     @classmethod
     def find_config_in_parent_dir(cls, path):
-        YamlSettingsFactory.create_new_settings_dir(path)
+        YamlSettingsFactory.create_new_settings_dir(path, SettingsFactorySelector.WHYLOG_DIR,
+                                                    SettingsFactorySelector.SETTINGS_FILE)
         config = SettingsFactorySelector.get_settings()['config']
         expected_path = SettingsFactorySelector._attach_whylog_dir(path)
         cls.validate_created_config(config, expected_path)
@@ -50,7 +52,7 @@ class TestBasic(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        #Removed test config directories if test failed
+        # Removed test config directories if test failed
         path = os.getcwd()
         cls.remove_config_dir(path)
         for i in six.moves.range(2):
