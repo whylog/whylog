@@ -19,7 +19,7 @@ class TestBasic(TestCase):
         assert os.path.isdir(predicted_dir_path)
         assert config._parsers_path == os.path.join(predicted_dir_path, YamlFileNames.parsers)
         assert sorted(os.listdir(predicted_dir_path)) == [
-            YamlFileNames.log_types,
+            YamlFileNames.default_log_types,
             YamlFileNames.parsers,
             YamlFileNames.rules,
             YamlFileNames.settings,

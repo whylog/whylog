@@ -54,8 +54,8 @@ class TestBasic(TestCase):
         output_path = os.path.join(path, 'expected_output.txt')
         log_file = os.path.join(path, 'node_1.log')
 
+        # TODO this 'if' is temporary, remove this later
         if not test_name == '003_match_time_range':
-            # TODO this 'if' is temporary, remove this later
             raise SkipTest("Functionality not implemented yet")
 
         line_number = self._get_cause_line_number(input_path)
