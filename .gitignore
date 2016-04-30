@@ -58,6 +58,3 @@ target/
 
 # Pycharm
 .idea/
-
-# Whylog
-*.whylog
