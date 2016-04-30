@@ -5,7 +5,7 @@ from unittest import TestCase
 import yaml
 
 from whylog.assistant.const import AssistantType
-from whylog.config import SettingsFactorySelector, YamlSettingsFactory
+from whylog.config import SettingsFactorySelector
 from whylog.config.consts import YamlFileNames
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
