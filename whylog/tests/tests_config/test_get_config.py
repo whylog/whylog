@@ -2,6 +2,8 @@ import os
 import shutil
 from unittest import TestCase
 
+import six
+
 from whylog.config import SettingsFactorySelector, YamlSettingsFactory
 from whylog.config.consts import YamlFileNames
 
@@ -36,7 +38,7 @@ class TestBasic(TestCase):
         path = os.getcwd()
         self.find_config_in_parent_dir(path)
         shutil.rmtree(SettingsFactorySelector._attach_whylog_dir(path))
-        for i in range(2):
+        for i in six.moves.range(2):
             path, _ = os.path.split(path)
             self.find_config_in_parent_dir(path)
             shutil.rmtree(SettingsFactorySelector._attach_whylog_dir(path))
@@ -50,7 +52,7 @@ class TestBasic(TestCase):
         #Removed test config directories if test failed
         path = os.getcwd()
         cls.remove_config_dir(path)
-        for i in range(2):
+        for i in six.moves.range(2):
             path, _ = os.path.split(path)
             cls.remove_config_dir(path)
         cls.remove_config_dir(SettingsFactorySelector.HOME_DIR)

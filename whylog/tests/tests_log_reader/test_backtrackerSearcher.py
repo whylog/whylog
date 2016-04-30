@@ -1,6 +1,8 @@
 import os.path
 from unittest import TestCase
 
+import six
+
 from whylog.log_reader import searchers
 from whylog.tests.tests_log_reader.constants import AFewLinesLogParams, TestPaths
 
@@ -62,7 +64,7 @@ class TestBacktrackSearcher(TestCase):
         self._run_reverse_and_check_results(log_file_path, [offset, bufsize], how_many_lines)
 
     def test_very_small_bufsize(self):
-        for i in range(1, 3):
+        for i in six.moves.range(1, 3):
             self._sample_call_with_specified_bufsize(i)
 
     def test_file_size_as_offset(self):
