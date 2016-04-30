@@ -52,7 +52,8 @@ class Rule(object):
         """
         clues_lists = [
             (clues[parser_name], occurrences)
-            for parser_name, occurrences in self._frequency_information if parser_name in clues
+            for parser_name, occurrences in self._frequency_information
+            if clues.get(parser_name) is not None
         ]
         effect_clue = effect_clues_dict[self._effect.name]
         constraint_manager = ConstraintManager()
@@ -77,14 +78,13 @@ class AbstractRuleFactory(object):
 
     @classmethod
     def _order_causes_list(cls, causes, constraints):
-        causes_with_indexes = [(causes[i], i + 1) for i in six.moves.range(len(causes))]
-        causes_with_indexes.sort(key=lambda x: x[0].name)
+        causes_with_indexes = list(enumerate(causes, 1))
+        causes_with_indexes.sort(key=lambda x: x[1].name)
         ordered_causes = []
         parser_index_mapping = {}
-        for i in six.moves.range(len(causes_with_indexes)):
-            parser, old_index = causes_with_indexes[i]
+        for new_idx, (old_index, parser) in enumerate(causes_with_indexes, 1):
             ordered_causes.append(parser)
-            parser_index_mapping[old_index] = i + 1
+            parser_index_mapping[old_index] = new_idx
         for constraint in constraints:
             for clue_group in constraint['clues_groups']:
                 if clue_group[0] != 0:

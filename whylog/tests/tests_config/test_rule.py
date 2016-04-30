@@ -5,14 +5,14 @@ import six
 from whylog.config.investigation_plan import Clue, LineSource
 from whylog.config.parsers import RegexParser
 from whylog.config.rule import RegexRuleFactory, Rule
-from whylog.constraints.verifier import InvestigationResult, Verifier
+from whylog.constraints.verifier import InvestigationResult
 from whylog.front import FrontInput
 
 
 class TestBasic(TestCase):
     cause_a = RegexParser('cause_a', '31 carrots', '^(\d\d) carrots$', [1], 'default', {1: 'int'})
     cause_b = RegexParser('cause_b', '79 broccoli', '^(\d\d) broccoli$', [1], 'default', {1: 'int'})
-    effect = RegexParser('effect', '53 dinners', '^(\d\d) carrots$', [1], 'default', {1: 'int'})
+    effect = RegexParser('effect', '53 dinners', '^(\d\d) dinners', [1], 'default', {1: 'int'})
     line_source = LineSource('localhost', 'node_1.log')
 
     def test_order_causes_list(self):
@@ -63,7 +63,7 @@ class TestBasic(TestCase):
             sorted_causes[i].name <= sorted_causes[i + 1].name
             for i in six.moves.range(len(sorted_causes) - 1)
         )
-        assert modified_constrains == option_1 or modified_constrains == option_2
+        assert modified_constrains in [option_1, option_2]
 
     def test_constraints_check_basic(self):
         rule = Rule(
@@ -96,11 +96,11 @@ class TestBasic(TestCase):
 
         assert len(results) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in results)
-        assert all(isinstance(line, FrontInput) for line in results[0].lines)
+
         assert results[0].lines == [
-            Verifier._front_input_from_clue(
+            FrontInput.from_clue(
                 Clue((42,), '42 carrots', 420, self.line_source)),
-            Verifier._front_input_from_clue(
+            FrontInput.from_clue(
                 Clue((42,), '42 broccoli', 120, self.line_source))
         ]  # yapf: disable
 
@@ -130,9 +130,9 @@ class TestBasic(TestCase):
 
         assert len(results) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in results)
-        assert all(isinstance(line, FrontInput) for line in results[0].lines)
+
         assert results[0].lines == [
-            Verifier._front_input_from_clue(
+            FrontInput.from_clue(
                 Clue((42,), '42 carrots', 420, self.line_source))
         ]  # yapf: disable
 
@@ -164,17 +164,17 @@ class TestBasic(TestCase):
 
         assert len(results) == 2
         assert all(isinstance(cause, InvestigationResult) for cause in results)
-        assert all(isinstance(line, FrontInput) for line in results[0].lines + results[1].lines)
+
         assert results[0].lines == [
-            Verifier._front_input_from_clue(
+            FrontInput.from_clue(
                 Clue((42,), '42 carrots', 420, self.line_source)),
-            Verifier._front_input_from_clue(
+            FrontInput.from_clue(
                 Clue((42,), '42 carrots', 460, self.line_source))
         ]  # yapf: disable
         assert results[1].lines == [
-            Verifier._front_input_from_clue(
+            FrontInput.from_clue(
                 Clue((42,), '42 carrots', 460, self.line_source)),
-            Verifier._front_input_from_clue(
+            FrontInput.from_clue(
                 Clue((42,), '42 carrots', 420, self.line_source))
         ]  # yapf: disable
 

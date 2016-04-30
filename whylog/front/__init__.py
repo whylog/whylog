@@ -9,3 +9,7 @@ class FrontInput(object):
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    @classmethod
+    def from_clue(cls, clue):
+        return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)

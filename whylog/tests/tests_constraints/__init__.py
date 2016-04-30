@@ -51,18 +51,17 @@ class TestBasic(TestCase):
         causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 2
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
-        assert all(isinstance(line, FrontInput) for line in causes[0].lines + causes[1].lines)
 
         assert causes[0].lines == [
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Chocolate', 2), 'Chocolate, 2 times', 100, line_source)),
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Banana', 2), 'Banana, 2 times', 1050, line_source))
         ]  # yapf: disable
         assert causes[1].lines == [
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Banana', 1), 'Banana, 1 times', 150, line_source)),
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Banana', 2), 'Banana, 2 times', 1050, line_source))
         ]  # yapf: disable
 
@@ -95,9 +94,9 @@ class TestBasic(TestCase):
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
         assert causes[0].lines == [
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Pear', 2), 'Pear, 2 times', 150, line_source)),
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Pear', 2), 'Pear, 2 times', 1050, line_source))
         ]  # yapf: disable
 
@@ -131,10 +130,9 @@ class TestBasic(TestCase):
         causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
-        assert all(isinstance(line, FrontInput) for line in causes[0].lines)
 
         assert causes[0].lines == [
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Banana', 2), 'Banana, 2 times', 1050, line_source))
         ]  # yapf: disable
         assert causes[0].constraints == [
@@ -182,12 +180,11 @@ class TestBasic(TestCase):
         causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
-        assert all(isinstance(line, FrontInput) for line in causes[0].lines)
 
         assert causes[0].lines == [
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Pear', 2), 'Pear, 2 times', 150, line_source)),
-            Verifier._front_input_from_clue(Clue(
+            FrontInput.from_clue(Clue(
                 ('Pineapple', 2), 'Pineapple, 2 times', 1050, line_source))
         ]  # yapf: disable
         assert causes[0].constraints == [
