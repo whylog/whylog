@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from whylog.config import SettingsFactorySelector, YamlSettingsFactory
 from whylog.config.consts import YamlFileNames
+from whylog.tests.consts import TestPaths
 
 
 class TestBasic(TestCase):
@@ -12,7 +13,7 @@ class TestBasic(TestCase):
         #This change was caused by fails os.names() for new directories.
         #Renaming was necessary to avoid conflicts between test config directories
         #and orginal independent non tests config directories
-        SettingsFactorySelector.WHYLOG_DIR = '.whylog_test'
+        SettingsFactorySelector.WHYLOG_DIR = TestPaths.WHYLOG_DIR
 
     @classmethod
     def validate_created_config(cls, config, predicted_dir_path):

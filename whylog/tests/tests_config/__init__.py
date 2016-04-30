@@ -12,6 +12,7 @@ from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
+from whylog.tests.consts import TestPaths
 
 # Constraint types
 identical_constr = "identical"
@@ -148,7 +149,7 @@ class TestBasic(TestCase):
         assert len(self.config._log_types['apache'].filename_matchers) == 1
 
     def test_add_new_rule_to_empty_config(self):
-        SettingsFactorySelector.WHYLOG_DIR = '.whylog_test'
+        SettingsFactorySelector.WHYLOG_DIR = TestPaths.WHYLOG_DIR
         config = SettingsFactorySelector.get_settings()['config']
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
         config.add_rule(self.user_intent)
