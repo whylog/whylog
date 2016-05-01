@@ -52,6 +52,7 @@ class TestBasic(TestCase):
         assert len(causes) == 2
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
+        assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
         assert causes[0].lines == [
             FrontInput.from_clue(Clue(
                 ('Chocolate', 2), 'Chocolate, 2 times', 100, line_source)),
@@ -93,6 +94,7 @@ class TestBasic(TestCase):
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
+        assert all(cause.constraints_linkage == InvestigationResult.AND for cause in causes)
         assert causes[0].lines == [
             FrontInput.from_clue(Clue(
                 ('Pear', 2), 'Pear, 2 times', 150, line_source)),
@@ -131,6 +133,7 @@ class TestBasic(TestCase):
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
+        assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
         assert causes[0].lines == [
             FrontInput.from_clue(Clue(
                 ('Banana', 2), 'Banana, 2 times', 1050, line_source))
@@ -181,6 +184,7 @@ class TestBasic(TestCase):
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
+        assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
         assert causes[0].lines == [
             FrontInput.from_clue(Clue(
                 ('Pear', 2), 'Pear, 2 times', 150, line_source)),
