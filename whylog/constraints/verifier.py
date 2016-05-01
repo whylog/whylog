@@ -139,7 +139,11 @@ class Verifier(object):
                 cls._verify_constraint(combination, effect, constraint, constraint_manager)
                 for constraint in constraints
             ):
-                causes.append(cls._create_investigation_result(combination, constraints, InvestigationResult.AND))
+                causes.append(
+                    cls._create_investigation_result(
+                        combination, constraints, InvestigationResult.AND
+                    )
+                )
         return causes
 
     @classmethod
@@ -163,9 +167,13 @@ class Verifier(object):
                     constraint
                     for constraint in constraints
                     if cls._verify_constraint(combination, effect, constraint, constraint_manager)
-                    ]
+                ]
                 if len(verified_constraints) > 0:
-                    causes.append(cls._pack_results_for_constraint_or(combination, verified_constraints))
+                    causes.append(
+                        cls._pack_results_for_constraint_or(
+                            combination, verified_constraints
+                        )
+                    )
         return causes
 
     @classmethod
@@ -181,7 +189,11 @@ class Verifier(object):
         for combination in cls._clues_combinations(clues_lists):
             if cls._verify_constraint(combination, effect, constraint, constraint_manager):
                 return []
-        causes.append(cls._create_investigation_result([cls.UNMATCHED], [constraint], InvestigationResult.NOT))
+        causes.append(
+            cls._create_investigation_result(
+                [cls.UNMATCHED], [constraint], InvestigationResult.NOT
+            )
+        )
         return causes
 
 

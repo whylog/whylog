@@ -274,12 +274,10 @@ class TestBasic(TestCase):
                 Clue(('Forest', 42), 'Forest, 42 times', 420, line_source)
             ], 1)
         ]  # yapf: disable
-        constraint = {
-            'clues_groups': [[0, 1], [1, 1], [2, 1]],
-            'name': 'identical',
-            'params': {}
-        }
-        causes = Verifier.single_constraint_not(clues_lists, effect, constraint, ConstraintManager())
+        constraint = {'clues_groups': [[0, 1], [1, 1], [2, 1]], 'name': 'identical', 'params': {}}
+        causes = Verifier.single_constraint_not(
+            clues_lists, effect, constraint, ConstraintManager()
+        )
 
         assert len(causes) == 1
         assert all(isinstance(cause, InvestigationResult) for cause in causes)
