@@ -186,9 +186,9 @@ class Verifier(object):
 
 
 class InvestigationResult(object):
-    AND = "and"
-    OR = "or"
-    NOT = "not"
+    AND = "AND"
+    OR = "OR"
+    NOT = "NOT"
 
     def __init__(self, lines, constraints, cons_linkage):
         self.lines = lines
@@ -196,9 +196,14 @@ class InvestigationResult(object):
         self.constraints_linkage = cons_linkage
 
     def __repr__(self):
-        return "\n(\n    result lines: %s;\n    due to constraints: %s\n)" % (
-            self.lines, self.constraints
-        )
+        if self.constraints_linkage in [self.AND, self.OR]:
+            return "\n(\n    result lines: %s;\n    due to '%s' constraints: %s\n)" % (
+                self.lines, self.constraints_linkage, self.constraints
+            )
+        else:
+            return "\n(\n    no result lines due to NOT;\n    constraints: %s\n)" % (
+                self.constraints
+            )
 
     def __eq__(self, other):
         return all([
