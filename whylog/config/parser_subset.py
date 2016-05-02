@@ -87,7 +87,7 @@ class ConcatenatedRegexParser(AbstractParserSubset):
 
     def _create_group_index_to_regex_name(self, parsers_indexes):
         index_to_regex = {}
-        for name, indexes in parsers_indexes.items():
+        for name, indexes in six.iteritems(parsers_indexes):
             index_to_regex[indexes[0]] = name
         return index_to_regex
 

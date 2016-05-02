@@ -6,8 +6,8 @@ import six
 
 from whylog.config import SettingsFactorySelector
 from whylog.config.consts import YamlFileNames
-from whylog.tests.consts import TestPaths
 from whylog.config.settings_factory import YamlSettingsFactory
+from whylog.tests.consts import TestPaths
 
 
 class TestBasic(TestCase):

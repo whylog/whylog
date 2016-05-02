@@ -45,7 +45,7 @@ class AbstractFileConfig(AbstractConfig):
             matchers[definition['log_type_name']].append(matcher)
         return dict(
             (log_type_name, LogType(log_type_name, log_type_matchers))
-            for log_type_name, log_type_matchers in matchers.items()
+            for log_type_name, log_type_matchers in six.iteritems(matchers)
         )
 
     @abstractmethod

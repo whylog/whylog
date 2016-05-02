@@ -145,7 +145,7 @@ class TestBasic(TestCase):
 
     def test_loading_log_types(self):
         assert len(self.config._log_types) == 2
-        assert sorted(self.config._log_types.keys()) == ['apache', 'default']
+        assert sorted(six.iterkeys(self.config._log_types)) == ['apache', 'default']
         assert len(self.config._log_types['default'].filename_matchers) == 2
         assert len(self.config._log_types['apache'].filename_matchers) == 1
 
@@ -173,7 +173,7 @@ class TestBasic(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        #remove .test_directory if test test_add_new_rule_to_empty_config failed
+        # remove .test_directory if test test_add_new_rule_to_empty_config failed
         test_whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
         if os.path.isdir(test_whylog_dir):
             shutil.rmtree(test_whylog_dir)
