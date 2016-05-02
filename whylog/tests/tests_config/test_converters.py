@@ -1,7 +1,8 @@
 from datetime import datetime
 from unittest import TestCase
 
-from whylog.config.parsers import ConcatenatedRegexParser, RegexParser
+from whylog.config.parser_subset import ConcatenatedRegexParser
+from whylog.config.parsers import RegexParser
 from whylog.converters.exceptions import UnsupportedConverterError
 
 

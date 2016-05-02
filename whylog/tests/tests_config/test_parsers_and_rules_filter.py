@@ -3,6 +3,8 @@ import os.path
 from datetime import datetime
 from unittest import TestCase
 
+import six
+
 from whylog.config import YamlConfig
 from whylog.front import FrontInput
 from whylog.tests.utils import ConfigPathFactory
@@ -98,7 +100,7 @@ class TestBasic(TestCase):
 
     @classmethod
     def creating_concatenated_parsers_parametrized(cls, config):
-        rule_chain = itertools.chain(*config._rules.values())
+        rule_chain = itertools.chain(*six.itervalues(config._rules))
         concatenated_parsers = config._create_concatenated_parsers_for_investigation(rule_chain)
         assert len(concatenated_parsers) == 1
         parser_list = concatenated_parsers['hydra']._parsers
