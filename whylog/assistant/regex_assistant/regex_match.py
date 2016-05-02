@@ -1,6 +1,6 @@
 import six
 
-from whylog.assistant.const import DataType
+from whylog.assistant.const import ConverterType
 from whylog.assistant.pattern_match import ParamGroup, PatternMatch
 from whylog.assistant.regex_assistant.guessing import guess_pattern_match
 from whylog.assistant.regex_assistant.regex import create_obvious_regex, regex_groups
@@ -47,7 +47,7 @@ class RegexMatch(object):
         if new_regex[-1] != '$':
             new_regex += '$'
 
-        default_converter = DataType.STRING
+        default_converter = ConverterType.TO_STRING
         self.param_groups = dict(
             (
                 key + 1, ParamGroup(groups[key], default_converter)
