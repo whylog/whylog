@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from whylog.config.mocked_investigation_plan import *
+from whylog.config.mocked_investigation_plan import mocked_investigation_plan
 from whylog.log_reader import SearchManager
 
 

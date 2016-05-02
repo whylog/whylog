@@ -3,7 +3,8 @@ from datetime import datetime
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
 from whylog.config.log_type import LogType
-from whylog.config.parsers import ConcatenatedRegexParser, RegexParser
+from whylog.config.parser_subset import ConcatenatedRegexParser
+from whylog.config.parsers import RegexParser
 from whylog.config.rule import Rule
 
 

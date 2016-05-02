@@ -4,6 +4,8 @@ from unittest import TestCase
 from generator import generate, generator
 
 from whylog.config import YamlConfig
+from whylog.config.investigation_plan import LineSource
+from whylog.constraints.verifier import InvestigationResult
 from whylog.front.utils import FrontInput
 from whylog.log_reader import LogReader
 from whylog.tests.tests_log_reader.constants import TestPaths
@@ -29,8 +31,34 @@ class TestBasic(TestCase):
         """ returns offset of line 'line_no' in file 'file_path' """
         return sum([len(line) for line in open(file_path)][0:line_no])
 
+    def _deduce_line_offset_by_unique_content(self, file_path, line_content):
+        all_lines = [line.rstrip('\n') for line in open(file_path)]
+        line_no = all_lines.index(line_content)
+        return self._deduce_line_offset(file_path, line_no)
+
     def _get_last_line_from_file(self, file_path):
         return [line.rstrip('\n') for line in open(file_path)][-1]
+
+    def _investigation_results_from_file(self, log_file, file_path):
+        results = []
+        file_content = [line.rstrip('\n') for line in open(file_path)]
+        for (linkage, lines_str, constraint_str) in zip(
+            *[
+                [
+                    x for (i, x) in enumerate(file_content) if (i % 3 == num)
+                ] for num in range(3)
+            ]
+        ):
+            # TODO enable upgrading InvRes with linkage (AND,OR,NOT) when support for linkage will be merged
+            lines = [
+                FrontInput(
+                    self._deduce_line_offset_by_unique_content(log_file, line_str), line_str,
+                    LineSource("localhost", "node_1.log")
+                ) for line_str in eval(lines_str)
+            ]
+            results.append(InvestigationResult(lines, [{'name': constraint_str}], linkage))
+            # there will not full info about constraint
+        return results
 
     @generate(
         # '001_most_basic',
@@ -51,8 +79,9 @@ class TestBasic(TestCase):
         prefix_path = os.path.join(*TestPaths.path_test_files)
         path = os.path.join(prefix_path, test_name)
         input_path = os.path.join(path, 'input.txt')
-        output_path = os.path.join(path, 'expected_output.txt')
+        # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
         log_file = os.path.join(path, 'node_1.log')
+        results_file = os.path.join(path, 'investigation_results.txt')
 
         # gathering information about effect line
         line_number = self._get_cause_line_number(input_path)
@@ -65,9 +94,10 @@ class TestBasic(TestCase):
         line = FrontInput(effect_line_offset, line_content, prefix_path)
 
         # action and checking the result
-        result = log_reader.get_causes(line)
-        assert result
-        assert result[0].lines[0].line_content == self._get_last_line_from_file(output_path)
-        # ^ hack basing on that for test 003 last line of expected_output.txt is a cause line
-        # FIXME it is not appropriate for each test
-        # FIXME checking up correctness should be more advanced for more advanced tests
+        results = log_reader.get_causes(line)
+        assert results
+        true_results = self._investigation_results_from_file(log_file, results_file)
+        for got, real in zip(results, true_results):
+            assert got.lines == real.lines
+            for constr_got, constr_real in zip(got.constraints, real.constraints):
+                assert constr_got['name'] == constr_real['name']
