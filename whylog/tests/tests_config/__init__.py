@@ -6,13 +6,14 @@ import six
 import yaml
 
 from whylog.assistant.const import AssistantType
-from whylog.config import SettingsFactorySelector, YamlSettingsFactory
+from whylog.config import SettingsFactorySelector
 from whylog.config.consts import YamlFileNames
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
+from whylog.tests.consts import TestPaths
 
 # Constraint types
 identical_constr = "identical"
@@ -149,7 +150,7 @@ class TestBasic(TestCase):
         assert len(self.config._log_types['apache'].filename_matchers) == 1
 
     def test_add_new_rule_to_empty_config(self):
-        YamlSettingsFactory.WHYLOG_DIR = '.test_whylog'
+        SettingsFactorySelector.WHYLOG_DIR = TestPaths.WHYLOG_DIR
         config = SettingsFactorySelector.get_settings()['config']
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
         config.add_rule(self.user_intent)
