@@ -1,5 +1,8 @@
 ---
 causes: [entry]
 effect: effect
-cause_constraints:
-    - {type: parameter anomaly, name: entry type}
+constraints:
+- clues_groups:
+  - [1, 1]
+  name: different
+  params: {value: normal}

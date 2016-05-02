@@ -1,4 +1,6 @@
 ---
 causes: [cause1, cause2]
 effect: effect
-type: and
+#unsupported rule field
+#type: and
+constraints: []

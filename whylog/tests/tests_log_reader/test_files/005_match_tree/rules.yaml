@@ -2,9 +2,17 @@
 causes: [intermediate]
 effect: effect
 constraints:
-    - {type: time, range: -1}
+- clues_groups:
+  - [1, 1]
+  - [0, 1]
+  name: time
+  params: {max_delta: 1}
 ---
 causes: [cause]
 effect: intermediate
 constraints:
-    - {type: time, range: -1}
+- clues_groups:
+  - [1, 1]
+  - [0, 1]
+  name: time
+  params: {max_delta: 1}

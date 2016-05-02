@@ -1,10 +1,14 @@
 ---
 name: cause
-regex: ^root cause of (\w)$
-params:
-    - {type: data, name: item}
+regex_str: ^root cause of (\w)$
+primary_key_groups: []
+log_type: default
+convertions: {}
+line_content: root cause of Y
 ---
 name: effect
-regex: ^visible effect on (\w)$
-params:
-    - {type: data, name: item}
+regex_str: ^visible effect on (\w)$
+primary_key_groups: []
+log_type: default
+convertions: {}
+line_content: visible effect on Y

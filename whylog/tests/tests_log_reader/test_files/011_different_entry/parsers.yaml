@@ -1,8 +1,14 @@
 ---
 name: entry
-regex: ^(\w+) entry$
-params:
-    - {type: data, name: entry type}
+regex_str: ^(\w+) entry$
+primary_key_groups: []
+log_type: default
+convertions: {}
+line_content: normal entry
 ---
 name: effect
-regex: ^visible effect$
+regex_str: ^visible effect$
+log_type: default
+primary_key_groups: []
+convertions: {}
+line_content: visible effect

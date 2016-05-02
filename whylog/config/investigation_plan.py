@@ -36,9 +36,8 @@ class InvestigationStep(object):
         self.earliest_cause_time = InvestigationStep.add_zero_timezone(earliest_cause_time)
 
     def is_line_in_time_range(self, line):
-        parsed_date = dateutil.parser.parse(line, fuzzy=True)
-        parsed_date = InvestigationStep.add_zero_timezone(parsed_date)
-        return self.effect_time >= parsed_date >= self.earliest_cause_time
+        #TODO: write method that check that line is in primary key values range
+        return True
 
     @classmethod
     def add_zero_timezone(cls, date):

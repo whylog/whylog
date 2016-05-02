@@ -1,4 +1,6 @@
 ---
 causes: [cause]
 effect: effect
-negative: true
+constraints: []
+# unsupported rule type
+#negative: true

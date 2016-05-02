@@ -1,5 +1,6 @@
 ---
 causes: [cause]
 effect: effect
-constraints:
-    - {type: latest}
+constraints: []
+# unsupported constraint type
+#    - {type: latest}
