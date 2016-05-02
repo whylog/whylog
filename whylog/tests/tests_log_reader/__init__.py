@@ -61,13 +61,13 @@ class TestBasic(TestCase):
         return results
 
     @generate(
-        # '001_most_basic',
+        '001_most_basic',
         # '002_match_latest',
         '003_match_time_range',
         # '005_match_tree',
-        # '006_match_parameter',
+        '006_match_parameter',
         # '007_match_or',
-        # '008_match_and',
+        '008_match_and',
         # '009_match_negation',
         # '010_multiple_files',
         # '011_different_entry',
