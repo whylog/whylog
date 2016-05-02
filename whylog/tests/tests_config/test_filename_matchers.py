@@ -1,5 +1,4 @@
 import os.path
-
 from unittest import TestCase
 
 from whylog.config.filename_matchers import WildCardFilenameMatcher

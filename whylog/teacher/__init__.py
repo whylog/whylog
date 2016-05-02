@@ -1,3 +1,5 @@
+import six
+
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.mock_outputs import create_sample_rule
 
@@ -50,8 +52,7 @@ class Teacher(object):
         and all constraints related to old line are removed.
 
         """
-
-        if line_id in self._parsers.keys():
+        if line_id in six.iterkeys(self._parsers):
             self.remove_line(line_id)
         if effect:
             self.effect_id = line_id
@@ -120,7 +121,7 @@ class Teacher(object):
         :param pattern_groups: groups in pattern that are linked by constraint
         :type pattern_groups: list[PatternGroup]
         """
-        if constraint_id in self._constraint_base.keys():
+        if constraint_id in six.iterkeys(self._constraint_base):
             self.remove_constraint(constraint_id)
 
         self._constraint_base[constraint_id] = constraint
@@ -148,7 +149,7 @@ class Teacher(object):
 
     def _sync_constraint_base_with_links(self):
         ids_from_links = self._constraint_links.distinct_constraint_ids()
-        for constraint_id in self._constraint_base.keys():
+        for constraint_id in six.iterkeys(self._constraint_base):
             if constraint_id not in ids_from_links:
                 del self._constraint_base[constraint_id]
 

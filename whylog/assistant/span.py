@@ -2,6 +2,7 @@
 Span as representation of interval and its pattern in som text
 Auxilary methods for Span
 """
+import six
 
 from whylog.assistant.const import DataType
 from whylog.exceptions import WhylogError
@@ -78,7 +79,7 @@ class Span(object):
         return self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
+        return hash(tuple(six.itervalues(self.__dict__)))
 
     def overlaps(self, other):
         return not (other.end <= self.start or other.start > self.start)
