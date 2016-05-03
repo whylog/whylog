@@ -164,9 +164,13 @@ class TimeConstraint(AbstractConstraint):
         actual_delta = greater_date - lower_date
         param_min_delta = param_dict.get(self.MIN_DELTA)
         param_max_delta = param_dict.get(self.MAX_DELTA)
-        if param_min_delta is not None and actual_delta < datetime.timedelta(seconds=param_min_delta):
+        if param_min_delta is not None and actual_delta < datetime.timedelta(
+            seconds=param_min_delta
+        ):
             return False
-        if param_max_delta is not None and actual_delta > datetime.timedelta(seconds=param_max_delta):
+        if param_max_delta is not None and actual_delta > datetime.timedelta(
+            seconds=param_max_delta
+        ):
             return False
         return True
 
