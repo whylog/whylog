@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from unittest import TestCase
 
-from whylog.user_constraints.exceptions import ConstructorGroupsCountError, ConstructorParamsError
 from whylog.user_constraints import IdenticalConstraint, TimeConstraint
+from whylog.user_constraints.exceptions import ConstructorGroupsCountError, ConstructorParamsError
 
 
 class TestIdenticalConstraint(TestCase):
