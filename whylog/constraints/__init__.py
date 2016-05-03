@@ -160,8 +160,8 @@ class TimeConstraint(AbstractConstraint):
         effect and cause should satisfy requirement:
         min_delta < time interval < max_delta
         """
-        lower_date, greater_date = group_contents
-        actual_delta = greater_date - lower_date
+        earlier_date, later_date = group_contents
+        actual_delta = later_date - earlier_date
         param_min_delta = param_dict.get(self.MIN_DELTA)
         param_max_delta = param_dict.get(self.MAX_DELTA)
         if param_min_delta is not None and actual_delta < datetime.timedelta(
