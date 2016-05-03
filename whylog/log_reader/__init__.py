@@ -4,7 +4,6 @@ from collections import defaultdict
 
 import six
 
-from whylog.front import FrontInput
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
 from whylog.log_reader.searchers import BacktrackSearcher
@@ -47,25 +46,31 @@ class SearchManager(object):
             (parser_name, list(clues_iter)) for parser_name, clues_iter in six.iteritems(collector)
         )
 
+    def _constraints_verification(self, clues):
+        """
+        provides constraints verification basing on
+        rules from investigation_plan and collected clues
+        """
+        causes = []
+        for rule in self._investigation_plan.suspected_rules:
+            results_from_rule = rule.constraints_check(clues, self._investigation_plan.effect_clues)
+            causes.extend(results_from_rule)
+        return causes
+
     def investigate(self):
         """
         this function collects clues from SearchHandlers
         (each of them corresponds to one InvestigationStep)
         in dictionary clues_collector
         and then provide their verification with constraints
-        :return: list of FrontInput objects
+        :return: list of InvestigationResults
         """
         clues_collector = defaultdict(itertools.chain)
-        for step, log_type in self._investigation_plan.get_next_investigation_step_with_log_type():
+        for step, log_type in self._investigation_plan.investigation_steps_with_log_types:
             search_handler = SearchHandler(step, log_type)
             InvestigationUtils.merge_clue_dicts(clues_collector, search_handler.investigate())
-        # clues = self._save_clues_in_normal_dict(clues_collector)
-        # TODO checking up the constraints should take place here
-        return [
-            FrontInput(
-                69, "2015-12-03 12:08:08 root cause", "node_1.log"
-            )
-        ]  # TODO it's a mock! values should be returned basing on clues and constraints
+        clues = self._save_clues_in_normal_dict(clues_collector)
+        return self._constraints_verification(clues)
 
 
 class SearchHandler(object):

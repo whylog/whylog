@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 import six
 
 from whylog.config.parsers import RegexParserFactory
+from whylog.constraints.verifier import ConstraintManager, Verifier
 
 
 class Rule(object):
@@ -13,6 +14,14 @@ class Rule(object):
         self._causes = causes
         self._effect = effect
         self._constraints = constraints
+        self._frequency_information = self._gather_causes_frequency_information()
+
+    def _gather_causes_frequency_information(self):
+        """
+        basing on self._causes and assumption that causes are sorted,
+        produces list of pairs: (parser name, number of occurrences of this parser)
+        """
+        return [(elem.name, len(list(group))) for elem, group in itertools.groupby(self._causes)]
 
     def serialize(self):
         return {
@@ -24,7 +33,7 @@ class Rule(object):
     def get_new_parsers(self, parser_name_generator):
         new_parsers = []
         for parser in itertools.chain([self._effect], self._causes):
-            #TODO: Refactor if teachers are mulithreding
+            # TODO: Refactor if teachers are mulithreding
             if parser_name_generator.is_free_parser_name(parser.name, self.EMPTY_BLACK_LIST):
                 new_parsers.append(parser)
         return new_parsers
@@ -34,6 +43,24 @@ class Rule(object):
 
     def get_effect_name(self):
         return self._effect.name
+
+    def constraints_check(self, clues, effect_clues_dict):
+        """
+        check if given clues satisfy rule
+        basing on its causes, effect and constraints.
+        returns list of InvestigationResult objects
+        """
+        clues_lists = [
+            (clues[parser_name], occurrences)
+            for parser_name, occurrences in self._frequency_information
+            if clues.get(parser_name) is not None
+        ]
+        effect_clue = effect_clues_dict[self._effect.name]
+        constraint_manager = ConstraintManager()
+        # TODO check basing on improved rule what should be used: and, or, not
+        return Verifier.constraints_and(
+            clues_lists, effect_clue, self._constraints, constraint_manager
+        )
 
 
 @six.add_metaclass(ABCMeta)
@@ -46,7 +73,23 @@ class AbstractRuleFactory(object):
             parsers_dict, user_rule_intent
         )
         constraints = cls._create_constraints_list(parser_ids_mapper, user_rule_intent)
-        return Rule(causes, effect, constraints)
+        ordered_causes, modified_constraints = cls._order_causes_list(causes, constraints)
+        return Rule(ordered_causes, effect, modified_constraints)
+
+    @classmethod
+    def _order_causes_list(cls, causes, constraints):
+        causes_with_indexes = list(enumerate(causes, 1))
+        causes_with_indexes.sort(key=lambda x: x[1].name)
+        ordered_causes = []
+        parser_index_mapping = {}
+        for new_idx, (old_index, parser) in enumerate(causes_with_indexes, 1):
+            ordered_causes.append(parser)
+            parser_index_mapping[old_index] = new_idx
+        for constraint in constraints:
+            for clue_group in constraint['clues_groups']:
+                if clue_group[0] != 0:
+                    clue_group[0] = parser_index_mapping[clue_group[0]]
+        return ordered_causes, constraints
 
     @classmethod
     @abstractmethod
@@ -71,7 +114,7 @@ class AbstractRuleFactory(object):
             clues = []
             for parser_id, group in constraint_intent.groups:
                 cause_id = parser_ids_mapper[parser_id]
-                clues.append((cause_id, group))
+                clues.append([cause_id, group])
             constraint_dict = {
                 "name": constraint_intent.type,
                 "clues_groups": clues,

@@ -83,6 +83,12 @@ class RegexParser(AbstractParser):
             converted_params.append(converter.convert(params[i]))
         return tuple(converted_params)
 
+    def __repr__(self):
+        return "(RegexParser: %s, %s, %s, %s, %s, %s)" % (
+            self.name, self.regex_str, self.line_content, self.convertions, self.log_type,
+            self.primary_key_groups
+        )
+
 
 @six.add_metaclass(ABCMeta)
 class AbstractParserFactory(object):

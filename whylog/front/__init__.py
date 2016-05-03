@@ -3,3 +3,13 @@ class FrontInput(object):
         self.offset = offset
         self.line_content = line_content
         self.resource_location = resource_location
+
+    def __repr__(self):
+        return "FrontInput(%s:%s: %s)" % (self.resource_location, self.offset, self.line_content)
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    @classmethod
+    def from_clue(cls, clue):
+        return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)

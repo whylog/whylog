@@ -1,23 +1,32 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 import six
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractConstraint(object):
-    @abstractmethod
-    def save(self, rulebase_rule):
-        pass
+    pass
 
 
 class TimeConstraint(AbstractConstraint):
-    def __init__(self, line_earlier, line_later, min_delta=None, max_delta=None):
+    def __init__(self, groups, param_dict):
         pass
 
+    @classmethod
+    def verify(cls, group_contents, param_dict):
+        # TODO remove mock
+        return True
 
-class IdenticalIntervals(AbstractConstraint):
-    def __init__(self, intervals):
+
+class IdenticalConstraint(AbstractConstraint):
+    def __init__(self, groups, params):
         pass
+
+    @classmethod
+    def verify(cls, group_contents, param_dict):
+        if len(group_contents) <= 1:
+            return False  # FIXME raise exception?
+        return all(group_contents[0] == group for group in group_contents)
 
 
 class AnyValueIntervals(AbstractConstraint):
