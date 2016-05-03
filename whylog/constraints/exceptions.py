@@ -50,4 +50,3 @@ class VerificatedParamsError(ConstraintError):
 
     def __str__(self):
         return "Wrong params while verification, params: %s" % (self.params,)
-

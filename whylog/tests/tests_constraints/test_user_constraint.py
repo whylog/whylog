@@ -66,4 +66,3 @@ class TestTimeConstraint(TestCase):
                 TimeConstraint.MAX_DELTA: self.max_delta
             }
         )
-
