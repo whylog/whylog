@@ -30,7 +30,7 @@ class LogReader(AbstractLogReader):
             raise NoLogTypeError(front_input)
         investigation_plan = self.config.create_investigation_plan(front_input, input_log_type)
         manager = SearchManager(investigation_plan)
-        return manager.investigate()
+        return manager.investigate(front_input)
 
     def get_causes_tree(self, front_input):
         pass
@@ -57,7 +57,7 @@ class SearchManager(object):
             causes.extend(results_from_rule)
         return causes
 
-    def investigate(self):
+    def investigate(self, original_front_input):
         """
         this function collects clues from SearchHandlers
         (each of them corresponds to one InvestigationStep)
@@ -68,7 +68,7 @@ class SearchManager(object):
         clues_collector = defaultdict(itertools.chain)
         for step, log_type in self._investigation_plan.investigation_steps_with_log_types:
             search_handler = SearchHandler(step, log_type)
-            InvestigationUtils.merge_clue_dicts(clues_collector, search_handler.investigate())
+            InvestigationUtils.merge_clue_dicts(clues_collector, search_handler.investigate(original_front_input))
         clues = self._save_clues_in_normal_dict(clues_collector)
         return self._constraints_verification(clues)
 
@@ -78,13 +78,13 @@ class SearchHandler(object):
         self._investigation_step = investigation_step
         self._log_type = log_type
 
-    def investigate(self):
+    def investigate(self, original_front_input):
         clues = defaultdict(itertools.chain)
         for host, path in self._log_type.files_to_parse():
             if host == "localhost":
                 searcher = BacktrackSearcher(path)
                 InvestigationUtils.merge_clue_dicts(
-                    clues, searcher.search(self._investigation_step)
+                    clues, searcher.search(self._investigation_step, original_front_input)
                 )
             else:
                 raise NotImplementedError(
