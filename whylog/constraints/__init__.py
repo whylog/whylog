@@ -2,9 +2,9 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 
 import six
 
-from whylog.teacher.user_intent import UserConstraintIntent
 from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import ConstructorGroupsCountError, ConstructorParamsError
+from whylog.teacher.user_intent import UserConstraintIntent
 
 
 @six.add_metaclass(ABCMeta)
