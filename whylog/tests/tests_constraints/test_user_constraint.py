@@ -67,12 +67,3 @@ class TestTimeConstraint(TestCase):
             }
         )
 
-    def test_verify_fail(self):
-        tc = TimeConstraint(params_checking=False)
-        assert not tc.verify(
-            [self.greater_date, self.lower_date], {
-                TimeConstraint.MIN_DELTA: self.min_delta,
-                TimeConstraint.MAX_DELTA: self.max_delta
-            }
-        )
-
