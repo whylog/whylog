@@ -18,19 +18,14 @@ class AbstractConstraint(object):
     def TYPE(self):
         pass
 
-    @abstractproperty
-    def MIN_GROUPS_COUNT(self):
-        return None
+    MIN_GROUPS_COUNT = 2
 
-    @abstractproperty
-    def MAX_GROUPS_COUNT(self):
-        return None
+    MAX_GROUPS_COUNT = None
 
     @abstractproperty
     def PARAMS(self):
         pass
 
-    @abstractmethod
     def __init__(self, groups=None, param_dict=None, params_checking=True):
         """
         For Teacher and Front use while creating user rule.
@@ -118,29 +113,22 @@ class TimeConstraint(AbstractConstraint):
     """
     Time delta between two dates must be greater or equal to 'min_delta'
     and lower or equal to 'max_delta'
+    I.e:
+    TimeConstraint(
+        [(0, 1), (2, 1)]
+        {'min_delta': datetime.timedelta(seconds=1), 'max_delta': datetime.timedelta(seconds=10)},
+    )
+    :param groups: First element of groups is a group with earlier date.
     """
 
     TYPE = ConstraintType.TIME_DELTA
 
-    MIN_GROUPS_COUNT = 2
     MAX_GROUPS_COUNT = 2
 
     MIN_DELTA = 'min_delta'
     MAX_DELTA = 'max_delta'
 
     PARAMS = sorted([MIN_DELTA, MAX_DELTA])
-
-    def __init__(self, groups=None, param_dict=None, params_checking=True):
-        """
-        :param groups: First element of groups is a group with earlier date.
-
-        I.e:
-        TimeConstraint(
-            [(0, 1), (2, 1)]
-            {'min_delta': datetime.timedelta(seconds=1), 'max_delta': datetime.timedelta(seconds=10)},
-        )
-        """
-        super(TimeConstraint, self).__init__(groups, param_dict, params_checking)
 
     def _check_optional_params(self, correct_param_names, actual_param_names):
         if self.MIN_DELTA not in actual_param_names and self.MAX_DELTA not in actual_param_names:
@@ -154,29 +142,21 @@ class TimeConstraint(AbstractConstraint):
 class IdenticalConstraint(AbstractConstraint):
     """
     Contents of groups must be identical.
+    I.e:
+    IdenticalConstraint(
+        [(1, 2), (2, 4)]
+    )
     """
 
     TYPE = ConstraintType.IDENTICAL
 
-    MIN_GROUPS_COUNT = 2
-    MAX_GROUPS_COUNT = None
-
     PARAMS = []
-
-    def __init__(self, groups=None, param_dict=None, params_checking=True):
-        """
-        I.e:
-        IdenticalConstraint(
-            [(1, 2), (2, 4)]
-        )
-        """
-        super(IdenticalConstraint, self).__init__(groups, param_dict, params_checking)
 
     def verify(self, group_contents, param_dict=None):
         """
         I.e:
-        - verify({}, ['comp1', 'comp1', 'comp1']) returns True
-        - verify({}, ['comp1', 'hello', 'comp1']) returns False
+        - verify(['comp1', 'comp1', 'comp1'], {}) returns True
+        - verify(['comp1', 'hello', 'comp1'], {}) returns False
         """
 
         if len(group_contents) <= 1:
