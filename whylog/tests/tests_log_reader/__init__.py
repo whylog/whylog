@@ -26,6 +26,9 @@ class TestBasic(TestCase):
         # it is reduced by 1 because auxiliary functions below use numerating from 0
         return int(open(file_path).readline().split(":")[1].rstrip('\n')) - 1
 
+    def _get_starting_file_name(self, input_info_file_path):
+        return open(input_info_file_path).readline().split(":")[0].rstrip('\n')
+
     def _get_concrete_line_from_file(self, file_path, line_num):
         return [line.rstrip('\n') for line in open(file_path)][line_num]
 
@@ -51,32 +54,11 @@ class TestBasic(TestCase):
             causes = [
                 FrontInput(
                     self._deduce_line_offset_by_unique_content(real_log_file, line_str), line_str,
-                    LineSource("localhost", "node_1.log")
+                    LineSource("localhost", os.path.split(real_log_file)[1])
                 ) for line_str in result['causes']
             ]  # yapf: disable
             results.append(InvestigationResult(causes, result['constraints'], result['linkage']))
         return results
-
-    # def _investigation_results_from_file(self, log_file, file_path):
-    #     results = []
-    #     file_content = [line.rstrip('\n') for line in open(file_path)]
-    #     for (linkage, lines_str, constraint_str) in zip(
-    #         *[
-    #             [
-    #                 x for (i, x) in enumerate(file_content) if (i % 3 == num)
-    #             ] for num in six.moves.range(3)
-    #         ]
-    #     ):
-    #         # TODO enable upgrading InvRes with linkage (AND,OR,NOT) when support for linkage will be merged
-    #         lines = [
-    #             FrontInput(
-    #                 self._deduce_line_offset_by_unique_content(log_file, line_str), line_str,
-    #                 LineSource("localhost", "node_1.log")
-    #             ) for line_str in eval(lines_str)
-    #         ]
-    #         results.append(InvestigationResult(lines, [{'name': constraint_str}]))
-    #         # there will not full info about constraint
-    #     return results
 
     @generate(
         '001_most_basic',
@@ -87,8 +69,8 @@ class TestBasic(TestCase):
         # '007_match_or',
         '008_match_and',
         # '009_match_negation',
-        # '010_multiple_files',
-        # '011_different_entry',
+        '010_multiple_files',
+        '011_different_entry',
         # '012_multiple_rulebooks',
         # '013_match_and_incomplete',
     )
@@ -99,26 +81,33 @@ class TestBasic(TestCase):
         input_path = os.path.join(path, 'input.txt')
         # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
 
+        original_log_file = os.path.join(path, 'node_1.log')
+        result_log_file = original_log_file
         if test_name == "010_multiple_files":
-            log_file = os.path.join(path, 'node_2.log')
-        else:
-            log_file = os.path.join(path, 'node_1.log')
-        results_file = os.path.join(path, 'investigation_results.yaml')
+            result_log_file = os.path.join(path, 'node_2.log')
+        if test_name == "011_different_entry":
+            result_log_file = os.path.join(path, 'node_3.log')
+
+        results_yaml_file = os.path.join(path, 'investigation_results.yaml')
 
         # gathering information about effect line
         line_number = self._get_cause_line_number(input_path)
-        line_content = self._get_concrete_line_from_file(log_file, line_number)
-        effect_line_offset = self._deduce_line_offset(log_file, line_number)
+        line_content = self._get_concrete_line_from_file(original_log_file, line_number)
+        print "line_content: %s" % line_content
+        effect_line_offset = self._deduce_line_offset(original_log_file, line_number)
 
         # preparing Whylog structures, normally prepared by Front
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         log_reader = LogReader(whylog_config)
-        effect_line = FrontInput(effect_line_offset, line_content, prefix_path)
+        effect_line = FrontInput(
+            effect_line_offset, line_content,
+            os.path.join(path, self._get_starting_file_name(input_path))
+        )
 
         # action and checking the result
         results = log_reader.get_causes(effect_line)
+        expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
         assert results
-        expected_results = self._investigation_results_from_yaml(results_file, log_file)
         assert len(results) == len(expected_results)
         for got, real in six.moves.zip(results, expected_results):
             assert got.lines == real.lines
