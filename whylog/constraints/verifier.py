@@ -8,10 +8,8 @@ from whylog.front import FrontInput
 
 class ConstraintRegistry(object):
     CONSTRAINTS = {
-        'identical': IdenticalConstraint([], {}),
-        'time': TimeConstraint(
-            [], {}
-        )
+        'identical': IdenticalConstraint(params_checking=False),
+        'time': TimeConstraint(params_checking=False)
         # register your constraint here
     }
 
