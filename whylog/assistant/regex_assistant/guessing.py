@@ -38,5 +38,5 @@ def _groups_from_spans(spans, regex, text):
         ParamGroup(content, converter)
         for content, converter in zip(group_contents, group_converters)
     ]
-    groups_dict = dict((key + 1, value) for key, value in six.iteritems(groups))
+    groups_dict = dict((key + 1, groups[key]) for key in six.moves.range(len(groups)))
     return groups_dict
