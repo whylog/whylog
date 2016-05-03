@@ -1,5 +1,7 @@
 import re
 
+import six
+
 from whylog.assistant.pattern_match import ParamGroup, PatternMatch
 from whylog.assistant.regex_assistant.regex import (
     create_obvious_regex, regex_from_group_spans, verify_regex
@@ -36,5 +38,5 @@ def _groups_from_spans(spans, regex, text):
         ParamGroup(content, converter)
         for content, converter in zip(group_contents, group_converters)
     ]
-    groups_dict = dict([(key + 1, groups[key]) for key in range(len(groups))])
+    groups_dict = dict((key + 1, value) for key, value in six.iteritems(groups))
     return groups_dict
