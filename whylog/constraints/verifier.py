@@ -185,16 +185,14 @@ class Verifier(object):
         returns list of all produced InvestigationResults
         """
         clues_lists = cls._construct_proper_clues_lists(clues_lists)
-        causes = []
         for combination in cls._clues_combinations(clues_lists):
             if cls._verify_constraint(combination, effect, constraint, constraint_manager):
                 return []
-        causes.append(
+        return [
             cls._create_investigation_result(
                 [cls.UNMATCHED], [constraint], InvestigationResult.NOT
             )
-        )
-        return causes
+        ]
 
 
 class InvestigationResult(object):
