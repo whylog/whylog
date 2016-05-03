@@ -35,7 +35,10 @@ class TestBasic(TestCase):
 
     def _deduce_line_offset_by_unique_content(self, file_path, line_content):
         all_lines = [line.rstrip('\n') for line in open(file_path)]
-        line_no = all_lines.index(line_content)
+        try:
+            line_no = all_lines.index(line_content)
+        except ValueError:
+            raise ValueError("Not found line '%s' in file '%s'" % (line_content, file_path))
         return self._deduce_line_offset(file_path, line_no)
 
     def _get_last_line_from_file(self, file_path):
@@ -95,7 +98,11 @@ class TestBasic(TestCase):
         path = os.path.join(prefix_path, test_name)
         input_path = os.path.join(path, 'input.txt')
         # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
-        log_file = os.path.join(path, 'node_1.log')
+
+        if test_name == "010_multiple_files":
+            log_file = os.path.join(path, 'node_2.log')
+        else:
+            log_file = os.path.join(path, 'node_1.log')
         results_file = os.path.join(path, 'investigation_results.yaml')
 
         # gathering information about effect line

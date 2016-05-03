@@ -82,8 +82,9 @@ class BacktrackSearcher(AbstractSearcher):
                     if len(line):
                         actual_offset = self._decrease_actual_offset_properly(actual_offset, line)
                         yield line, actual_offset
-            actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
-            yield truncated, actual_offset
+            if truncated:
+                actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
+                yield truncated, actual_offset
 
     def search(self, investigation_step):
         clues = defaultdict(list)
