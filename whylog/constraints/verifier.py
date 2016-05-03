@@ -68,7 +68,7 @@ class Verifier(object):
                 if combination[parser_num - 1] == Verifier.UNMATCHED:
                     return False
                 groups.append(combination[parser_num - 1].regex_parameters[group_num - 1])
-        return constraint_verifier.verify(constraint['params'], groups)
+        return constraint_verifier.verify(groups, constraint['params'])
 
     @classmethod
     def _clues_combinations(cls, clues_tuples, collected_subset=[]):
