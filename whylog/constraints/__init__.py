@@ -16,6 +16,9 @@ class AbstractConstraint(object):
 
     @abstractproperty
     def TYPE(self):
+        """
+        Constraint type name. Must be unique for each constraint.
+        """
         pass
 
     MIN_GROUPS_COUNT = 2
@@ -24,6 +27,11 @@ class AbstractConstraint(object):
 
     @abstractproperty
     def PARAMS(self):
+        """
+        Params names.
+        Constraint construction requires a dict[param name, param value].
+        Some of then can be optional.
+        """
         pass
 
     def __init__(self, groups=None, param_dict=None, params_checking=True):
@@ -61,9 +69,17 @@ class AbstractConstraint(object):
             raise ConstructorParamsError(self.TYPE, correct_param_names, actual_param_names)
 
     def _check_mandatory_params(self, correct_param_names, actual_param_names):
+        """
+        Verifies mandatory params used to construct Constraint
+        Throws exception if params don't meet requirements
+        """
         pass
 
     def _check_optional_params(self, correct_param_names, actual_param_names):
+        """
+        Verifies optional params used to construct Constraint
+        Throws exception if params don't meet requirements
+        """
         pass
 
     def convert_to_user_constraint_intent(self):
@@ -143,9 +159,7 @@ class IdenticalConstraint(AbstractConstraint):
     """
     Contents of groups must be identical.
     I.e:
-    IdenticalConstraint(
-        [(1, 2), (2, 4)]
-    )
+    IdenticalConstraint([(1, 2), (2, 4)])
     """
 
     TYPE = ConstraintType.IDENTICAL
@@ -159,8 +173,6 @@ class IdenticalConstraint(AbstractConstraint):
         - verify(['comp1', 'hello', 'comp1'], {}) returns False
         """
 
-        if len(group_contents) <= 1:
-            return False  # FIXME raise exception?
         return all(group_contents[0] == group for group in group_contents)
 
 

@@ -41,12 +41,3 @@ class ConstructorGroupsCountError(ConstraintError):
             self.constraint_type, self.groups_count, self.minimal_groups_count,
             self.maximal_groups_count
         )
-
-
-class VerificatedParamsError(ConstraintError):
-    def __init__(self, constraint_type, params):
-        self.constraint_type = constraint_type
-        self.params = params
-
-    def __str__(self):
-        return "Wrong params while verification, params: %s" % (self.params,)
