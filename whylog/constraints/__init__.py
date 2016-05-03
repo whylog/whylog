@@ -1,3 +1,4 @@
+import datetime
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 import six
@@ -37,7 +38,6 @@ class AbstractConstraint(object):
     def __init__(self, groups=None, param_dict=None, params_checking=True):
         """
         For Teacher and Front use while creating user rule.
-
         :param param_dict: dict of additional params of constraint
         :param groups: all groups that are linked by constraint,
                        represented by list of tuples (line_id, group_no),
@@ -151,7 +151,23 @@ class TimeConstraint(AbstractConstraint):
             raise ConstructorParamsError(self.TYPE, correct_param_names, actual_param_names)
 
     def verify(self, group_contents, param_dict):
-        # TODO remove mock
+        """
+        :param group_contents
+        group_contents[0] = date supposed to be earlier (cause)
+        group_contents[1] = date supposed to be later (effect)
+        :param param_dict
+        contains 'min_delta' and 'max_delta', time interval between
+        effect and cause should satisfy requirement:
+        min_delta < time interval < max_delta
+        """
+        lower_date, greater_date = group_contents
+        actual_delta = greater_date - lower_date
+        param_min_delta = param_dict.get(self.MIN_DELTA)
+        param_max_delta = param_dict.get(self.MAX_DELTA)
+        if param_min_delta is not None and actual_delta < datetime.timedelta(seconds=param_min_delta):
+            return False
+        if param_max_delta is not None and actual_delta > datetime.timedelta(seconds=param_max_delta):
+            return False
         return True
 
 
