@@ -8,10 +8,8 @@ from whylog.front import FrontInput
 
 class ConstraintRegistry(object):
     CONSTRAINTS = {
-        'identical': IdenticalConstraint([], {}),
-        'time': TimeConstraint(
-            [], {}
-        )
+        'identical': IdenticalConstraint(params_checking=False),
+        'time': TimeConstraint(params_checking=False)
         # register your constraint here
     }
 
@@ -70,7 +68,7 @@ class Verifier(object):
                 if combination[parser_num - 1] == Verifier.UNMATCHED:
                     return False
                 groups.append(combination[parser_num - 1].regex_parameters[group_num - 1])
-        return constraint_verifier.verify(groups, constraint['params'])
+        return constraint_verifier.verify(constraint['params'], groups)
 
     @classmethod
     def _clues_combinations(cls, clues_tuples, collected_subset=[]):

@@ -9,21 +9,22 @@ class AbstractConstraint(object):
 
 
 class TimeConstraint(AbstractConstraint):
-    def __init__(self, groups, param_dict):
+    def __init__(self, groups=None, param_dict=None, params_checking=True):
+        assert not params_checking
         pass
 
     @classmethod
-    def verify(cls, group_contents, param_dict):
+    def verify(cls, param_dict, group_contents):
         # TODO remove mock
         return True
 
 
 class IdenticalConstraint(AbstractConstraint):
-    def __init__(self, groups, params):
-        pass
+    def __init__(self, groups=None, param_dict=None, params_checking=True):
+        assert not params_checking
 
     @classmethod
-    def verify(cls, group_contents, param_dict):
+    def verify(cls, param_dict, group_contents):
         if len(group_contents) <= 1:
             return False  # FIXME raise exception?
         return all(group_contents[0] == group for group in group_contents)
