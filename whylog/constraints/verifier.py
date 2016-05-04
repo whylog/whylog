@@ -3,7 +3,7 @@ import itertools
 from whylog.config.investigation_plan import Clue
 from whylog.constraints import IdenticalConstraint, TimeConstraint
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
-from whylog.front import FrontInput
+from whylog.front.utils import FrontInput
 
 
 class ConstraintRegistry(object):

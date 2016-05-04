@@ -1,5 +1,5 @@
-from whylog.config import LineSource
 from whylog.config.filename_matchers import WildCardFilenameMatcher
+from whylog.config.investigation_plan import LineSource
 from whylog.config.log_type import LogType
 from whylog.front.utils import FrontInput
 from whylog.front.whylog_factory import whylog_factory

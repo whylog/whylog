@@ -14,12 +14,12 @@ class FrontInput(object):
         self.line_content = line_content
         self.line_source = line_source
 
-        def __repr__(self):
-            return "FrontInput(%s:%s: %s)" % (self.line_source, self.offset, self.line_content)
+    def __repr__(self):
+        return "FrontInput(%s:%s: %s)" % (self.line_source, self.offset, self.line_content)
 
-        def __eq__(self, other):
-            return self.__dict__ == other.__dict__
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
-        @classmethod
-        def from_clue(cls, clue):
-            return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)
+    @classmethod
+    def from_clue(cls, clue):
+        return FrontInput(clue.line_offset, clue.line_prefix_content, clue.line_source)
