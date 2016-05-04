@@ -1,7 +1,7 @@
 import os.path
 from unittest import TestCase
 
-import six
+import yaml
 from generator import generate, generator
 
 from whylog.config import YamlConfig
@@ -40,25 +40,17 @@ class TestBasic(TestCase):
     def _get_last_line_from_file(self, file_path):
         return [line.rstrip('\n') for line in open(file_path)][-1]
 
-    def _investigation_results_from_file(self, log_file, file_path):
+    def _investigation_results_from_yaml(self, yaml_file, real_log_file):
+        file_content = yaml.load(open(yaml_file))
         results = []
-        file_content = [line.rstrip('\n') for line in open(file_path)]
-        for (linkage, lines_str, constraint_str) in zip(
-            *[
-                [
-                    x for (i, x) in enumerate(file_content) if (i % 3 == num)
-                ] for num in six.moves.range(3)
-            ]
-        ):
-            # TODO enable upgrading InvRes with linkage (AND,OR,NOT) when support for linkage will be merged
-            lines = [
+        for result in file_content:
+            causes = [
                 FrontInput(
-                    self._deduce_line_offset_by_unique_content(log_file, line_str), line_str,
+                    self._deduce_line_offset_by_unique_content(real_log_file, line_str), line_str,
                     LineSource("localhost", "node_1.log")
-                ) for line_str in eval(lines_str)
+                ) for line_str in result['causes']
             ]
-            results.append(InvestigationResult(lines, [{'name': constraint_str}], linkage))
-            # there will not full info about constraint
+            results.append(InvestigationResult(causes, result['constraints'], result['linkage']))
         return results
 
     @generate(
@@ -82,7 +74,7 @@ class TestBasic(TestCase):
         input_path = os.path.join(path, 'input.txt')
         # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
         log_file = os.path.join(path, 'node_1.log')
-        results_file = os.path.join(path, 'investigation_results.txt')
+        results_file = os.path.join(path, 'investigation_results.yaml')
 
         # gathering information about effect line
         line_number = self._get_cause_line_number(input_path)
@@ -97,7 +89,7 @@ class TestBasic(TestCase):
         # action and checking the result
         results = log_reader.get_causes(effect_line)
         assert results
-        expected_results = self._investigation_results_from_file(log_file, results_file)
+        expected_results = self._investigation_results_from_yaml(results_file, log_file)
         assert len(results) == len(expected_results)
         for got, real in zip(results, expected_results):
             assert got.lines == real.lines

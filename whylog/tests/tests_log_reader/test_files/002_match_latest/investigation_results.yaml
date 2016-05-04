@@ -1,0 +1,4 @@
+- linkage: AND
+  causes: ["2 root cause"]
+  constraints:
+  - name: latest

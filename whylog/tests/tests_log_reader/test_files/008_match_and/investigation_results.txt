@@ -1,3 +1,0 @@
-AND
-["root cause1", "root cause2"]
--

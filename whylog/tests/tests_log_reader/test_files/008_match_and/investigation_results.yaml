@@ -1,0 +1,3 @@
+- linkage: AND
+  causes: ["root cause1", "root cause2"]
+  constraints: []

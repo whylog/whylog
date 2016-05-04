@@ -1,0 +1,8 @@
+- linkage: AND
+  causes: ["2015-12-03 12:08:08 root cause"]
+  constraints:
+  - clues_groups:
+    - [1, 1]
+    - [0, 1]
+    name: time
+    params: {max_delta: 1}

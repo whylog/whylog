@@ -1,0 +1,8 @@
+- linkage: AND
+  causes: ["root cause of X"]
+  constraints:
+  - clues_groups:
+    - [1, 1]
+    - [0, 1]
+    name: identical
+    params: {}

@@ -1,0 +1,3 @@
+- linkage: OR
+  causes: ["root cause2"]
+  constraints: []
