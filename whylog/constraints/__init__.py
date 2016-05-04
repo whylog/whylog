@@ -153,12 +153,12 @@ class TimeConstraint(AbstractConstraint):
     def verify(self, group_contents, param_dict):
         """
         :param group_contents
-        group_contents[0] = date supposed to be earlier (cause)
-        group_contents[1] = date supposed to be later (effect)
+        group_contents[0] = date supposed to be earlier
+        group_contents[1] = date supposed to be later
         :param param_dict
         contains 'min_delta' and 'max_delta', time interval between
-        effect and cause should satisfy requirement:
-        min_delta < time interval < max_delta
+        two given dates should satisfy requirement:
+        min_delta <= time delta <= max_delta
         """
         earlier_date, later_date = group_contents
         actual_delta = later_date - earlier_date

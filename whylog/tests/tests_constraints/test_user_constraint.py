@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest import TestCase
 
 from whylog.constraints import IdenticalConstraint, TimeConstraint
@@ -34,8 +34,8 @@ class TestIdenticalConstraint(TestCase):
 
 class TestTimeConstraint(TestCase):
     def setUp(self):
-        self.min_delta = timedelta(seconds=1)
-        self.max_delta = timedelta(seconds=10)
+        self.min_delta = 1
+        self.max_delta = 10
         self.lower_date = datetime(2016, 5, 19, 8, 35, 1)
         self.greater_date = datetime(2016, 5, 19, 8, 35, 5)
 
