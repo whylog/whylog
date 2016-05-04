@@ -54,6 +54,27 @@ class TestBasic(TestCase):
             results.append(InvestigationResult(causes, result['constraints'], result['linkage']))
         return results
 
+    # def _investigation_results_from_file(self, log_file, file_path):
+    #     results = []
+    #     file_content = [line.rstrip('\n') for line in open(file_path)]
+    #     for (linkage, lines_str, constraint_str) in zip(
+    #         *[
+    #             [
+    #                 x for (i, x) in enumerate(file_content) if (i % 3 == num)
+    #             ] for num in six.moves.range(3)
+    #         ]
+    #     ):
+    #         # TODO enable upgrading InvRes with linkage (AND,OR,NOT) when support for linkage will be merged
+    #         lines = [
+    #             FrontInput(
+    #                 self._deduce_line_offset_by_unique_content(log_file, line_str), line_str,
+    #                 LineSource("localhost", "node_1.log")
+    #             ) for line_str in eval(lines_str)
+    #         ]
+    #         results.append(InvestigationResult(lines, [{'name': constraint_str}]))
+    #         # there will not full info about constraint
+    #     return results
+
     @generate(
         '001_most_basic',
         # '002_match_latest',
