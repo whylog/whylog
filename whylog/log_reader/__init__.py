@@ -68,7 +68,9 @@ class SearchManager(object):
         clues_collector = defaultdict(itertools.chain)
         for step, log_type in self._investigation_plan.investigation_steps_with_log_types:
             search_handler = SearchHandler(step, log_type)
-            InvestigationUtils.merge_clue_dicts(clues_collector, search_handler.investigate(original_front_input))
+            InvestigationUtils.merge_clue_dicts(
+                clues_collector, search_handler.investigate(original_front_input)
+            )
         clues = self._save_clues_in_normal_dict(clues_collector)
         return self._constraints_verification(clues)
 

@@ -73,7 +73,7 @@ class TestBasic(TestCase):
         '011_different_entry',
         # '012_multiple_rulebooks',
         # '013_match_and_incomplete',
-    )
+    )  # yapf: disable
     def test_one(self, test_name):
         # paths files setup
         prefix_path = os.path.join(*TestPaths.path_test_files)
@@ -93,7 +93,6 @@ class TestBasic(TestCase):
         # gathering information about effect line
         line_number = self._get_cause_line_number(input_path)
         line_content = self._get_concrete_line_from_file(original_log_file, line_number)
-        print "line_content: %s" % line_content
         effect_line_offset = self._deduce_line_offset(original_log_file, line_number)
 
         # preparing Whylog structures, normally prepared by Front
