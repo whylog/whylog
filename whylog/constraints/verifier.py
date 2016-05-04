@@ -119,9 +119,9 @@ class Verifier(object):
     @classmethod
     def _pack_results_for_constraint_or(cls, combination, constraints):
         return cls._create_investigation_result(
-            [
+            (
                 clue for clue in combination if not clue == Verifier.UNMATCHED
-            ], constraints, InvestigationResult.OR
+            ), constraints, InvestigationResult.OR
         )
 
     @classmethod
@@ -154,26 +154,27 @@ class Verifier(object):
         and for each such combination produces InvestigationResult object.
         returns list of all produced InvestigationResults
         """
-        causes = []
         if not constraints:
             # when there is lack of constraints, but there are existing clues combinations,
             # each of them should be returned
-            for combination in cls._clues_combinations(clues_lists):
-                causes.append(cls._pack_results_for_constraint_or(combination, constraints))
-        else:
-            clues_lists = cls._construct_proper_clues_lists(clues_lists)
-            for combination in cls._clues_combinations(clues_lists):
-                verified_constraints = [
-                    constraint
-                    for constraint in constraints
-                    if cls._verify_constraint(combination, effect, constraint, constraint_manager)
-                ]
-                if len(verified_constraints) > 0:
-                    causes.append(
-                        cls._pack_results_for_constraint_or(
-                            combination, verified_constraints
-                        )
+            return [
+                cls._pack_results_for_constraint_or(combination, constraints)
+                for combination in cls._clues_combinations(clues_lists)
+            ]
+        causes = []
+        clues_lists = cls._construct_proper_clues_lists(clues_lists)
+        for combination in cls._clues_combinations(clues_lists):
+            verified_constraints = [
+                constraint
+                for constraint in constraints
+                if cls._verify_constraint(combination, effect, constraint, constraint_manager)
+            ]
+            if verified_constraints:
+                causes.append(
+                    cls._pack_results_for_constraint_or(
+                        combination, verified_constraints
                     )
+                )
         return causes
 
     @classmethod
