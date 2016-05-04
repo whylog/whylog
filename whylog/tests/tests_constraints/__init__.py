@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from whylog.config.investigation_plan import Clue, LineSource
 from whylog.constraints.verifier import ConstraintManager, InvestigationResult, Verifier
-from whylog.front import FrontInput
+from whylog.front.utils import FrontInput
 
 
 class TestBasic(TestCase):

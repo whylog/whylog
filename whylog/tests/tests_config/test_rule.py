@@ -6,7 +6,7 @@ from whylog.config.investigation_plan import Clue, LineSource
 from whylog.config.parsers import RegexParser
 from whylog.config.rule import RegexRuleFactory, Rule
 from whylog.constraints.verifier import InvestigationResult
-from whylog.front import FrontInput
+from whylog.front.utils import FrontInput
 
 
 class TestBasic(TestCase):
