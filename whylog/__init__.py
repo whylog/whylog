@@ -1,4 +1,4 @@
-from whylog.config import WildCardFilenameMatcher, LineSource, LogType
+from whylog.config import LineSource, LogType, WildCardFilenameMatcher
 from whylog.front.utils import FrontInput
 from whylog.front.whylog_factory import whylog_factory
 from whylog.log_reader import LogReader
