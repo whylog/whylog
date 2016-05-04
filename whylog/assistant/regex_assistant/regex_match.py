@@ -1,3 +1,5 @@
+import six
+
 from whylog.assistant.const import DataType
 from whylog.assistant.pattern_match import ParamGroup, PatternMatch
 from whylog.assistant.regex_assistant.guessing import guess_pattern_match
@@ -52,7 +54,7 @@ class RegexMatch():
             [
                 (
                     key + 1, ParamGroup(groups[key], default_converter)
-                ) for key in range(len(groups))
+                ) for key in six.moves.range(len(groups))
             ]
         )
         self.regex = new_regex
@@ -68,7 +70,9 @@ class RegexMatch():
         guessed_pattern_matches = guess_pattern_match(self.line_text)
         guessed_dict = dict(
             [
-                (key, guessed_pattern_matches[key]) for key in range(len(guessed_pattern_matches))
+                (
+                    key, guessed_pattern_matches[key]
+                ) for key in six.moves.range(len(guessed_pattern_matches))
             ]
         )
         self.guessed_pattern_matches = guessed_dict

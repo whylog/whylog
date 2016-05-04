@@ -47,4 +47,3 @@ class RegexAssistant(AbstractAssistant):
         If properties are not met, proper exceptions are returned.
         """
         return self.regex_matches[line_id].verify()
-

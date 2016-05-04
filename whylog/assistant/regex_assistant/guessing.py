@@ -36,7 +36,7 @@ def _groups_from_spans(spans, regex, text):
     group_converters = [span.data_type for span in sorted_spans]
     groups = [
         ParamGroup(content, converter)
-        for content, converter in zip(group_contents, group_converters)
+        for content, converter in six.moves.zip(group_contents, group_converters)
     ]
     groups_dict = dict((key + 1, groups[key]) for key in six.moves.range(len(groups)))
     return groups_dict

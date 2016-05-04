@@ -2,6 +2,8 @@
 Auxiliary methods on ranges (intervals)
 """
 
+import six
+
 
 def complementary_ranges(ranges, start_index, end_index):
     """
@@ -25,7 +27,7 @@ def complementary_ranges(ranges, start_index, end_index):
     if end_index > last_end:
         complement_ranges.append((last_end, end_index))
 
-    for (_, previous_end), (succeeding_start, _) in zip(ranges_union, ranges_union[1:]):
+    for (_, previous_end), (succeeding_start, _) in six.moves.zip(ranges_union, ranges_union[1:]):
         complement_ranges.append((previous_end, succeeding_start))
     return sorted(complement_ranges)
 
