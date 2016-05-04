@@ -3,53 +3,12 @@ Regex verification and creating (but not finding groups in regex)
 """
 
 import re
-from collections import deque
-
-import six
 
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
-from whylog.assistant.span import Span
 from whylog.assistant.span_list import SpanList
 
 special_characters = frozenset('.^$*+{}?[]|()]')
 group_pattern = re.compile(r"[a-zA-Z]+|[0-9]+|\s+|[\W]+")
-
-
-def group_spans_from_regex(regex, text):
-    """
-    Creates spans from regex groups in regex corresponding to text.
-
-    Assumption: regex matches text.
-    """
-
-    if len(regex) < 2:
-        return []
-
-    verify_regex(regex, text)
-
-    matcher = re.match(re.compile(regex), text)
-    groups_count = len(matcher.groups())
-    group_ranges_in_text = [
-        matcher.span(group_no + 1) for group_no in six.moves.range(groups_count)
-    ]
-
-    group_ranges_in_regex = []
-    parenthesis_stack = deque()
-    for pos in six.moves.range(1, len(regex)):
-        if not regex[pos - 1] == '\\':
-            if regex[pos] == '(':
-                parenthesis_stack.append(pos)
-            elif regex[pos] == ')':
-                group_ranges_in_regex.append((parenthesis_stack.pop(), pos))
-
-    group_ranges_in_regex.sort()
-    group_regexes = [regex[start + 1:end] for start, end in group_ranges_in_regex]
-    group_spans = [
-        Span(
-            start, end, pattern=group_regex
-        ) for (start, end), group_regex in six.moves.zip(group_ranges_in_text, group_regexes)
-    ] # yapf: disable
-    return SpanList(group_spans).sort_by_start_and_end()
 
 
 def regex_from_group_spans(group_spans, line_text):

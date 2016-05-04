@@ -4,9 +4,10 @@ from unittest import TestCase
 from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.regex_assistant.regex import (
-    create_date_regex, create_obvious_regex, group_spans_from_regex, regex_from_group_spans,
+    create_date_regex, create_obvious_regex, regex_from_group_spans,
     regex_groups, verify_regex
 )
+from whylog.assistant.span import Span
 from whylog.assistant.span_list import SpanList
 from whylog.assistant.spans_finding import (
     _find_date_spans_by_force, find_date_spans, find_spans_by_regex
@@ -125,19 +126,11 @@ class TestBasic(TestBase):
         assert dates[0] == '2015-12-03'
         assert dates[1] == '10/Oct/1999:21:15:05 +0500'
 
-    def test_group_spans_from_regex(self):
-        text = r'12:56:23 Error on comp12'
-        regex = r'^(\d\d:\d\d:\d\d) Error on (comp(\d+))$'
-        spans = group_spans_from_regex(regex, text)
-        assert set([(span.start, span.end, span.pattern) for span in spans]) == set(
-            [
-                (0, 8, '\d\d:\d\d:\d\d'), (18, 24, 'comp(\d+)'), (22, 24, '\d+')
-            ]
-        )
-
     def test_regex_from_group_spans(self):
         text = r'Error on comp21'
         regex = r'^Error on (comp(\d\d))$'
-        group_spans = group_spans_from_regex(regex, text)
+        span_comp = Span(9, 15, pattern=r'comp(\d\d)')
+        span_number = Span(13, 15, pattern=r'\d\d')
+        group_spans = SpanList([span_comp, span_number])
         regex_from_groups = regex_from_group_spans(group_spans, text)
         assert regex == regex_from_groups
