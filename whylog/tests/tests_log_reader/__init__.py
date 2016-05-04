@@ -1,6 +1,7 @@
 import os.path
 from unittest import TestCase
 
+import six
 import yaml
 from generator import generate, generator
 
@@ -91,7 +92,7 @@ class TestBasic(TestCase):
         assert results
         expected_results = self._investigation_results_from_yaml(results_file, log_file)
         assert len(results) == len(expected_results)
-        for got, real in zip(results, expected_results):
+        for got, real in six.moves.zip(results, expected_results):
             assert got.lines == real.lines
             for constr_got, constr_real in zip(got.constraints, real.constraints):
                 assert constr_got['name'] == constr_real['name']

@@ -1,6 +1,5 @@
 import os
 import platform
-
 import shutil
 from unittest import TestCase
 
