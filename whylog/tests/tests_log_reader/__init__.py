@@ -1,6 +1,7 @@
 import os.path
 from unittest import TestCase
 
+import six
 from generator import generate, generator
 
 from whylog.config import YamlConfig
@@ -46,7 +47,7 @@ class TestBasic(TestCase):
             *[
                 [
                     x for (i, x) in enumerate(file_content) if (i % 3 == num)
-                ] for num in range(3)
+                ] for num in six.moves.range(3)
             ]
         ):
             # TODO enable upgrading InvRes with linkage (AND,OR,NOT) when support for linkage will be merged
@@ -91,13 +92,14 @@ class TestBasic(TestCase):
         # preparing Whylog structures, normally prepared by Front
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         log_reader = LogReader(whylog_config)
-        line = FrontInput(effect_line_offset, line_content, prefix_path)
+        effect_line = FrontInput(effect_line_offset, line_content, prefix_path)
 
         # action and checking the result
-        results = log_reader.get_causes(line)
+        results = log_reader.get_causes(effect_line)
         assert results
-        true_results = self._investigation_results_from_file(log_file, results_file)
-        for got, real in zip(results, true_results):
+        expected_results = self._investigation_results_from_file(log_file, results_file)
+        assert len(results) == len(expected_results)
+        for got, real in zip(results, expected_results):
             assert got.lines == real.lines
             for constr_got, constr_real in zip(got.constraints, real.constraints):
                 assert constr_got['name'] == constr_real['name']
