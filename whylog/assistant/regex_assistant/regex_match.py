@@ -6,7 +6,7 @@ from whylog.assistant.regex_assistant.guessing import guess_pattern_match
 from whylog.assistant.regex_assistant.regex import create_obvious_regex, regex_groups
 
 
-class RegexMatch():
+class RegexMatch(object):
     """
     Container for information about line and corresponding regex
     Keeps own data integrity - especially consistency between regex and groups (param_groups).
@@ -51,11 +51,9 @@ class RegexMatch():
 
         default_converter = DataType.STRING
         self.param_groups = dict(
-            [
-                (
-                    key + 1, ParamGroup(groups[key], default_converter)
-                ) for key in six.moves.range(len(groups))
-            ]
+            (
+                key + 1, ParamGroup(groups[key], default_converter)
+            ) for key in six.moves.range(len(groups))
         )
         self.regex = new_regex
 

@@ -29,7 +29,6 @@ def regex_from_group_spans(group_spans, line_text):
         if span.is_param:
             span_pattern = "(" + span_pattern + ")"
         regex += span_pattern
-    regex = "^" + regex + "$"
     return regex
 
 
@@ -41,14 +40,14 @@ def verify_regex(regex, text):
     """
 
     # regex must match a whole text from its beginning to end.
-    matcher = re.match('^%s$' % (regex,), text)
+    matcher = re.match('%s$' % (regex,), text)
 
     if matcher is None:
         raise NotMatchingRegexError(text, regex)
 
 
 def regex_groups(regex, text):
-    matcher = re.match('^%s$' % (regex,), text)
+    matcher = re.match('%s$' % (regex,), text)
     if matcher is None:
         raise NotMatchingRegexError(text, regex)
     else:
