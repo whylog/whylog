@@ -48,16 +48,3 @@ class RegexAssistant(AbstractAssistant):
         """
         return self.regex_matches[line_id].verify()
 
-    def make_groups(self, groups):
-        """
-        Improves regexes by adding to them regex groups corresponding to params in text.
-        :param groups: pairs (line_id, group_id)
-        """
-        raise NotImplementedError
-
-    def remove_groups(self, groups):
-        """
-        Improves regexes by removing regex groups corresponding to params in text.
-        :param groups: pairs (line_id, group_id)
-        """
-        raise NotImplementedError
