@@ -50,7 +50,7 @@ class TestBasic(TestCase):
                     self._deduce_line_offset_by_unique_content(real_log_file, line_str), line_str,
                     LineSource("localhost", "node_1.log")
                 ) for line_str in result['causes']
-            ]
+            ]  # yapf: disable
             results.append(InvestigationResult(causes, result['constraints'], result['linkage']))
         return results
 
