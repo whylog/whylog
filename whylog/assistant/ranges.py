@@ -17,19 +17,21 @@ def complementary_ranges(ranges, start_index, end_index):
     ranges_union = _ranges_union(ranges)
     complement_ranges = []
 
-    # edge cases
     if not ranges:
         return [(start_index, end_index)]
+
     first_start, _ = ranges_union[0]
     if start_index < first_start:
         complement_ranges.append((start_index, first_start))
+
+    for (_, previous_end), (succeeding_start, _) in six.moves.zip(ranges_union, ranges_union[1:]):
+        complement_ranges.append((previous_end, succeeding_start))
+
     _, last_end = ranges_union[-1]
     if end_index > last_end:
         complement_ranges.append((last_end, end_index))
 
-    for (_, previous_end), (succeeding_start, _) in six.moves.zip(ranges_union, ranges_union[1:]):
-        complement_ranges.append((previous_end, succeeding_start))
-    return sorted(complement_ranges)
+    return complement_ranges
 
 
 def _ranges_union(ranges):

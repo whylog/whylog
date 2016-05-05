@@ -30,7 +30,7 @@ def guess_obvious_pattern_match(text):
 
 def _groups_from_spans(spans, regex, text):
     verify_regex(regex, text)
-    matcher = re.match(re.compile(regex), text)
+    matcher = re.match(regex, text)
     group_contents = matcher.groups()
     sorted_spans = spans.sort_by_start_and_end()
     group_converters = [span.data_type for span in sorted_spans]

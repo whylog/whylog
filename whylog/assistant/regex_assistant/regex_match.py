@@ -44,9 +44,7 @@ class RegexMatch(object):
 
         groups = regex_groups(new_regex, self.line_text)
 
-        if not new_regex[0] == '^':
-            new_regex = '^' + new_regex
-        if not new_regex[-1] == '$':
+        if new_regex[-1] != '$':
             new_regex += '$'
 
         default_converter = DataType.STRING
@@ -67,11 +65,9 @@ class RegexMatch(object):
     def _guess_regexes(self):
         guessed_pattern_matches = guess_pattern_match(self.line_text)
         guessed_dict = dict(
-            [
-                (
-                    key, guessed_pattern_matches[key]
-                ) for key in six.moves.range(len(guessed_pattern_matches))
-            ]
+            (
+                key, guessed_pattern_matches[key]
+            ) for key in six.moves.range(len(guessed_pattern_matches))
         )
         self.guessed_pattern_matches = guessed_dict
         self.update_by_guessed_regex(regex_id=0)
