@@ -102,3 +102,8 @@ class LineSource(object):
 
     def __repr__(self):
         return "(LineSource: %s:%s)" % (self.host, self.path)
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        return all((self.host == other.host, self.path == other.path))
