@@ -7,7 +7,6 @@ from whylog.teacher.mock_outputs import create_sample_rule
 class PatternGroup(object):
     """
     Keeps "coordinates" of group that represents param in text
-
     :param line_id: id of line to which group belongs.
     :param number: number of group in line.
                    Groups don't overlap. Numeration from left, from 1.
@@ -26,7 +25,7 @@ class TeacherParser(object):
 class Teacher(object):
     """
     Enable teaching new rule. One Teacher per one entering rule.
-
+    :type pattern_assistant: AbstractAssistant
     :type _parsers: dict[int, TeacherParser]
     :type _constraint_base: dict[int, AbstractConstraint]
     :param _constraint_links: Keeps links between constraints and groups.
@@ -47,10 +46,8 @@ class Teacher(object):
     def add_line(self, line_id, line_object, effect=False):
         """
         Adds new line to rule.
-
         If line_id already exists, old line is overwritten by new line
         and all constraints related to old line are removed.
-
         """
         if line_id in six.iterkeys(self._parsers):
             self.remove_line(line_id)
@@ -62,7 +59,6 @@ class Teacher(object):
     def remove_line(self, line_id):
         """
         Removes line from rule.
-
         Assumption: line with line_id exists in rule.
         Removes also all constraints related to this line.
         """
@@ -71,33 +67,21 @@ class Teacher(object):
         self.pattern_assistant.remove_line(line_id)
         del self._parsers[line_id]
 
-    def update_pattern(self, line_id, proposed_pattern):
+    def update_pattern(self, line_id, pattern):
         """
         Loads text pattern proposed by user, verifies if it matches line text.
         """
-        pass
+        self.pattern_assistant.update_by_pattern(line_id, pattern)
 
-    def make_group(self, line_id, span):
+    def guess_patterns(self, line_id):
         """
-        Improves text pattern by adding group corresponding to param in text.
+        Returns list of guessed patterns for a line.
+        """
+        pattern_matches = self.pattern_assistant.guess_pattern_matches(line_id)
+        return [pattern_match.pattern for pattern_match in pattern_matches]
 
-        Removes (or maybe updates) constraints related to groups in line with line_id
-        """
-        pass
-
-    def remove_group(self, pattern_group):
-        """
-        Improves text pattern by removing group corresponding to param in text.
-
-        Removes (or maybe updates) constraints related to groups in line with line_id
-        """
-        pass
-
-    def guess_pattern(self, line_id):
-        """
-        Guess text pattern for line text.
-        """
-        pass
+    def choose_guessed_pattern(self, line_id, pattern_id):
+        self.pattern_assistant.update_by_guessed_pattern_match(line_id, pattern_id)
 
     def set_pattern_name(self, line_id, name):
         pass
@@ -114,10 +98,8 @@ class Teacher(object):
     def register_constraint(self, constraint_id, pattern_groups, constraint):
         """
         Adds new constraint to rule.
-
         If constraint_id already exists, constraint with this constraint_id
         is overwritten by new constraint
-
         :param pattern_groups: groups in pattern that are linked by constraint
         :type pattern_groups: list[PatternGroup]
         """
@@ -133,7 +115,6 @@ class Teacher(object):
     def remove_constraint(self, constraint_id):
         """
         Removes constraint from rule.
-
         Assumption: Constraint already exists in rule.
         """
         self._constraint_links.remove_links_by_constraint(constraint_id)
@@ -177,12 +158,12 @@ class Teacher(object):
         """
         Creates rule for Front that will be shown to user
         """
-        #TODO: remove mock
+        # TODO: remove mock
         return create_sample_rule()
 
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
-        #TODO: remove mock
+        # TODO: remove mock
         self.config.add_rule(create_sample_rule())
