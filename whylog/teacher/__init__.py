@@ -18,8 +18,15 @@ class PatternGroup(object):
 
 
 class TeacherParser(object):
-    def __init__(self, line_object):
+    """
+    :type line: FrontInput
+    """
+
+    def __init__(self, line_object, name, primary_keys, log_type):
         self.line = line_object
+        self.name = name
+        self.primary_keys = primary_keys
+        self.log_type = log_type
 
 
 class Teacher(object):
