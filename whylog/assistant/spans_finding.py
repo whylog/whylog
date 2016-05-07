@@ -62,7 +62,9 @@ def _find_date_spans_by_force(text):
 
             if date.year - date_now.year > 1:
                 continue
-            new_span = Span(start, end, pattern_creator=create_date_regex, converter=ConverterType.TO_DATE)
+            new_span = Span(
+                start, end, pattern_creator=create_date_regex, converter=ConverterType.TO_DATE
+            )  # yapf: disable
             date_spans.add(new_span)
             not_overlapping_start = end
             # break, because we don't care about shorter date groups
