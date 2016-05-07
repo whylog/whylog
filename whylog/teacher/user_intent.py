@@ -19,6 +19,9 @@ class UserParserIntent(object):
         self.line_offset = line_offset
         self.line_resource_location = line_resource_location
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
 class UserConstraintIntent(object):
     def __init__(self, constr_type, groups, params=None):

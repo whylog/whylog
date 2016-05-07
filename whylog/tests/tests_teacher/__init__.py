@@ -47,3 +47,27 @@ class TestBase(TestCase):
         for test_file in self.test_files:
             open(test_file, 'w').close()
 
+
+class TestParser(TestBase):
+    def test_default_user_parser(self):
+        user_rule = self.teacher.get_rule()
+        effect_parser = user_rule.parsers[self.effect_id]
+
+        wanted_effect_parser = UserParserIntent(
+            'regex_assistant',
+            'error_occurred_in_reading',
+            r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in reading test$',
+            None,
+            [1],
+            {
+                1: ParamGroup(
+                    content='2015-12-03 12:11:00',
+                    converter='to_date'
+                )
+            },
+            self.effect_front_input.line_content,
+            self.effect_front_input.offset,
+            self.effect_front_input.line_source,
+        )
+        assert wanted_effect_parser == effect_parser
+
