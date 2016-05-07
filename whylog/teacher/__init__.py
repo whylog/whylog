@@ -1,7 +1,6 @@
 import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
-from whylog.teacher.mock_outputs import create_sample_rule
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
