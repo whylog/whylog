@@ -202,12 +202,18 @@ class Teacher(object):
         """
         Creates rule for Front that will be shown to user
         """
-        # TODO: remove mock
-        return create_sample_rule()
+        user_parsers = dict(
+            (line_id, self._prepare_user_parser(line_id)) for line_id in six.iterkeys(self._parsers)
+        )
+        user_constraints = [
+            constraint.convert_to_user_constraint_intent()
+            for constraint in six.itervalues(self._constraint_base)
+        ]
+        return UserRuleIntent(self.effect_id, user_parsers, user_constraints)
 
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
-        # TODO: remove mock
-        self.config.add_rule(create_sample_rule())
+        # TODO: validate rule
+        self.config.add_rule(self.get_rule())
