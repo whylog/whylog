@@ -70,4 +70,3 @@ class TestParser(TestBase):
             self.effect_front_input.line_source,
         )
         assert wanted_effect_parser == effect_parser
-
