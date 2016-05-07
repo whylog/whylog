@@ -1,5 +1,5 @@
 class AssistantType:
-    REGEX = 'regex'
+    REGEX = 'regex_assistant'
 
 
 class ConverterType:

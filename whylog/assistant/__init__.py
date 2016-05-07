@@ -1,10 +1,17 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 import six
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractAssistant(object):
+    @abstractproperty
+    def TYPE(self):
+        """
+        Assistant type. Must be unique for each assistant.
+        """
+        pass
+
     @abstractmethod
     def add_line(self, line_id, line_object):
         pass
