@@ -25,10 +25,11 @@ class RegexMatch(object):
         self.param_groups = dict()
 
         self.regex = None
-        self.update_by_regex(create_obvious_regex(self.line_text))
 
         self.guessed_pattern_matches = dict()
+
         self._guess_regexes()
+        self.update_by_guessed_regex(0)
 
     def convert_to_pattern_match(self):
         return PatternMatch(self.line_text, self.regex, self.param_groups)
@@ -46,6 +47,8 @@ class RegexMatch(object):
 
         if new_regex[-1] != '$':
             new_regex += '$'
+        if new_regex[0] != '^':
+            new_regex = '^' + new_regex
 
         default_converter = ConverterType.TO_STRING
         self.param_groups = dict(
@@ -56,7 +59,7 @@ class RegexMatch(object):
         self.regex = new_regex
 
     def update_by_pattern_match(self, pattern_match):
-        self.regex = pattern_match.pattern
+        self.update_by_regex(pattern_match.pattern)
         self.param_groups = pattern_match.param_groups
 
     def update_by_guessed_regex(self, regex_id):
@@ -70,7 +73,6 @@ class RegexMatch(object):
             ) for key in six.moves.range(len(guessed_pattern_matches))
         )
         self.guessed_pattern_matches = guessed_dict
-        self.update_by_guessed_regex(regex_id=0)
 
     def set_converter(self, group_no, converter):
         #TODO: verify converter
