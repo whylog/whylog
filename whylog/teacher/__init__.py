@@ -50,6 +50,8 @@ class Teacher(object):
         self._constraint_links = ConstraintLinksBase()
         self.effect_id = None
 
+        self.names_blacklist = set()
+
     def add_line(self, line_id, line_object, effect=False):
         """
         Adds new line to rule.
@@ -80,6 +82,8 @@ class Teacher(object):
         )
         self._parsers[line_id] = new_teacher_parser
 
+        self.names_blacklist.add(default_name)
+
     def remove_line(self, line_id):
         """
         Removes line from rule.
@@ -90,6 +94,7 @@ class Teacher(object):
         self._remove_constraints_by_line(line_id)
         self.pattern_assistant.remove_line(line_id)
         del self._parsers[line_id]
+        self.names_blacklist.remove(self._parsers[line_id].name)
 
     def update_pattern(self, line_id, pattern):
         """
