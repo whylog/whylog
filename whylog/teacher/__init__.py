@@ -2,6 +2,7 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.mock_outputs import create_sample_rule
+from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
 class PatternGroup(object):
@@ -182,6 +183,20 @@ class Teacher(object):
         Simulates searching causes with alreday created rule.
         """
         pass
+
+    def _prepare_user_parser(self, line_id):
+        """
+        :type pattern_match: PatternMatch
+        """
+        pattern_match = self.pattern_assistant.get_pattern_match(line_id)
+        teacher_parser = self._parsers[line_id]
+        pattern_type = self.pattern_assistant.TYPE
+        return UserParserIntent(
+            pattern_type, teacher_parser.name, pattern_match.pattern, teacher_parser.log_type,
+            teacher_parser.primary_keys, pattern_match.param_groups,
+            teacher_parser.line.line_content, teacher_parser.line.offset,
+            teacher_parser.line.line_source
+        )
 
     def get_rule(self):
         """
