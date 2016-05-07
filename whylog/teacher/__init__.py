@@ -60,8 +60,25 @@ class Teacher(object):
             self.remove_line(line_id)
         if effect:
             self.effect_id = line_id
+        self._add_default_parser(line_id, line_object)
+
+    def _add_default_parser(self, line_id, line_object):
         self.pattern_assistant.add_line(line_id, line_object)
-        self._parsers[line_id] = TeacherParser(line_object)
+
+        default_pattern_match = self.pattern_assistant.get_pattern_match(line_id)
+        default_pattern = default_pattern_match.pattern
+        default_groups = default_pattern_match.param_groups
+
+        default_name = self.config.propose_parser_name(
+            line_object.line_content, default_pattern, self.names_blacklist
+        )
+        defaulf_primary_key = [min(default_groups.keys())] if default_groups else []
+        default_log_type_name = None
+
+        new_teacher_parser = TeacherParser(
+            line_object, default_name, defaulf_primary_key, default_log_type_name
+        )
+        self._parsers[line_id] = new_teacher_parser
 
     def remove_line(self, line_id):
         """
