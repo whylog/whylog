@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
@@ -16,17 +18,8 @@ class PatternGroup(object):
         self.line_id = line_id
         self.number = group_number_in_line
 
-
-class TeacherParser(object):
-    """
-    :type line: FrontInput
-    """
-
-    def __init__(self, line_object, name, primary_keys, log_type):
-        self.line = line_object
-        self.name = name
-        self.primary_keys = primary_keys
-        self.log_type = log_type
+# :type line: FrontInput
+TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
 
 
 class Teacher(object):
@@ -50,8 +43,6 @@ class Teacher(object):
         self._constraint_links = ConstraintLinksBase()
         self.effect_id = None
 
-        self.names_blacklist = set()
-
     def add_line(self, line_id, line_object, effect=False):
         """
         Adds new line to rule.
@@ -64,6 +55,9 @@ class Teacher(object):
             self.effect_id = line_id
         self._add_default_parser(line_id, line_object)
 
+    def _get_names_blacklist(self):
+        return [parser.name for parser in six.itervalues(self._parsers)]
+
     def _add_default_parser(self, line_id, line_object):
         self.pattern_assistant.add_line(line_id, line_object)
 
@@ -72,17 +66,18 @@ class Teacher(object):
         default_groups = default_pattern_match.param_groups
 
         default_name = self.config.propose_parser_name(
-            line_object.line_content, default_pattern, self.names_blacklist
+            line_object.line_content, default_pattern, self._get_names_blacklist()
         )
-        defaulf_primary_key = [min(default_groups.keys())] if default_groups else []
+        if default_groups:
+            default_primary_key = [min(default_groups.keys())]
+        else:
+            default_primary_key = []
         default_log_type_name = None
 
         new_teacher_parser = TeacherParser(
-            line_object, default_name, defaulf_primary_key, default_log_type_name
+            line_object, default_name, default_primary_key, default_log_type_name
         )
         self._parsers[line_id] = new_teacher_parser
-
-        self.names_blacklist.add(default_name)
 
     def remove_line(self, line_id):
         """
@@ -94,7 +89,6 @@ class Teacher(object):
         self._remove_constraints_by_line(line_id)
         self.pattern_assistant.remove_line(line_id)
         del self._parsers[line_id]
-        self.names_blacklist.remove(self._parsers[line_id].name)
 
     def update_pattern(self, line_id, pattern):
         """
@@ -195,7 +189,7 @@ class Teacher(object):
             teacher_parser.primary_keys, pattern_match.param_groups,
             teacher_parser.line.line_content, teacher_parser.line.offset,
             teacher_parser.line.line_source
-        )
+        )  # yapf: disable
 
     def get_rule(self):
         """
