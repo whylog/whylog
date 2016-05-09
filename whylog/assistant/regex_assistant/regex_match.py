@@ -47,8 +47,6 @@ class RegexMatch(object):
 
         if new_regex[-1] != '$':
             new_regex += '$'
-        if new_regex[0] != '^':
-            new_regex = '^' + new_regex
 
         default_converter = ConverterType.TO_STRING
         self.param_groups = dict(

@@ -56,7 +56,7 @@ class TestParser(TestBase):
         wanted_effect_parser = UserParserIntent(
             'regex_assistant',
             'error_occurred_in_reading',
-            r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in reading test$',
+            r'([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in reading test$',
             None,
             [1],
             {
@@ -68,5 +68,5 @@ class TestParser(TestBase):
             self.effect_front_input.line_content,
             self.effect_front_input.offset,
             self.effect_front_input.line_source,
-        )
+            )  # yapf: disable
         assert wanted_effect_parser == effect_parser
