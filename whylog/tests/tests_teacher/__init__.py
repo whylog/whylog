@@ -68,5 +68,5 @@ class TestParser(TestBase):
             self.effect_front_input.line_content,
             self.effect_front_input.offset,
             self.effect_front_input.line_source,
-            )  # yapf: disable
+        )  # yapf: disable
         assert wanted_effect_parser == effect_parser
