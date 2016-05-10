@@ -4,7 +4,7 @@ Auxilary methods for Span
 """
 import six
 
-from whylog.assistant.const import DataType
+from whylog.assistant.const import ConverterType
 from whylog.exceptions import WhylogError
 
 
@@ -49,14 +49,14 @@ class Span(object):
         pattern_creator=None,
         is_param=True,
         pattern=None,
-        data_type=DataType.STRING
+        converter=ConverterType.TO_STRING
     ):
         """
         :param start, end: represent interval [start, end) of some text
         :param is_param: True if Span represents parameter in some text, False otherwise
         :param pattern: pattern corresponding to this interval in some text (i.e. regex)
         :param pattern_creator: function that creates pattern for given interval and text
-        :param data_type: type of data represented by interval in text.
+        :param converter: type of data represented by interval in text.
         """
         if start >= end:
             raise SpanConstructorParamsError(start, end)
@@ -70,7 +70,7 @@ class Span(object):
             raise UnableToCreatePatternError(start, end)
         self.pattern = pattern
         self.pattern_creator = pattern_creator
-        self.data_type = data_type
+        self.converter = converter
 
     def __repr__(self):
         return "Span(" + str(self.start) + ", " + str(self.end) + ")"

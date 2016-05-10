@@ -1,11 +1,11 @@
 class AssistantType:
-    REGEX = 'regex'
+    REGEX = 'regex_assistant'
 
 
-class DataType:
-    STRING = 'string'
-    DATE = 'date'
-    FLOAT = 'float'
+class ConverterType:
+    TO_STRING = 'to_string'
+    TO_DATE = 'to_date'
+    TO_FLOAT = 'to_float'
 
 
 class DateParams:

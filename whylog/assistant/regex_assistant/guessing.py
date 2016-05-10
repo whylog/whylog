@@ -33,7 +33,7 @@ def _groups_from_spans(spans, regex, text):
     matcher = re.match(regex, text)
     group_contents = matcher.groups()
     sorted_spans = spans.sort_by_start_and_end()
-    group_converters = [span.data_type for span in sorted_spans]
+    group_converters = [span.converter for span in sorted_spans]
     groups = [
         ParamGroup(content, converter)
         for content, converter in six.moves.zip(group_contents, group_converters)

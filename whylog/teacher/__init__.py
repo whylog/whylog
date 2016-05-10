@@ -1,7 +1,9 @@
+from collections import namedtuple
+
 import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
-from whylog.teacher.mock_outputs import create_sample_rule
+from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
 class PatternGroup(object):
@@ -16,10 +18,8 @@ class PatternGroup(object):
         self.line_id = line_id
         self.number = group_number_in_line
 
-
-class TeacherParser(object):
-    def __init__(self, line_object):
-        self.line = line_object
+# :type line: FrontInput
+TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
 
 
 class Teacher(object):
@@ -53,8 +53,31 @@ class Teacher(object):
             self.remove_line(line_id)
         if effect:
             self.effect_id = line_id
+        self._add_default_parser(line_id, line_object)
+
+    def _get_names_blacklist(self):
+        return [parser.name for parser in six.itervalues(self._parsers)]
+
+    def _add_default_parser(self, line_id, line_object):
         self.pattern_assistant.add_line(line_id, line_object)
-        self._parsers[line_id] = TeacherParser(line_object)
+
+        default_pattern_match = self.pattern_assistant.get_pattern_match(line_id)
+        default_pattern = default_pattern_match.pattern
+        default_groups = default_pattern_match.param_groups
+
+        default_name = self.config.propose_parser_name(
+            line_object.line_content, default_pattern, self._get_names_blacklist()
+        )
+        if default_groups:
+            default_primary_key = [min(default_groups.keys())]
+        else:
+            default_primary_key = []
+        default_log_type_name = None
+
+        new_teacher_parser = TeacherParser(
+            line_object, default_name, default_primary_key, default_log_type_name
+        )
+        self._parsers[line_id] = new_teacher_parser
 
     def remove_line(self, line_id):
         """
@@ -154,16 +177,36 @@ class Teacher(object):
         """
         pass
 
+    def _prepare_user_parser(self, line_id):
+        """
+        :type pattern_match: PatternMatch
+        """
+        pattern_match = self.pattern_assistant.get_pattern_match(line_id)
+        teacher_parser = self._parsers[line_id]
+        pattern_type = self.pattern_assistant.TYPE
+        return UserParserIntent(
+            pattern_type, teacher_parser.name, pattern_match.pattern, teacher_parser.log_type,
+            teacher_parser.primary_keys, pattern_match.param_groups,
+            teacher_parser.line.line_content, teacher_parser.line.offset,
+            teacher_parser.line.line_source
+        )  # yapf: disable
+
     def get_rule(self):
         """
         Creates rule for Front that will be shown to user
         """
-        # TODO: remove mock
-        return create_sample_rule()
+        user_parsers = dict(
+            (line_id, self._prepare_user_parser(line_id)) for line_id in six.iterkeys(self._parsers)
+        )
+        user_constraints = [
+            constraint.convert_to_user_constraint_intent()
+            for constraint in six.itervalues(self._constraint_base)
+        ]
+        return UserRuleIntent(self.effect_id, user_parsers, user_constraints)
 
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
-        # TODO: remove mock
-        self.config.add_rule(create_sample_rule())
+        # TODO: validate rule
+        self.config.add_rule(self.get_rule())

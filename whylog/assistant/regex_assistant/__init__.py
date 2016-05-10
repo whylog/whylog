@@ -1,4 +1,5 @@
 from whylog.assistant import AbstractAssistant
+from whylog.assistant.const import AssistantType
 from whylog.assistant.regex_assistant.regex_match import RegexMatch
 
 
@@ -10,6 +11,8 @@ class RegexAssistant(AbstractAssistant):
 
     :type regex_matches: dict[int, RegexMatch]
     """
+
+    TYPE = AssistantType.REGEX
 
     def __init__(self):
         self.regex_matches = {}
