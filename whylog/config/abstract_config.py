@@ -140,14 +140,10 @@ class AbstractConfig(object):
 
     def _create_steps_in_investigation(self, concatenated_parsers, suspected_rules, effect_clues):
         steps = []
+        search_ranges = self._get_search_ranges(suspected_rules, effect_clues)
         for log_type_name, parser in six.iteritems(concatenated_parsers):
             log_type = self._log_types[log_type_name]
-            #TODO mocked for 003_test
-            #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
-            #TODO base on effect_clues and suspected_rules per log type
-            effect_time = datetime(2015, 12, 3, 12, 8, 9)  #TODO remove mock
-            earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)  #TODO remove mock
-            investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
+            investigation_step = InvestigationStep(parser, search_ranges.get(log_type_name, {}))
             steps.append((investigation_step, log_type))
         return steps
 
