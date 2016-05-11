@@ -55,8 +55,12 @@ class AbstractConfig(object):
             self._parsers[parser.name] = parser
 
     def add_log_type(self, log_type):
-        # TODO Can assume that exists only one LogType object for one log type name
-        pass
+        for matcher in log_type.filename_matchers:
+            self.add_filename_matcher_to_log_type(matcher)
+
+    def add_filename_matcher_to_log_type(self, matcher):
+        matcher_definition = matcher.serialize()
+        self._save_filename_matcher_definition(matcher_definition)
 
     @abstractmethod
     def _save_rule_definition(self, rule_definition):
@@ -64,6 +68,10 @@ class AbstractConfig(object):
 
     @abstractmethod
     def _save_parsers_definition(self, parser_definitions):
+        pass
+
+    @abstractmethod
+    def _save_filename_matcher_definition(self, matcher_definition):
         pass
 
     def get_log_type(self, front_input):

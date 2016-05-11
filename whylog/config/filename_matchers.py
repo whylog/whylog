@@ -34,6 +34,14 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
         return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(line_source.path,
                                                                                         self.path_pattern)
 
+    def serialize(self):
+        return {
+            'matcher_class_name': "WildCardFilenameMatcher",
+            'log_type_name': self.log_type_name,
+            'host_pattern': self.host_pattern,
+            'path_pattern': self.path_pattern
+        }
+
     def __repr__(self):
         return "(WildCardFilenameMatcher: %s, %s, %s)" % (
             self.log_type_name, self.path_pattern, self.host_pattern
