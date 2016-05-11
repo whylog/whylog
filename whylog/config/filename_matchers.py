@@ -31,15 +31,16 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
             raise NotImplementedError
 
     def is_belong_to_matcher(self, line_source):
-        return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(line_source.path,
-                                                                                        self.path_pattern)
+        return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(
+            line_source.path, self.path_pattern
+        )
 
     def serialize(self):
         return {
             'matcher_class_name': "WildCardFilenameMatcher",
             'log_type_name': self.log_type_name,
+            'path_pattern': self.path_pattern,
             'host_pattern': self.host_pattern,
-            'path_pattern': self.path_pattern
         }
 
     def __repr__(self):

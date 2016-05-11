@@ -85,7 +85,11 @@ class TestBasic(TestCase):
         # preparing Whylog structures, normally prepared by Front
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         log_reader = LogReader(whylog_config)
-        effect_line = FrontInput(effect_line_offset, line_content, LineSource('localhost', log_file))
+        effect_line = FrontInput(
+            effect_line_offset, line_content, LineSource(
+                'localhost', log_file
+            )
+        )
 
         # action and checking the result
         results = log_reader.get_causes(effect_line)

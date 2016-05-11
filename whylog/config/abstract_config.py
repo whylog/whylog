@@ -59,8 +59,7 @@ class AbstractConfig(object):
             self.add_filename_matcher_to_log_type(matcher)
 
     def add_filename_matcher_to_log_type(self, matcher):
-        matcher_definition = matcher.serialize()
-        self._save_filename_matcher_definition(matcher_definition)
+        self._save_filename_matcher_definition(matcher.serialize())
 
     @abstractmethod
     def _save_rule_definition(self, rule_definition):

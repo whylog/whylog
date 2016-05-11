@@ -1,8 +1,8 @@
 from whylog.config.investigation_plan import LineSource
 from whylog.front.utils import FrontInput
 from whylog.front.whylog_factory import whylog_factory
-from whylog.tests.utils import TestRemovingSettings
 from whylog.log_reader.exceptions import NoLogTypeError
+from whylog.tests.utils import TestRemovingSettings
 
 
 class TestWhylogFactory(TestRemovingSettings):

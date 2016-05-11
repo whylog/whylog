@@ -1,5 +1,5 @@
-import shutil
 import os.path
+import shutil
 from unittest import TestCase
 
 from whylog.config import SettingsFactorySelector
