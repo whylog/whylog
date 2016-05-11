@@ -33,6 +33,7 @@ class InvestigationStep(object):
     This class is responsible for finding all possible Clues from parsed logs.
     Also controls searched time range in logs file.
     """
+
     def __init__(self, parser_subset, search_ranges):
         self._parser_subset = parser_subset
         self._search_ranges = search_ranges

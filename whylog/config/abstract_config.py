@@ -5,7 +5,7 @@ from datetime import datetime
 import six
 
 from whylog.config.filename_matchers import WildCardFilenameMatcher
-from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
+from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
 from whylog.config.log_type import LogType
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parser_subset import ConcatenatedRegexParser
@@ -149,9 +149,15 @@ class AbstractConfig(object):
 
     def _get_search_ranges(self, suspected_rules, effect_clues):
         #TODO: remove mock
-        return {'database': {'date': {'max': datetime(2016, 4, 12, 23, 53, 3),
-                                      'min': datetime(2016, 4, 12, 23, 54, 33)}},
-                'apache': {'date': {'max': datetime(2016, 4, 12, 23, 54, 33)}}}
+        return {
+            'database': {
+                'date': {
+                    'max': datetime(2016, 4, 12, 23, 53, 3),
+                    'min': datetime(2016, 4, 12, 23, 54, 33)
+                }
+            },
+            'apache': {'date': {'max': datetime(2016, 4, 12, 23, 54, 33)}}
+        }
 
     def is_free_parser_name(self, parser_name, black_list):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
