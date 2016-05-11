@@ -67,6 +67,11 @@ class AbstractConfig(object):
     def _save_parsers_definition(self, parser_definitions):
         pass
 
+    def get_log_type(self, front_input):
+        # TODO: remove mock
+        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
+        return LogType('default', [matcher])
+
     def create_investigation_plan(self, front_input, log_type):
         matching_parsers, effect_params = self._find_matching_parsers(
             front_input.line_content, log_type.name
@@ -79,20 +84,13 @@ class AbstractConfig(object):
         )
         return InvestigationPlan(suspected_rules, steps, effect_clues)
 
-    def get_log_type(self, front_input):
-        # TODO: remove mock
-        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
-        return LogType('default', [matcher])
-
     def _create_effect_clues(self, effect_params, front_input):
         effect_clues = {}
-        # TODO: remove mocks line source should come from front_input
-        line_source = LineSource('localhost', 'node_1.log')
         for parser_name, params in six.iteritems(effect_params):
             parser = self._parsers[parser_name]
             clue = Clue(
                 parser.convert_params(params), front_input.line_content, front_input.offset,
-                line_source
+                front_input.line_source
             )
             effect_clues[parser_name] = clue
         return effect_clues
@@ -152,6 +150,12 @@ class AbstractConfig(object):
             investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
             steps.append((investigation_step, log_type))
         return steps
+
+    def _get_search_ranges(self, suspected_rules, effect_clues):
+        #TODO: remove mock
+        return {'database': {'date': {'max': datetime(2016, 4, 12, 23, 53, 3),
+                                      'min': datetime(2016, 4, 12, 23, 54, 33)}},
+                'apache': {'date': {'max': datetime(2016, 4, 12, 23, 54, 33)}}}
 
     def is_free_parser_name(self, parser_name, black_list):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
