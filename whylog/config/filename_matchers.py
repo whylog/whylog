@@ -1,3 +1,4 @@
+import fnmatch
 import glob
 from abc import ABCMeta, abstractmethod
 
@@ -8,6 +9,10 @@ import six
 class AbstractFilenameMatcher(object):
     @abstractmethod
     def get_matched_files(self):
+        pass
+
+    @abstractmethod
+    def is_belong_to_matcher(self, line_source):
         pass
 
 
@@ -24,6 +29,10 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
         else:
             # TODO: finding files in others hosts
             raise NotImplementedError
+
+    def is_belong_to_matcher(self, line_source):
+        return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(line_source.path,
+                                                                                        self.path_pattern)
 
     def __repr__(self):
         return "(WildCardFilenameMatcher: %s, %s, %s)" % (

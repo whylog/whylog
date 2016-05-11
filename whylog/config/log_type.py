@@ -14,3 +14,9 @@ class LogType(object):
                 if file_source not in parsed_files:
                     parsed_files.add(file_source)
                     yield file_source
+
+    def is_belong_to_log_type(self, line_source):
+        for matcher in self.filename_matchers:
+            if matcher.is_belong_to_matcher(line_source):
+                return True
+        return False

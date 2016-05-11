@@ -4,9 +4,8 @@ from datetime import datetime
 
 import six
 
-from whylog.config.filename_matchers import WildCardFilenameMatcher
+
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
-from whylog.config.log_type import LogType
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parser_subset import ConcatenatedRegexParser
 from whylog.config.rule import RegexRuleFactory
@@ -68,9 +67,10 @@ class AbstractConfig(object):
         pass
 
     def get_log_type(self, front_input):
-        # TODO: remove mock
-        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
-        return LogType('default', [matcher])
+        line_source = front_input.line_source
+        for log_type in six.itervalues(self._log_types):
+            if log_type.is_belong_to_log_type(line_source):
+                return log_type
 
     def create_investigation_plan(self, front_input, log_type):
         matching_parsers, effect_params = self._find_matching_parsers(
