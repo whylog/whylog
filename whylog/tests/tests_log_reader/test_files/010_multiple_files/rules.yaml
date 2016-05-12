@@ -3,3 +3,4 @@ causes: [cause]
 effect: effect
 constraints: []
 #node: different
+linkage: AND

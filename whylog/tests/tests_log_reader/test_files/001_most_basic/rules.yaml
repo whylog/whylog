@@ -2,3 +2,4 @@
 causes: [cause]
 effect: effect
 constraints: []
+linkage: AND

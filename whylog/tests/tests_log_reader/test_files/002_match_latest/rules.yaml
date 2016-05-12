@@ -4,3 +4,4 @@ effect: effect
 constraints: []
 # unsupported constraint type
 #    - {type: latest}
+linkage: AND
