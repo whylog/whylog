@@ -13,6 +13,12 @@ class Rule(object):
     LINKAGE_OR = "OR"
     LINKAGE_NOT = "NOT"
 
+    LINKAGE_SELECTOR = {
+        LINKAGE_AND: Verifier.constraints_and,
+        LINKAGE_OR: Verifier.constraints_or
+        # TODO: add support for NOT
+    }
+
     def __init__(self, causes, effect, constraints, linkage):
         self._causes = causes
         self._effect = effect
@@ -61,8 +67,7 @@ class Rule(object):
         ]
         effect_clue = effect_clues_dict[self._effect.name]
         constraint_manager = ConstraintManager()
-        # TODO check basing on improved rule what should be used: and, or, not
-        return Verifier.constraints_and(
+        return self.LINKAGE_SELECTOR[self._linkage](
             clues_lists, effect_clue, self._constraints, constraint_manager
         )
 
@@ -132,8 +137,9 @@ class AbstractRuleFactory(object):
     def from_dao(cls, serialized_rule, parsers):
         # TODO: restore serialized_rule["linkage"] when UserRuleIntent will support rule linkage
         return Rule(
-            [parsers[cause] for cause in serialized_rule["causes"]],
-            parsers[serialized_rule["effect"]], serialized_rule["constraints"],
+            [
+                parsers[cause] for cause in serialized_rule["causes"]
+            ], parsers[serialized_rule["effect"]], serialized_rule["constraints"],
             serialized_rule.get("linkage", Rule.LINKAGE_AND)
         )
 
