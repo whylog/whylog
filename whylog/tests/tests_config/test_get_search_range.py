@@ -61,11 +61,16 @@ class TestBasic(TestCase):
         expected_ranges = {
             'database': {
                 'date': {
-                    'max': datetime(2016, 4, 12, 23, 53, 3),
-                    'min': datetime(2016, 4, 12, 23, 54, 33)
+                    'left_bound': datetime(2016, 4, 12, 23, 53, 3),
+                    'right_bound': datetime(2016, 4, 12, 23, 54, 33)
                 }
             },
-            'apache': {'date': {'max': datetime(2016, 4, 12, 23, 54, 33)}}
+            'apache': {
+                'date': {
+                    'left_bound': datetime(2016, 4, 12, 23, 54, 33),
+                    'right_bound': effect_time
+                }
+            }
         }
 
         assert calculated_ranges == expected_ranges

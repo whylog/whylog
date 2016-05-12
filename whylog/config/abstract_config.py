@@ -152,11 +152,16 @@ class AbstractConfig(object):
         return {
             'database': {
                 'date': {
-                    'max': datetime(2016, 4, 12, 23, 53, 3),
-                    'min': datetime(2016, 4, 12, 23, 54, 33)
+                    'left_bound': datetime(2016, 4, 12, 23, 53, 3),
+                    'right_bound': datetime(2016, 4, 12, 23, 54, 33)
                 }
             },
-            'apache': {'date': {'max': datetime(2016, 4, 12, 23, 54, 33)}}
+            'apache': {
+                'date': {
+                    'left_bound': datetime(2016, 4, 12, 23, 54, 33),
+                    'right_bound': datetime(2016, 4, 12, 23, 54, 43)
+                }
+            }
         }
 
     def is_free_parser_name(self, parser_name, black_list):

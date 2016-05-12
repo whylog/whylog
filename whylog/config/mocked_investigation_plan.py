@@ -23,7 +23,14 @@ def mocked_investigation_plan():
     )
     concatenated = ConcatenatedRegexParser([cause])
     effect_time = datetime(2015, 12, 3, 12, 8, 9)
-    search_range = {'database': {'date': {'max': datetime(2015, 12, 3, 12, 8, 8)}}}
+    search_range = {
+        'default': {
+            'date': {
+                'left_bound': datetime(2015, 12, 3, 12, 8, 8),
+                'right_bound': effect_time
+            }
+        }
+    }
     default_investigation_step = InvestigationStep(concatenated, search_range)
     rule = Rule(
         [cause], effect, [
