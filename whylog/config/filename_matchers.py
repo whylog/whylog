@@ -12,7 +12,7 @@ class AbstractFilenameMatcher(object):
         pass
 
     @abstractmethod
-    def is_belong_to_matcher(self, line_source):
+    def does_belong_to_matcher(self, line_source):
         pass
 
 
@@ -30,7 +30,7 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
             # TODO: finding files in others hosts
             raise NotImplementedError
 
-    def is_belong_to_matcher(self, line_source):
+    def does_belong_to_matcher(self, line_source):
         return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(
             line_source.path, self.path_pattern
         )

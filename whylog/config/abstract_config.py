@@ -4,7 +4,6 @@ from datetime import datetime
 
 import six
 
-
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parser_subset import ConcatenatedRegexParser
@@ -76,7 +75,7 @@ class AbstractConfig(object):
     def get_log_type(self, front_input):
         line_source = front_input.line_source
         for log_type in six.itervalues(self._log_types):
-            if log_type.is_belong_to_log_type(line_source):
+            if log_type.does_belong_to_log_type(line_source):
                 return log_type
 
     def create_investigation_plan(self, front_input, log_type):
