@@ -6,18 +6,6 @@ from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
-class PatternGroup(object):
-    """
-    Keeps "coordinates" of group that represents param in text
-    :param line_id: id of line to which group belongs.
-    :param number: number of group in line.
-                   Groups don't overlap. Numeration from left, from 1.
-    """
-
-    def __init__(self, line_id, group_number_in_line):
-        self.line_id = line_id
-        self.number = group_number_in_line
-
 # :type line: FrontInput
 TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
 
@@ -136,7 +124,7 @@ class Teacher(object):
         self._constraint_base[constraint_id] = constraint
         new_constraint_links = [
             (line_id, group_no, constraint_id) for (line_id, group_no) in constraint.groups
-            ]
+        ]
         self._constraint_links.add_links(new_constraint_links)
 
     def remove_constraint(self, constraint_id):

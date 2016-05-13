@@ -34,6 +34,9 @@ class TestBase(TestCase):
         self._add_test_rule()
 
     def _add_test_rule(self):
+        """
+        Adds Rule with no constraints.
+        """
         line_content = r'2015-12-03 12:11:00 Error occurred in reading test'
         line_source = LineSource('sample_host', 'sample_path')
         offset = 42
@@ -42,7 +45,7 @@ class TestBase(TestCase):
         self.teacher.add_line(self.effect_id, self.effect_front_input, effect=True)
 
         cause1_line_content = r'2015-12-03 12:10:55 Data is missing on comp21'
-        cause1_line_source = None
+        cause1_line_source = LineSource('sample_host1', 'sample_path1')
         cause1_offset = 30
         cause1_front_input = FrontInput(cause1_offset, cause1_line_content, cause1_line_source)
         self.cause1_id = 1
@@ -51,16 +54,15 @@ class TestBase(TestCase):
         self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
 
         cause2_line_content = r'2015-12-03 12:10:50 Data migration to comp21 failed in test 123'
-        cause2_line_source = None
+        cause2_line_source = LineSource('sample_host2', 'sample_path2')
         cause2_offset = 21
         cause2_front_input = FrontInput(cause2_offset, cause2_line_content, cause2_line_source)
-        self.cause2_id = 2
-        self.teacher.add_line(self.cause2_id, cause2_front_input)
+        cause2_id = 2
+        self.teacher.add_line(cause2_id, cause2_front_input)
         cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
-        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
+        self.teacher.update_pattern(cause2_id, cause2_pattern)
 
-        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
-
+        self.identical_groups = [(self.cause1_id, 2), (cause2_id, 2)]
 
     def tearDown(self):
         self._clean_test_files()
@@ -130,8 +132,7 @@ class TestConstraints(TestBase):
 
     def test_remove_line(self):
         """
-        Removing line which is related with constraint
-        should indicate removal of this constraint.
+        Removing line should indicate removal of related constraints.
         """
         self._register_identical_constraint()
 
@@ -143,8 +144,7 @@ class TestConstraints(TestBase):
 
     def test_update_pattern(self):
         """
-        Updating pattern of line which is related with constraint
-        should indicate removal of this constraint
+        Updating pattern of line should indicate removal of related constraints.
         (even if new pattern is the same as old or has the same groups)
         """
         self._register_identical_constraint()

@@ -33,7 +33,6 @@ class UserConstraintIntent(object):
         return self.__dict__ == other.__dict__
 
 
-
 class UserRuleIntent(object):
     def __init__(self, effect_id, parsers=None, constraints=None):
         self.effect_id = effect_id
