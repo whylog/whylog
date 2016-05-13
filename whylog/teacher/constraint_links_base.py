@@ -46,8 +46,7 @@ class ConstraintLinksBase:
 
     def _select_by_group(self, select_line_id, select_group_no):
         return [
-            link
-            for link in self.links
+            link for link in self.links
             if link.line_id == select_line_id and link.group_no == select_group_no
         ]
 

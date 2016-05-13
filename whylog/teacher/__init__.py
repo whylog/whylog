@@ -5,7 +5,6 @@ import six
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
-
 # :type line: FrontInput
 TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
 
