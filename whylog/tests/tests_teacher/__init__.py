@@ -5,9 +5,10 @@ from whylog.assistant.pattern_match import ParamGroup
 from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.config import YamlConfig
 from whylog.config.investigation_plan import LineSource
+from whylog.constraints import IdenticalConstraint
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
-from whylog.teacher.user_intent import UserParserIntent
+from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_teacher', 'test_files']
@@ -40,6 +41,27 @@ class TestBase(TestCase):
         self.effect_id = 0
         self.teacher.add_line(self.effect_id, self.effect_front_input, effect=True)
 
+        cause1_line_content = r'2015-12-03 12:10:55 Data is missing on comp21'
+        cause1_line_source = None
+        cause1_offset = 30
+        cause1_front_input = FrontInput(cause1_offset, cause1_line_content, cause1_line_source)
+        self.cause1_id = 1
+        self.teacher.add_line(self.cause1_id, cause1_front_input)
+        self.cause1_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$'
+        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
+
+        cause2_line_content = r'2015-12-03 12:10:50 Data migration to comp21 failed in test 123'
+        cause2_line_source = None
+        cause2_offset = 21
+        cause2_front_input = FrontInput(cause2_offset, cause2_line_content, cause2_line_source)
+        self.cause2_id = 2
+        self.teacher.add_line(self.cause2_id, cause2_front_input)
+        cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
+        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
+
+        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
+
+
     def tearDown(self):
         self._clean_test_files()
 
@@ -70,3 +92,65 @@ class TestParser(TestBase):
             self.effect_front_input.line_source,
         )  # yapf: disable
         assert wanted_effect_parser == effect_parser
+
+
+class TestConstraints(TestBase):
+    def _register_identical_constraint(self, constraint_id=1):
+        constraint = IdenticalConstraint(groups=self.identical_groups)
+        self.teacher.register_constraint(constraint_id, constraint)
+
+    def _constraints_absence_check(self):
+        user_rule = self.teacher.get_rule()
+        assert not user_rule.constraints
+        assert not self.teacher._constraint_base
+        assert not self.teacher._constraint_links.get_links()
+
+    def _constraints_presence_check(self):
+        user_rule = self.teacher.get_rule()
+        assert user_rule.constraints
+        assert self.teacher._constraint_base
+        assert self.teacher._constraint_links.get_links()
+
+    def test_register_and_remove_constraint(self):
+        self._constraints_absence_check()
+
+        constraint_id = 1
+        constraint = IdenticalConstraint(groups=self.identical_groups)
+        self.teacher.register_constraint(constraint_id, constraint)
+        user_rule = self.teacher.get_rule()
+
+        wanted_constraint = UserConstraintIntent(IdenticalConstraint.TYPE, self.identical_groups)
+        assert wanted_constraint == user_rule.constraints[0]
+
+        self._constraints_presence_check()
+
+        self.teacher.remove_constraint(constraint_id)
+
+        self._constraints_absence_check()
+
+    def test_remove_line(self):
+        """
+        Removing line which is related with constraint
+        should indicate removal of this constraint.
+        """
+        self._register_identical_constraint()
+
+        self._constraints_presence_check()
+
+        self.teacher.remove_line(self.cause1_id)
+
+        self._constraints_absence_check()
+
+    def test_update_pattern(self):
+        """
+        Updating pattern of line which is related with constraint
+        should indicate removal of this constraint
+        (even if new pattern is the same as old or has the same groups)
+        """
+        self._register_identical_constraint()
+
+        self._constraints_presence_check()
+
+        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
+
+        self._constraints_absence_check()
