@@ -39,7 +39,7 @@ class BacktrackSearcher(AbstractSearcher):
         """
         for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
             line_content, line_offset = line
-            if investigation_step.is_line_in_time_range(line_content):
+            if investigation_step.is_line_in_search_range(line_content):
                 return line_offset
 
     @classmethod

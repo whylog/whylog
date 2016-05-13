@@ -1,7 +1,3 @@
-from datetime import datetime
-
-import dateutil.parser
-import dateutil.tz
 import six
 
 
@@ -37,22 +33,14 @@ class InvestigationStep(object):
     This class is responsible for finding all possible Clues from parsed logs.
     Also controls searched time range in logs file.
     """
-    EARLIEST_DATE = datetime.min.replace(tzinfo=dateutil.tz.tzutc())
 
-    def __init__(self, parser_subset, effect_time, earliest_cause_time=EARLIEST_DATE):
+    def __init__(self, parser_subset, search_ranges):
         self._parser_subset = parser_subset
-        self.effect_time = InvestigationStep.add_zero_timezone(effect_time)
-        self.earliest_cause_time = InvestigationStep.add_zero_timezone(earliest_cause_time)
+        self._search_ranges = search_ranges
 
-    def is_line_in_time_range(self, line):
+    def is_line_in_search_range(self, super_parser_groups):
         #TODO: write method that check that line is in primary key values range
         return True
-
-    @classmethod
-    def add_zero_timezone(cls, date):
-        if date.tzinfo is None:
-            return date.replace(tzinfo=dateutil.tz.tzutc())
-        return date
 
     def get_clues(self, line, offset, line_source):
         converted_params = self._parser_subset.convert_parsers_groups_from_matched_line(line)
