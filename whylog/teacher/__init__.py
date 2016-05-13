@@ -139,9 +139,9 @@ class Teacher(object):
         for constraint_id in constraints_to_remove:
             self.remove_constraint(constraint_id)
 
-    def _remove_constraint_by_group(self, group):
+    def _remove_constraint_by_group(self, line_id, group_number):
         constraints_to_remove = self._constraint_links.remove_links_by_group(
-            group.line_id, group.number
+            line_id, group_number
         )
         for constraint_id in constraints_to_remove:
             self.remove_constraint(constraint_id)
