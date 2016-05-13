@@ -48,7 +48,7 @@ class ConstraintLinksBase:
         return [
             link for link in self.links
             if link.line_id == select_line_id and link.group_no == select_group_no
-        ]
+        ]  # yapf: disable
 
     def _select_by_constraint(self, select_constraint_id):
         return [link for link in self.links if link.constraint_id == select_constraint_id]
