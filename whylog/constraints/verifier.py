@@ -171,7 +171,7 @@ class Verifier(object):
                 constraint
                 for constraint in constraints
                 if cls._verify_constraint(combination, effect, constraint, constraint_manager)
-            ]
+            ]  # yapf: disable
             if verified_constraints:
                 causes.append(
                     cls._pack_results_for_constraint_or(
