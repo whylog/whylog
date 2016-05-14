@@ -17,6 +17,14 @@ class UnsupportedConstraintTypeError(VerificationError):
         return "No such constraint (%s) registered" % self._constraint_data['name']
 
 
+class WrongConstraintClassSetup(VerificationError):
+    def __init__(self, constraint_type):
+        self._constraint_type = constraint_type
+
+    def __str__(self):
+        return "Constraint object '%s' was incorrectly constructed" % self._constraint_type
+
+
 class ConstructorParamsError(ConstraintError):
     def __init__(self, constraint_type, correct_param_names, incorrect_param_names):
         self.constraint_type = constraint_type

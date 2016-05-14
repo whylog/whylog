@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 import six
 
 from whylog.constraints.const import ConstraintType
-from whylog.constraints.exceptions import ConstructorGroupsCountError, ConstructorParamsError
+from whylog.constraints.exceptions import ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
 from whylog.teacher.user_intent import UserConstraintIntent
 
 
@@ -146,33 +146,39 @@ class TimeConstraint(AbstractConstraint):
 
     PARAMS = sorted([MIN_DELTA, MAX_DELTA])
 
+    def __init__(self, groups=None, param_dict=None, params_checking=True):
+        super(TimeConstraint, self).__init__(groups, param_dict, params_checking)
+        param_min_delta = self.params.get(self.MIN_DELTA)
+        param_max_delta = self.params.get(self.MAX_DELTA)
+        if param_min_delta is not None and param_max_delta is not None:
+            self.verify = self._verify_both
+            self._min_delta = datetime.timedelta(seconds=param_min_delta)
+            self._max_delta = datetime.timedelta(seconds=param_max_delta)
+        elif param_max_delta is not None:
+            self.verify = self._verify_max
+            self._max_delta = datetime.timedelta(seconds=param_max_delta)
+        elif param_min_delta is not None:
+            self.verify = self._verify_min
+            self._min_delta = datetime.timedelta(seconds=param_min_delta)
+
     def _check_optional_params(self, correct_param_names, actual_param_names):
         if self.MIN_DELTA not in actual_param_names and self.MAX_DELTA not in actual_param_names:
             raise ConstructorParamsError(self.TYPE, correct_param_names, actual_param_names)
 
-    def verify(self, group_contents, param_dict):
-        """
-        :param group_contents
-        group_contents[0] = date supposed to be earlier
-        group_contents[1] = date supposed to be later
-        :param param_dict
-        contains 'min_delta' and 'max_delta', time interval between
-        two given dates should satisfy requirement:
-        min_delta <= time delta <= max_delta
-        """
+    def _verify_min(self, group_contents, param_dict):
         earlier_date, later_date = group_contents
-        actual_delta = later_date - earlier_date
-        param_min_delta = param_dict.get(self.MIN_DELTA)
-        param_max_delta = param_dict.get(self.MAX_DELTA)
-        if param_min_delta is not None and actual_delta < datetime.timedelta(
-            seconds=param_min_delta
-        ):
-            return False
-        if param_max_delta is not None and actual_delta > datetime.timedelta(
-            seconds=param_max_delta
-        ):
-            return False
-        return True
+        return later_date - earlier_date >= self._min_delta
+
+    def _verify_max(self, group_contents, param_dict):
+        earlier_date, later_date = group_contents
+        return later_date - earlier_date <= self._max_delta
+
+    def _verify_both(self, group_contents, param_dict):
+        earlier_date, later_date = group_contents
+        return self._max_delta >= later_date - earlier_date >= self._min_delta
+
+    def verify(self, group_contents, param_dict):
+        raise WrongConstraintClassSetup(self.TYPE)
 
 
 class IdenticalConstraint(AbstractConstraint):
