@@ -1,8 +1,8 @@
 #!/bin/bash -ux
 
 base_remote="${1:-origin}"
-base_branch="${1:-master}"
-base_remote_branch="${1:-master}"
+base_branch="${2:-master}"
+base_remote_branch="${3:-master}"
 
 set +e
 
