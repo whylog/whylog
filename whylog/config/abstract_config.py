@@ -5,7 +5,7 @@ from datetime import datetime
 import six
 
 from whylog.config.filename_matchers import WildCardFilenameMatcher
-from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep, LineSource
+from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
 from whylog.config.log_type import LogType
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parser_subset import ConcatenatedRegexParser
@@ -67,6 +67,11 @@ class AbstractConfig(object):
     def _save_parsers_definition(self, parser_definitions):
         pass
 
+    def get_log_type(self, front_input):
+        # TODO: remove mock
+        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
+        return LogType('default', [matcher])
+
     def create_investigation_plan(self, front_input, log_type):
         matching_parsers, effect_params = self._find_matching_parsers(
             front_input.line_content, log_type.name
@@ -79,20 +84,13 @@ class AbstractConfig(object):
         )
         return InvestigationPlan(suspected_rules, steps, effect_clues)
 
-    def get_log_type(self, front_input):
-        # TODO: remove mock
-        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
-        return LogType('default', [matcher])
-
     def _create_effect_clues(self, effect_params, front_input):
         effect_clues = {}
-        # TODO: remove mocks line source should come from front_input
-        line_source = LineSource('localhost', 'node_1.log')
         for parser_name, params in six.iteritems(effect_params):
             parser = self._parsers[parser_name]
             clue = Clue(
                 parser.convert_params(params), front_input.line_content, front_input.offset,
-                line_source
+                front_input.line_source
             )
             effect_clues[parser_name] = clue
         return effect_clues
@@ -142,16 +140,29 @@ class AbstractConfig(object):
 
     def _create_steps_in_investigation(self, concatenated_parsers, suspected_rules, effect_clues):
         steps = []
+        search_ranges = self._get_search_ranges(suspected_rules, effect_clues)
         for log_type_name, parser in six.iteritems(concatenated_parsers):
             log_type = self._log_types[log_type_name]
-            #TODO mocked for 003_test
-            #TODO calculate effect time(or other primary key value) and earliest cause time(or other primary key value)
-            #TODO base on effect_clues and suspected_rules per log type
-            effect_time = datetime(2015, 12, 3, 12, 8, 9)  #TODO remove mock
-            earliest_cause_time = datetime(2015, 12, 3, 12, 8, 8)  #TODO remove mock
-            investigation_step = InvestigationStep(parser, effect_time, earliest_cause_time)
+            investigation_step = InvestigationStep(parser, search_ranges.get(log_type_name, {}))
             steps.append((investigation_step, log_type))
         return steps
+
+    def _get_search_ranges(self, suspected_rules, effect_clues):
+        #TODO: remove mock
+        return {
+            'database': {
+                'date': {
+                    'left_bound': datetime(2016, 4, 12, 23, 53, 3),
+                    'right_bound': datetime(2016, 4, 12, 23, 54, 33)
+                }
+            },
+            'apache': {
+                'date': {
+                    'left_bound': datetime(2016, 4, 12, 23, 54, 33),
+                    'right_bound': datetime(2016, 4, 12, 23, 54, 43)
+                }
+            }
+        }
 
     def is_free_parser_name(self, parser_name, black_list):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
