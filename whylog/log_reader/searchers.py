@@ -95,7 +95,7 @@ class BacktrackSearcher(AbstractSearcher):
             offset = self._deduce_offset(investigation_step)
         for line, actual_offset in self._reverse_from_offset(offset):
             # TODO: remove mock
-            line_source = LineSource('localhost', os.path.split(self._file_path)[1])
+            line_source = LineSource('localhost', self._file_path)
             clues_from_line = investigation_step.get_clues(line, actual_offset, line_source)
             self._merge_clues(clues, clues_from_line)
         return clues
