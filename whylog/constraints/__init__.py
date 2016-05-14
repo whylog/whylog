@@ -162,6 +162,8 @@ class TimeConstraint(AbstractConstraint):
         elif param_min_delta is not None:
             self.verify = self._verify_min
             self._min_delta = datetime.timedelta(seconds=param_min_delta)
+        else:
+            raise WrongConstraintClassSetup(self.TYPE)
 
     def _check_optional_params(self, correct_param_names, actual_param_names):
         if self.MIN_DELTA not in actual_param_names and self.MAX_DELTA not in actual_param_names:
@@ -180,7 +182,7 @@ class TimeConstraint(AbstractConstraint):
         return self._max_delta >= later_date - earlier_date >= self._min_delta
 
     def verify(self, group_contents, param_dict):
-        raise WrongConstraintClassSetup(self.TYPE)
+        pass
 
 
 class IdenticalConstraint(AbstractConstraint):
