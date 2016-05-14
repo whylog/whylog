@@ -8,15 +8,18 @@ from whylog.front.utils import FrontInput
 
 class ConstraintRegistry(object):
     CONSTRAINTS = {
-        'identical': IdenticalConstraint(params_checking=False),
-        'time': TimeConstraint(params_checking=False)
+        'identical': IdenticalConstraint,
+        'time': TimeConstraint
         # register your constraint here
     }
 
     @classmethod
     def get_constraint(cls, constraint_data):
         if constraint_data['name'] in cls.CONSTRAINTS:
-            return cls.CONSTRAINTS[constraint_data['name']]
+            return cls.CONSTRAINTS[constraint_data['name']](
+                param_dict=constraint_data['params'],
+                params_checking=False
+            )
         raise UnsupportedConstraintTypeError(constraint_data)
 
 
@@ -168,7 +171,7 @@ class Verifier(object):
                 constraint
                 for constraint in constraints
                 if cls._verify_constraint(combination, effect, constraint, constraint_manager)
-            ]
+            ]  # yapf: disable
             if verified_constraints:
                 causes.append(
                     cls._pack_results_for_constraint_or(
