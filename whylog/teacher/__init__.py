@@ -1,13 +1,14 @@
+from collections import namedtuple
+
 import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
-from whylog.teacher.mock_outputs import create_sample_rule
+from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
 class PatternGroup(object):
     """
     Keeps "coordinates" of group that represents param in text
-
     :param line_id: id of line to which group belongs.
     :param number: number of group in line.
                    Groups don't overlap. Numeration from left, from 1.
@@ -17,16 +18,14 @@ class PatternGroup(object):
         self.line_id = line_id
         self.number = group_number_in_line
 
-
-class TeacherParser(object):
-    def __init__(self, line_object):
-        self.line = line_object
+# :type line: FrontInput
+TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
 
 
 class Teacher(object):
     """
     Enable teaching new rule. One Teacher per one entering rule.
-
+    :type pattern_assistant: AbstractAssistant
     :type _parsers: dict[int, TeacherParser]
     :type _constraint_base: dict[int, AbstractConstraint]
     :param _constraint_links: Keeps links between constraints and groups.
@@ -47,22 +46,42 @@ class Teacher(object):
     def add_line(self, line_id, line_object, effect=False):
         """
         Adds new line to rule.
-
         If line_id already exists, old line is overwritten by new line
         and all constraints related to old line are removed.
-
         """
         if line_id in six.iterkeys(self._parsers):
             self.remove_line(line_id)
         if effect:
             self.effect_id = line_id
+        self._add_default_parser(line_id, line_object)
+
+    def _get_names_blacklist(self):
+        return [parser.name for parser in six.itervalues(self._parsers)]
+
+    def _add_default_parser(self, line_id, line_object):
         self.pattern_assistant.add_line(line_id, line_object)
-        self._parsers[line_id] = TeacherParser(line_object)
+
+        default_pattern_match = self.pattern_assistant.get_pattern_match(line_id)
+        default_pattern = default_pattern_match.pattern
+        default_groups = default_pattern_match.param_groups
+
+        default_name = self.config.propose_parser_name(
+            line_object.line_content, default_pattern, self._get_names_blacklist()
+        )
+        if default_groups:
+            default_primary_key = [min(default_groups.keys())]
+        else:
+            default_primary_key = []
+        default_log_type_name = None
+
+        new_teacher_parser = TeacherParser(
+            line_object, default_name, default_primary_key, default_log_type_name
+        )
+        self._parsers[line_id] = new_teacher_parser
 
     def remove_line(self, line_id):
         """
         Removes line from rule.
-
         Assumption: line with line_id exists in rule.
         Removes also all constraints related to this line.
         """
@@ -71,33 +90,21 @@ class Teacher(object):
         self.pattern_assistant.remove_line(line_id)
         del self._parsers[line_id]
 
-    def update_pattern(self, line_id, proposed_pattern):
+    def update_pattern(self, line_id, pattern):
         """
         Loads text pattern proposed by user, verifies if it matches line text.
         """
-        pass
+        self.pattern_assistant.update_by_pattern(line_id, pattern)
 
-    def make_group(self, line_id, span):
+    def guess_patterns(self, line_id):
         """
-        Improves text pattern by adding group corresponding to param in text.
+        Returns list of guessed patterns for a line.
+        """
+        pattern_matches = self.pattern_assistant.guess_pattern_matches(line_id)
+        return [pattern_match.pattern for pattern_match in pattern_matches]
 
-        Removes (or maybe updates) constraints related to groups in line with line_id
-        """
-        pass
-
-    def remove_group(self, pattern_group):
-        """
-        Improves text pattern by removing group corresponding to param in text.
-
-        Removes (or maybe updates) constraints related to groups in line with line_id
-        """
-        pass
-
-    def guess_pattern(self, line_id):
-        """
-        Guess text pattern for line text.
-        """
-        pass
+    def choose_guessed_pattern(self, line_id, pattern_id):
+        self.pattern_assistant.update_by_guessed_pattern_match(line_id, pattern_id)
 
     def set_pattern_name(self, line_id, name):
         pass
@@ -114,10 +121,8 @@ class Teacher(object):
     def register_constraint(self, constraint_id, pattern_groups, constraint):
         """
         Adds new constraint to rule.
-
         If constraint_id already exists, constraint with this constraint_id
         is overwritten by new constraint
-
         :param pattern_groups: groups in pattern that are linked by constraint
         :type pattern_groups: list[PatternGroup]
         """
@@ -133,7 +138,6 @@ class Teacher(object):
     def remove_constraint(self, constraint_id):
         """
         Removes constraint from rule.
-
         Assumption: Constraint already exists in rule.
         """
         self._constraint_links.remove_links_by_constraint(constraint_id)
@@ -173,16 +177,36 @@ class Teacher(object):
         """
         pass
 
+    def _prepare_user_parser(self, line_id):
+        """
+        :type pattern_match: PatternMatch
+        """
+        pattern_match = self.pattern_assistant.get_pattern_match(line_id)
+        teacher_parser = self._parsers[line_id]
+        pattern_type = self.pattern_assistant.TYPE
+        return UserParserIntent(
+            pattern_type, teacher_parser.name, pattern_match.pattern, teacher_parser.log_type,
+            teacher_parser.primary_keys, pattern_match.param_groups,
+            teacher_parser.line.line_content, teacher_parser.line.offset,
+            teacher_parser.line.line_source
+        )  # yapf: disable
+
     def get_rule(self):
         """
         Creates rule for Front that will be shown to user
         """
-        #TODO: remove mock
-        return create_sample_rule()
+        user_parsers = dict(
+            (line_id, self._prepare_user_parser(line_id)) for line_id in six.iterkeys(self._parsers)
+        )
+        user_constraints = [
+            constraint.convert_to_user_constraint_intent()
+            for constraint in six.itervalues(self._constraint_base)
+        ]
+        return UserRuleIntent(self.effect_id, user_parsers, user_constraints)
 
     def save(self):
         """
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
-        #TODO: remove mock
-        self.config.add_rule(create_sample_rule())
+        # TODO: validate rule
+        self.config.add_rule(self.get_rule())

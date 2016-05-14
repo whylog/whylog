@@ -1,10 +1,13 @@
 import os.path
 from unittest import TestCase
 
+import six
+import yaml
 from generator import generate, generator
-from nose.plugins.skip import SkipTest
 
 from whylog.config import YamlConfig
+from whylog.config.investigation_plan import LineSource
+from whylog.constraints.verifier import InvestigationResult
 from whylog.front.utils import FrontInput
 from whylog.log_reader import LogReader
 from whylog.tests.tests_log_reader.constants import TestPaths
@@ -30,48 +33,66 @@ class TestBasic(TestCase):
         """ returns offset of line 'line_no' in file 'file_path' """
         return sum([len(line) for line in open(file_path)][0:line_no])
 
+    def _deduce_line_offset_by_unique_content(self, file_path, line_content):
+        all_lines = [line.rstrip('\n') for line in open(file_path)]
+        line_no = all_lines.index(line_content)
+        return self._deduce_line_offset(file_path, line_no)
+
     def _get_last_line_from_file(self, file_path):
         return [line.rstrip('\n') for line in open(file_path)][-1]
 
+    def _investigation_results_from_yaml(self, yaml_file, real_log_file):
+        file_content = yaml.load(open(yaml_file))
+        results = []
+        for result in file_content:
+            causes = [
+                FrontInput(
+                    self._deduce_line_offset_by_unique_content(real_log_file, line_str), line_str,
+                    LineSource("localhost", "node_1.log")
+                ) for line_str in result['causes']
+            ]  # yapf: disable
+            results.append(InvestigationResult(causes, result['constraints'], result['linkage']))
+        return results
+
     @generate(
         '001_most_basic',
-        '002_match_latest',
+        # '002_match_latest',
         '003_match_time_range',
-        '005_match_tree',
+        # '005_match_tree',
         '006_match_parameter',
-        '007_match_or',
+        # '007_match_or',
         '008_match_and',
-        '009_match_negation',
-        '010_multiple_files',
-        '011_different_entry',
-        '012_multiple_rulebooks',
-        '013_match_and_incomplete',
+        # '009_match_negation',
+        # '010_multiple_files',
+        # '011_different_entry',
+        # '012_multiple_rulebooks',
+        # '013_match_and_incomplete',
     )
     def test_one(self, test_name):
+        # paths files setup
         prefix_path = os.path.join(*TestPaths.path_test_files)
         path = os.path.join(prefix_path, test_name)
         input_path = os.path.join(path, 'input.txt')
-        output_path = os.path.join(path, 'expected_output.txt')
+        # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
         log_file = os.path.join(path, 'node_1.log')
+        results_file = os.path.join(path, 'investigation_results.yaml')
 
-        # TODO this 'if' is temporary, remove this later
-        if not test_name == '003_match_time_range':
-            raise SkipTest("Functionality not implemented yet")
-
+        # gathering information about effect line
         line_number = self._get_cause_line_number(input_path)
         line_content = self._get_concrete_line_from_file(log_file, line_number)
         effect_line_offset = self._deduce_line_offset(log_file, line_number)
 
+        # preparing Whylog structures, normally prepared by Front
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         log_reader = LogReader(whylog_config)
-        line = FrontInput(effect_line_offset, line_content, prefix_path)
+        effect_line = FrontInput(effect_line_offset, line_content, prefix_path)
 
-        result = log_reader.get_causes(line)
-
-        if test_name == '003_match_time_range':
-            # TODO this 'if' is temporary, remove this later
-            assert result
-            assert result[0].lines[0].line_content == self._get_last_line_from_file(output_path)
-            # ^ hack basing on that for test 003 last line of expected_output.txt is a cause line
-            # FIXME it is not appropriate for each test
-            # FIXME checking up correctness should be more advanced for more advanced tests
+        # action and checking the result
+        results = log_reader.get_causes(effect_line)
+        assert results
+        expected_results = self._investigation_results_from_yaml(results_file, log_file)
+        assert len(results) == len(expected_results)
+        for got, real in six.moves.zip(results, expected_results):
+            assert got.lines == real.lines
+            for constr_got, constr_real in zip(got.constraints, real.constraints):
+                assert constr_got['name'] == constr_real['name']

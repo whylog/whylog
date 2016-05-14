@@ -5,9 +5,31 @@ Regex verification and creating (but not finding groups in regex)
 import re
 
 from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
+from whylog.assistant.span_list import SpanList
 
 special_characters = frozenset('.^$*+{}?[]|()]')
 group_pattern = re.compile(r"[a-zA-Z]+|[0-9]+|\s+|[\W]+")
+
+
+def regex_from_group_spans(group_spans, line_text):
+    sorted_group_spans = group_spans.sort_by_start_and_end()
+    # TODO:
+    # [(1,5), (2, 3)] -> [(1,5)]
+    # [(1,5), (3, 7)] -> Error somewhere
+    greedy_group_spans = SpanList.not_overlapping_spans(sorted_group_spans)
+    complement_spans = greedy_group_spans.complementary_spans(
+        0, len(line_text), create_obvious_regex
+    )
+    line_spans = (complement_spans + greedy_group_spans).sort_by_start_and_end()
+
+    regex = r""
+    for span in line_spans:
+        span.update_pattern(line_text)
+        span_pattern = span.pattern
+        if span.is_param:
+            span_pattern = "(" + span_pattern + ")"
+        regex += span_pattern
+    return regex
 
 
 def verify_regex(regex, text):
@@ -18,8 +40,14 @@ def verify_regex(regex, text):
     """
 
     # regex must match a whole text from its beginning to end.
-    matcher = re.match('^%s$' % (regex,), text)
+    matcher = re.match('%s$' % (regex,), text)
 
+    if matcher is None:
+        raise NotMatchingRegexError(text, regex)
+
+
+def regex_groups(regex, text):
+    matcher = re.match('%s$' % (regex,), text)
     if matcher is None:
         raise NotMatchingRegexError(text, regex)
     else:

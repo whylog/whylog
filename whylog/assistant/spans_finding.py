@@ -9,7 +9,7 @@ from datetime import datetime
 import six
 from dateutil.parser import parse as date_parse
 
-from whylog.assistant.const import DataType, DateParams
+from whylog.assistant.const import ConverterType, DateParams
 from whylog.assistant.regex_assistant.regex import create_date_regex
 from whylog.assistant.span import Span
 from whylog.assistant.span_list import SpanList
@@ -34,11 +34,9 @@ def find_date_spans(text, regexes=None):
 
 
 def _find_date_spans_by_regex(regexes, text):
-    return _find_spans_by_regex(
-        regexes,
-        text,
-        pattern_creator=create_date_regex,
-        converter=DataType.DATE
+    return find_spans_by_regex(
+        regexes, text, pattern_creator=create_date_regex,
+        converter=ConverterType.TO_DATE
     )  # yapf: disable
 
 
@@ -64,7 +62,9 @@ def _find_date_spans_by_force(text):
 
             if date.year - date_now.year > 1:
                 continue
-            new_span = Span(start, end, pattern_creator=create_date_regex, data_type=DataType.DATE)
+            new_span = Span(
+                start, end, pattern_creator=create_date_regex, converter=ConverterType.TO_DATE
+            )  # yapf: disable
             date_spans.add(new_span)
             not_overlapping_start = end
             # break, because we don't care about shorter date groups
@@ -72,7 +72,7 @@ def _find_date_spans_by_force(text):
     return date_spans
 
 
-def _find_spans_by_regex(regexes, text, pattern_creator=None, converter=DataType.STRING):
+def find_spans_by_regex(regexes, text, pattern_creator=None, converter=ConverterType.TO_STRING):
     spans = set()
     for compiled_regex, regex in six.iteritems(regexes):
         for match in re.finditer(compiled_regex, text):
