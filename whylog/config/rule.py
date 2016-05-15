@@ -136,10 +136,9 @@ class AbstractRuleFactory(object):
     @classmethod
     def from_dao(cls, serialized_rule, parsers):
         # TODO: restore serialized_rule["linkage"] when UserRuleIntent will support rule linkage
+        causes = [parsers[cause] for cause in serialized_rule["causes"]]
         return Rule(
-            [
-                parsers[cause] for cause in serialized_rule["causes"]
-            ], parsers[serialized_rule["effect"]], serialized_rule["constraints"],
+            causes, parsers[serialized_rule["effect"]], serialized_rule["constraints"],
             serialized_rule.get("linkage", Rule.LINKAGE_AND)
         )
 
