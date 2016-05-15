@@ -11,10 +11,6 @@ class AbstractFilenameMatcher(object):
     def get_matched_files(self):
         pass
 
-    @abstractmethod
-    def does_belong_to_matcher(self, line_source):
-        pass
-
 
 class WildCardFilenameMatcher(AbstractFilenameMatcher):
     def __init__(self, host_pattern, path_pattern, log_type_name):
@@ -30,8 +26,7 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
             # TODO: finding files in others hosts
             raise NotImplementedError
 
-    def does_belong_to_matcher(self, line_source):
-        print line_source
+    def __contains__(self, line_source):
         return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(
             line_source.path, self.path_pattern
         )
