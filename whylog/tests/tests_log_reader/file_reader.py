@@ -75,9 +75,12 @@ class OpenedLogsFile(object):
     def __init__(self, *args):
         self._opened_file = OpenedFile(*args)
         self._seek_count = 0
+        self._read_bytes = 0
 
     def read(self, *args):
-        return self._opened_file.read(*args)
+        ret = self._opened_file.read(*args)
+        self._read_bytes += len(ret)
+        return ret
 
     def tell(self):
         return self._opened_file.tell()

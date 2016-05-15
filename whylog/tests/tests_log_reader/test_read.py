@@ -8,9 +8,11 @@ class TestLogsReading(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.opened_file = OpenedLogsFile(
-            datetime.datetime(year=2000,
-                              month=1,
-                              day=1),
+            datetime.datetime(
+                year=2000,
+                month=1,
+                day=1
+            ),
             datetime.timedelta(microseconds=100),
             10000,
             42
