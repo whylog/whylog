@@ -31,6 +31,7 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
             raise NotImplementedError
 
     def does_belong_to_matcher(self, line_source):
+        print line_source
         return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(
             line_source.path, self.path_pattern
         )

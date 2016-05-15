@@ -16,3 +16,4 @@ constraints:
   - [0, 1]
   name: time
   params: {max_delta: 1}
+linkage: AND

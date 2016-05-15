@@ -19,3 +19,6 @@ class LogType(object):
         return any(
             matcher.does_belong_to_matcher(line_source) for matcher in self.filename_matchers
         )
+
+    def __repr__(self):
+        return "(LogType: %s %s)" % (self.name, self.filename_matchers)

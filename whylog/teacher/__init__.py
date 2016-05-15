@@ -5,19 +5,6 @@ import six
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
-
-class PatternGroup(object):
-    """
-    Keeps "coordinates" of group that represents param in text
-    :param line_id: id of line to which group belongs.
-    :param number: number of group in line.
-                   Groups don't overlap. Numeration from left, from 1.
-    """
-
-    def __init__(self, line_id, group_number_in_line):
-        self.line_id = line_id
-        self.number = group_number_in_line
-
 # :type line: FrontInput
 TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
 
@@ -93,8 +80,11 @@ class Teacher(object):
     def update_pattern(self, line_id, pattern):
         """
         Loads text pattern proposed by user, verifies if it matches line text.
+        Removes constraints related with updating line
+        TODO: Update related constraints rather than remove.
         """
         self.pattern_assistant.update_by_pattern(line_id, pattern)
+        self._remove_constraints_by_line(line_id)
 
     def guess_patterns(self, line_id):
         """
@@ -118,7 +108,7 @@ class Teacher(object):
     def set_log_type(self, line_id, log_type):
         pass
 
-    def register_constraint(self, constraint_id, pattern_groups, constraint):
+    def register_constraint(self, constraint_id, constraint):
         """
         Adds new constraint to rule.
         If constraint_id already exists, constraint with this constraint_id
@@ -126,12 +116,13 @@ class Teacher(object):
         :param pattern_groups: groups in pattern that are linked by constraint
         :type pattern_groups: list[PatternGroup]
         """
+        #TODO: validate constraint
         if constraint_id in six.iterkeys(self._constraint_base):
             self.remove_constraint(constraint_id)
 
         self._constraint_base[constraint_id] = constraint
         new_constraint_links = [
-            (group.line_id, group.number, constraint_id) for group in pattern_groups
+            (line_id, group_no, constraint_id) for (line_id, group_no) in constraint.groups
         ]
         self._constraint_links.add_links(new_constraint_links)
 
@@ -144,18 +135,14 @@ class Teacher(object):
         del self._constraint_base[constraint_id]
 
     def _remove_constraints_by_line(self, line_id):
-        self._constraint_links.remove_links_by_line(line_id)
-        self._sync_constraint_base_with_links()
+        constraints_to_remove = self._constraint_links.remove_links_by_line(line_id)
+        for constraint_id in constraints_to_remove:
+            self.remove_constraint(constraint_id)
 
-    def _remove_constraint_by_group(self, group):
-        self._constraint_links.remove_links_by_group(group.line_id, group.number)
-        self._sync_constraint_base_with_links()
-
-    def _sync_constraint_base_with_links(self):
-        ids_from_links = self._constraint_links.distinct_constraint_ids()
-        for constraint_id in six.iterkeys(self._constraint_base):
-            if constraint_id not in ids_from_links:
-                del self._constraint_base[constraint_id]
+    def _remove_constraint_by_group(self, line_id, group_number):
+        constraints_to_remove = self._constraint_links.remove_links_by_group(line_id, group_number)
+        for constraint_id in constraints_to_remove:
+            self.remove_constraint(constraint_id)
 
     def set_causes_relation(self, relation):
         """

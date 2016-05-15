@@ -7,3 +7,4 @@ constraints:
   - [0, 1]
   name: identical
   params: {}
+linkage: AND

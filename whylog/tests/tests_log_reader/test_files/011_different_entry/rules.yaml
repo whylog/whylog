@@ -6,3 +6,4 @@ constraints:
   - [1, 1]
   name: different
   params: {value: normal}
+linkage: AND

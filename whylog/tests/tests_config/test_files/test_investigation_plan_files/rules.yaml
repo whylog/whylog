@@ -23,6 +23,7 @@ constraints:
   name: hetero
   params: {different: 1}
 effect: lostdata
+linkage: AND
 ---
 causes: [connectionerror, datamigration]
 constraints:
@@ -48,3 +49,4 @@ constraints:
   name: hetero
   params: {different: 1}
 effect: lostdatadate
+linkage: AND

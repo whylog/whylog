@@ -29,6 +29,9 @@ class UserConstraintIntent(object):
         self.groups = groups
         self.params = params or {}
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
 class UserRuleIntent(object):
     def __init__(self, effect_id, parsers=None, constraints=None):

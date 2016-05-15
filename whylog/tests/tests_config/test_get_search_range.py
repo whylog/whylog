@@ -47,7 +47,7 @@ class TestBasic(TestCase):
             }
         ]
 
-        cls.rule = Rule([cause1, cause2], effect, constraints)
+        cls.rule = Rule([cause1, cause2], effect, constraints, Rule.LINKAGE_AND)
         cls.config._rules['apache'].append(cls.rule)
 
     def test_get_search_range(self):

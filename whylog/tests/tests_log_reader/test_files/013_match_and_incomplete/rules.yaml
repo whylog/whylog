@@ -4,3 +4,4 @@ effect: effect
 constraints: []
 # unsupported yet
 #type: and
+linkage: AND
