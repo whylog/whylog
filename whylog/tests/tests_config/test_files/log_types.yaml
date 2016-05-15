@@ -16,4 +16,3 @@ log_type_name: apache
 host_pattern: localhost
 path_pattern: node.log
 super_parser: { regex_str: '^(\d+).*', group_order: [1], convertions: {1: date}}
-

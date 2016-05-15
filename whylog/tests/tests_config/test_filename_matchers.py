@@ -5,7 +5,9 @@ from unittest import TestCase
 from whylog.config import SettingsFactorySelector
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
+from whylog.config.super_parser import RegexSuperParser
 from whylog.tests.utils import TestPaths
+
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files', 'simple_logs_files']
 
@@ -15,8 +17,8 @@ class TestBasic(TestCase):
         path = os.path.join(*path_test_files)
         suffix_1 = 'node_1.log'
         suffix_2 = 'node_[12].log'
-        matcher_1 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_1), 'default')
-        matcher_2 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_2), 'default')
+        matcher_1 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_1), 'default', None)
+        matcher_2 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_2), 'default', None)
         log_type = LogType('default', [matcher_1, matcher_2])
 
         assert sorted(log_type.files_to_parse()) == [
@@ -29,7 +31,8 @@ class TestBasic(TestCase):
         config = SettingsFactorySelector.get_settings()['config']
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
 
-        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
+        super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
+        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default', super_parser)
         default_log_type = LogType('default', [matcher])
         config.add_log_type(default_log_type)
 
@@ -42,6 +45,7 @@ class TestBasic(TestCase):
         assert matcher.host_pattern == 'localhost'
         assert matcher.path_pattern == 'node_1.log'
         assert matcher.log_type_name == 'default'
+        assert matcher.super_parser == super_parser
         assert isinstance(matcher, WildCardFilenameMatcher)
 
         shutil.rmtree(whylog_dir)
