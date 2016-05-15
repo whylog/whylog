@@ -2,7 +2,7 @@ import six
 
 from whylog.assistant.exceptions import NotMatchingPatternError
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
-from whylog.teacher.exceptions import NotUniqueParserName, NotMatchingPatternWarning
+from whylog.teacher.exceptions import NotMatchingPatternWarning, NotUniqueParserName
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
