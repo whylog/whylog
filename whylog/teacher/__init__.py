@@ -1,12 +1,19 @@
-from collections import namedtuple
-
 import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
-# :type line: FrontInput
-TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
+
+class TeacherParser(object):
+    """
+    :type line: FrontInput
+    """
+
+    def __init__(self, line_object, name, primary_keys, log_type):
+        self.line = line_object
+        self.name = name
+        self.primary_keys = primary_keys
+        self.log_type = log_type
 
 
 class Teacher(object):
