@@ -16,3 +16,6 @@ class YamlConfig(AbstractFileConfig):
 
     def _convert_parsers_to_file_form(self, parser_definitions):
         return yaml.safe_dump_all(parser_definitions, explicit_start=True)
+
+    def _convert_matcher_to_file_form(self, matcher_definition):
+        return yaml.safe_dump(matcher_definition, explicit_start=True)

@@ -15,5 +15,8 @@ class LogType(object):
                     parsed_files.add(file_source)
                     yield file_source
 
+    def __contains__(self, line_source):
+        return any(line_source in matcher for matcher in self.filename_matchers)
+
     def __repr__(self):
         return "(LogType: %s %s)" % (self.name, self.filename_matchers)

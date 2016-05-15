@@ -88,7 +88,7 @@ class BacktrackSearcher(AbstractSearcher):
 
     def search(self, investigation_step, original_front_input):
         clues = defaultdict(list)
-        if original_front_input.line_source == self._file_path:
+        if original_front_input.line_source.path == self._file_path:
             # TODO checking if host is also the same
             offset = original_front_input.offset
         else:

@@ -1,6 +1,7 @@
 from whylog.config.investigation_plan import LineSource
 from whylog.front.utils import FrontInput
 from whylog.front.whylog_factory import whylog_factory
+from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.tests.utils import TestRemovingSettings
 
 
@@ -10,5 +11,5 @@ class TestWhylogFactory(TestRemovingSettings):
         teacher = teacher_generator()
 
         front_input = FrontInput(1, 'line content', LineSource('host', 'path'))
-        log_reader.get_causes(front_input)
         teacher.add_line(0, front_input, True)
+        self.assertRaises(NoLogTypeError, log_reader.get_causes, front_input)

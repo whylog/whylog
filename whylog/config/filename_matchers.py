@@ -1,3 +1,4 @@
+import fnmatch
 import glob
 from abc import ABCMeta, abstractmethod
 
@@ -24,6 +25,19 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
         else:
             # TODO: finding files in others hosts
             raise NotImplementedError
+
+    def __contains__(self, line_source):
+        return fnmatch.fnmatch(line_source.host, self.host_pattern) and fnmatch.fnmatch(
+            line_source.path, self.path_pattern
+        )
+
+    def serialize(self):
+        return {
+            'matcher_class_name': "WildCardFilenameMatcher",
+            'log_type_name': self.log_type_name,
+            'path_pattern': self.path_pattern,
+            'host_pattern': self.host_pattern,
+        }
 
     def __repr__(self):
         return "(WildCardFilenameMatcher: %s, %s, %s)" % (

@@ -99,8 +99,9 @@ class TestBasic(TestCase):
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         log_reader = LogReader(whylog_config)
         effect_line = FrontInput(
-            effect_line_offset, line_content,
-            os.path.join(path, self._get_starting_file_name(input_path))
+            effect_line_offset, line_content, LineSource(
+                'localhost', os.path.join(path, self._get_starting_file_name(input_path))
+            )
         )
 
         # action and checking the result

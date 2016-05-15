@@ -60,10 +60,18 @@ class AbstractFileConfig(AbstractConfig):
         with open(self._parsers_path, "a") as parsers_file:
             parsers_file.write(self._convert_parsers_to_file_form(parser_definitions))
 
+    def _save_filename_matcher_definition(self, matcher_definition):
+        with open(self._log_type_path, "a") as parsers_file:
+            parsers_file.write(self._convert_matcher_to_file_form(matcher_definition))
+
     @abstractmethod
     def _convert_rule_to_file_form(self, dict_definition):
         pass
 
     @abstractmethod
     def _convert_parsers_to_file_form(self, dict_definition):
+        pass
+
+    @abstractmethod
+    def _convert_matcher_to_file_form(self, dict_definition):
         pass
