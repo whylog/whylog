@@ -92,9 +92,7 @@ class Teacher(object):
         try:
             self.pattern_assistant.update_by_pattern(line_id, pattern)
         except NotMatchingPatternError:
-            return NotMatchingPatternWarning(
-                self._parsers[line_id].line.line_content, pattern
-            )
+            return NotMatchingPatternWarning(self._parsers[line_id].line.line_content, pattern)
         self._remove_constraints_by_line(line_id)
 
     def guess_patterns(self, line_id):
