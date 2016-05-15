@@ -1,12 +1,14 @@
 import os
+import six
 from unittest import TestCase
 
 from whylog.assistant.const import ConverterType
 from whylog.assistant.pattern_match import ParamGroup
 from whylog.assistant.regex_assistant import RegexAssistant
-from whylog.assistant.regex_assistant.exceptions import NotMatchingRegexError
 from whylog.assistant.regex_assistant.regex import create_obvious_regex
 from whylog.config import YamlConfig
+from whylog.config.log_type import LogType
+from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import LineSource
 from whylog.constraints import IdenticalConstraint
 from whylog.front.utils import FrontInput
@@ -128,7 +130,8 @@ class TestParser(TestBase):
         assert new_primary_key_groups == parser.primary_key_groups
 
     def test_setting_log_type(self):
-        new_log_type = '_very_low_likely_log_type'
+        sample_filename_matcher = WildCardFilenameMatcher('localhost', 'sample_path', 'default')
+        new_log_type = LogType('localhost', [sample_filename_matcher])
         self.teacher.set_log_type(self.effect_id, new_log_type)
         parser = self.teacher.get_rule().parsers[self.effect_id]
         assert new_log_type == parser.log_type_name
@@ -140,15 +143,17 @@ class TestParser(TestBase):
         assert new_effect_pattern == updated_pattern
 
         not_matching_pattern = new_effect_pattern + 'not_matching_part_of_regex'
-        self.assertRaises(
-            NotMatchingRegexError, self.teacher.update_pattern, self.effect_id, not_matching_pattern
-        )
+        warning = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
+        assert warning.pattern == not_matching_pattern
 
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)
         assert len(effect_guessed_patterns) > 1
+        effect_guessed_regexes = [
+            pattern_match.pattern for pattern_match in six.itervalues(effect_guessed_patterns)
+        ]
         effect_obvious_regex = create_obvious_regex(self.effect_front_input.line_content)
-        assert effect_obvious_regex in effect_guessed_patterns
+        assert effect_obvious_regex in effect_guessed_regexes
 
 
 class TestConstraints(TestBase):

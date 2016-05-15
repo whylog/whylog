@@ -1,15 +1,12 @@
 import six
 
+from whylog.assistant.exceptions import NotMatchingPatternError
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
-from whylog.teacher.exceptions import NotUniqueParserName
+from whylog.teacher.exceptions import NotUniqueParserName, NotMatchingPatternWarning
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
 class TeacherParser(object):
-    """
-    :type line: FrontInput
-    """
-
     def __init__(self, line_object, name, primary_keys, log_type):
         self.line = line_object
         self.name = name
@@ -91,16 +88,20 @@ class Teacher(object):
         Removes constraints related with updating line
         TODO: Update related constraints rather than remove.
         """
-        self.pattern_assistant.update_by_pattern(line_id, pattern)
+
+        try:
+            self.pattern_assistant.update_by_pattern(line_id, pattern)
+        except NotMatchingPatternError:
+            return NotMatchingPatternWarning(
+                self._parsers[line_id].line.line_content, pattern
+            )
         self._remove_constraints_by_line(line_id)
 
     def guess_patterns(self, line_id):
         """
         Returns list of guessed patterns for a line.
         """
-        pattern_matches = self.pattern_assistant.guess_pattern_matches(line_id)
-        # TODO: Consider returning dict[int, pattern_match] in order to show guessed converters too.
-        return [pattern_match.pattern for pattern_match in six.itervalues(pattern_matches)]
+        return self.pattern_assistant.guess_pattern_matches(line_id)
 
     def choose_guessed_pattern(self, line_id, pattern_id):
         self.pattern_assistant.update_by_guessed_pattern_match(line_id, pattern_id)

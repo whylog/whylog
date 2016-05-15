@@ -11,3 +11,16 @@ class NotUniqueParserName(TeacherError):
 
     def __str__(self):
         return 'Name is not unique, name: %s' % (self.parser_name,)
+
+
+class TeacherWarning(object):
+    pass
+
+
+class NotMatchingPatternWarning(TeacherWarning):
+    def __init__(self, line, pattern):
+        self.line = line
+        self.pattern = pattern
+
+    def __str__(self):
+        return 'Pattern does not match line, pattern: %s, line: %s' % (self.pattern, self.line)

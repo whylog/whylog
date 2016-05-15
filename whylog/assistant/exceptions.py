@@ -5,6 +5,10 @@ class WhylogAssistantError(WhylogError):
     pass
 
 
+class NotMatchingPatternError(WhylogAssistantError):
+    pass
+
+
 class DateFromFutureError(WhylogAssistantError):
     def __init__(self, parsed_date, date_text):
         self.date_text = date_text
