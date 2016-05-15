@@ -10,7 +10,8 @@ class TestLogsReading(TestCase):
         cls.opened_file = OpenedLogsFile(
             datetime.datetime(year=2000, month=1, day=1),
             datetime.timedelta(microseconds=100),
-            1000000
+            1000000,
+            42
         )
 
     def test_bisect_line_finding(self):
