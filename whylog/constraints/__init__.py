@@ -1,4 +1,6 @@
 import datetime
+import itertools
+
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 import six
@@ -96,7 +98,6 @@ class AbstractConstraint(object):
     def get_param_names(cls):
         """
         Returns names of constraint additional params.
-
         For Front to display param names to user and then ask user for param contents.
         """
         return cls.PARAMS
@@ -105,7 +106,6 @@ class AbstractConstraint(object):
     def get_groups_count(cls):
         """
         Returns minimal and maximal count of groups needed to create constraint.
-
         For Front to ask user for proper count of groups.
         2, None - at least 2 groups
         2, 2 - exactly 2 groups
@@ -206,10 +206,20 @@ class IdenticalConstraint(AbstractConstraint):
         return all(group_contents[0] == group for group in group_contents)
 
 
-class DifferentValueConstraint(AbstractConstraint):
+class DifferentConstraint(AbstractConstraint):
     """
     Contents of groups must be different.
     """
+
+    TYPE = ConstraintType.DIFFERENT
+    PARAMS = []
+
+    def verify(self, group_contents, param_dict):
+        param = param_dict.get("value")
+        if param:
+            return len(set(itertools.chain(group_contents, [param]))) == len(group_contents) + 1
+        else:
+            return len(set(group_contents)) == len(group_contents)
 
 
 class ValueDeltaConstraint(AbstractConstraint):

@@ -1,7 +1,7 @@
 import itertools
 
 from whylog.config.investigation_plan import Clue
-from whylog.constraints import IdenticalConstraint, TimeConstraint
+from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 from whylog.front.utils import FrontInput
 
@@ -9,9 +9,10 @@ from whylog.front.utils import FrontInput
 class ConstraintRegistry(object):
     CONSTRAINTS = {
         'identical': IdenticalConstraint,
-        'time': TimeConstraint
+        'time': TimeConstraint,
+        'different': DifferentConstraint
         # register your constraint here
-    }
+    }  # yapf: disable
 
     @classmethod
     def get_constraint(cls, constraint_data):

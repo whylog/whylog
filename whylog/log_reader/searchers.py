@@ -12,7 +12,7 @@ from whylog.log_reader.const import BufsizeConsts
 @six.add_metaclass(ABCMeta)
 class AbstractSearcher(object):
     @abstractmethod
-    def search(self, search_data):
+    def search(self, search_data, original_front_input):
         """
         transfer investigation to searcher
         """
@@ -20,12 +20,12 @@ class AbstractSearcher(object):
 
 
 class IndexSearcher(AbstractSearcher):
-    def search(self, search_data):
+    def search(self, search_data, original_front_input):
         pass
 
 
 class DatabaseSearcher(AbstractSearcher):
-    def search(self, search_data):
+    def search(self, search_data, original_front_input):
         pass
 
 
@@ -40,7 +40,7 @@ class BacktrackSearcher(AbstractSearcher):
         for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
             line_content, line_offset = line
             if investigation_step.is_line_in_search_range(line_content):
-                return line_offset
+                return line_offset + len(line_content) + 1
 
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
@@ -82,16 +82,20 @@ class BacktrackSearcher(AbstractSearcher):
                     if len(line):
                         actual_offset = self._decrease_actual_offset_properly(actual_offset, line)
                         yield line, actual_offset
-            actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
-            yield truncated, actual_offset
+            if truncated:
+                actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
+                yield truncated, actual_offset
 
-    def search(self, investigation_step):
+    def search(self, investigation_step, original_front_input):
         clues = defaultdict(list)
-        offset = self._deduce_offset(investigation_step)
+        if original_front_input.line_source == self._file_path:
+            # TODO checking if host is also the same
+            offset = original_front_input.offset
+        else:
+            offset = self._deduce_offset(investigation_step)
         for line, actual_offset in self._reverse_from_offset(offset):
-            # TODO: line_source object should be also passed into get_clues function
             # TODO: remove mock
-            line_source = LineSource('localhost', 'node_1.log')
+            line_source = LineSource('localhost', self._file_path)
             clues_from_line = investigation_step.get_clues(line, actual_offset, line_source)
             self._merge_clues(clues, clues_from_line)
         return clues

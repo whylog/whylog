@@ -14,3 +14,6 @@ class LogType(object):
                 if file_source not in parsed_files:
                     parsed_files.add(file_source)
                     yield file_source
+
+    def __repr__(self):
+        return "(LogType: %s %s)" % (self.name, self.filename_matchers)

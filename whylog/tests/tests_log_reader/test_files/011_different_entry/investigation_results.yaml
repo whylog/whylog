@@ -1,0 +1,7 @@
+- linkage: AND
+  causes: ["different entry"]
+  constraints:
+  - clues_groups:
+    - [1, 1]
+    name: different
+    params: {value: normal}

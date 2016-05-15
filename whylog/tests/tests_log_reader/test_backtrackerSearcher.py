@@ -52,8 +52,11 @@ class TestBacktrackSearcher(TestCase):
         ]
 
         data_reversed = list(backtracker._reverse_from_offset(*reverse_from_offset_params))
-        if final_offset_should_be_zero:
-            assert data_reversed[-1][1] == 0
+        if how_many_last_lines > 0:
+            if final_offset_should_be_zero:
+                assert data_reversed[-1][1] == 0
+        else:
+            assert not lines_reversed
 
         self._verify_lines(lines_reversed, lines)
 
@@ -73,3 +76,8 @@ class TestBacktrackSearcher(TestCase):
         self._run_reverse_and_check_results(
             log_file_path, [file_size_as_offset], self._count_lines_in_file(log_file_path)
         )
+
+    def test_yield_nothing_when_offset_is_zero(self):
+        log_file_path = TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME)
+        offset = 0
+        self._run_reverse_and_check_results(log_file_path, [offset], 0)
