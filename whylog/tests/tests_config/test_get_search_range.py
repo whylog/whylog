@@ -1,7 +1,7 @@
 import os.path
 import shutil
 from datetime import datetime
-from unittest import TestCase
+from unittest import TestCase, SkipTest
 
 from whylog.config import SettingsFactorySelector
 from whylog.config.investigation_plan import Clue, LineSource
@@ -20,43 +20,68 @@ class TestBasic(TestCase):
         cause1_regex = '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) cause1 transaction number: (\d+) Host: (\w)$'
         cause1_line = '2016-04-12 23:39:43 cause1 transaction number: 10101 Host: db_host'
         convertions = {1: 'date'}
-        cause1 = RegexParser("cause1", cause1_line, cause1_regex, [1], 'database', convertions)
+        cls.cause1 = RegexParser("cause1", cause1_line, cause1_regex, [1], 'database', convertions)
 
         cause2_regex = '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) cause2 moved resource id: (\d+) Host: (\w)$'
         cause2_line = '2016-04-12 23:40:43 cause2 moved resource id: 1234 Host: apache_host'
         convertions = {1: 'date'}
-        cause2 = RegexParser("cause2", cause2_line, cause2_regex, [1], 'apache', convertions)
+        cls.cause2 = RegexParser("cause2", cause2_line, cause2_regex, [1], 'apache', convertions)
 
         effect_regex = '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) effect internal server error Host: (\w)$'
         effect_line = '2016-04-12 23:54:43 effect internal server error Host: apache_host'
         convertions = {1: 'date'}
-        effect = RegexParser("effect", effect_line, effect_regex, [1], 'apache', convertions)
+        cls.effect = RegexParser("effect", effect_line, effect_regex, [1], 'apache', convertions)
 
-        constraints = [
-            {
-                'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
-                'params': {
-                    'max_delta': 100,
-                    'min_delta': 10
-                }
-            }, {
-                'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
-                'params': {'max_delta': 10}
-            }
-        ]
-
-        cls.rule = Rule([cause1, cause2], effect, constraints, Rule.LINKAGE_AND)
-        cls.config._rules['apache'].append(cls.rule)
-
-    def test_get_search_range(self):
         line_source = LineSource('localhost', 'node_1.log')
         effect_time = datetime(2016, 4, 12, 23, 54, 43)
         effect_line = '2016-04-12 23:54:43 effect internal server error Host: apache_host'
-        effect_clues = {'effect': Clue((effect_time,), effect_line, 40, line_source)}
+        cls.effect_clues = {'effect': Clue((effect_time,), effect_line, 40, line_source)}
 
-        calculated_ranges = self.config._get_search_ranges([self.rule], effect_clues)
+    def test_search_range_no_constraints_on_primary_values(self):
+        rule = Rule([self.cause1, self.cause2], self.effect, [], Rule.LINKAGE_AND)
+        self.config._rules['apache'].append(rule)
+        calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
+        self.config._rules['apache'].pop()
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == {}
+
+    def test_search_range_single_log_types(self):
+        constraints = [{'clues_groups': [[1, 1], [0, 1]],
+                        'name': 'time',
+                        'params': {'max_delta': 10}}]
+        rule = Rule([self.cause2], self.effect, constraints, Rule.LINKAGE_AND)
+
+        self.config._rules['apache'].append(rule)
+        calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
+        self.config._rules['apache'].pop()
+
+        expected_ranges = {
+            'apache': {
+                'date': {
+                    'left_bound': datetime(2016, 4, 12, 23, 54, 33),
+                    'right_bound': datetime(2016, 4, 12, 23, 54, 43)
+                }
+            }
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_two_log_types(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 100,
+                        'min_delta': 10}}, {'clues_groups': [[2, 1], [0, 1]],
+                                            'name': 'time',
+                                            'params': {'max_delta': 10}}
+        ]
+        rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+
+        self.config._rules['apache'].append(rule)
+        calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
+        self.config._rules['apache'].pop()
 
         expected_ranges = {
             'database': {
@@ -68,12 +93,41 @@ class TestBasic(TestCase):
             'apache': {
                 'date': {
                     'left_bound': datetime(2016, 4, 12, 23, 54, 33),
-                    'right_bound': effect_time
+                    'right_bound': datetime(2016, 4, 12, 23, 54, 43)
                 }
             }
         }
 
         assert calculated_ranges == expected_ranges
+
+    # def test_search_range_lack_of_left_bound(self):
+    #     constraints1 = [
+    #         {'clues_groups': [[1, 1], [0, 1]],
+    #          'name': 'time',
+    #          'params': {'min_delta': 10}},
+    #     ]
+    #     rule = Rule([self.cause1, self.cause2], self.effect, constraints1)
+    #
+    #     self.config._rules['apache'].append(rule)
+    #     calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
+    #     self.config._rules['apache'].pop()
+    #
+    #     expected_ranges = {
+    #         'database': {
+    #             'date': {
+    #                 'left_bound': datetime(2016, 4, 12, 23, 53, 3),
+    #                 'right_bound': datetime(2016, 4, 12, 23, 54, 33)
+    #             }
+    #         },
+    #         'apache': {
+    #             'date': {
+    #                 'left_bound': datetime(2016, 4, 12, 23, 54, 33),
+    #                 'right_bound': datetime(2016, 4, 12, 23, 54, 43)
+    #             }
+    #         }
+    #     }
+
+        # assert calculated_ranges == expected_ranges
 
     @classmethod
     def tearDownClass(cls):
