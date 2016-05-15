@@ -146,7 +146,7 @@ class TestParser(TestBase):
 
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)
-        assert len(effect_guessed_patterns) > 2
+        assert len(effect_guessed_patterns) > 1
         effect_obvious_regex = create_obvious_regex(self.effect_front_input.line_content)
         assert effect_obvious_regex in effect_guessed_patterns
 
