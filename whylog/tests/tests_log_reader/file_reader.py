@@ -72,8 +72,8 @@ class OpenedFile(object):
 
 
 class OpenedLogsFile(object):
-    def __init__(self, *args):
-        self._opened_file = OpenedFile(*args)
+    def __init__(self, file_object):
+        self._opened_file = file_object
         self._seek_count = 0
         self._read_bytes = 0
 
