@@ -1,17 +1,13 @@
 import six
 
 
-class OpenedFile(object):
+class DataGeneratorLogSource(object):
     def __init__(self, start_time, time_interval, number_of_lines, line_padding):
         self._start_time = start_time
         self._time_interval = time_interval
         self._number_of_lines = number_of_lines
         self._line_padding = line_padding
         self._position = 0
-
-    @classmethod
-    def _repeat(cls, n, sign="r"):
-        return sign * n
 
     def _deduce_line_no(self, offset):
         return offset / self._line_padding
@@ -22,9 +18,9 @@ class OpenedFile(object):
     def _get_line(self, line_no):
         current_line_time = self._start_time + line_no * self._time_interval
         current_line_time_str = str(current_line_time) + " "
-        current_line = current_line_time_str + self._repeat(
+        current_line = current_line_time_str + (
             self._line_padding - len(current_line_time_str) - 1
-        ) + "\n"
+        ) * "r" + "\n"
         return current_line
 
     def _line_lying_on_offset(self, offset):

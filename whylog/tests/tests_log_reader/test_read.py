@@ -1,14 +1,14 @@
 import datetime
 from unittest import TestCase
 
-from whylog.tests.tests_log_reader.file_reader import OpenedFile, OpenedLogsFile
+from whylog.tests.tests_log_reader.file_reader import DataGeneratorLogSource, OpenedLogsFile
 
 
 class TestLogsReading(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.opened_file = OpenedLogsFile(
-            OpenedFile(
+            DataGeneratorLogSource(
                 datetime.datetime(
                     year=2000,
                     month=1,
