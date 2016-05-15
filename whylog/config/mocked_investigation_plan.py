@@ -39,7 +39,7 @@ def mocked_investigation_plan():
                 'name': 'time',
                 'params': {'max_delta': 1}
             }
-        ]
+        ], Rule.LINKAGE_AND
     )  # yapf: disable
     line_source = LineSource('localhost', 'node_1.log')
     effect_clues = {'effect': Clue((effect_time,), 'visible effect', 40, line_source)}

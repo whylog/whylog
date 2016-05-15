@@ -4,3 +4,4 @@ effect: effect
 #unsupported rule field
 #type: and
 constraints: []
+linkage: AND

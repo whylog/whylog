@@ -1,6 +1,5 @@
 ---
 causes: [cause1, cause2]
 effect: effect
-# unsupported rule type
-#type: or
 constraints: []
+linkage: OR

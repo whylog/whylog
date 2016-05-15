@@ -9,11 +9,21 @@ from whylog.constraints.verifier import ConstraintManager, Verifier
 
 class Rule(object):
     EMPTY_BLACK_LIST = frozenset()
+    LINKAGE_AND = "AND"
+    LINKAGE_OR = "OR"
+    LINKAGE_NOT = "NOT"
 
-    def __init__(self, causes, effect, constraints):
+    LINKAGE_SELECTOR = {
+        LINKAGE_AND: Verifier.constraints_and,
+        LINKAGE_OR: Verifier.constraints_or
+        # TODO: add support for NOT
+    }
+
+    def __init__(self, causes, effect, constraints, linkage):
         self._causes = causes
         self._effect = effect
         self._constraints = constraints
+        self._linkage = linkage
         self._frequency_information = self._gather_causes_frequency_information()
 
     def _gather_causes_frequency_information(self):
@@ -57,8 +67,7 @@ class Rule(object):
         ]
         effect_clue = effect_clues_dict[self._effect.name]
         constraint_manager = ConstraintManager()
-        # TODO check basing on improved rule what should be used: and, or, not
-        return Verifier.constraints_and(
+        return self.LINKAGE_SELECTOR[self._linkage](
             clues_lists, effect_clue, self._constraints, constraint_manager
         )
 
@@ -74,7 +83,8 @@ class AbstractRuleFactory(object):
         )
         constraints = cls._create_constraints_list(parser_ids_mapper, user_rule_intent)
         ordered_causes, modified_constraints = cls._order_causes_list(causes, constraints)
-        return Rule(ordered_causes, effect, modified_constraints)
+        # TODO use user_rule_intent instead of Rule.LINKAGE_AND when UserRuleIntent will support rule linkage
+        return Rule(ordered_causes, effect, modified_constraints, Rule.LINKAGE_AND)
 
     @classmethod
     def _order_causes_list(cls, causes, constraints):
@@ -125,9 +135,11 @@ class AbstractRuleFactory(object):
 
     @classmethod
     def from_dao(cls, serialized_rule, parsers):
+        # TODO: restore serialized_rule["linkage"] when UserRuleIntent will support rule linkage
+        causes = [parsers[cause] for cause in serialized_rule["causes"]]
         return Rule(
-            [parsers[cause] for cause in serialized_rule["causes"]],
-            parsers[serialized_rule["effect"]], serialized_rule["constraints"]
+            causes, parsers[serialized_rule["effect"]], serialized_rule["constraints"],
+            serialized_rule.get("linkage", Rule.LINKAGE_AND)
         )
 
 

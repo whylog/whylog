@@ -60,7 +60,7 @@ class TestBasic(TestCase):
         '003_match_time_range',
         # '005_match_tree',
         '006_match_parameter',
-        # '007_match_or',
+        '007_match_or',
         '008_match_and',
         # '009_match_negation',
         # '010_multiple_files',

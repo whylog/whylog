@@ -73,7 +73,7 @@ class TestBasic(TestCase):
                     'name': 'identical',
                     'params': {}
                 }
-            ]
+            ], Rule.LINKAGE_AND
         )  # yapf: disable
         effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
         clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
@@ -112,7 +112,7 @@ class TestBasic(TestCase):
                     'name': 'identical',
                     'params': {}
                 }
-            ]
+            ], Rule.LINKAGE_AND
         )  # yapf: disable
         effect_clues_dict = {'cause_a': Clue((42,), '42 carrots', 1420, self.line_source)}
         clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
@@ -144,7 +144,7 @@ class TestBasic(TestCase):
                     'name': 'identical',
                     'params': {}
                 }
-            ]
+            ], Rule.LINKAGE_AND
         )  # yapf: disable
         effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
         clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
@@ -186,7 +186,7 @@ class TestBasic(TestCase):
                     'name': 'identical',
                     'params': {}
                 }
-            ]
+            ], Rule.LINKAGE_AND
         )  # yapf: disable
         effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
         clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
@@ -207,7 +207,7 @@ class TestBasic(TestCase):
                     'name': 'identical',
                     'params': {}
                 }
-            ]
+            ], Rule.LINKAGE_AND
         )  # yapf: disable
         effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
         clues = {  # it's dictionary of the same type as clues dict collected in SearchManager
