@@ -175,7 +175,7 @@ class Teacher(object):
 
     def test_rule(self):
         """
-        Simulates searching causes with alreday created rule.
+        Simulates searching causes with already created rule.
         """
         pass
 
