@@ -1,7 +1,9 @@
 import os.path
 import shutil
 from datetime import datetime
-from unittest import TestCase, SkipTest
+from unittest import TestCase
+
+from nose.plugins.skip import SkipTest
 
 from whylog.config import SettingsFactorySelector
 from whylog.config.investigation_plan import Clue, LineSource
