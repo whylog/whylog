@@ -6,8 +6,16 @@ from whylog.assistant.exceptions import UnsupportedAssistantError
 from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.config.consts import YamlFileNames
 from whylog.config.exceptions import UnsupportedConfigType
+from whylog.config.filename_matchers import WildCardFilenameMatcher
+from whylog.config.investigation_plan import LineSource
+from whylog.config.log_type import LogType
+
 from whylog.config.settings_factory import YamlSettingsFactory
 from whylog.config.yaml_config import YamlConfig
+
+assert WildCardFilenameMatcher
+assert LineSource
+assert LogType
 
 
 class SettingsFactorySelector(object):
