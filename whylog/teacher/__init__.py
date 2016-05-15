@@ -112,14 +112,16 @@ class Teacher(object):
         else:
             raise NotUniqueParserName(name)
 
-    def set_converter(self, pattern_group, converter):
-        pass
+    def set_converter(self, line_id, group_no, converter):
+        # TODO: validate converter
+        self.pattern_assistant.set_converter(line_id, group_no, converter)
 
     def set_primary_key(self, line_id, group_numbers):
-        pass
+        # TODO: validate primary_key
+        self._parsers[line_id].primary_keys = group_numbers
 
     def set_log_type(self, line_id, log_type):
-        pass
+        self._parsers[line_id].log_type = log_type
 
     def register_constraint(self, constraint_id, constraint):
         """
