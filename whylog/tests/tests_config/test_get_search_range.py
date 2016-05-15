@@ -33,15 +33,25 @@ class TestBasic(TestCase):
         cls.effect = RegexParser("effect", effect_line, effect_regex, [1], 'apache', convertions)
 
         line_source = LineSource('localhost', 'node_1.log')
-        effect_time = datetime(2016, 4, 12, 23, 54, 43)
+        cls.effect_time = datetime(2016, 4, 12, 23, 54, 43)
         effect_line = '2016-04-12 23:54:43 effect internal server error Host: apache_host'
-        cls.effect_clues = {'effect': Clue((effect_time,), effect_line, 40, line_source)}
+        cls.effect_clues = {'effect': Clue((cls.effect_time,), effect_line, 40, line_source)}
+
+        cls.earliest_date = datetime(1, 1, 1, 1, 1, 1)
+        cls.ten_second_earlier = datetime(2016, 4, 12, 23, 54, 33)
+        cls.one_hundred_second_earlier = datetime(2016, 4, 12, 23, 53, 3)
+        cls.ten_second_later = datetime(2016, 4, 12, 23, 54, 53)
+
+    @classmethod
+    def calculate_range(cls, rule):
+        cls.config._rules['apache'].append(rule)
+        calculated_ranges = cls.config._get_search_ranges([rule], cls.effect_clues)
+        cls.config._rules['apache'].pop()
+        return calculated_ranges
 
     def test_search_range_no_constraints_on_primary_values(self):
         rule = Rule([self.cause1, self.cause2], self.effect, [], Rule.LINKAGE_AND)
-        self.config._rules['apache'].append(rule)
-        calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
-        self.config._rules['apache'].pop()
+        calculated_ranges = self.calculate_range(rule)
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == {}
@@ -51,16 +61,13 @@ class TestBasic(TestCase):
                         'name': 'time',
                         'params': {'max_delta': 10}}]
         rule = Rule([self.cause2], self.effect, constraints, Rule.LINKAGE_AND)
-
-        self.config._rules['apache'].append(rule)
-        calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
-        self.config._rules['apache'].pop()
+        calculated_ranges = self.calculate_range(rule)
 
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': datetime(2016, 4, 12, 23, 54, 33),
-                    'right_bound': datetime(2016, 4, 12, 23, 54, 43)
+                    'left_bound': self.ten_second_earlier,
+                    'right_bound': self.effect_time
                 }
             }
         }
@@ -73,61 +80,226 @@ class TestBasic(TestCase):
             {'clues_groups': [[1, 1], [0, 1]],
              'name': 'time',
              'params': {'max_delta': 100,
-                        'min_delta': 10}}, {'clues_groups': [[2, 1], [0, 1]],
-                                            'name': 'time',
-                                            'params': {'max_delta': 10}}
+                        'min_delta': 10}},
+            {'clues_groups': [[2, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 10}}
         ]
         rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
-
-        self.config._rules['apache'].append(rule)
-        calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
-        self.config._rules['apache'].pop()
+        calculated_ranges = self.calculate_range(rule)
 
         expected_ranges = {
             'database': {
                 'date': {
-                    'left_bound': datetime(2016, 4, 12, 23, 53, 3),
-                    'right_bound': datetime(2016, 4, 12, 23, 54, 33)
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.ten_second_earlier
                 }
             },
             'apache': {
                 'date': {
-                    'left_bound': datetime(2016, 4, 12, 23, 54, 33),
-                    'right_bound': datetime(2016, 4, 12, 23, 54, 43)
+                    'left_bound': self.ten_second_earlier,
+                    'right_bound': self.effect_time
                 }
             }
         }
 
         assert calculated_ranges == expected_ranges
 
-    # def test_search_range_lack_of_left_bound(self):
-    #     constraints1 = [
-    #         {'clues_groups': [[1, 1], [0, 1]],
-    #          'name': 'time',
-    #          'params': {'min_delta': 10}},
-    #     ]
-    #     rule = Rule([self.cause1, self.cause2], self.effect, constraints1)
-    #
-    #     self.config._rules['apache'].append(rule)
-    #     calculated_ranges = self.config._get_search_ranges([rule], self.effect_clues)
-    #     self.config._rules['apache'].pop()
-    #
-    #     expected_ranges = {
-    #         'database': {
-    #             'date': {
-    #                 'left_bound': datetime(2016, 4, 12, 23, 53, 3),
-    #                 'right_bound': datetime(2016, 4, 12, 23, 54, 33)
-    #             }
-    #         },
-    #         'apache': {
-    #             'date': {
-    #                 'left_bound': datetime(2016, 4, 12, 23, 54, 33),
-    #                 'right_bound': datetime(2016, 4, 12, 23, 54, 43)
-    #             }
-    #         }
-    #     }
+    def test_search_range_lack_of_left_bound(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'min_delta': 10}},
+        ]
+        rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
 
-        # assert calculated_ranges == expected_ranges
+        expected_ranges = {
+            'database': {
+                'date': {
+                    'left_bound': self.earliest_date,
+                    'right_bound': self.ten_second_earlier
+                }
+            },
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_lack_of_right_bound(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 10}},
+        ]
+        rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
+
+        expected_ranges = {
+            'database': {
+                'date': {
+                    'left_bound': self.ten_second_earlier,
+                    'right_bound': self.effect_time
+                }
+            },
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_delayed_logs(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'min_delta': -10, 'max_delta': 100}},
+        ]
+        rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
+
+        expected_ranges = {
+            'database': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.ten_second_later
+                }
+            },
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_on_identical_constraint(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'identical',
+             'params': {}},
+        ]
+        rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
+
+        expected_ranges = {
+            'database': {
+                'date': {
+                    'left_bound': self.effect_time,
+                    'right_bound': self.effect_time
+                }
+            },
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_merge_range(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 75,
+                        'min_delta': 10}},
+            {'clues_groups': [[2, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 10}},
+            {'clues_groups': [[3, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 100, 'min_delta': 20}},
+            {'clues_groups': [[3, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 100, 'min_delta': 20}}
+        ]
+        rule = Rule([self.cause1, self.cause2, self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
+
+        expected_ranges = {
+            'database': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.ten_second_earlier
+                }
+            },
+            'apache': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.effect_time
+                }
+            }
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_covering(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 75,
+                        'min_delta': 10}},
+            {'clues_groups': [[2, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 100}},
+        ]
+        rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
+
+        expected_ranges = {
+            'apache': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.effect_time
+                }
+            }
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_reasoning_on_not_only_effect(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 75,
+                        'min_delta': 10}},
+            {'clues_groups': [[2, 1], [1, 1]],
+             'name': 'time',
+             'params': {'max_delta': 25}},
+        ]
+        rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
+
+        expected_ranges = {
+            'apache': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.effect_time
+                }
+            }
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
+
+    def test_search_range_mixed_constraint_type(self):
+        constraints1 = [
+            {'clues_groups': [[1, 1], [0, 1]],
+             'name': 'time',
+             'params': {'max_delta': 100,
+                        'min_delta': 10}},
+            {'clues_groups': [[2, 1], [0, 1]],
+             'name': 'identical',
+             'params': {}},
+        ]
+        rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range(rule)
+
+        expected_ranges = {
+            'apache': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.effect_time
+                }
+            }
+        }
+
+        raise SkipTest('Not implemented yet')
+        assert calculated_ranges == expected_ranges
 
     @classmethod
     def tearDownClass(cls):
