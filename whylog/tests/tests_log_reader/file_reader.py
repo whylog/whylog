@@ -1,8 +1,7 @@
-import datetime
 import six
 
 
-class OpenedLogsFile(object):
+class OpenedFile(object):
     def __init__(self, start_time, time_interval, number_of_lines, line_padding):
         self._start_time = start_time
         self._time_interval = time_interval
@@ -70,3 +69,19 @@ class OpenedLogsFile(object):
             self._position = (self._number_of_lines * self._line_padding) - offset
         else:
             assert False
+
+
+class OpenedLogsFile(object):
+    def __init__(self, *args):
+        self._opened_file = OpenedFile(*args)
+        self._seek_count = 0
+
+    def read(self, *args):
+        return self._opened_file.read(*args)
+
+    def tell(self):
+        return self._opened_file.tell()
+
+    def seek(self, *args):
+        self._seek_count += 1
+        self._opened_file.seek(*args)
