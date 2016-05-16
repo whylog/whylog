@@ -6,6 +6,7 @@ import six
 
 from whylog.config.super_parser import RegexSuperParserFactory
 
+
 @six.add_metaclass(ABCMeta)
 class AbstractFilenameMatcher(object):
     @abstractmethod

@@ -50,6 +50,10 @@ class TestBasic(TestCase):
 
         shutil.rmtree(whylog_dir)
 
+    def test_super_parser(self):
+        #TODO test for super parser get groups
+        pass
+
     @classmethod
     def tearDownClass(cls):
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
