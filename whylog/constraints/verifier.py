@@ -185,7 +185,7 @@ class Verifier(object):
     def constraints_not(cls, clues_lists, effect, constraints, constraint_manager):
         """
         provide investigation if there is zero or one constraint,
-        because only in such cases NOT linkage has sens
+        because only in such cases NOT linkage has sense
         """
         if len(constraints) > 1:
             return []
@@ -194,14 +194,11 @@ class Verifier(object):
                 return cls.single_constraint_not(
                     clues_lists, effect, constraints[0], constraint_manager
                 )
-            else:
-                return [cls._create_investigation_result([], [], InvestigationResult.NOT)]
         else:
             if clues_lists:
                 return [
                 ]  # if all parsers found their matched logs, the NOT requirement isn't satisfied
-            else:
-                return [cls._create_investigation_result([], [], InvestigationResult.NOT)]
+        return [cls._create_investigation_result([], [], InvestigationResult.NOT)]
 
     @classmethod
     def single_constraint_not(cls, clues_lists, effect, constraint, constraint_manager):
