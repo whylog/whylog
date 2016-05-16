@@ -68,7 +68,7 @@ class TestBasic(TestCase):
         '006_match_parameter',
         '007_match_or',
         '008_match_and',
-        # '009_match_negation',
+        '009_match_negation',
         '010_multiple_files',
         '011_different_entry',
         # '012_multiple_rulebooks',
