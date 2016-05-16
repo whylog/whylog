@@ -189,15 +189,24 @@ class Verifier(object):
         """
         if len(constraints) > 1:
             return []
-        if not constraints:
+        if constraints:
+            if clues_lists:
+                return cls.single_constraint_not(clues_lists, effect, constraints[0], constraint_manager)
+            else:
+                return [
+                    cls._create_investigation_result(
+                        [], [], InvestigationResult.NOT
+                    )
+                ]
+        else:
             if clues_lists:
                 return []  # if all parsers found their matched logs, the NOT requirement isn't satisfied
-            return [
-                cls._create_investigation_result(
-                    [], [], InvestigationResult.NOT
-                )
-            ]
-        return cls.single_constraint_not(clues_lists, effect, constraints[0], constraint_manager)
+            else:
+                return [
+                    cls._create_investigation_result(
+                        [], [], InvestigationResult.NOT
+                    )
+                ]
 
     @classmethod
     def single_constraint_not(cls, clues_lists, effect, constraint, constraint_manager):
