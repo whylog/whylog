@@ -14,7 +14,7 @@ from whylog.config.log_type import LogType
 from whylog.constraints import IdenticalConstraint
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
-from whylog.teacher.exceptions import NotUniqueParserName
+from whylog.teacher.rule_problems import NotUniqueParserName, NotMatchingPattern
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory
 
@@ -109,9 +109,8 @@ class TestParser(TestBase):
         rule = self.teacher.get_rule()
         assert new_name == rule.parsers[self.effect_id].pattern_name
 
-        self.assertRaises(
-            NotUniqueParserName, self.teacher.set_pattern_name, self.cause1_id, new_name
-        )
+        warning = self.teacher.set_pattern_name(self.cause1_id, new_name)
+        assert type(warning) == NotUniqueParserName
 
     def test_setting_converter(self):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
@@ -145,7 +144,7 @@ class TestParser(TestBase):
 
         not_matching_pattern = new_effect_pattern + 'not_matching_part_of_regex'
         warning = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
-        assert warning.pattern == not_matching_pattern
+        assert type(warning) == NotMatchingPattern
 
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)

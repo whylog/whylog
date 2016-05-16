@@ -2,7 +2,7 @@ import six
 
 from whylog.assistant.exceptions import NotMatchingPatternError
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
-from whylog.teacher.exceptions import NotMatchingPatternWarning, NotUniqueParserName
+from whylog.teacher.rule_problems import NotMatchingPattern, NotUniqueParserName
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 
@@ -92,7 +92,7 @@ class Teacher(object):
         try:
             self.pattern_assistant.update_by_pattern(line_id, pattern)
         except NotMatchingPatternError:
-            return NotMatchingPatternWarning(self._parsers[line_id].line.line_content, pattern)
+            return NotMatchingPattern(self._parsers[line_id].line.line_content, pattern)
         self._remove_constraints_by_line(line_id)
 
     def guess_patterns(self, line_id):
@@ -109,7 +109,7 @@ class Teacher(object):
         if self.config.is_free_parser_name(name, names_blacklist):
             self._parsers[line_id].name = name
         else:
-            raise NotUniqueParserName(name)
+            return NotUniqueParserName(name)
 
     def set_converter(self, line_id, group_no, converter):
         # TODO: validate converter
@@ -127,8 +127,6 @@ class Teacher(object):
         Adds new constraint to rule.
         If constraint_id already exists, constraint with this constraint_id
         is overwritten by new constraint
-        :param pattern_groups: groups in pattern that are linked by constraint
-        :type pattern_groups: list[PatternGroup]
         """
         #TODO: validate constraint
         if constraint_id in six.iterkeys(self._constraint_base):
