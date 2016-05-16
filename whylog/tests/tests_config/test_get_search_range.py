@@ -330,8 +330,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': self.earliest_date,
-                    'right_bound': self.effect_time
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.ten_second_earlier
                 }
             }
         }
