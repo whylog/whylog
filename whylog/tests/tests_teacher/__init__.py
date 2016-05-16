@@ -110,7 +110,7 @@ class TestParser(TestBase):
         assert new_name == rule.parsers[self.effect_id].pattern_name
 
         problems = self.teacher.set_pattern_name(self.cause1_id, new_name)
-        assert type(problems[0]) == NotUniqueParserName
+        assert str(problems[0]) == 'Name is not unique, name: error_occurred_in_reading_hello'
 
     def test_setting_converter(self):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
@@ -144,7 +144,8 @@ class TestParser(TestBase):
 
         not_matching_pattern = new_effect_pattern + 'not_matching_part_of_regex'
         problems = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
-        assert type(problems[0]) == NotMatchingPattern
+        assert str(problems[0]) == \
+               'Pattern does not match line, pattern: ^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in (.*) test$not_matching_part_of_regex, line: 2015-12-03 12:11:00 Error occurred in reading test'
 
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)
