@@ -191,22 +191,17 @@ class Verifier(object):
             return []
         if constraints:
             if clues_lists:
-                return cls.single_constraint_not(clues_lists, effect, constraints[0], constraint_manager)
+                return cls.single_constraint_not(
+                    clues_lists, effect, constraints[0], constraint_manager
+                )
             else:
-                return [
-                    cls._create_investigation_result(
-                        [], [], InvestigationResult.NOT
-                    )
-                ]
+                return [cls._create_investigation_result([], [], InvestigationResult.NOT)]
         else:
             if clues_lists:
-                return []  # if all parsers found their matched logs, the NOT requirement isn't satisfied
-            else:
                 return [
-                    cls._create_investigation_result(
-                        [], [], InvestigationResult.NOT
-                    )
-                ]
+                ]  # if all parsers found their matched logs, the NOT requirement isn't satisfied
+            else:
+                return [cls._create_investigation_result([], [], InvestigationResult.NOT)]
 
     @classmethod
     def single_constraint_not(cls, clues_lists, effect, constraint, constraint_manager):
@@ -220,11 +215,7 @@ class Verifier(object):
         for combination in cls._clues_combinations(clues_lists):
             if cls._verify_constraint(combination, effect, constraint, constraint_manager):
                 return []
-        return [
-            cls._create_investigation_result(
-                [], [constraint], InvestigationResult.NOT
-            )
-        ]
+        return [cls._create_investigation_result([], [constraint], InvestigationResult.NOT)]
 
 
 class InvestigationResult(object):
