@@ -9,7 +9,6 @@ from whylog.config.log_type import LogType
 from whylog.config.super_parser import RegexSuperParser
 from whylog.tests.utils import TestPaths
 
-
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files', 'simple_logs_files']
 
 
@@ -18,8 +17,10 @@ class TestBasic(TestCase):
         path = os.path.join(*path_test_files)
         suffix_1 = 'node_1.log'
         suffix_2 = 'node_[12].log'
-        matcher_1 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_1), 'default', None)
-        matcher_2 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_2), 'default', None)
+        matcher_1 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_1), 'default',
+                                            None)
+        matcher_2 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_2), 'default',
+                                            None)
         log_type = LogType('default', [matcher_1, matcher_2])
 
         assert sorted(log_type.files_to_parse()) == [
@@ -57,8 +58,11 @@ class TestBasic(TestCase):
         super_parser1 = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
         assert super_parser1.get_ordered_group(line) == [('date', datetime(2015, 12, 3, 12, 8, 9))]
 
-        super_parser2 = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).* Host name: (\d+)', [2, 1], {1: 'date', 2: 'int'})
-        assert super_parser2.get_ordered_group(line) == [('int', 2), ('date', datetime(2015, 12, 3, 12, 8, 9))]
+        super_parser2 = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).* Host name: (\d+)',
+                                         [2, 1], {1: 'date',
+                                                  2: 'int'})
+        assert super_parser2.get_ordered_group(line) == [('int', 2),
+                                                         ('date', datetime(2015, 12, 3, 12, 8, 9))]
 
         super_parser3 = RegexSuperParser('foo bar', [], {})
         assert super_parser3.get_ordered_group(line) == []

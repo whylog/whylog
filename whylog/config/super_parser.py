@@ -23,10 +23,10 @@ class RegexSuperParser(AbstractSuperParser):
 
     def serialize(self):
         return {
-                'regex_str': self.regex.pattern,
-                'group_order': self.group_order,
-                'convertions': self.convertions
-                }
+            'regex_str': self.regex.pattern,
+            'group_order': self.group_order,
+            'convertions': self.convertions
+        }
 
     def __eq__(self, other):
         return self.serialize() == other.serialize()
@@ -45,7 +45,6 @@ class RegexSuperParser(AbstractSuperParser):
                 continue
             converter = CONVERTION_MAPPING[conv_type]
             result.append((conv_type, converter.convert(to_convert)))
-        print result
         return result
 
 
