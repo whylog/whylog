@@ -1,7 +1,9 @@
 import datetime
 from unittest import TestCase
 
-from whylog.tests.tests_log_reader.file_reader import DataGeneratorLogSource, OperationCountingFileWrapper
+from whylog.tests.tests_log_reader.file_reader import (
+    DataGeneratorLogSource, OperationCountingFileWrapper
+)
 
 
 class TestLogsReading(TestCase):
