@@ -71,8 +71,8 @@ class TestBasic(TestCase):
         # '009_match_negation',
         '010_multiple_files',
         '011_different_entry',
-        # '012_multiple_rulebooks',
-        # '013_match_and_incomplete',
+# '012_multiple_rulebooks',
+# '013_match_and_incomplete',
     )  # yapf: disable
     def test_one(self, test_name):
         # paths files setup

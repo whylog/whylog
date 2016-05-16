@@ -14,7 +14,6 @@ from whylog.config.log_type import LogType
 from whylog.constraints import IdenticalConstraint
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
-from whylog.teacher.rule_problems import NotMatchingPattern, NotUniqueParserName
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory
 
