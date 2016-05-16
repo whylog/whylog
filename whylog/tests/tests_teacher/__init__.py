@@ -109,8 +109,8 @@ class TestParser(TestBase):
         rule = self.teacher.get_rule()
         assert new_name == rule.parsers[self.effect_id].pattern_name
 
-        warning = self.teacher.set_pattern_name(self.cause1_id, new_name)
-        assert type(warning) == NotUniqueParserName
+        problems = self.teacher.set_pattern_name(self.cause1_id, new_name)
+        assert type(problems[0]) == NotUniqueParserName
 
     def test_setting_converter(self):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
@@ -143,8 +143,8 @@ class TestParser(TestBase):
         assert new_effect_pattern == updated_pattern
 
         not_matching_pattern = new_effect_pattern + 'not_matching_part_of_regex'
-        warning = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
-        assert type(warning) == NotMatchingPattern
+        problems = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
+        assert type(problems[0]) == NotMatchingPattern
 
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)

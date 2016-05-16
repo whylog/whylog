@@ -88,12 +88,13 @@ class Teacher(object):
         Removes constraints related with updating line
         TODO: Update related constraints rather than remove.
         """
-
+        problems = []
         try:
             self.pattern_assistant.update_by_pattern(line_id, pattern)
         except NotMatchingPatternError:
-            return NotMatchingPattern(self._parsers[line_id].line.line_content, pattern)
+            problems.append(NotMatchingPattern(self._parsers[line_id].line.line_content, pattern))
         self._remove_constraints_by_line(line_id)
+        return problems
 
     def guess_patterns(self, line_id):
         """
@@ -105,11 +106,13 @@ class Teacher(object):
         self.pattern_assistant.update_by_guessed_pattern_match(line_id, pattern_id)
 
     def set_pattern_name(self, line_id, name):
+        problems = []
         names_blacklist = self._get_names_blacklist()
         if self.config.is_free_parser_name(name, names_blacklist):
             self._parsers[line_id].name = name
         else:
-            return NotUniqueParserName(name)
+            problems.append(NotUniqueParserName(name))
+        return problems
 
     def set_converter(self, line_id, group_no, converter):
         # TODO: validate converter
