@@ -25,11 +25,19 @@ class TestIdenticalConstraint(TestCase):
 
     def test_verify_success(self):
         ic = IdenticalConstraint(params_checking=False)
-        assert ic.verify(['comp1', 'comp1', 'comp1'])
+        assert ic.verify(['comp1', 'comp1', 'comp1'], {})
 
     def test_verify_fail(self):
         ic = IdenticalConstraint(params_checking=False)
-        assert not ic.verify(['comp1', 'hello', 'comp1'])
+        assert not ic.verify(['comp1', 'hello', 'comp1'], {})
+
+    def test_verify_with_param_success(self):
+        ic = IdenticalConstraint(params_checking=False)
+        assert ic.verify(['foo', 'foo', 'foo'], {'value': 'foo'})
+
+    def test_verify_with_param_fail(self):
+        ic = IdenticalConstraint(params_checking=False)
+        assert not ic.verify(['bar', 'bar', 'foo'], {'value': 'bar'})
 
 
 class TestTimeConstraint(TestCase):
