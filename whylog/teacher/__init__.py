@@ -1,12 +1,17 @@
-from collections import namedtuple
-
 import six
 
+from whylog.assistant.exceptions import NotMatchingPatternError
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
+from whylog.teacher.rule_problems import NotMatchingPattern, NotUniqueParserName
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
-# :type line: FrontInput
-TeacherParser = namedtuple('TeacherParser', ['line', 'name', 'primary_keys', 'log_type'])
+
+class TeacherParser(object):
+    def __init__(self, line_object, name, primary_keys, log_type):
+        self.line = line_object
+        self.name = name
+        self.primary_keys = primary_keys
+        self.log_type = log_type
 
 
 class Teacher(object):
@@ -83,38 +88,48 @@ class Teacher(object):
         Removes constraints related with updating line
         TODO: Update related constraints rather than remove.
         """
-        self.pattern_assistant.update_by_pattern(line_id, pattern)
+        problems = []
+        try:
+            self.pattern_assistant.update_by_pattern(line_id, pattern)
+        except NotMatchingPatternError:
+            problems.append(NotMatchingPattern(self._parsers[line_id].line.line_content, pattern))
         self._remove_constraints_by_line(line_id)
+        return problems
 
     def guess_patterns(self, line_id):
         """
         Returns list of guessed patterns for a line.
         """
-        pattern_matches = self.pattern_assistant.guess_pattern_matches(line_id)
-        return [pattern_match.pattern for pattern_match in pattern_matches]
+        return self.pattern_assistant.guess_pattern_matches(line_id)
 
     def choose_guessed_pattern(self, line_id, pattern_id):
         self.pattern_assistant.update_by_guessed_pattern_match(line_id, pattern_id)
 
     def set_pattern_name(self, line_id, name):
-        pass
+        problems = []
+        names_blacklist = self._get_names_blacklist()
+        if self.config.is_free_parser_name(name, names_blacklist):
+            self._parsers[line_id].name = name
+        else:
+            problems.append(NotUniqueParserName(name))
+        return problems
 
-    def set_converter(self, pattern_group, converter):
-        pass
+    def set_converter(self, line_id, group_no, converter):
+        # TODO: validate converter
+        self.pattern_assistant.set_converter(line_id, group_no, converter)
 
     def set_primary_key(self, line_id, group_numbers):
-        pass
+        # TODO: validate primary_key
+        self._parsers[line_id].primary_keys = group_numbers
 
     def set_log_type(self, line_id, log_type):
-        pass
+        self._parsers[line_id].log_type = log_type
 
     def register_constraint(self, constraint_id, constraint):
         """
         Adds new constraint to rule.
         If constraint_id already exists, constraint with this constraint_id
         is overwritten by new constraint
-        :param pattern_groups: groups in pattern that are linked by constraint
-        :type pattern_groups: list[PatternGroup]
         """
         #TODO: validate constraint
         if constraint_id in six.iterkeys(self._constraint_base):
@@ -160,7 +175,7 @@ class Teacher(object):
 
     def test_rule(self):
         """
-        Simulates searching causes with alreday created rule.
+        Simulates searching causes with already created rule.
         """
         pass
 

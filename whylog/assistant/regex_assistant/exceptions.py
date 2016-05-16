@@ -1,11 +1,7 @@
-from whylog.assistant.exceptions import WhylogAssistantError
+from whylog.assistant.exceptions import NotMatchingPatternError
 
 
-class WhylogRegexAssistantError(WhylogAssistantError):
-    pass
-
-
-class NotMatchingRegexError(WhylogRegexAssistantError):
+class NotMatchingRegexError(NotMatchingPatternError):
     def __init__(self, line_content, regex):
         self.line_content = line_content
         self.regex = regex
