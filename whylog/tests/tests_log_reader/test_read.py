@@ -42,6 +42,7 @@ class TestLogsReading(TestCase):
         raise SkipTest('Not implemented yet')
         line_no = millisecs / self.time_delta_ms
         assert offset == line_no * self.line_padding
+        assert self.opened_file._seek_count < 30
 
     def test_bisect_first_line_of_file(self):
         backtracker = BacktrackSearcher("")
@@ -49,6 +50,7 @@ class TestLogsReading(TestCase):
 
         raise SkipTest('Not implemented yet')
         assert offset == 0
+        assert self.opened_file._seek_count < 30
 
     def test_bisect_last_line_of_file(self):
         backtracker = BacktrackSearcher("")
@@ -56,3 +58,4 @@ class TestLogsReading(TestCase):
 
         raise SkipTest('Not implemented yet')
         assert offset == (self.number_of_lines - 1) * self.line_padding
+        assert self.opened_file._seek_count < 30
