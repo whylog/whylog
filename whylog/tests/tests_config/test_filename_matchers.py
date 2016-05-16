@@ -1,5 +1,6 @@
 import os.path
 import shutil
+from datetime import datetime
 from unittest import TestCase
 
 from whylog.config import SettingsFactorySelector
@@ -51,8 +52,16 @@ class TestBasic(TestCase):
         shutil.rmtree(whylog_dir)
 
     def test_super_parser(self):
-        #TODO test for super parser get groups
-        pass
+        line = '2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2'
+
+        super_parser1 = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
+        assert super_parser1.get_ordered_group(line) == [('date', datetime(2015, 12, 3, 12, 8, 9))]
+
+        super_parser2 = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).* Host name: (\d+)', [2, 1], {1: 'date', 2: 'int'})
+        assert super_parser2.get_ordered_group(line) == [('int', 2), ('date', datetime(2015, 12, 3, 12, 8, 9))]
+
+        super_parser3 = RegexSuperParser('foo bar', [], {})
+        assert super_parser3.get_ordered_group(line) == []
 
     @classmethod
     def tearDownClass(cls):
