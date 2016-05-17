@@ -2,5 +2,5 @@
 log_type_name: default
 matcher_class_name: WildCardFilenameMatcher
 host_pattern: localhost
-path_pattern: whylog\tests\tests_log_reader\test_files\009_match_not\node_1.log
+path_pattern: whylog\tests\tests_log_reader\test_files\009_match_negation\node_1.log
 super_parser: { regex_str: '.*', group_order: [], convertions: {}}

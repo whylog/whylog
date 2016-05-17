@@ -15,8 +15,8 @@ class Rule(object):
 
     LINKAGE_SELECTOR = {
         LINKAGE_AND: Verifier.constraints_and,
-        LINKAGE_OR: Verifier.constraints_or
-        # TODO: add support for NOT
+        LINKAGE_OR: Verifier.constraints_or,
+        LINKAGE_NOT: Verifier.constraints_not
     }
 
     def __init__(self, causes, effect, constraints, linkage):
