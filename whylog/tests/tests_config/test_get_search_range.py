@@ -69,7 +69,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'max_delta': 10}
             }
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause2], self.effect, constraints, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -80,7 +80,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -99,7 +99,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'max_delta': 10}
             }
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -116,7 +116,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -128,7 +128,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'min_delta': 10}
             },
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause1], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -139,7 +139,7 @@ class TestBasic(TestCase):
                     'right_bound': self.ten_second_earlier
                 }
             },
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -151,7 +151,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'max_delta': 10}
             },
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause1], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -162,7 +162,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             },
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -177,7 +177,7 @@ class TestBasic(TestCase):
                     'max_delta': 100
                 }
             },
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause1], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -188,7 +188,7 @@ class TestBasic(TestCase):
                     'right_bound': self.ten_second_later
                 }
             },
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -221,7 +221,7 @@ class TestBasic(TestCase):
                     'min_delta': 20
                 }
             }
-        ]
+        ] # yapf: disable
         rule = Rule(
             [self.cause1, self.cause2, self.cause1, self.cause2], self.effect, constraints1,
             Rule.LINKAGE_AND
@@ -241,7 +241,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -261,7 +261,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'max_delta': 100}
             },
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -272,7 +272,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -292,7 +292,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'max_delta': 25}
             },
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -303,7 +303,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -323,7 +323,7 @@ class TestBasic(TestCase):
                 'name': 'identical',
                 'params': {}
             },
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -334,7 +334,7 @@ class TestBasic(TestCase):
                     'right_bound': self.ten_second_earlier
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -361,7 +361,7 @@ class TestBasic(TestCase):
                 'name': 'identical',
                 'params': {}
             },
-        ]
+        ] # yapf: disable
         rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -372,7 +372,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
@@ -387,7 +387,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         assert calculated_ranges == expected_ranges
 
@@ -398,7 +398,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'max_delta': 10}
             }
-        ]
+        ] # yapf: disable
         rule1 = Rule([self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         constraints2 = [
             {
@@ -413,7 +413,7 @@ class TestBasic(TestCase):
                 'name': 'time',
                 'params': {'max_delta': 100}
             }
-        ]
+        ] # yapf: disable
         rule2 = Rule([self.cause1, self.cause2], self.effect, constraints2, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule1, rule2])
 
@@ -430,7 +430,7 @@ class TestBasic(TestCase):
                     'right_bound': self.effect_time
                 }
             }
-        }
+        } # yapf: disable
 
         raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
