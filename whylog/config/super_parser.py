@@ -10,11 +10,15 @@ from whylog.converters import CONVERTION_MAPPING, STRING
 class AbstractSuperParser(object):
     @abstractmethod
     def get_ordered_groups(self, line):
+        """
+        This method basing on line, returns list of pairs (converted super parser
+        group content, type of this group convertion) in super parser primary key groups order
+        """
         pass
 
 
 class RegexSuperParser(AbstractSuperParser):
-    NO_MATCH = []
+    NO_PRIMARY_KEY = tuple()
 
     def __init__(self, regex_str, group_order, convertions):
         self.regex = re.compile(regex_str)
@@ -32,9 +36,21 @@ class RegexSuperParser(AbstractSuperParser):
         return self.serialize() == other.serialize()
 
     def get_ordered_groups(self, line):
+        """
+        Example:
+            super_parser = RegexSuperParser(
+                '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).* Host name: (\d+)', [2, 1], {
+                    1: 'date',
+                    2: 'int'
+                }
+            )
+            line = '2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2'
+            super_parser.get_ordered_groups(line) returns:
+            [('int', 2), ('date', datetime(2015, 12, 3, 12, 8, 9))]
+        """
         match = self.regex.match(line)
         if not match:
-            return self.NO_MATCH
+            return self.NO_PRIMARY_KEY
         groups = match.groups()
         result = []
         for group_nr in self.group_order:
@@ -45,7 +61,9 @@ class RegexSuperParser(AbstractSuperParser):
                 continue
             converter = CONVERTION_MAPPING[convertion_type]
             result.append((convertion_type, converter.convert(group_to_convert)))
-        return result
+        if result:
+            return result
+        return self.NO_PRIMARY_KEY
 
 
 @six.add_metaclass(ABCMeta)

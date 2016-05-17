@@ -71,7 +71,7 @@ class TestBasic(TestCase):
         ]
 
         super_parser3 = RegexSuperParser('foo bar', [], {})
-        assert super_parser3.get_ordered_groups(line) == []
+        assert super_parser3.get_ordered_groups(line) == tuple()
 
     @classmethod
     def tearDownClass(cls):
