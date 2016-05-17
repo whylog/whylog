@@ -33,11 +33,11 @@ class TestIdenticalConstraint(TestCase):
 
     def test_verify_with_param_success(self):
         ic = IdenticalConstraint(params_checking=False)
-        assert ic.verify(['foo', 'foo', 'foo'], {'value': 'foo'})
+        assert ic.verify(['foo', 'foo', 'foo'], {ic.PARAM_VALUE: 'foo'})
 
     def test_verify_with_param_fail(self):
         ic = IdenticalConstraint(params_checking=False)
-        assert not ic.verify(['bar', 'bar', 'foo'], {'value': 'bar'})
+        assert not ic.verify(['bar', 'bar', 'foo'], {ic.PARAM_VALUE: 'bar'})
 
 
 class TestTimeConstraint(TestCase):
