@@ -223,3 +223,75 @@ class TestBasic(TestCase):
         assert effect_clues_dict['effect'].regex_parameters[0] == \
             clues['cause_a'][0].regex_parameters[0]
         assert not results
+
+    def test_not_one_constraint_nothing_matched(self):
+        rule = Rule(
+            [self.cause_a], self.effect, [
+                {
+                    'clues_groups': [[0, 1], [1, 1]],
+                    'name': 'identical',
+                    'params': {}
+                }
+            ], Rule.LINKAGE_NOT
+        )  # yapf: disable
+        effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
+        clues = {
+            'dummy': [
+                Clue((98,), '98 foo bar', 980, self.line_source),
+                Clue((99,), '99 foo bar', 990, self.line_source)
+            ]
+        }  # yapf: disable
+        results = rule.constraints_check(clues, effect_clues_dict)
+        assert results
+        assert len(results) == 1
+        assert results[0].lines == []
+        assert results[0].constraints_linkage == InvestigationResult.NOT
+
+    def test_not_one_constraint_something_matched_but_constraint_rejected_it(self):
+        rule = Rule(
+            [self.cause_a], self.effect, [
+                {
+                    'clues_groups': [[0, 1], [1, 1]],
+                    'name': 'identical',
+                    'params': {}
+                }
+            ], Rule.LINKAGE_NOT
+        )  # yapf: disable
+        effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
+        clues = {
+            'cause_a': [
+                Clue((13,), '13 carrots', 130, self.line_source),
+            ],
+            'dummy': [
+                Clue((98,), '98 foo bar', 980, self.line_source),
+                Clue((99,), '99 foo bar', 990, self.line_source)
+            ]
+        }  # yapf: disable
+        results = rule.constraints_check(clues, effect_clues_dict)
+        assert results
+        assert len(results) == 1
+        assert results[0].lines == []
+        assert results[0].constraints_linkage == InvestigationResult.NOT
+
+    def test_not_one_constraint_something_matched_but_constraint_approves(self):
+        rule = Rule(
+            [self.cause_a], self.effect, [
+                {
+                    'clues_groups': [[0, 1], [1, 1]],
+                    'name': 'identical',
+                    'params': {}
+                }
+            ], Rule.LINKAGE_NOT
+        )  # yapf: disable
+        effect_clues_dict = {'effect': Clue((42,), '42 dinners', 1420, self.line_source)}
+        clues = {
+            'cause_a': [
+                Clue((42,), '42 carrots', 420, self.line_source),
+            ],
+            'dummy': [
+                Clue((98,), '98 foo bar', 980, self.line_source),
+                Clue((99,), '99 foo bar', 990, self.line_source)
+            ]
+        }  # yapf: disable
+        results = rule.constraints_check(clues, effect_clues_dict)
+        assert not results

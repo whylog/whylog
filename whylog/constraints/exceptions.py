@@ -17,6 +17,14 @@ class UnsupportedConstraintTypeError(VerificationError):
         return "No such constraint (%s) registered" % self._constraint_data['name']
 
 
+class TooManyConstraintsToNegate(VerificationError):
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return "Whylog does not know how to provide investigation when more than 1 constraint are negated"
+
+
 class WrongConstraintClassSetup(VerificationError):
     def __init__(self, constraint_type):
         self._constraint_type = constraint_type
