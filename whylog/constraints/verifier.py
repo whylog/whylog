@@ -2,7 +2,7 @@ import itertools
 
 from whylog.config.investigation_plan import Clue
 from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
-from whylog.constraints.exceptions import UnsupportedConstraintTypeError
+from whylog.constraints.exceptions import TooManyConstraintsToNegate, UnsupportedConstraintTypeError
 from whylog.front.utils import FrontInput
 
 
@@ -188,7 +188,7 @@ class Verifier(object):
         because only in such cases NOT linkage has sense
         """
         if len(constraints) > 1:
-            return []
+            raise TooManyConstraintsToNegate()
         if constraints:
             if clues_lists:
                 return cls.single_constraint_not(
@@ -196,8 +196,8 @@ class Verifier(object):
                 )
         else:
             if clues_lists:
-                return [
-                ]  # if all parsers found their matched logs, the NOT requirement isn't satisfied
+                # if all parsers found their matched logs, the NOT requirement isn't satisfied
+                return []
         return [cls._create_investigation_result([], [], InvestigationResult.NOT)]
 
     @classmethod
