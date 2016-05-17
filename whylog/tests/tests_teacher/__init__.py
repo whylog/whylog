@@ -129,7 +129,10 @@ class TestParser(TestBase):
         assert new_primary_key_groups == parser.primary_key_groups
 
     def test_setting_log_type(self):
-        sample_filename_matcher = WildCardFilenameMatcher('localhost', 'sample_path', 'default')
+        #TODO setting simple RegexSuperParser
+        sample_filename_matcher = WildCardFilenameMatcher(
+            'localhost', 'sample_path', 'default', None
+        )
         new_log_type = LogType('localhost', [sample_filename_matcher])
         self.teacher.set_log_type(self.effect_id, new_log_type)
         parser = self.teacher.get_rule().parsers[self.effect_id]

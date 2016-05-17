@@ -58,7 +58,7 @@ class TestBasic(TestCase):
         line = '2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2'
 
         super_parser1 = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
-        assert super_parser1.get_ordered_group(line) == [('date', datetime(2015, 12, 3, 12, 8, 9))]
+        assert super_parser1.get_ordered_groups(line) == [('date', datetime(2015, 12, 3, 12, 8, 9))]
 
         super_parser2 = RegexSuperParser(
             '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).* Host name: (\d+)', [2, 1], {
@@ -66,12 +66,12 @@ class TestBasic(TestCase):
                 2: 'int'
             }
         )
-        assert super_parser2.get_ordered_group(line) == [
+        assert super_parser2.get_ordered_groups(line) == [
             ('int', 2), ('date', datetime(2015, 12, 3, 12, 8, 9))
         ]
 
         super_parser3 = RegexSuperParser('foo bar', [], {})
-        assert super_parser3.get_ordered_group(line) == []
+        assert super_parser3.get_ordered_groups(line) == []
 
     @classmethod
     def tearDownClass(cls):

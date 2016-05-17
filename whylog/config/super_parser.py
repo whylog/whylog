@@ -9,7 +9,7 @@ from whylog.converters import CONVERTION_MAPPING, STRING
 @six.add_metaclass(ABCMeta)
 class AbstractSuperParser(object):
     @abstractmethod
-    def get_ordered_group(self, line):
+    def get_ordered_groups(self, line):
         pass
 
 
@@ -31,20 +31,20 @@ class RegexSuperParser(AbstractSuperParser):
     def __eq__(self, other):
         return self.serialize() == other.serialize()
 
-    def get_ordered_group(self, line):
+    def get_ordered_groups(self, line):
         match = self.regex.match(line)
         if not match:
             return self.NO_MATCH
         groups = match.groups()
         result = []
         for group_nr in self.group_order:
-            conv_type = self.convertions.get(group_nr)
-            to_convert = groups[group_nr - 1]
-            if conv_type is None:
-                result.append((STRING, to_convert))
+            convertion_type = self.convertions.get(group_nr)
+            group_to_convert = groups[group_nr - 1]
+            if convertion_type is None:
+                result.append((STRING, group_to_convert))
                 continue
-            converter = CONVERTION_MAPPING[conv_type]
-            result.append((conv_type, converter.convert(to_convert)))
+            converter = CONVERTION_MAPPING[convertion_type]
+            result.append((convertion_type, converter.convert(group_to_convert)))
         return result
 
 
