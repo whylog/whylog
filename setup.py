@@ -1,7 +1,7 @@
 import os.path
 import platform
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
@@ -30,5 +30,5 @@ setup(
     classifiers=[
         "Development Status :: 0 - Alpha",
     ],
-    packages=['whylog'],
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 )  # yapf: disable
