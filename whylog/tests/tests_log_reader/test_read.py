@@ -37,7 +37,7 @@ class TestLogsReading(TestCase):
         date = datetime.datetime(year=2000, month=1, day=1, second=secs)
 
         backtracker = BacktrackSearcher("")
-        offset = backtracker._find_offset_by_date(self.opened_file, date)
+        offset = backtracker._find_offset_by_date(self.opened_file, date, {})
 
         raise SkipTest('Not implemented yet')
         line_no = millisecs / self.time_delta_ms
@@ -46,7 +46,7 @@ class TestLogsReading(TestCase):
 
     def test_bisect_first_line_of_file(self):
         backtracker = BacktrackSearcher("")
-        offset = backtracker._find_offset_by_date(self.opened_file, self.the_earliest_date)
+        offset = backtracker._find_offset_by_date(self.opened_file, self.the_earliest_date, {})
 
         raise SkipTest('Not implemented yet')
         assert offset == 0
@@ -54,7 +54,7 @@ class TestLogsReading(TestCase):
 
     def test_bisect_last_line_of_file(self):
         backtracker = BacktrackSearcher("")
-        offset = backtracker._find_offset_by_date(self.opened_file, self.the_soonest_date)
+        offset = backtracker._find_offset_by_date(self.opened_file, self.the_soonest_date, {})
 
         raise SkipTest('Not implemented yet')
         assert offset == (self.number_of_lines - 1) * self.line_padding
