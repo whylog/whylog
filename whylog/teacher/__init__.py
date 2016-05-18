@@ -2,7 +2,7 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.rule_validation_problems import (
-    NotUniqueParserNameProblem, ValidationResult, WrongLogTypeProblem, WrongPrimaryKeyProblem
+    NotUniqueParserNameProblem, ValidationResult, NotSetLogTypeProblem, WrongPrimaryKeyProblem
 )
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
@@ -166,20 +166,13 @@ class Teacher(object):
                 errors.append(WrongPrimaryKeyProblem(primary_key, group_numbers, line_id))
         return ValidationResult(errors=errors, warnings=[])
 
-    def name_is_duplicated(self, searched_name, names):
-        count = 0
-        for name in names:
-            if name == searched_name:
-                count += 1
-        return count > 1
-
     def _validate_pattern_names(self):
         errors = []
         names_blacklist = self._get_names_blacklist()
         for line_id in six.iterkeys(self._parsers):
             parser = self._parsers[line_id]
             blacklist_except_name = set(names_blacklist) - set([parser.name])
-            if self.name_is_duplicated(parser.name, names_blacklist) or \
+            if names_blacklist.count(parser.name) > 1 or \
                     not self.config.is_free_parser_name(parser.name, blacklist_except_name):
                 errors.append(NotUniqueParserNameProblem(line_id))
         return ValidationResult(errors=errors, warnings=[])
@@ -189,7 +182,7 @@ class Teacher(object):
         for line_id in six.iterkeys(self._parsers):
             parser = self._parsers[line_id]
             if parser.log_type is None:
-                errors.append(WrongLogTypeProblem(line_id))
+                errors.append(NotSetLogTypeProblem(line_id))
         return ValidationResult(errors=errors, warnings=[])
 
     def validate(self):
@@ -211,12 +204,6 @@ class Teacher(object):
                 pattern_assistant_validation_result,
             ]
         )  # yapf: disable
-
-    def test_rule(self):
-        """
-        Simulates searching causes with already created rule.
-        """
-        pass
 
     def _prepare_user_parser(self, line_id):
         """
@@ -254,3 +241,5 @@ class Teacher(object):
         validation_result = self.validate()
         if not validation_result.errors:
             self.config.add_rule(self.get_rule())
+        else:
+            return validation_result

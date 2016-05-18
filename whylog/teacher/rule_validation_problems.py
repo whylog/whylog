@@ -32,11 +32,11 @@ class ConstraintValidationProblem(RuleValidationProblem):
     pass
 
 
-class PatternAssistantValidationProblem(RuleValidationProblem):
+class ParserValidationProblem(RuleValidationProblem):
     pass
 
 
-class NotUniqueParserNameProblem(RuleValidationProblem):
+class NotUniqueParserNameProblem(ParserValidationProblem):
     def __init__(self, line_id):
         self.line_id = line_id
 
@@ -47,7 +47,7 @@ class NotUniqueParserNameProblem(RuleValidationProblem):
         return 'Parser name is not unique, line id: %s' % (self.line_id,)
 
 
-class WrongLogTypeProblem(RuleValidationProblem):
+class NotSetLogTypeProblem(ParserValidationProblem):
     def __init__(self, line_id):
         self.line_id = line_id
 
@@ -58,7 +58,7 @@ class WrongLogTypeProblem(RuleValidationProblem):
         return 'Log type is not set, line id: %s' % (self.line_id,)
 
 
-class WrongPrimaryKeyProblem(RuleValidationProblem):
+class WrongPrimaryKeyProblem(ParserValidationProblem):
     def __init__(self, primary_key, group_numbers, line_id):
         self.primary_key = primary_key
         self.group_numbers = group_numbers

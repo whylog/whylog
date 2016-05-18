@@ -15,7 +15,7 @@ from whylog.converters import ConverterType
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
 from whylog.teacher.rule_validation_problems import (
-    NotUniqueParserNameProblem, WrongLogTypeProblem, WrongPrimaryKeyProblem
+    NotUniqueParserNameProblem, NotSetLogTypeProblem, WrongPrimaryKeyProblem
 )
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory
@@ -86,9 +86,9 @@ class TestParser(TestBase):
         validation_result = self.teacher.validate()
         assert not validation_result.warnings
         assert len(validation_result.errors) == 3
-        assert WrongLogTypeProblem(self.effect_id) in validation_result.errors
-        assert WrongLogTypeProblem(self.cause1_id) in validation_result.errors
-        assert WrongLogTypeProblem(self.cause2_id) in validation_result.errors
+        assert NotSetLogTypeProblem(self.effect_id) in validation_result.errors
+        assert NotSetLogTypeProblem(self.cause1_id) in validation_result.errors
+        assert NotSetLogTypeProblem(self.cause2_id) in validation_result.errors
 
     def test_default_user_parser(self):
         self._initial_validation_check()
