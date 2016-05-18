@@ -17,17 +17,18 @@ class TestBasic(TestCase):
         path = os.path.join(*path_test_files)
         suffix_1 = 'node_1.log'
         suffix_2 = 'node_[12].log'
+        super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
         matcher_1 = WildCardFilenameMatcher(
-            'localhost', os.path.join(path, suffix_1), 'default', None
+            'localhost', os.path.join(path, suffix_1), 'default', super_parser
         )
         matcher_2 = WildCardFilenameMatcher(
-            'localhost', os.path.join(path, suffix_2), 'default', None
+            'localhost', os.path.join(path, suffix_2), 'default', super_parser
         )
         log_type = LogType('default', [matcher_1, matcher_2])
 
         assert sorted(log_type.files_to_parse()) == [
-            ('localhost', os.path.join(path, 'node_1.log')),
-            ('localhost', os.path.join(path, 'node_2.log'))
+            ('localhost', os.path.join(path, 'node_1.log'), super_parser),
+            ('localhost', os.path.join(path, 'node_2.log'), super_parser)
         ]
 
     def test_add_log_type(self):

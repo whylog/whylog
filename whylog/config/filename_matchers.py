@@ -24,7 +24,7 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
     def get_matched_files(self):
         if self.host_pattern == 'localhost':
             for path in glob.iglob(self.path_pattern):
-                yield 'localhost', path
+                yield 'localhost', path, self.super_parser
         else:
             # TODO: finding files in others hosts
             raise NotImplementedError

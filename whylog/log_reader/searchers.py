@@ -30,16 +30,18 @@ class DatabaseSearcher(AbstractSearcher):
 
 
 class BacktrackSearcher(AbstractSearcher):
-    def __init__(self, file_path):
+    def __init__(self, file_path, investigation_step, super_parser):
         self._file_path = file_path
+        self._investigation_step = investigation_step
+        self._super_parser = super_parser
 
-    def _deduce_offset(self, investigation_step):
+    def _deduce_offset(self):
         """
         returns offset of the line with the specified time
         """
         for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
             line_content, line_offset = line
-            if investigation_step.is_line_in_search_range(line_content):
+            if self._investigation_step.is_line_in_search_range(line_content):
                 return line_offset + len(line_content) + 1
 
     def _find_offset(self, opened_file, primary_key_value, super_parser):
@@ -92,16 +94,16 @@ class BacktrackSearcher(AbstractSearcher):
                 actual_offset = self._decrease_actual_offset_properly(actual_offset, truncated)
                 yield truncated, actual_offset
 
-    def search(self, investigation_step, original_front_input):
+    def search(self, original_front_input):
         clues = defaultdict(list)
         if original_front_input.line_source.path == self._file_path:
             # TODO checking if host is also the same
             offset = original_front_input.offset
         else:
-            offset = self._deduce_offset(investigation_step)
+            offset = self._deduce_offset()
         for line, actual_offset in self._reverse_from_offset(offset):
             # TODO: remove mock
             line_source = LineSource('localhost', self._file_path)
-            clues_from_line = investigation_step.get_clues(line, actual_offset, line_source)
+            clues_from_line = self._investigation_step.get_clues(line, actual_offset, line_source)
             self._merge_clues(clues, clues_from_line)
         return clues
