@@ -194,8 +194,8 @@ class IdenticalConstraint(AbstractConstraint):
 
     TYPE = ConstraintType.IDENTICAL
 
-    PARAM_VALUE = "value"
-    PARAMS = []
+    PARAM_VALUE = 'value'
+    PARAMS = [PARAM_VALUE]
 
     def verify(self, group_contents, param_dict):
         """

@@ -18,7 +18,7 @@ class TestIdenticalConstraint(TestCase):
         )
 
     def test_get_param_names(self):
-        assert IdenticalConstraint.get_param_names() == []
+        assert IdenticalConstraint.get_param_names() == [IdenticalConstraint.PARAM_VALUE]
 
     def test_get_group_count(self):
         assert IdenticalConstraint.get_groups_count() == (2, None)
