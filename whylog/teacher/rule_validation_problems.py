@@ -1,9 +1,6 @@
 import itertools
 
-from abc import ABCMeta, abstractproperty
 from collections import namedtuple
-
-import six
 
 ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
 
@@ -47,33 +44,23 @@ class RuleValidationProblem(object):
     pass
 
 
-@six.add_metaclass(ABCMeta)
 class ConstraintValidationProblem(RuleValidationProblem):
-    @abstractproperty
+    def __init__(self, constraint_id):
+        self.constraint_id = constraint_id
+
     def get_constraint_id(self):
-        """
-        Id of constraint related to this problem
-        """
-        pass
+        return self.constraint_id
 
 
-@six.add_metaclass(ABCMeta)
 class ParserValidationProblem(RuleValidationProblem):
-    @abstractproperty
-    def get_line_id(self):
-        """
-        Id of line related to this problem
-        """
-        pass
-
-
-class NotUniqueParserNameProblem(ParserValidationProblem):
     def __init__(self, line_id):
         self.line_id = line_id
 
     def get_line_id(self):
         return self.line_id
 
+
+class NotUniqueParserNameProblem(ParserValidationProblem):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
@@ -82,12 +69,6 @@ class NotUniqueParserNameProblem(ParserValidationProblem):
 
 
 class NotSetLogTypeProblem(ParserValidationProblem):
-    def __init__(self, line_id):
-        self.line_id = line_id
-
-    def get_line_id(self):
-        return self.line_id
-
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
@@ -97,12 +78,9 @@ class NotSetLogTypeProblem(ParserValidationProblem):
 
 class WrongPrimaryKeyProblem(ParserValidationProblem):
     def __init__(self, primary_key, group_numbers, line_id):
+        super(WrongPrimaryKeyProblem, self).__init__(line_id)
         self.primary_key = primary_key
         self.group_numbers = group_numbers
-        self.line_id = line_id
-
-    def get_line_id(self):
-        return self.line_id
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
