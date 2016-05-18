@@ -1,6 +1,7 @@
 from whylog.assistant import AbstractAssistant
 from whylog.assistant.const import AssistantType
 from whylog.assistant.regex_assistant.regex_match import RegexMatch
+from whylog.teacher.rule_validation_problems import ValidationResult
 
 
 class RegexAssistant(AbstractAssistant):
@@ -41,12 +42,11 @@ class RegexAssistant(AbstractAssistant):
     def set_converter(self, line_id, group_no, converter):
         self.regex_matches[line_id].set_converter(group_no, converter)
 
-    def verify(self, line_id):
+    def validate(self):
         """
         Verifies regex properties such as:
         - matching a whole text
-        - matching text in a one way only
-        - proper data type assigned to regex group
+        - proper data converter assigned to regex group
         If properties are not met, proper exceptions are returned.
         """
-        return self.regex_matches[line_id].verify()
+        return ValidationResult([], [])  # TODO: fix it

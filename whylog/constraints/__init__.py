@@ -9,6 +9,7 @@ from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import (
     ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
 )
+from whylog.teacher.rule_validation_problems import ValidationResult
 from whylog.teacher.user_intent import UserConstraintIntent
 
 
@@ -125,6 +126,13 @@ class AbstractConstraint(object):
         """
 
         pass
+
+    def validate(self):
+        """
+        Validates constraint: verifies if it is ready to save
+        """
+        # TODO: implement in subclass and test it
+        return ValidationResult([], [])
 
 
 class TimeConstraint(AbstractConstraint):

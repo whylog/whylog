@@ -27,8 +27,8 @@ class ValidationResult(object):
 class RuleValidationProblem(object):
     pass
 
-
 class ConstraintValidationProblem(RuleValidationProblem):
+
     pass
 
 

@@ -41,5 +41,5 @@ class AbstractAssistant(object):
         pass
 
     @abstractmethod
-    def verify(self):
+    def validate(self):
         pass

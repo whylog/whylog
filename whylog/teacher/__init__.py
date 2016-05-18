@@ -2,7 +2,7 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.rule_validation_problems import (
-    NotUniqueParserNameProblem, ValidationResult, NotSetLogTypeProblem, WrongPrimaryKeyProblem
+    NotSetLogTypeProblem, NotUniqueParserNameProblem, ValidationResult, WrongPrimaryKeyProblem
 )
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
@@ -185,6 +185,11 @@ class Teacher(object):
                 errors.append(NotSetLogTypeProblem(line_id))
         return ValidationResult(errors=errors, warnings=[])
 
+    def _validate_constraints(self):
+        return ValidationResult.result_from_results(
+            [constraint.validate() for constraint in six.itervalues(self._constraint_base)]
+        )
+
     def validate(self):
         """
         Verifies if Rule is ready to save.
@@ -193,8 +198,8 @@ class Teacher(object):
         primary_keys_validation_result = self._validate_primary_keys()
         pattern_names_validation_result = self._validate_pattern_names()
         log_type_validation_result = self._validate_log_type()
-        constraints_validation_result = ValidationResult([], [])  # TODO: fix
-        pattern_assistant_validation_result = ValidationResult([], [])  # TODO: fix
+        constraints_validation_result = self.pattern_assistant.validate()
+        pattern_assistant_validation_result = self._validate_constraints()
         return ValidationResult.result_from_results(
             [
                 primary_keys_validation_result,
