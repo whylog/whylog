@@ -3,7 +3,9 @@ from unittest import TestCase
 
 from nose.plugins.skip import SkipTest
 
+from whylog.log_reader.read_utils import ReadUtils
 from whylog.log_reader.searchers import BacktrackSearcher
+from whylog.tests.tests_log_reader.constants import AFewLinesLogParams, TestPaths
 from whylog.tests.tests_log_reader.file_reader import (
     DataGeneratorLogSource, OperationCountingFileWrapper
 )
@@ -28,6 +30,14 @@ class TestLogsReading(TestCase):
                 datetime_format="%c"
             )
         )  # yapf: disable
+
+    def test_getting_line_by_offset(self):
+        fh = open(TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME))
+        assert all([
+            [ReadUtils.get_line_containing_offset(fh, i, 40) for i in range(100)] ==\
+            [ReadUtils.get_line_containing_offset(fh, i, j) for i in range(100)]
+            for j in range(1, 120)
+        ])
 
     def test_bisect_line_finding(self):
         secs = 3

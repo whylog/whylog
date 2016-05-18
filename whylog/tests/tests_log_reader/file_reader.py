@@ -48,7 +48,7 @@ class DataGeneratorLogSource(object):
         if first_line_no == last_line_no:
             line = self._get_line(first_line_no)
             position_in_line = self._position_in_line(self._position)
-            return line[position_in_line:position_in_line + size]
+            result = line[position_in_line:position_in_line + size]
         else:
             first_line_position = self._position_in_line(self._position)
             first_line_fragment = self._get_line(first_line_no)[first_line_position:]
@@ -60,7 +60,9 @@ class DataGeneratorLogSource(object):
                     (first_line_fragment,), lines_between, (last_line_fragment,)
                 )
             )
-            return content
+            result = content
+        self._position += size
+        return result
 
     def tell(self):
         return self._position
