@@ -15,7 +15,7 @@ from whylog.converters import ConverterType
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
 from whylog.teacher.rule_validation_problems import (
-    NotUniqueParserNameProblem, NotSetLogTypeProblem, WrongPrimaryKeyProblem
+    NotSetLogTypeProblem, NotUniqueParserNameProblem, WrongPrimaryKeyProblem
 )
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory

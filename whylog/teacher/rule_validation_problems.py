@@ -1,8 +1,8 @@
-from abc import ABCMeta, abstractproperty
+import itertools
 
+from abc import ABCMeta, abstractproperty
 from collections import namedtuple
 
-import itertools
 import six
 
 ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
@@ -29,12 +29,18 @@ class ValidationResult(object):
         return not self.errors
 
     def select_parser_problems(self, line_id):
-        return [problem for problem in itertools.chain(self.warnings, self.errors)
-                if isinstance(problem, ParserValidationProblem) and problem.get_line_id() == line_id]
+        return [
+            problem for problem in itertools.chain(self.warnings, self.errors)
+            if isinstance(problem, ParserValidationProblem) \
+                and problem.get_line_id() == line_id
+        ]  # yapf: disable
 
     def select_constraint_problems(self, constraint_id):
-        return [problem for problem in itertools.chain(self.warnings, self.errors)
-                if isinstance(problem, ConstraintValidationProblem) and problem.get_constraint_id() == constraint_id]
+        return [
+            problem for problem in itertools.chain(self.warnings, self.errors)
+            if isinstance(problem, ConstraintValidationProblem) \
+                and problem.get_constraint_id() == constraint_id
+        ]  # yapf: disable
 
 
 class RuleValidationProblem(object):

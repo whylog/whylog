@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from whylog.teacher.rule_validation_problems import (
-    ValidationResult, NotSetLogTypeProblem, NotUniqueParserNameProblem
+    NotSetLogTypeProblem, NotUniqueParserNameProblem, ValidationResult
 )
 
 
