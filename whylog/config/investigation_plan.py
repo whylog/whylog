@@ -1,5 +1,7 @@
 import six
 
+from whylog.config.utils import CompareResult
+
 
 class InvestigationPlan(object):
     """
@@ -33,8 +35,7 @@ class InvestigationStep(object):
     This class is responsible for finding all possible Clues from parsed logs.
     Also controls searched time range in logs file.
     """
-    LT, EQ, GT = six.moves.range(-1, 2)
-    LEFT_BOUND, RIGHT_BOUND = six.moves.range(-1, 1)
+    LEFT_BOUND, RIGHT_BOUND = 'left_bound', 'right_bound'
 
     def __init__(self, parser_subset, search_ranges):
         self._parser_subset = parser_subset
@@ -50,7 +51,7 @@ class InvestigationStep(object):
         how relative to bound this line is.
         """
         #TODO: remove mock
-        return self.EQ
+        return CompareResult.EQ
 
     def get_clues(self, line, offset, line_source):
         converted_params = self._parser_subset.convert_parsers_groups_from_matched_line(line)

@@ -34,7 +34,7 @@ class TestLogsReading(TestCase):
         millisecs = secs * 1000
         date = datetime(year=2000, month=1, day=1, second=secs)
 
-        backtracker = BacktrackSearcher("")
+        backtracker = BacktrackSearcher("", None, None)
         offset = backtracker._find_offset(self.opened_file, date, {})
 
         raise SkipTest('Not implemented yet')
@@ -43,7 +43,7 @@ class TestLogsReading(TestCase):
         assert self.opened_file._seek_count < 30
 
     def test_bisect_first_line_of_file(self):
-        backtracker = BacktrackSearcher("")
+        backtracker = BacktrackSearcher("", None, None)
         offset = backtracker._find_offset(self.opened_file, datetime.min, {})
 
         raise SkipTest('Not implemented yet')
@@ -51,7 +51,7 @@ class TestLogsReading(TestCase):
         assert self.opened_file._seek_count < 30
 
     def test_bisect_last_line_of_file(self):
-        backtracker = BacktrackSearcher("")
+        backtracker = BacktrackSearcher("", None, None)
         offset = backtracker._find_offset(self.opened_file, datetime.max, {})
 
         raise SkipTest('Not implemented yet')
