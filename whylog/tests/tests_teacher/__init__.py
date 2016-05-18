@@ -3,7 +3,6 @@ from unittest import TestCase
 
 import six
 
-from whylog.assistant.const import ConverterType
 from whylog.assistant.pattern_match import ParamGroup
 from whylog.assistant.regex_assistant import RegexAssistant
 from whylog.assistant.regex_assistant.regex import create_obvious_regex
@@ -12,6 +11,7 @@ from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import LineSource
 from whylog.config.log_type import LogType
 from whylog.constraints import IdenticalConstraint
+from whylog.converters import ConverterType
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
@@ -92,7 +92,7 @@ class TestParser(TestBase):
             {
                 1: ParamGroup(
                     content='2015-12-03 12:11:00',
-                    converter='to_date'
+                    converter=ConverterType.TO_DATE
                 )
             },
             self.effect_front_input.line_content,
