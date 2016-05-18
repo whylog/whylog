@@ -15,6 +15,9 @@ from whylog.converters import ConverterType
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
+from whylog.teacher.rule_validation_problems import (
+    NotUniqueParserNameProblem, WrongPrimaryKeyProblem, WrongLogTypeProblem, ValidationResult
+)
 from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_teacher', 'test_files']
@@ -79,10 +82,19 @@ class TestBase(TestCase):
 
 
 class TestParser(TestBase):
+    def _initial_validation_check(self):
+        validation_result = self.teacher.validate()
+        assert not validation_result.warnings
+        assert len(validation_result.errors) == 3
+        assert WrongLogTypeProblem(self.effect_id) in validation_result.errors
+        assert WrongLogTypeProblem(self.cause1_id) in validation_result.errors
+        assert WrongLogTypeProblem(self.cause2_id) in validation_result.errors
+
     def test_default_user_parser(self):
+        self._initial_validation_check()
+
         user_rule = self.teacher.get_rule()
         effect_parser = user_rule.parsers[self.effect_id]
-
         wanted_effect_parser = UserParserIntent(
             'regex_assistant',
             'error_occurred_in_reading',
@@ -108,8 +120,19 @@ class TestParser(TestBase):
         rule = self.teacher.get_rule()
         assert new_name == rule.parsers[self.effect_id].pattern_name
 
-        problems = self.teacher.set_pattern_name(self.cause1_id, new_name)
-        assert str(problems[0]) == 'Name is not unique, name: error_occurred_in_reading_hello'
+        self._initial_validation_check()
+
+    def test_setting_wrong_parser_name(self):
+        effect_parser_name = self.teacher.get_rule().parsers[self.effect_id].pattern_name
+        self.teacher.set_pattern_name(self.cause1_id, effect_parser_name)
+        rule = self.teacher.get_rule()
+        assert effect_parser_name == rule.parsers[self.cause1_id].pattern_name
+
+        validation_result = self.teacher.validate()
+        effect_name_problem = NotUniqueParserNameProblem(self.cause1_id)
+        cause1_name_problem = NotUniqueParserNameProblem(self.effect_id)
+        assert effect_name_problem in validation_result.errors
+        assert cause1_name_problem in validation_result.errors
 
     def test_setting_converter(self):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
@@ -120,6 +143,8 @@ class TestParser(TestBase):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
         assert new_converter == parser.groups[3].converter
 
+        self._initial_validation_check()
+
     def test_setting_primary_key(self):
         parser = self.teacher.get_rule().parsers[self.cause1_id]
         new_primary_key_groups = [1, 2]
@@ -127,6 +152,18 @@ class TestParser(TestBase):
         self.teacher.set_primary_key(self.cause1_id, new_primary_key_groups)
         parser = self.teacher.get_rule().parsers[self.cause1_id]
         assert new_primary_key_groups == parser.primary_key_groups
+
+    def test_setting_wrong_primary_key(self):
+        wrong_primary_key_groups = [1, 30000]
+        self.teacher.set_primary_key(self.effect_id, wrong_primary_key_groups)
+        parser = self.teacher.get_rule().parsers[self.effect_id]
+        assert wrong_primary_key_groups == parser.primary_key_groups
+
+        validation_result = self.teacher.validate()
+        primary_key_problem = WrongPrimaryKeyProblem(
+            wrong_primary_key_groups, parser.groups.keys(), self.effect_id
+        )
+        assert primary_key_problem in validation_result.errors
 
     def test_setting_log_type(self):
         #TODO setting simple RegexSuperParser
@@ -143,11 +180,7 @@ class TestParser(TestBase):
         self.teacher.update_pattern(self.effect_id, new_effect_pattern)
         updated_pattern = self.teacher.get_rule().parsers[self.effect_id].pattern
         assert new_effect_pattern == updated_pattern
-
-        not_matching_pattern = new_effect_pattern + 'not_matching_part_of_regex'
-        problems = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
-        assert str(problems[0]) == \
-               'Pattern does not match line, pattern: ^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in (.*) test$not_matching_part_of_regex, line: 2015-12-03 12:11:00 Error occurred in reading test'
+        # TODO: test not matching pattern
 
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)
