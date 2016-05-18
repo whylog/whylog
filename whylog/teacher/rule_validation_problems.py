@@ -1,5 +1,4 @@
 import itertools
-
 from collections import namedtuple
 
 ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
