@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from unittest import TestCase
 
 from nose.plugins.skip import SkipTest
@@ -17,24 +17,22 @@ class TestLogsReading(TestCase):
         cls.line_padding = 42
         cls.opened_file = OperationCountingFileWrapper(
             DataGeneratorLogSource(
-                start_time=datetime.datetime(
+                start_time=datetime(
                     year=2000,
                     month=1,
                     day=1
                 ),
-                time_delta=datetime.timedelta(milliseconds=cls.time_delta_ms),
+                time_delta=timedelta(milliseconds=cls.time_delta_ms),
                 number_of_lines=cls.number_of_lines,
                 line_padding=cls.line_padding,
                 datetime_format="%c"
             )
         )  # yapf: disable
-        cls.the_earliest_date = datetime.datetime(year=1, month=1, day=1)
-        cls.the_soonest_date = datetime.datetime(year=2222, month=1, day=1)
 
     def test_bisect_line_finding(self):
         secs = 3
         millisecs = secs * 1000
-        date = datetime.datetime(year=2000, month=1, day=1, second=secs)
+        date = datetime(year=2000, month=1, day=1, second=secs)
 
         backtracker = BacktrackSearcher("")
         offset = backtracker._find_offset(self.opened_file, date, {})
@@ -46,7 +44,7 @@ class TestLogsReading(TestCase):
 
     def test_bisect_first_line_of_file(self):
         backtracker = BacktrackSearcher("")
-        offset = backtracker._find_offset(self.opened_file, self.the_earliest_date, {})
+        offset = backtracker._find_offset(self.opened_file, datetime.min, {})
 
         raise SkipTest('Not implemented yet')
         assert offset == 0
@@ -54,7 +52,7 @@ class TestLogsReading(TestCase):
 
     def test_bisect_last_line_of_file(self):
         backtracker = BacktrackSearcher("")
-        offset = backtracker._find_offset(self.opened_file, self.the_soonest_date, {})
+        offset = backtracker._find_offset(self.opened_file, datetime.max, {})
 
         raise SkipTest('Not implemented yet')
         assert offset == (self.number_of_lines - 1) * self.line_padding
