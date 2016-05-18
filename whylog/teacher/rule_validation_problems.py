@@ -1,4 +1,9 @@
+from abc import ABCMeta, abstractproperty
+
 from collections import namedtuple
+
+import itertools
+import six
 
 ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
 
@@ -23,23 +28,45 @@ class ValidationResult(object):
     def acceptable(self):
         return not self.errors
 
+    def select_parser_problems(self, line_id):
+        return [problem for problem in itertools.chain(self.warnings, self.errors)
+                if isinstance(problem, ParserValidationProblem) and problem.get_line_id() == line_id]
+
+    def select_constraint_problems(self, constraint_id):
+        return [problem for problem in itertools.chain(self.warnings, self.errors)
+                if isinstance(problem, ConstraintValidationProblem) and problem.get_constraint_id() == constraint_id]
+
 
 class RuleValidationProblem(object):
     pass
 
 
+@six.add_metaclass(ABCMeta)
 class ConstraintValidationProblem(RuleValidationProblem):
+    @abstractproperty
+    def get_constraint_id(self):
+        """
+        Id of constraint related to this problem
+        """
+        pass
 
-    pass
 
-
+@six.add_metaclass(ABCMeta)
 class ParserValidationProblem(RuleValidationProblem):
-    pass
+    @abstractproperty
+    def get_line_id(self):
+        """
+        Id of line related to this problem
+        """
+        pass
 
 
 class NotUniqueParserNameProblem(ParserValidationProblem):
     def __init__(self, line_id):
         self.line_id = line_id
+
+    def get_line_id(self):
+        return self.line_id
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -51,6 +78,9 @@ class NotUniqueParserNameProblem(ParserValidationProblem):
 class NotSetLogTypeProblem(ParserValidationProblem):
     def __init__(self, line_id):
         self.line_id = line_id
+
+    def get_line_id(self):
+        return self.line_id
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -64,6 +94,9 @@ class WrongPrimaryKeyProblem(ParserValidationProblem):
         self.primary_key = primary_key
         self.group_numbers = group_numbers
         self.line_id = line_id
+
+    def get_line_id(self):
+        return self.line_id
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
