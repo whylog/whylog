@@ -42,6 +42,12 @@ class BacktrackSearcher(AbstractSearcher):
             if investigation_step.is_line_in_search_range(line_content):
                 return line_offset + len(line_content) + 1
 
+    def _find_offset(self, opened_file, primary_key_value, super_parser):
+        """
+        returns offset of the line with the specified time
+        """
+        pass  # TODO: implement bisect offset finding
+
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
         for parser_name, clue in six.iteritems(clues_from_line):
