@@ -1,4 +1,3 @@
-backport_collections
 frozendict
 python-dateutil
 pyyaml

@@ -1,5 +1,3 @@
-from backport_collections import Counter
-
 import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
@@ -168,14 +166,20 @@ class Teacher(object):
                 errors.append(WrongPrimaryKeyProblem(primary_key, group_numbers, line_id))
         return ValidationResult(errors=errors, warnings=[])
 
+    def name_is_duplicated(self, searched_name, names):
+        count = 0
+        for name in names:
+            if name == searched_name:
+                count += 1
+        return count > 1
+
     def _validate_pattern_names(self):
         errors = []
         names_blacklist = self._get_names_blacklist()
-        names_counter = Counter(names_blacklist)
         for line_id in six.iterkeys(self._parsers):
             parser = self._parsers[line_id]
             blacklist_except_name = set(names_blacklist) - set([parser.name])
-            if names_counter[parser.name] > 1 or \
+            if self.name_is_duplicated(parser.name, names_blacklist) or \
                     not self.config.is_free_parser_name(parser.name, blacklist_except_name):
                 errors.append(NotUniqueParserNameProblem(line_id))
         return ValidationResult(errors=errors, warnings=[])
