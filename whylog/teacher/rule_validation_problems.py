@@ -1,5 +1,3 @@
-import itertools
-
 from collections import namedtuple
 
 ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
@@ -18,8 +16,8 @@ class ValidationResult(object):
 
     @classmethod
     def result_from_results(cls, results):
-        errors = sorted(itertools.chain(*[result.errors for result in results]))
-        warnings = sorted(itertools.chain(*[result.warnings for result in results]))
+        errors = sum([result.errors for result in results], [])
+        warnings = sum([result.warnings for result in results], [])
         return ValidationResult(errors, warnings)
 
     def acceptable(self):

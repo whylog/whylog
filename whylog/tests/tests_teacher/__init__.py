@@ -14,10 +14,10 @@ from whylog.constraints import IdenticalConstraint
 from whylog.converters import ConverterType
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
-from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.teacher.rule_validation_problems import (
-    NotUniqueParserNameProblem, WrongPrimaryKeyProblem, WrongLogTypeProblem, ValidationResult
+    NotUniqueParserNameProblem, WrongPrimaryKeyProblem, WrongLogTypeProblem
 )
+from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_teacher', 'test_files']

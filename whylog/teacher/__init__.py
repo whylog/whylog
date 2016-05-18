@@ -1,10 +1,10 @@
-import six
-
 from collections import Counter
+
+import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.rule_validation_problems import (
-    NotUniqueParserNameProblem, ValidationResult, WrongLogTypeProblem, WrongPrimaryKeyProblem
+    NotUniqueParserNameProblem, ValidationResult, WrongPrimaryKeyProblem, WrongLogTypeProblem
 )
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
@@ -130,7 +130,7 @@ class Teacher(object):
         self._constraint_base[constraint_id] = constraint
         new_constraint_links = [
             (line_id, group_no, constraint_id) for (line_id, group_no) in constraint.groups
-            ]
+        ]
         self._constraint_links.add_links(new_constraint_links)
 
     def remove_constraint(self, constraint_id):
@@ -206,7 +206,7 @@ class Teacher(object):
                 constraints_validation_result,
                 pattern_assistant_validation_result,
             ]
-        )
+        )  # yapf: disable
 
     def test_rule(self):
         """
@@ -240,7 +240,7 @@ class Teacher(object):
         user_constraints = [
             constraint.convert_to_user_constraint_intent()
             for constraint in six.itervalues(self._constraint_base)
-            ]
+        ]
         return UserRuleIntent(self.effect_id, user_parsers, user_constraints)
 
     def save(self):
@@ -250,4 +250,3 @@ class Teacher(object):
         validation_result = self.validate()
         if not validation_result.errors:
             self.config.add_rule(self.get_rule())
-
