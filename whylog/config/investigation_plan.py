@@ -33,14 +33,24 @@ class InvestigationStep(object):
     This class is responsible for finding all possible Clues from parsed logs.
     Also controls searched time range in logs file.
     """
+    LT, EQ, GT = six.moves.range(-1, 2)
+    LEFT_BOUND, RIGHT_BOUND = six.moves.range(-1, 1)
 
     def __init__(self, parser_subset, search_ranges):
         self._parser_subset = parser_subset
         self._search_ranges = search_ranges
 
     def is_line_in_search_range(self, super_parser_groups):
-        #TODO: write method that check that line is in primary key values range
+        #TODO: delete this deprecated method
         return True
+
+    def compare_with_bound(self, bound, super_parser_groups):
+        """
+        Basing on super_parser_groups extracted from line, returns information
+        how relative to bound this line is.
+        """
+        #TODO: remove mock
+        return self.EQ
 
     def get_clues(self, line, offset, line_source):
         converted_params = self._parser_subset.convert_parsers_groups_from_matched_line(line)

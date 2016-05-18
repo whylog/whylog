@@ -82,12 +82,10 @@ class SearchHandler(object):
 
     def investigate(self, original_front_input):
         clues = defaultdict(itertools.chain)
-        for host, path in self._log_type.files_to_parse():
+        for host, path, super_parser in self._log_type.files_to_parse():
             if host == "localhost":
-                searcher = BacktrackSearcher(path)
-                InvestigationUtils.merge_clue_dicts(
-                    clues, searcher.search(self._investigation_step, original_front_input)
-                )
+                searcher = BacktrackSearcher(path, self._investigation_step, super_parser)
+                InvestigationUtils.merge_clue_dicts(clues, searcher.search(original_front_input))
             else:
                 raise NotImplementedError(
                     "Cannot operate on %s which is different than %s" % (host, "localhost")
