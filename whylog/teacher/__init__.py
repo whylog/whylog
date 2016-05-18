@@ -1,4 +1,4 @@
-from collections import Counter
+from backport_collections import Counter
 
 import six
 
