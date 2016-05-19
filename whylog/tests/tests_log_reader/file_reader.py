@@ -59,7 +59,7 @@ class DataGeneratorLogSource(object):
                 itertools.chain(
                     (first_line_fragment,), lines_between, (last_line_fragment,)
                 )
-            )
+            )  # yapf: disable
             result = content
         self._position += size
         return result

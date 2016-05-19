@@ -1,3 +1,6 @@
+from whylog.log_reader.exceptions import ReadingError
+
+
 class ReadUtils(object):
     @classmethod
     def _read_content(cls, fd, position, buf_size):
@@ -48,11 +51,16 @@ class ReadUtils(object):
         after = cls._expand_left(fd, offset, buf_size)
         before = cls._expand_right(fd, offset, buf_size)
         if not before:
-            raise Exception("Empty file!")
+            raise ReadingError("Empty file!")
         if not after:
-            raise Exception("Offset bigger than file size!")
-        return before[-1] + after[0]
+            raise ReadingError("Offset bigger than file size!")
+        return before[-1] + after[0], offset - len(before[-1]), offset + len(after[0])
 
     @classmethod
     def get_line_containing_offset(cls, fd, offset, buf_size):
+        """
+        returns line which contains the specified offset
+        and returns also offsets of the first and the last sign of this line.
+        if there is '\n' on specified offset, the previous line is returned
+        """
         return cls._read_entire_line(fd, offset, buf_size)

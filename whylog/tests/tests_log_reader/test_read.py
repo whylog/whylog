@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from unittest import TestCase
 
+import six
 from nose.plugins.skip import SkipTest
 
 from whylog.log_reader.read_utils import ReadUtils
@@ -33,11 +34,16 @@ class TestLogsReading(TestCase):
 
     def test_getting_line_by_offset(self):
         fh = open(TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME))
-        assert all([
-            [ReadUtils.get_line_containing_offset(fh, i, 40) for i in range(100)] ==\
-            [ReadUtils.get_line_containing_offset(fh, i, j) for i in range(100)]
-            for j in range(1, 120)
-        ])
+        assert all(
+            [
+                [
+                    (('aaa-%d-bbb' % (i // 10)), (i // 10) * 10, (i // 10) * 10 + 9
+                    ) for i in six.moves.range(100)
+                ] == [
+                    ReadUtils.get_line_containing_offset(fh, i, j) for i in six.moves.range(100)
+                ] for j in six.moves.range(1, 120, 7)
+            ]
+        )
 
     def test_bisect_line_finding(self):
         secs = 3
