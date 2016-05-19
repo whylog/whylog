@@ -88,3 +88,25 @@ class ReadUtils(object):
                 # going left, omit actual line, but maybe it will be returned
                 right = line_begin
         return right
+
+    @classmethod
+    def binary_search_right(cls, fd, left, right, value, super_parser):
+        while left + 1 < right:
+            curr = (left + right) / 2
+            line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
+            # value_of_line = super_parser.get_ordered_groups(line)
+            # TODO: mock fragment begin, replace it with right implementation
+            date = datetime.strptime(line[:24], "%c")
+            print date
+            print value
+            if value >= date:  # TODO: comparison between value and lines primary key value
+                # TODO: mock fragment end
+                # go to the end of current line, maybe it will be returned
+                left = line_end
+            else:
+                # going left, current line is not interesting
+                right = line_begin - 1
+        if right == 0:
+            return 0
+        _, offset, _ = cls.get_line_containing_offset(fd, right - 1, 512)
+        return offset

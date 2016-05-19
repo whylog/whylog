@@ -46,10 +46,12 @@ class BacktrackSearcher(AbstractSearcher):
                 return line_offset + len(line_content) + 1
 
     def _find_left(self, opened_file, value, super_parser):
-        return ReadUtils.binary_search_left(opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser)
+        return ReadUtils.binary_search_left(opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value,
+                                            super_parser)
 
     def _find_right(self, opened_file, value, super_parser):
-        pass
+        return ReadUtils.binary_search_right(opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value,
+                                             super_parser)
 
     def _find_offsets_range(self, opened_file, search_range, super_parser):
         """
@@ -58,7 +60,7 @@ class BacktrackSearcher(AbstractSearcher):
         """
         pass
         # TODO: run function _find_left on left bound
-        # TODO: and run functions _fin_right on right bound
+        # TODO: and run functions _find_right on right bound
 
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
