@@ -58,7 +58,6 @@ class TestLogsReading(TestCase):
         offset = backtracker._find_left(self.opened_file, date, {})
 
         assert offset == secs * self.line_padding
-        print self.opened_file._seek_count
         assert self.opened_file._seek_count < 100
 
     def test_bisect_first_line_of_file(self):
@@ -74,17 +73,3 @@ class TestLogsReading(TestCase):
 
         assert offset == (self.number_of_lines - 1) * self.line_padding
         assert self.opened_file._seek_count < 100
-
-
-time_delta_ms = 1000
-number_of_lines = 10000
-line_padding = 42
-opened_file = OperationCountingFileWrapper(
-    DataGeneratorLogSource(
-        start_time=datetime(year=2000, month=1, day=1),
-        time_delta=timedelta(milliseconds=time_delta_ms),
-        number_of_lines=number_of_lines,
-        line_padding=line_padding,
-        datetime_format="%c"
-    )
-)

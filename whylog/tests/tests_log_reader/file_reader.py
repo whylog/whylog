@@ -44,8 +44,6 @@ class DataGeneratorLogSource(object):
         assert size >= 0
         first_line_no = self._deduce_line_no(self._position)
         last_line_no = self._deduce_line_no(self._position + size)
-        print "read: off=%s, size=%s" % (self._position, size)
-        # assert last_line_no < self._number_of_lines
         if first_line_no == last_line_no:
             line = self._get_line(first_line_no)
             position_in_line = self._position_in_line(self._position)

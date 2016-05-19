@@ -75,11 +75,8 @@ class ReadUtils(object):
         while left + 1 < right:
             curr = (left + right) / 2
             line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
-            # value_of_line = super_parser.get_ordered_groups(line)
             # TODO: mock fragment begin, replace it with right implementation
             date = datetime.strptime(line[:24], "%c")
-            print date
-            print value
             if date < value:  # TODO: comparison between value and lines primary key value
                 # TODO: mock fragment end
                 # omit actual line and go right
@@ -94,11 +91,8 @@ class ReadUtils(object):
         while left + 1 < right:
             curr = (left + right) / 2
             line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
-            # value_of_line = super_parser.get_ordered_groups(line)
             # TODO: mock fragment begin, replace it with right implementation
             date = datetime.strptime(line[:24], "%c")
-            print date
-            print value
             if value >= date:  # TODO: comparison between value and lines primary key value
                 # TODO: mock fragment end
                 # go to the end of current line, maybe it will be returned
