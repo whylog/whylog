@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from datetime import  datetime
 
 import dateutil.parser
 import six
@@ -21,12 +22,16 @@ class AbstractConverter(object):
 
 
 class IntConverter(AbstractConverter):
+    MIN_VALUE = -2000000000
+
     @classmethod
     def convert(cls, pattern_group):
         return int(pattern_group)
 
 
 class FloatConverter(AbstractConverter):
+    MIN_VALUE = float('-inf')
+
     @classmethod
     def convert(cls, pattern_group):
         return float(pattern_group)
@@ -34,6 +39,8 @@ class FloatConverter(AbstractConverter):
 
 #TODO: Simple date convertion will replace for concreate date format converter in the future
 class DateConverter(AbstractConverter):
+    MIN_VALUE = datetime.min
+
     @classmethod
     def convert(cls, pattern_group):
         return dateutil.parser.parse(pattern_group, fuzzy=True)

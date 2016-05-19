@@ -1,4 +1,6 @@
+from collections import defaultdict, deque
 import itertools
+from frozendict import frozendict
 from abc import ABCMeta, abstractmethod
 
 import six
@@ -19,6 +21,9 @@ class Rule(object):
         LINKAGE_OR: Verifier.constraints_or,
         LINKAGE_NOT: Verifier.constraints_not
     }
+
+    EFFECT_NUMBER = 0
+    NO_RANGE = frozendict()
 
     def __init__(self, causes, effect, constraints, linkage):
         self._causes = causes
@@ -57,6 +62,52 @@ class Rule(object):
     def get_effect_name(self):
         return self._effect.name
 
+    def get_search_ranges(self, effect_clues):
+        # if self._linkage != self.LINKAGE_AND:
+        # TODO: implementation for OR linkage
+        # raise NotImplementedError
+        group, group_type = self._effect.get_primary_key_group()
+        if not group:
+            return self.NO_RANGE
+        # Here assumption that len of primary_keys_groups equals 1
+        primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group - 1]
+        parser_ranges = {
+            self.EFFECT_NUMBER: {group_type: {"left_bound": primary_group_value, "right_bound": primary_group_value}}}
+        queue = deque([self.EFFECT_NUMBER])
+        aggregated_constraints = self._aggregate_constraints()
+        while queue:
+            parser_number = queue.popleft()
+            for constraint in aggregated_constraints[parser_number]:
+                constraint_type = constraint['name']
+                depended_parser_number = constraint['clues_groups'][0][0]
+                depended_group_number = constraint['clues_groups'][0][1]
+                base_parser_number = constraint['clues_groups'][1][0]
+                base_parser_group_number = constraint['clues_groups'][1][1]
+                in_primary_key = self._is_primary_key_group(base_parser_group_number, base_parser_number)
+                if not in_primary_key:
+                    continue
+                max_delta = constraint['params'].get('max_delta')
+                min_delta = constraint['params'].get('min_delta', 0)
+                # depended_group_type = self
+                # parser_ranges[depended_parser_number][]
+                queue.append(depended_parser_number)
+
+    def _is_primary_key_group(self, base_parser_group_number, base_parser_number):
+        if base_parser_number == self.EFFECT_NUMBER:
+            return self._effect.is_primary_key(base_parser_group_number)
+        return self._causes[base_parser_number - 1].is_primary_key(base_parser_group_number)
+
+    def _aggregate_constraints(self):
+        # Aggregate constraints have to have min_delta and max_delta params
+        # At this moment only TimeConstraint has this property
+        delta_constraints = set(['time'])
+        parser_with_constraints = defaultdict(list)
+        for constraint in self._constraints:
+            if constraint['name'] in delta_constraints:
+                base_parser = constraint['clues_groups'][1][0]
+                parser_with_constraints[base_parser].append(constraint)
+        return parser_with_constraints
+
     def constraints_check(self, clues, effect_clues_dict):
         """
         check if given clues satisfy rule
@@ -67,7 +118,7 @@ class Rule(object):
             (clues[parser_name], occurrences)
             for parser_name, occurrences in self._frequency_information
             if clues.get(parser_name) is not None
-        ]
+            ]
         effect_clue = effect_clues_dict[self._effect.name]
         constraint_manager = ConstraintManager()
         return self.LINKAGE_SELECTOR[self._linkage](

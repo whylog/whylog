@@ -156,21 +156,11 @@ class AbstractConfig(object):
         return steps
 
     def _get_search_ranges(self, suspected_rules, effect_clues):
-        #TODO: remove mock
-        return {
-            'database': {
-                'date': {
-                    'left_bound': datetime(2016, 4, 12, 23, 53, 3),
-                    'right_bound': datetime(2016, 4, 12, 23, 54, 33)
-                }
-            },
-            'apache': {
-                'date': {
-                    'left_bound': datetime(2016, 4, 12, 23, 54, 33),
-                    'right_bound': datetime(2016, 4, 12, 23, 54, 43)
-                }
-            }
-        }
+        # This implementation assumes that all primary key groups is a one element list
+        # TODO implementation for longer primary key groups
+        rule = suspected_rules[0]
+        rule.get_search_ranges(effect_clues)
+        return {}
 
     def is_free_parser_name(self, parser_name, black_list):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
