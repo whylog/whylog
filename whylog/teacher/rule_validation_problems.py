@@ -72,6 +72,11 @@ class ConstraintValidationProblem(RuleValidationProblem):
 class ParserValidationProblem(RuleValidationProblem):
     def __init__(self, line_id):
         self.line_id = line_id
+        self.TEMPLATE = 'Parser problem in line: %s. %s'
+
+    @property
+    def message(self):
+        return ''
 
     def get_line_id(self):
         return self.line_id
@@ -82,15 +87,16 @@ class ParserValidationProblem(RuleValidationProblem):
     def concerns_constraint(self, constraint_id):
         return False
 
+    def __str__(self):
+        return self.TEMPLATE % (self.line_id, self.message)
+
 
 class NotUniqueParserNameProblem(ParserValidationProblem):
-    def __str__(self):
-        return 'Parser name is not unique, line id: %s' % (self.line_id,)
+    message = 'Parser name is not unique'
 
 
 class NotSetLogTypeProblem(ParserValidationProblem):
-    def __str__(self):
-        return 'Log type is not set, line id: %s' % (self.line_id,)
+    message = 'Log type is not set'
 
 
 class InvalidPrimaryKeyProblem(ParserValidationProblem):
@@ -99,6 +105,7 @@ class InvalidPrimaryKeyProblem(ParserValidationProblem):
         self.primary_key = primary_key
         self.group_numbers = group_numbers
 
-    def __str__(self):
-        return 'Primary key %s should be subset of pattern groups %s, line id: %s' % \
-               (self.primary_key, self.group_numbers, self.line_id)
+    @property
+    def message(self):
+        return 'Primary key %s should be subset of pattern groups %s' % \
+               (self.primary_key, self.group_numbers)
