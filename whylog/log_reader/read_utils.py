@@ -1,7 +1,17 @@
+from datetime import datetime
+
 from whylog.log_reader.exceptions import EmptyFile, OffsetBiggerThanFileSize
 
 
 class ReadUtils(object):
+    @classmethod
+    def size_of_opened_file(cls, fh):
+        prev_position = fh.tell()
+        fh.seek(0, 2)
+        size = fh.tell()
+        fh.seek(prev_position)
+        return size
+
     @classmethod
     def _read_content(cls, fd, position, buf_size):
         fd.seek(position)
@@ -59,3 +69,22 @@ class ReadUtils(object):
         if there is '\n' on specified offset, the previous line is returned
         """
         return cls._read_entire_line(fd, offset, buf_size)
+
+    @classmethod
+    def binary_search_left(cls, fd, left, right, value, super_parser):
+        while left + 1 < right:
+            curr = (left + right) / 2
+            line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
+            # value_of_line = super_parser.get_ordered_groups(line)
+            # TODO: mock fragment begin, replace it with right implementation
+            date = datetime.strptime(line[:24], "%c")
+            print date
+            print value
+            if date < value:  # TODO: comparison between value and lines primary key value
+                # TODO: mock fragment end
+                # omit actual line and go right
+                left = line_end + 1
+            else:
+                # going left, omit actual line, but maybe it will be returned
+                right = line_begin
+        return right
