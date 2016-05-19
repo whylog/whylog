@@ -1,3 +1,7 @@
+from abc import ABCMeta, abstractmethod
+
+import six
+
 import itertools
 from collections import namedtuple
 
@@ -27,21 +31,28 @@ class ValidationResult(object):
     def select_parser_problems(self, line_id):
         return [
             problem for problem in itertools.chain(self.warnings, self.errors)
-            if isinstance(problem, ParserValidationProblem) \
-                and problem.get_line_id() == line_id
+            if problem.concerns_parser(line_id)
         ]  # yapf: disable
 
     def select_constraint_problems(self, constraint_id):
         return [
             problem for problem in itertools.chain(self.warnings, self.errors)
-            if isinstance(problem, ConstraintValidationProblem) \
-                and problem.get_constraint_id() == constraint_id
+            if problem.concerns_constraint(constraint_id)
         ]  # yapf: disable
 
 
+@six.add_metaclass(ABCMeta)
 class RuleValidationProblem(object):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    @abstractmethod
+    def concerns_parser(self, parser_id):
+        pass
+
+    @abstractmethod
+    def concerns_constraint(self, constraint_id):
+        pass
 
 
 class ConstraintValidationProblem(RuleValidationProblem):
@@ -51,6 +62,12 @@ class ConstraintValidationProblem(RuleValidationProblem):
     def get_constraint_id(self):
         return self.constraint_id
 
+    def concerns_parser(self, parser_id):
+        return False
+
+    def concerns_constraint(self, constraint_id):
+        return self.constraint_id == constraint_id
+
 
 class ParserValidationProblem(RuleValidationProblem):
     def __init__(self, line_id):
@@ -58,6 +75,12 @@ class ParserValidationProblem(RuleValidationProblem):
 
     def get_line_id(self):
         return self.line_id
+
+    def concerns_parser(self, parser_id):
+        return self.line_id == parser_id
+
+    def concerns_constraint(self, constraint_id):
+        return False
 
 
 class NotUniqueParserNameProblem(ParserValidationProblem):
