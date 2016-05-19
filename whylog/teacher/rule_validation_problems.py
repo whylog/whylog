@@ -93,9 +93,9 @@ class NotSetLogTypeProblem(ParserValidationProblem):
         return 'Log type is not set, line id: %s' % (self.line_id,)
 
 
-class WrongPrimaryKeyProblem(ParserValidationProblem):
+class InvalidPrimaryKeyProblem(ParserValidationProblem):
     def __init__(self, primary_key, group_numbers, line_id):
-        super(WrongPrimaryKeyProblem, self).__init__(line_id)
+        super(InvalidPrimaryKeyProblem, self).__init__(line_id)
         self.primary_key = primary_key
         self.group_numbers = group_numbers
 

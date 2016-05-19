@@ -2,7 +2,7 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.rule_validation_problems import (
-    NotSetLogTypeProblem, NotUniqueParserNameProblem, ValidationResult, WrongPrimaryKeyProblem
+    InvalidPrimaryKeyProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ValidationResult
 )
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
@@ -163,7 +163,7 @@ class Teacher(object):
             pattern_match = self.pattern_assistant.get_pattern_match(line_id)
             group_numbers = pattern_match.param_groups.keys()
             if set(primary_key) - set(group_numbers):
-                errors.append(WrongPrimaryKeyProblem(primary_key, group_numbers, line_id))
+                errors.append(InvalidPrimaryKeyProblem(primary_key, group_numbers, line_id))
         return ValidationResult(errors=errors, warnings=[])
 
     def _validate_pattern_names(self):

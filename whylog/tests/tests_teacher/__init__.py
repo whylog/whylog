@@ -15,7 +15,7 @@ from whylog.converters import ConverterType
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
 from whylog.teacher.rule_validation_problems import (
-    NotSetLogTypeProblem, NotUniqueParserNameProblem, WrongPrimaryKeyProblem
+    InvalidPrimaryKeyProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem
 )
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory
@@ -160,7 +160,7 @@ class TestParser(TestBase):
         assert wrong_primary_key_groups == parser.primary_key_groups
 
         validation_result = self.teacher.validate()
-        primary_key_problem = WrongPrimaryKeyProblem(
+        primary_key_problem = InvalidPrimaryKeyProblem(
             wrong_primary_key_groups, parser.groups.keys(), self.effect_id
         )
         assert primary_key_problem in validation_result.errors
