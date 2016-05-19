@@ -194,19 +194,13 @@ class Teacher(object):
         """
         Verifies if Rule is ready to save.
         """
-
-        primary_keys_validation_result = self._validate_primary_keys()
-        pattern_names_validation_result = self._validate_pattern_names()
-        log_type_validation_result = self._validate_log_type()
-        constraints_validation_result = self.pattern_assistant.validate()
-        pattern_assistant_validation_result = self._validate_constraints()
         return ValidationResult.result_from_results(
             [
-                primary_keys_validation_result,
-                pattern_names_validation_result,
-                log_type_validation_result,
-                constraints_validation_result,
-                pattern_assistant_validation_result,
+                self._validate_primary_keys(),
+                self._validate_pattern_names(),
+                self._validate_log_type(),
+                self.pattern_assistant.validate(),
+                self._validate_constraints(),
             ]
         )  # yapf: disable
 
