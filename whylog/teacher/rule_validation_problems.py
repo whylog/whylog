@@ -94,7 +94,7 @@ class NotSetLogTypeProblem(ParserValidationProblem):
 
 
 class InvalidPrimaryKeyProblem(ParserValidationProblem):
-    def __init__(self, primary_key, group_numbers, line_id):
+    def __init__(self, line_id, primary_key, group_numbers):
         super(InvalidPrimaryKeyProblem, self).__init__(line_id)
         self.primary_key = primary_key
         self.group_numbers = group_numbers

@@ -161,7 +161,7 @@ class TestParser(TestBase):
 
         validation_result = self.teacher.validate()
         primary_key_problem = InvalidPrimaryKeyProblem(
-            wrong_primary_key_groups, parser.groups.keys(), self.effect_id
+            self.effect_id, wrong_primary_key_groups, parser.groups.keys()
         )
         assert primary_key_problem in validation_result.errors
 
