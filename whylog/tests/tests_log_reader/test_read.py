@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from unittest import TestCase
 
 import six
-from nose.plugins.skip import SkipTest
 
 from whylog.log_reader.read_utils import ReadUtils
 from whylog.log_reader.searchers import BacktrackSearcher

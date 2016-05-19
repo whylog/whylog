@@ -14,7 +14,7 @@ class DataGeneratorLogSource(object):
         self._position = 0
 
     def _deduce_line_no(self, offset):
-        return offset / self._line_padding
+        return offset // self._line_padding
 
     def _position_in_line(self, offset):
         return offset % self._line_padding

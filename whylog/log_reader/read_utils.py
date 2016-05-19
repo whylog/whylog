@@ -73,10 +73,11 @@ class ReadUtils(object):
     @classmethod
     def binary_search_left(cls, fd, left, right, value, super_parser):
         while left + 1 < right:
-            curr = (left + right) / 2
+            curr = (left + right) // 2
             line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
             # TODO: mock fragment begin, replace it with right implementation
-            date = datetime.strptime(line[:24], "%c")
+            date = datetime.strptime(line.split(' r')[0], "%c")
+            # hack basing on specific lines construction in file_reader.py, it's mock, it should be removed later
             if date < value:  # TODO: comparison between value and lines primary key value
                 # TODO: mock fragment end
                 # omit actual line and go right
@@ -89,10 +90,11 @@ class ReadUtils(object):
     @classmethod
     def binary_search_right(cls, fd, left, right, value, super_parser):
         while left + 1 < right:
-            curr = (left + right) / 2
+            curr = (left + right) // 2
             line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
             # TODO: mock fragment begin, replace it with right implementation
-            date = datetime.strptime(line[:24], "%c")
+            date = datetime.strptime(line.split(' r')[0], "%c")
+            # hack basing on specific lines construction in file_reader.py, it's mock, it should be removed later
             if value >= date:  # TODO: comparison between value and lines primary key value
                 # TODO: mock fragment end
                 # go to the end of current line, maybe it will be returned

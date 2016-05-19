@@ -47,11 +47,13 @@ class BacktrackSearcher(AbstractSearcher):
 
     def _find_left(self, opened_file, value, super_parser):
         return ReadUtils.binary_search_left(
-            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser)
+            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser
+        )
 
     def _find_right(self, opened_file, value, super_parser):
         return ReadUtils.binary_search_right(
-            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser)
+            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser
+        )
 
     def _find_offsets_range(self, opened_file, search_range, super_parser):
         """
