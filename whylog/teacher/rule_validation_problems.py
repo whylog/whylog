@@ -4,7 +4,6 @@ from collections import namedtuple
 
 import six
 
-
 ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
 
 
