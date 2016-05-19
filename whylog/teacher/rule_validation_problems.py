@@ -40,7 +40,8 @@ class ValidationResult(object):
 
 
 class RuleValidationProblem(object):
-    pass
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 
 class ConstraintValidationProblem(RuleValidationProblem):
@@ -60,17 +61,11 @@ class ParserValidationProblem(RuleValidationProblem):
 
 
 class NotUniqueParserNameProblem(ParserValidationProblem):
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-
     def __str__(self):
         return 'Parser name is not unique, line id: %s' % (self.line_id,)
 
 
 class NotSetLogTypeProblem(ParserValidationProblem):
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-
     def __str__(self):
         return 'Log type is not set, line id: %s' % (self.line_id,)
 
@@ -80,9 +75,6 @@ class WrongPrimaryKeyProblem(ParserValidationProblem):
         super(WrongPrimaryKeyProblem, self).__init__(line_id)
         self.primary_key = primary_key
         self.group_numbers = group_numbers
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
 
     def __str__(self):
         return 'Primary key %s should be subset of pattern groups %s, line id: %s' % \
