@@ -1,9 +1,9 @@
+import itertools
 from abc import ABCMeta, abstractmethod
+from collections import namedtuple
 
 import six
 
-import itertools
-from collections import namedtuple
 
 ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
 
