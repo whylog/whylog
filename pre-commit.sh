@@ -8,18 +8,22 @@ set +e
 
 if grep -r --extended-regexp '^ *class [^\(]+(\(\))?:' whylog/; then
     echo "old-style class detected!"
+    exit 1
 fi
 
 if grep -r --extended-regex '\b(all|any|filter|map|reduce)\(\[' whylog/; then
     echo "improper use of function and list comprenension! (use a generator expression instead of list comprehension)"
+    exit 1
 fi
 
 if grep -r '\_\_metaclass\_\_' whylog/; then
     echo "improper declaration of metaclass detected! (use six for that)"
+    exit 1
 fi
 
 if grep -r 'isinstance(' whylog/; then
     echo "isinstance detected! (check behavior, not identity)"
+    exit 1
 fi
 
 if [ "$(<.git/refs/heads/${base_branch})" != "$(<.git/refs/remotes/${base_remote}/${base_remote_branch})" ]; then
