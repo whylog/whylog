@@ -10,6 +10,10 @@ if grep -r --extended-regexp '^ *class [^\(]+(\(\))?:' whylog/; then
     echo "old-style class detected!"
 fi
 
+if grep -r --extended-regex '\b(all|any|filter|map|reduce)\(\[' whylog/; then
+    echo "improper use of function and list comprenension! (use a generator expression instead of list comprehension)"
+fi
+
 if grep -r '\_\_metaclass\_\_' whylog/; then
     echo "improper declaration of metaclass detected! (use six for that)"
 fi

@@ -73,5 +73,6 @@ script:
   - if [ -n "$SCA" ]; then grep -r '\_\_metaclass\_\_' whylog/ && exit 1 || true; else echo skip; fi
   - if [ -n "$SCA" ]; then grep -r --extended-regex '^ *class [^\(]+(\(\))?:' whylog/ && exit 1 || true; else echo skip; fi
   - if [ -n "$SCA" ]; then grep -r 'isinstance(' whylog/ && exit 1 || true; else echo skip; fi
+  - if [ -n "$SCA" ]; then grep -r --extended-regex '\b(all|any)\(\[' whylog/ && exit 1 || true; else echo skip; fi
   - if [ -n "$SCA" ]; then exit; else echo skip; fi
   - python setup.py nosetests
