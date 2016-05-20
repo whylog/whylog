@@ -14,6 +14,10 @@ if grep -r '\_\_metaclass\_\_' whylog/; then
     echo "improper declaration of metaclass detected! (use six for that)"
 fi
 
+if grep -r 'isinstance(' whylog/; then
+    echo "isinstance detected! (check behavior, not identity)"
+fi
+
 if [ "$(<.git/refs/heads/${base_branch})" != "$(<.git/refs/remotes/${base_remote}/${base_remote_branch})" ]; then
     echo """running yapf in full mode, because an assumption that master and origin/master are the same, is broken. To fix it, do this:
 git checkout master
