@@ -163,7 +163,7 @@ class Teacher(object):
             pattern_match = self.pattern_assistant.get_pattern_match(line_id)
             group_numbers = pattern_match.param_groups.keys()
             if set(primary_key) - set(group_numbers):
-                errors.append(InvalidPrimaryKeyProblem(line_id, primary_key, group_numbers))
+                errors.append(InvalidPrimaryKeyProblem(primary_key, group_numbers))
         return ValidationResult(errors=errors, warnings=[])
 
     def _validate_pattern_names(self):
@@ -174,7 +174,7 @@ class Teacher(object):
             blacklist_except_name = set(names_blacklist) - set([parser.name])
             if names_blacklist.count(parser.name) > 1 or \
                     not self.config.is_free_parser_name(parser.name, blacklist_except_name):
-                errors.append(NotUniqueParserNameProblem(line_id))
+                errors.append(NotUniqueParserNameProblem())
         return ValidationResult(errors=errors, warnings=[])
 
     def _validate_log_type(self):
@@ -182,7 +182,7 @@ class Teacher(object):
         for line_id in six.iterkeys(self._parsers):
             parser = self._parsers[line_id]
             if parser.log_type is None:
-                errors.append(NotSetLogTypeProblem(line_id))
+                errors.append(NotSetLogTypeProblem())
         return ValidationResult(errors=errors, warnings=[])
 
     def _validate_constraints(self):

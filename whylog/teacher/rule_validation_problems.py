@@ -1,10 +1,6 @@
 import itertools
-from abc import ABCMeta, abstractmethod
-from collections import namedtuple
 
-import six
-
-ValidationResult = namedtuple('ValidationResult', ['errors', 'warnings'])
+#ValidationResult = namedtuple('ValidationResult', ['parser_problems', 'rule_problems'])
 
 
 class ValidationResult(object):
@@ -40,71 +36,39 @@ class ValidationResult(object):
         ]  # yapf: disable
 
 
-@six.add_metaclass(ABCMeta)
 class RuleValidationProblem(object):
+    MESSAGE_TEMPLATE = 'Rule problem: %s'
+    MESSAGE = ''
+
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
-    @abstractmethod
-    def concerns_parser(self, parser_id):
-        pass
-
-    @abstractmethod
-    def concerns_constraint(self, constraint_id):
-        pass
+    def __str__(self):
+        return self.MESSAGE_TEMPLATE % (self.MESSAGE,)
 
 
 class ConstraintValidationProblem(RuleValidationProblem):
-    def __init__(self, constraint_id):
-        self.constraint_id = constraint_id
-
-    def get_constraint_id(self):
-        return self.constraint_id
-
-    def concerns_parser(self, parser_id):
-        return False
-
-    def concerns_constraint(self, constraint_id):
-        return self.constraint_id == constraint_id
+    MESSAGE_TEMPLATE = 'Constraint problem: %s'
 
 
 class ParserValidationProblem(RuleValidationProblem):
-    def __init__(self, line_id):
-        self.line_id = line_id
-        self.TEMPLATE = 'Parser problem in line: %s. %s'
-
-    @property
-    def message(self):
-        return ''
-
-    def get_line_id(self):
-        return self.line_id
-
-    def concerns_parser(self, parser_id):
-        return self.line_id == parser_id
-
-    def concerns_constraint(self, constraint_id):
-        return False
-
-    def __str__(self):
-        return self.TEMPLATE % (self.line_id, self.message)
+    MESSAGE_TEMPLATE = 'Parser problem: %s'
 
 
 class NotUniqueParserNameProblem(ParserValidationProblem):
-    message = 'Parser name is not unique'
+    MESSAGE = 'Parser name is not unique.'
 
 
 class NotSetLogTypeProblem(ParserValidationProblem):
-    message = 'Log type is not set'
+    MESSAGE = 'Log type is not set.'
 
 
 class InvalidPrimaryKeyProblem(ParserValidationProblem):
-    def __init__(self, line_id, primary_key, group_numbers):
-        super(InvalidPrimaryKeyProblem, self).__init__(line_id)
+    MESSAGE = 'Primary key %s should be subset of pattern groups %s.'
+
+    def __init__(self, primary_key, group_numbers):
         self.primary_key = primary_key
         self.group_numbers = group_numbers
 
-    @property
-    def message(self):
-        return 'Primary key %s should be subset of pattern groups %s' % \
-               (self.primary_key, self.group_numbers)
+    def __str__(self):
+        return self.MESSAGE_TEMPLATE % (self.MESSAGE % (self.primary_key, self.group_numbers))
