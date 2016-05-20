@@ -1,4 +1,4 @@
-class ConstraintType:
+class ConstraintType(object):
     DIFFERENT = 'different'
     HETERO = 'hetero'
     IDENTICAL = 'identical'
