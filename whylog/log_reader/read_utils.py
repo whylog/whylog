@@ -23,18 +23,15 @@ class ReadUtils(object):
         return first_part[:-1] + ["".join((first_part[-1], second_part[0]))] + second_part[1:]
 
     @classmethod
-    def _expand_left(cls, fd, position, buf_size):
-        after = []
-        while len(after) < 2:
-            lines = cls._read_split_lines(fd, position, buf_size)
-            if lines == ['']:
-                break
-            after = cls._join_results(after, lines)
-            position += buf_size
-        return after
+    def _expand_after(cls, fd, position):
+        fd.seek(position)
+        line = fd.readline()
+        if not line:
+            raise OffsetBiggerThanFileSize(position)
+        return line.strip()
 
     @classmethod
-    def _expand_right(cls, fd, position, buf_size):
+    def _expand_before(cls, fd, position, buf_size):
         before = []
         while len(before) < 2:
             position -= buf_size
@@ -44,17 +41,15 @@ class ReadUtils(object):
                 break
             lines = cls._read_split_lines(fd, position, buf_size)
             before = cls._join_results(lines, before)
-        return before
+        if not before:
+            raise EmptyFile()
+        return before[-1]
 
     @classmethod
     def _read_entire_line(cls, fd, offset, buf_size):
-        after = cls._expand_left(fd, offset, buf_size)
-        before = cls._expand_right(fd, offset, buf_size)
-        if not before:
-            raise EmptyFile()
-        if not after:
-            raise OffsetBiggerThanFileSize(offset)
-        return before[-1] + after[0], offset - len(before[-1]), offset + len(after[0])
+        after = cls._expand_after(fd, offset)
+        before = cls._expand_before(fd, offset, buf_size)
+        return before + after, offset - len(before), offset + len(after)
 
     @classmethod
     def get_line_containing_offset(cls, fd, offset, buf_size):
