@@ -236,8 +236,8 @@ class InvestigationResult(object):
             )
 
     def __eq__(self, other):
-        return all([
+        return all((
             self.lines == other.lines,
             self.constraints == other.constraints,
             self.constraints_linkage == other.constraints_linkage
-        ])  # yapf: disable
+        ))  # yapf: disable
