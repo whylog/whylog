@@ -64,21 +64,11 @@ class Rule(object):
         return self._effect.name
 
     def get_search_ranges(self, effect_clues):
-        # if self._linkage != self.LINKAGE_AND:
-        # TODO: implementation for OR linkage
-        # raise NotImplementedError
         group, group_type = self._effect.get_primary_key_group()
         if not group:
             return self.NO_RANGE
-        # Here assumption that len of primary_keys_groups equals 1
-        primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group - 1]
         parser_ranges = {
-            self.EFFECT_NUMBER: {
-                group_type: {
-                    "left_bound": primary_group_value,
-                    "right_bound": primary_group_value
-                }
-            }
+            self.EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
         }
         queue = deque([self.EFFECT_NUMBER])
         aggregated_constraints = self._aggregate_constraints()
@@ -86,36 +76,51 @@ class Rule(object):
         while queue:
             parser_number = queue.popleft()
             for constraint in aggregated_constraints[parser_number]:
-                depended_parser_number = constraint['clues_groups'][0][0]
-                depended_group_number = constraint['clues_groups'][0][1]
-                base_parser_number = constraint['clues_groups'][1][0]
-                base_parser_group_number = constraint['clues_groups'][1][1]
-                in_primary_key = self._is_primary_key_group(
-                    base_parser_group_number, base_parser_number
-                )
-                if not in_primary_key:
-                    continue
-                in_primary_key = self._is_primary_key_group(
-                    depended_group_number, depended_parser_number
-                )
-                if not in_primary_key:
-                    continue
+                clues_groups = constraint['clues_groups']
+                depended_parser_number = clues_groups[0][0]
+                base_parser_number = clues_groups[1][0]
                 if depended_parser_number in used_parsers:
                     continue
-                group_type = 'date'
-                max_delta = constraint['params'].get('max_delta')
-                min_delta = constraint['params'].get('min_delta')
-                left_bound = parser_ranges[base_parser_number][group_type]["left_bound"]
-                right_bound = parser_ranges[base_parser_number][group_type]["right_bound"]
-                converter = CONVERTION_MAPPING[group_type]
-                new_left_bound = converter.switch_by_delta(left_bound, max_delta, "max")
-                new_right_bound = converter.switch_by_delta(right_bound, min_delta, "min")
-                parser_ranges[depended_parser_number] = {
-                    group_type: {"left_bound": new_left_bound, "right_bound": new_right_bound}}
+                if not self._is_primary_key_constraint(clues_groups):
+                    continue
+                _, group_type = self._causes[depended_parser_number - 1].get_primary_key_group()
+                parser_ranges[depended_parser_number] = self._calculate_parser_bounds(
+                    base_parser_number, constraint['params'], group_type, parser_ranges
+                )
                 queue.append(depended_parser_number)
                 used_parsers.add(depended_parser_number)
         parser_ranges.pop(self.EFFECT_NUMBER)
         return self._aggregate_by_log_type(parser_ranges)
+
+    def _get_effect_range(self, effect_clues, group, group_type):
+        # Here assumption that len of primary_keys_groups equals 1
+        primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group - 1]
+        return {group_type: {"left_bound": primary_group_value, "right_bound": primary_group_value}}
+
+    def _is_primary_key_constraint(self, clues_groups):
+        base_parser_number = clues_groups[1][0]
+        depended_parser_number = clues_groups[0][0]
+        base_parser_group_number = clues_groups[1][1]
+        depended_group_number = clues_groups[0][1]
+        return self._is_primary_key_group(base_parser_group_number, base_parser_number) and \
+               self._is_primary_key_group(depended_group_number, depended_parser_number)
+
+    def _calculate_parser_bounds(self, base_parser_number, params, group_type, parser_ranges):
+        max_delta = params.get('max_delta')
+        min_delta = params.get('min_delta')
+        left_bound, right_bound = self._get_base_bounds(
+            base_parser_number, group_type, parser_ranges
+        )
+        converter = CONVERTION_MAPPING[group_type]
+        new_left_bound = converter.switch_by_delta(left_bound, max_delta, "max")
+        new_right_bound = converter.switch_by_delta(right_bound, min_delta, "min")
+        return {group_type: {"left_bound": new_left_bound, "right_bound": new_right_bound}}
+
+    @classmethod
+    def _get_base_bounds(cls, base_parser_number, group_type, parser_ranges):
+        left_bound = parser_ranges[base_parser_number][group_type]["left_bound"]
+        right_bound = parser_ranges[base_parser_number][group_type]["right_bound"]
+        return left_bound, right_bound
 
     def _aggregate_by_log_type(self, parser_ranges):
         search_ranges = {}
@@ -136,8 +141,12 @@ class Rule(object):
 
     @classmethod
     def _update_bounds(cls, old_bounds_dict, parser_bound_dict):
-        old_bounds_dict["left_bound"] = min(old_bounds_dict["left_bound"], parser_bound_dict["left_bound"])
-        old_bounds_dict["right_bound"] = max(old_bounds_dict["right_bound"], parser_bound_dict["right_bound"])
+        old_bounds_dict["left_bound"] = min(
+            old_bounds_dict["left_bound"], parser_bound_dict["left_bound"]
+        )
+        old_bounds_dict["right_bound"] = max(
+            old_bounds_dict["right_bound"], parser_bound_dict["right_bound"]
+        )
 
     def _is_primary_key_group(self, parser_group_number, parser_number):
         if parser_number == self.EFFECT_NUMBER:
@@ -165,7 +174,7 @@ class Rule(object):
             (clues[parser_name], occurrences)
             for parser_name, occurrences in self._frequency_information
             if clues.get(parser_name) is not None
-            ]
+        ]
         effect_clue = effect_clues_dict[self._effect.name]
         constraint_manager = ConstraintManager()
         return self.LINKAGE_SELECTOR[self._linkage](
