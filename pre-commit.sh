@@ -6,7 +6,7 @@ base_remote_branch="${3:-master}"
 
 set +e
 
-if grep -r --perl-regexp '^ *class [^\(]+(\(\))?:' whylog/; then
+if grep -r --extended-regexp '^ *class [^\(]+(\(\))?:' whylog/; then
     echo "old-style class detected!"
 fi
 
