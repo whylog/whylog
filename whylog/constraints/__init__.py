@@ -9,7 +9,6 @@ from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import (
     ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
 )
-from whylog.teacher.rule_validation_problems import ValidationResult
 from whylog.teacher.user_intent import UserConstraintIntent
 
 

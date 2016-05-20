@@ -1,12 +1,10 @@
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
-from whylog.teacher.rule_validation_problems import (
-    OneParserRuleProblem,
-    NoEffectParserProblem,
-    NotSetLogTypeProblem,
-    NotUniqueParserNameProblem,
-)
 from whylog.tests.tests_teacher import TestBase
+
+from whylog.teacher.rule_validation_problems import (  # isort:skip
+    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, OneParserRuleProblem
+)  # yapf: disable
 
 
 class TestValidationBase(TestBase):
