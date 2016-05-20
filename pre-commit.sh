@@ -6,6 +6,10 @@ base_remote_branch="${3:-master}"
 
 set +e
 
+if grep -r --perl-regexp '^ *class [^\(]+(\(\))?:' whylog/; then
+    echo "old-style class detected!"
+fi
+
 if [ "$(<.git/refs/heads/${base_branch})" != "$(<.git/refs/remotes/${base_remote}/${base_remote_branch})" ]; then
     echo """running yapf in full mode, because an assumption that master and origin/master are the same, is broken. To fix it, do this:
 git checkout master
