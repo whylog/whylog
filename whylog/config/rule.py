@@ -8,6 +8,7 @@ import six
 from whylog.config.parsers import RegexParserFactory
 from whylog.constraints.constraint_manager import ConstraintManager
 from whylog.constraints.verifier import Verifier
+from whylog.converters import CONVERTION_MAPPING
 
 
 class Rule(object):
@@ -72,30 +73,76 @@ class Rule(object):
         # Here assumption that len of primary_keys_groups equals 1
         primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group - 1]
         parser_ranges = {
-            self.EFFECT_NUMBER: {group_type: {"left_bound": primary_group_value, "right_bound": primary_group_value}}}
+            self.EFFECT_NUMBER: {
+                group_type: {
+                    "left_bound": primary_group_value,
+                    "right_bound": primary_group_value
+                }
+            }
+        }
         queue = deque([self.EFFECT_NUMBER])
         aggregated_constraints = self._aggregate_constraints()
+        used_parsers = set([self.EFFECT_NUMBER])
         while queue:
             parser_number = queue.popleft()
             for constraint in aggregated_constraints[parser_number]:
-                constraint_type = constraint['name']
                 depended_parser_number = constraint['clues_groups'][0][0]
                 depended_group_number = constraint['clues_groups'][0][1]
                 base_parser_number = constraint['clues_groups'][1][0]
                 base_parser_group_number = constraint['clues_groups'][1][1]
-                in_primary_key = self._is_primary_key_group(base_parser_group_number, base_parser_number)
+                in_primary_key = self._is_primary_key_group(
+                    base_parser_group_number, base_parser_number
+                )
                 if not in_primary_key:
                     continue
+                in_primary_key = self._is_primary_key_group(
+                    depended_group_number, depended_parser_number
+                )
+                if not in_primary_key:
+                    continue
+                if depended_parser_number in used_parsers:
+                    continue
+                group_type = 'date'
                 max_delta = constraint['params'].get('max_delta')
-                min_delta = constraint['params'].get('min_delta', 0)
-                # depended_group_type = self
-                # parser_ranges[depended_parser_number][]
+                min_delta = constraint['params'].get('min_delta')
+                left_bound = parser_ranges[base_parser_number][group_type]["left_bound"]
+                right_bound = parser_ranges[base_parser_number][group_type]["right_bound"]
+                converter = CONVERTION_MAPPING[group_type]
+                new_left_bound = converter.switch_by_delta(left_bound, max_delta, "max")
+                new_right_bound = converter.switch_by_delta(right_bound, min_delta, "min")
+                parser_ranges[depended_parser_number] = {
+                    group_type: {"left_bound": new_left_bound, "right_bound": new_right_bound}}
                 queue.append(depended_parser_number)
+                used_parsers.add(depended_parser_number)
+        parser_ranges.pop(self.EFFECT_NUMBER)
+        return self._aggregate_by_log_type(parser_ranges)
 
-    def _is_primary_key_group(self, base_parser_group_number, base_parser_number):
-        if base_parser_number == self.EFFECT_NUMBER:
-            return self._effect.is_primary_key(base_parser_group_number)
-        return self._causes[base_parser_number - 1].is_primary_key(base_parser_group_number)
+    def _aggregate_by_log_type(self, parser_ranges):
+        search_ranges = {}
+        for parser_number, ranges in six.iteritems(parser_ranges):
+            parser_log_type = self._causes[parser_number - 1].log_type
+            if parser_log_type not in search_ranges:
+                search_ranges[parser_log_type] = ranges
+                continue
+            self._update_log_type_ranges(parser_log_type, ranges, search_ranges)
+        return search_ranges
+
+    def _update_log_type_ranges(self, parser_log_type, ranges, search_ranges):
+        for group_type in ranges:
+            if group_type not in search_ranges[parser_log_type]:
+                search_ranges[parser_log_type][group_type] = ranges[group_type]
+                continue
+            self._update_bounds(search_ranges[parser_log_type][group_type], ranges[group_type])
+
+    @classmethod
+    def _update_bounds(cls, old_bounds_dict, parser_bound_dict):
+        old_bounds_dict["left_bound"] = min(old_bounds_dict["left_bound"], parser_bound_dict["left_bound"])
+        old_bounds_dict["right_bound"] = max(old_bounds_dict["right_bound"], parser_bound_dict["right_bound"])
+
+    def _is_primary_key_group(self, parser_group_number, parser_number):
+        if parser_number == self.EFFECT_NUMBER:
+            return self._effect.is_primary_key(parser_group_number)
+        return self._causes[parser_number - 1].is_primary_key(parser_group_number)
 
     def _aggregate_constraints(self):
         # Aggregate constraints have to have min_delta and max_delta params

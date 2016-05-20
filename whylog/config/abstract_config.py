@@ -159,8 +159,7 @@ class AbstractConfig(object):
         # This implementation assumes that all primary key groups is a one element list
         # TODO implementation for longer primary key groups
         rule = suspected_rules[0]
-        rule.get_search_ranges(effect_clues)
-        return {}
+        return rule.get_search_ranges(effect_clues)
 
     def is_free_parser_name(self, parser_name, black_list):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)

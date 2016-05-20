@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from datetime import  datetime
+from datetime import datetime, timedelta
 
 import dateutil.parser
 import six
@@ -40,6 +40,18 @@ class FloatConverter(AbstractConverter):
 #TODO: Simple date convertion will replace for concreate date format converter in the future
 class DateConverter(AbstractConverter):
     MIN_VALUE = datetime.min
+
+    @classmethod
+    def switch_by_delta(cls, date, delta, delta_type):
+        if not delta:
+            if delta_type == "max":
+                return cls.MIN_VALUE
+            else:
+                return date
+        converted_delta = timedelta(seconds=abs(delta))
+        if delta > 0:
+            return date - converted_delta
+        return date + converted_delta
 
     @classmethod
     def convert(cls, pattern_group):
