@@ -132,7 +132,7 @@ class AbstractConstraint(object):
         Validates constraint: verifies if it is ready to save
         """
         # TODO: implement in subclass and test it
-        return ValidationResult([], [])
+        return {}
 
 
 class TimeConstraint(AbstractConstraint):
