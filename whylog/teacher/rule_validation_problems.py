@@ -39,6 +39,7 @@ class ValidationResult(object):
 class RuleValidationProblem(object):
     MESSAGE_TEMPLATE = 'Rule problem: %s'
     MESSAGE = ''
+    IS_FATAL = True
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
