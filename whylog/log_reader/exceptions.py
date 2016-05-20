@@ -15,9 +15,13 @@ class NoLogTypeError(LogReaderError):
         )
 
 
-class ReadingError(LogReaderError):
-    def __init__(self, info):
-        self.info = info
+class EmptyFile(LogReaderError):
+    pass
+
+
+class OffsetBiggerThanFileSize(LogReaderError):
+    def __init__(self, offset):
+        self.offset = offset
 
     def __str__(self):
-        return 'Read error: %s' % self.info
+        return 'Captured offset (%s) is too big' % self.offset

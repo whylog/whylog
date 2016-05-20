@@ -1,4 +1,4 @@
-from whylog.log_reader.exceptions import ReadingError
+from whylog.log_reader.exceptions import EmptyFile, OffsetBiggerThanFileSize
 
 
 class ReadUtils(object):
@@ -20,7 +20,7 @@ class ReadUtils(object):
             return second_part
         if not second_part:
             return first_part
-        return first_part[:-1] + ["".join([first_part[-1], second_part[0]])] + second_part[1:]
+        return first_part[:-1] + ["".join((first_part[-1], second_part[0]))] + second_part[1:]
 
     @classmethod
     def _expand_left(cls, fd, position, buf_size):
@@ -51,9 +51,9 @@ class ReadUtils(object):
         after = cls._expand_left(fd, offset, buf_size)
         before = cls._expand_right(fd, offset, buf_size)
         if not before:
-            raise ReadingError("Empty file!")
+            raise EmptyFile()
         if not after:
-            raise ReadingError("Offset bigger than file size!")
+            raise OffsetBiggerThanFileSize(offset)
         return before[-1] + after[0], offset - len(before[-1]), offset + len(after[0])
 
     @classmethod

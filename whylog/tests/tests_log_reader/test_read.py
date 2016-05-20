@@ -33,17 +33,11 @@ class TestLogsReading(TestCase):
         )  # yapf: disable
 
     def test_getting_line_by_offset(self):
-        fh = open(TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME))
-        assert all(
-            [
-                [
-                    (('aaa-%d-bbb' % (i // 10)), (i // 10) * 10, (i // 10) * 10 + 9
-                    ) for i in six.moves.range(100)
-                ] == [
-                    ReadUtils.get_line_containing_offset(fh, i, j) for i in six.moves.range(100)
-                ] for j in six.moves.range(1, 120, 7)
-            ]
-        )
+        with open(TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME)) as fh:
+            for j in six.moves.range(1, 120, 7):
+                for i in six.moves.range(100):
+                    assert ReadUtils.get_line_containing_offset(fh, i, j) == \
+                           AFewLinesLogParams.get_line_with_borders(i)
 
     def test_bisect_line_finding(self):
         secs = 3
