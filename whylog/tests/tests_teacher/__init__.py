@@ -147,7 +147,6 @@ class TestParser(TestRuleUpdateBase):
         self.teacher.update_pattern(self.effect_id, new_effect_pattern)
         updated_pattern = self.teacher.get_rule().parsers[self.effect_id].pattern
         assert new_effect_pattern == updated_pattern
-        # TODO: test not matching pattern
 
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)

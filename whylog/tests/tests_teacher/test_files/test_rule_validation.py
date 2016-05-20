@@ -1,7 +1,10 @@
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
 from whylog.teacher.rule_validation_problems import (
-    OneParserRuleProblem, NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem,
+    OneParserRuleProblem,
+    NoEffectParserProblem,
+    NotSetLogTypeProblem,
+    NotUniqueParserNameProblem,
 )
 from whylog.tests.tests_teacher import TestBase
 
@@ -59,8 +62,12 @@ class TestParserValidationTest(TestValidationBase):
         self.teacher.remove_line(self.cause1_id)
 
         validation_result = self.teacher.validate()
-        assert not validation_result.in_parser_problems(self.effect_id, NotUniqueParserNameProblem())
-        assert not validation_result.in_parser_problems(self.cause1_id, NotUniqueParserNameProblem())
+        assert not validation_result.in_parser_problems(
+            self.effect_id, NotUniqueParserNameProblem()
+        )
+        assert not validation_result.in_parser_problems(
+            self.cause1_id, NotUniqueParserNameProblem()
+        )
         self._initial_validation_check()
 
     def test_not_set_log_type(self):
@@ -75,6 +82,3 @@ class TestParserValidationTest(TestValidationBase):
 
         validation_result = self.teacher.validate()
         assert not validation_result.in_parser_problems(self.effect_id, NotSetLogTypeProblem())
-
-
-

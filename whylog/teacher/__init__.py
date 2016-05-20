@@ -2,8 +2,8 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.rule_validation_problems import (
-    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem,
-    OneParserRuleProblem, ValidationResult
+    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, OneParserRuleProblem,
+    ValidationResult
 )
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 

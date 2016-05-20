@@ -1,7 +1,6 @@
 from whylog.assistant import AbstractAssistant
 from whylog.assistant.const import AssistantType
 from whylog.assistant.regex_assistant.regex_match import RegexMatch
-from whylog.teacher.rule_validation_problems import ValidationResult
 
 
 class RegexAssistant(AbstractAssistant):
