@@ -14,9 +14,6 @@ from whylog.constraints import IdenticalConstraint
 from whylog.converters import ConverterType
 from whylog.front.utils import FrontInput
 from whylog.teacher import Teacher
-from whylog.teacher.rule_validation_problems import (
-    InvalidPrimaryKeyProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem
-)
 from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent
 from whylog.tests.utils import ConfigPathFactory
 
@@ -40,38 +37,31 @@ class TestBase(TestCase):
         yaml_config = YamlConfig(parsers_path, rules_path, log_types_path)
         regex_assistant = RegexAssistant()
         self.teacher = Teacher(yaml_config, regex_assistant)
+
+        self.effect_id = 0
+        self.effect_front_input = FrontInput(
+            offset=42,
+            line_content=r'2015-12-03 12:11:00 Error occurred in reading test',
+            line_source=LineSource('sample_host', 'sample_path')
+        )
+
+        self.cause1_id = 1
+        self.cause1_front_input = FrontInput(
+            offset=30,
+            line_content=r'2015-12-03 12:10:55 Data is missing on comp21',
+            line_source=LineSource('sample_host1', 'sample_path1')
+        )
+
+        self.cause2_id = 2
+        self.cause2_front_input = FrontInput(
+            offset=21,
+            line_content=r'2015-12-03 12:10:50 Data migration to comp21 failed in test 123',
+            line_source=LineSource('sample_host2', 'sample_path2')
+        )
         self._add_test_rule()
 
     def _add_test_rule(self):
-        """
-        Adds Rule with no constraints.
-        """
-        line_content = r'2015-12-03 12:11:00 Error occurred in reading test'
-        line_source = LineSource('sample_host', 'sample_path')
-        offset = 42
-        self.effect_front_input = FrontInput(offset, line_content, line_source)
-        self.effect_id = 0
         self.teacher.add_line(self.effect_id, self.effect_front_input, effect=True)
-
-        cause1_line_content = r'2015-12-03 12:10:55 Data is missing on comp21'
-        cause1_line_source = LineSource('sample_host1', 'sample_path1')
-        cause1_offset = 30
-        cause1_front_input = FrontInput(cause1_offset, cause1_line_content, cause1_line_source)
-        self.cause1_id = 1
-        self.teacher.add_line(self.cause1_id, cause1_front_input)
-        self.cause1_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$'
-        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
-
-        cause2_line_content = r'2015-12-03 12:10:50 Data migration to comp21 failed in test 123'
-        cause2_line_source = LineSource('sample_host2', 'sample_path2')
-        cause2_offset = 21
-        cause2_front_input = FrontInput(cause2_offset, cause2_line_content, cause2_line_source)
-        self.cause2_id = 2
-        self.teacher.add_line(self.cause2_id, cause2_front_input)
-        cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
-        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
-
-        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
 
     def tearDown(self):
         self._clean_test_files()
@@ -81,17 +71,23 @@ class TestBase(TestCase):
             open(test_file, 'w').close()
 
 
-class TestParser(TestBase):
-    def _initial_validation_check(self):
-        validation_result = self.teacher.validate()
-        assert not validation_result.warnings
-        assert len(validation_result.errors) == 3
-        # TODO fix
-        assert NotSetLogTypeProblem() in validation_result.errors
+class TestRuleUpdateBase(TestBase):
+    def _add_test_rule(self):
+        super(TestRuleUpdateBase, self)._add_test_rule()
 
+        self.teacher.add_line(self.cause1_id, self.cause1_front_input)
+        self.cause1_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$'
+        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
+
+        self.teacher.add_line(self.cause2_id, self.cause2_front_input)
+        cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
+        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
+
+        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
+
+
+class TestParser(TestRuleUpdateBase):
     def test_default_user_parser(self):
-        self._initial_validation_check()
-
         user_rule = self.teacher.get_rule()
         effect_parser = user_rule.parsers[self.effect_id]
         wanted_effect_parser = UserParserIntent(
@@ -119,20 +115,6 @@ class TestParser(TestBase):
         rule = self.teacher.get_rule()
         assert new_name == rule.parsers[self.effect_id].pattern_name
 
-        self._initial_validation_check()
-
-    def test_setting_wrong_parser_name(self):
-        effect_parser_name = self.teacher.get_rule().parsers[self.effect_id].pattern_name
-        self.teacher.set_pattern_name(self.cause1_id, effect_parser_name)
-        rule = self.teacher.get_rule()
-        assert effect_parser_name == rule.parsers[self.cause1_id].pattern_name
-
-        validation_result = self.teacher.validate()
-        effect_name_problem = NotUniqueParserNameProblem()
-        cause1_name_problem = NotUniqueParserNameProblem()
-        assert effect_name_problem in validation_result.errors
-        assert cause1_name_problem in validation_result.errors
-
     def test_setting_converter(self):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
         new_converter = ConverterType.TO_FLOAT
@@ -142,8 +124,6 @@ class TestParser(TestBase):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
         assert new_converter == parser.groups[3].converter
 
-        self._initial_validation_check()
-
     def test_setting_primary_key(self):
         parser = self.teacher.get_rule().parsers[self.cause1_id]
         new_primary_key_groups = [1, 2]
@@ -151,16 +131,6 @@ class TestParser(TestBase):
         self.teacher.set_primary_key(self.cause1_id, new_primary_key_groups)
         parser = self.teacher.get_rule().parsers[self.cause1_id]
         assert new_primary_key_groups == parser.primary_key_groups
-
-    def test_setting_wrong_primary_key(self):
-        wrong_primary_key_groups = [1, 30000]
-        self.teacher.set_primary_key(self.effect_id, wrong_primary_key_groups)
-        parser = self.teacher.get_rule().parsers[self.effect_id]
-        assert wrong_primary_key_groups == parser.primary_key_groups
-
-        validation_result = self.teacher.validate()
-        primary_key_problem = InvalidPrimaryKeyProblem(wrong_primary_key_groups, parser.groups.keys())
-        assert primary_key_problem in validation_result.errors
 
     def test_setting_log_type(self):
         #TODO setting simple RegexSuperParser
@@ -189,7 +159,7 @@ class TestParser(TestBase):
         assert effect_obvious_regex in effect_guessed_regexes
 
 
-class TestConstraints(TestBase):
+class TestConstraints(TestRuleUpdateBase):
     def _register_identical_constraint(self, constraint_id=1):
         constraint = IdenticalConstraint(groups=self.identical_groups)
         self.teacher.register_constraint(constraint_id, constraint)

@@ -2,7 +2,8 @@ import six
 
 from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.rule_validation_problems import (
-    InvalidPrimaryKeyProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ValidationResult
+    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem,
+    OneParserRuleProblem, ValidationResult
 )
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
@@ -13,6 +14,18 @@ class TeacherParser(object):
         self.name = name
         self.primary_key = primary_key
         self.log_type = log_type
+
+    def validate_name(self, config, names_blacklist):
+        blacklist_except_name = set(names_blacklist) - set([self.name])
+        if names_blacklist.count(self.name) > 1 or \
+                not config.is_free_parser_name(self.name, blacklist_except_name):
+            return [NotUniqueParserNameProblem()]
+        return []
+
+    def validate_log_type(self):
+        if self.log_type is None:
+            return [NotSetLogTypeProblem()]
+        return []
 
 
 class Teacher(object):
@@ -81,6 +94,8 @@ class Teacher(object):
 
         self._remove_constraints_by_line(line_id)
         self.pattern_assistant.remove_line(line_id)
+        if line_id == self.effect_id:
+            self.effect_id = None
         del self._parsers[line_id]
 
     def update_pattern(self, line_id, pattern):
@@ -110,6 +125,7 @@ class Teacher(object):
 
     def set_primary_key(self, line_id, group_numbers):
         # Assumption: group_numbers is list of integers
+        # TODO: move it to pattern_assistant and validate there
         self._parsers[line_id].primary_key = group_numbers
 
     def set_log_type(self, line_id, log_type):
@@ -156,53 +172,41 @@ class Teacher(object):
         """
         pass
 
-    def _validate_primary_keys(self):
-        errors = []
-        for line_id in six.iterkeys(self._parsers):
-            primary_key = self._parsers[line_id].primary_key
-            pattern_match = self.pattern_assistant.get_pattern_match(line_id)
-            group_numbers = pattern_match.param_groups.keys()
-            if set(primary_key) - set(group_numbers):
-                errors.append(InvalidPrimaryKeyProblem(primary_key, group_numbers))
-        return ValidationResult(errors=errors, warnings=[])
+    def _rule_problems(self):
+        problems = []
+        if self.effect_id is None:
+            problems.append(NoEffectParserProblem())
+        if len(self._parsers) < 2:
+            problems.append(OneParserRuleProblem())
+        return problems
 
-    def _validate_pattern_names(self):
-        errors = []
+    def _parser_problems(self):
+        problems = {}
         names_blacklist = self._get_names_blacklist()
-        for line_id in six.iterkeys(self._parsers):
-            parser = self._parsers[line_id]
-            blacklist_except_name = set(names_blacklist) - set([parser.name])
-            if names_blacklist.count(parser.name) > 1 or \
-                    not self.config.is_free_parser_name(parser.name, blacklist_except_name):
-                errors.append(NotUniqueParserNameProblem())
-        return ValidationResult(errors=errors, warnings=[])
+        for parser_id in six.iterkeys(self._parsers):
+            parser = self._parsers[parser_id]
+            parser_problems = []
+            parser_problems += parser.validate_name(self.config, names_blacklist)
+            parser_problems += parser.validate_log_type()
+            parser_problems += self.pattern_assistant.validate(parser_id)
+            problems[parser_id] = parser_problems
+        return problems
 
-    def _validate_log_type(self):
-        errors = []
-        for line_id in six.iterkeys(self._parsers):
-            parser = self._parsers[line_id]
-            if parser.log_type is None:
-                errors.append(NotSetLogTypeProblem())
-        return ValidationResult(errors=errors, warnings=[])
-
-    def _validate_constraints(self):
-        return ValidationResult.result_from_results(
-            [constraint.validate() for constraint in six.itervalues(self._constraint_base)]
-        )
+    def _constraint_problems(self):
+        problems = {}
+        for constraint_id in six.iterkeys(self._constraint_base):
+            constraint = self._constraint_base[constraint_id]
+            problems[constraint_id] = constraint.validate()
+        return problems
 
     def validate(self):
         """
         Verifies if Rule is ready to save.
         """
-        return ValidationResult.result_from_results(
-            [
-                self._validate_primary_keys(),
-                self._validate_pattern_names(),
-                self._validate_log_type(),
-                self.pattern_assistant.validate(),
-                self._validate_constraints(),
-            ]
-        )  # yapf: disable
+
+        return ValidationResult(
+            self._rule_problems(), self._parser_problems(), self._constraint_problems()
+        )
 
     def _prepare_user_parser(self, line_id):
         """
@@ -238,7 +242,7 @@ class Teacher(object):
         Verifies text patterns and constraints. If they meet all requirements, saves Rule.
         """
         validation_result = self.validate()
-        if not validation_result.errors:
+        if validation_result.is_acceptable():
             self.config.add_rule(self.get_rule())
         else:
             return validation_result

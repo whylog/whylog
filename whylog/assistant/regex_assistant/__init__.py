@@ -42,11 +42,11 @@ class RegexAssistant(AbstractAssistant):
     def set_converter(self, line_id, group_no, converter):
         self.regex_matches[line_id].set_converter(group_no, converter)
 
-    def validate(self):
+    def validate(self, line_id):
         """
         Verifies regex properties such as:
         - matching a whole text
         - proper data converter assigned to regex group
         If properties are not met, proper exceptions are returned.
         """
-        return ValidationResult([], [])  # TODO: fix it
+        return {}  # TODO: fix it
