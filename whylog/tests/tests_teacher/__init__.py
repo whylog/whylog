@@ -140,9 +140,11 @@ class TestParser(TestBase):
 
     def test_update_pattern(self):
         new_effect_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in (.*) test$'
+        line_content = self.teacher.get_rule().parsers[self.effect_id].line_content
         self.teacher.update_pattern(self.effect_id, new_effect_pattern)
         updated_pattern = self.teacher.get_rule().parsers[self.effect_id].pattern
         assert new_effect_pattern == updated_pattern
+        assert line_content == self.teacher.get_rule().parsers[self.effect_id].line_content
 
         not_matching_pattern = new_effect_pattern + 'not_matching_part_of_regex'
         problems = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
