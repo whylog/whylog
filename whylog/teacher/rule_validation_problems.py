@@ -28,15 +28,6 @@ class ValidationResult(object):
         )
         return all([not problem.IS_FATAL for problem in all_problems])
 
-    def in_parser_problems(self, parser_id, problem):
-        problems = self.parser_problems.get(parser_id)
-        if problems is None:
-            return False
-        return problem in problems
-
-    def in_rule_problems(self, problem):
-        return problem in self.rule_problems
-
 
 class RuleValidationProblem(object):
     MESSAGE_TEMPLATE = 'Rule problem: %s'
