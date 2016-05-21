@@ -193,10 +193,12 @@ class Teacher(object):
         return problems
 
     def _constraint_problems(self):
-        return dict([
-            (constraint_id, constraint.validate())
-            for constraint_id, constraint in six.iteritems(self._constraint_base)
-        ])
+        return dict(
+            [
+                (constraint_id, constraint.validate())
+                for constraint_id, constraint in six.iteritems(self._constraint_base)
+            ]
+        )  # yapf: disable
 
     def validate(self):
         """
@@ -226,10 +228,8 @@ class Teacher(object):
         Creates rule for Front that will be shown to user
         """
         user_parsers = dict(
-            (line_id, self._prepare_user_parser(line_id)) for line_id in six.iterkeys(
-                self._parsers
-            )
-        )
+            (line_id, self._prepare_user_parser(line_id)) for line_id in six.iterkeys(self._parsers)
+        )  # yapf: disable
         user_constraints = [
             constraint.convert_to_user_constraint_intent()
             for constraint in six.itervalues(self._constraint_base)

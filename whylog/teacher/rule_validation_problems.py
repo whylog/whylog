@@ -1,8 +1,7 @@
 import itertools
+from abc import ABCMeta
 
 import six
-
-from abc import ABCMeta, abstractmethod, abstractproperty
 
 
 class ValidationResult(object):
