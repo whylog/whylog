@@ -194,10 +194,8 @@ class Teacher(object):
 
     def _constraint_problems(self):
         return dict(
-            [
-                (constraint_id, constraint.validate())
-                for constraint_id, constraint in six.iteritems(self._constraint_base)
-            ]
+            (constraint_id, constraint.validate())
+            for constraint_id, constraint in six.iteritems(self._constraint_base)
         )  # yapf: disable
 
     def validate(self):
