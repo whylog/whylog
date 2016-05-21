@@ -96,9 +96,10 @@ class AbstractConfig(object):
         for parser_name, params in six.iteritems(effect_params):
             parser = self._parsers[parser_name]
             clue = Clue(
-                parser.convert_params(params), front_input.line_content, front_input.offset,
-                front_input.line_source
-            )
+                parser.convert_params(
+                    params
+                ), front_input.line_content, front_input.offset, front_input.line_source
+            ) # yapf: disable
             effect_clues[parser_name] = clue
         return effect_clues
 
