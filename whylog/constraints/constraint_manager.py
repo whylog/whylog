@@ -1,6 +1,7 @@
 import six
 
-from whylog.constraints import DifferentConstraint, HeteroConstraint, IdenticalConstraint, TimeConstraint, ValueDeltaConstraint
+from whylog.constraints import (DifferentConstraint, HeteroConstraint, IdenticalConstraint,
+                                TimeConstraint, ValueDeltaConstraint)
 from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 
