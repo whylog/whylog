@@ -1,3 +1,5 @@
+import six
+
 from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
 from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
@@ -24,6 +26,9 @@ class ConstraintRegistry(object):
     def constraint_from_name(cls, constraint_name):
         return cls.CONSTRAINTS.get(constraint_name)
 
+    @classmethod
+    def get_types(cls):
+        return six.iterkeys(cls.CONSTRAINTS)
 
 class ConstraintManager(object):
     """
