@@ -1,6 +1,6 @@
 from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
-from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 from whylog.constraints.const import ConstraintType
+from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 
 
 class ConstraintRegistry(object):
