@@ -19,6 +19,10 @@ class ConstraintRegistry(object):
             )
         raise UnsupportedConstraintTypeError(constraint_data)
 
+    @classmethod
+    def constraint_from_name(cls, constraint_name):
+        return cls.CONSTRAINTS.get(constraint_name)
+
 
 class ConstraintManager(object):
     """
