@@ -1,15 +1,17 @@
 import six
 
-from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
+from whylog.constraints import DifferentConstraint, HeteroConstraint, IdenticalConstraint, TimeConstraint, ValueDeltaConstraint
 from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 
 
 class ConstraintRegistry(object):
     CONSTRAINTS = {
+        ConstraintType.DIFFERENT: DifferentConstraint,
         ConstraintType.IDENTICAL: IdenticalConstraint,
         ConstraintType.TIME_DELTA: TimeConstraint,
-        ConstraintType.DIFFERENT: DifferentConstraint
+        ConstraintType.VALUE_DELTA: ValueDeltaConstraint,
+        ConstraintType.HETERO: HeteroConstraint,
         # register your constraint here
     }  # yapf: disable
 
@@ -29,6 +31,7 @@ class ConstraintRegistry(object):
     @classmethod
     def get_types(cls):
         return six.iterkeys(cls.CONSTRAINTS)
+
 
 class ConstraintManager(object):
     """
