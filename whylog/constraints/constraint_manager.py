@@ -1,7 +1,7 @@
 import six
 
-from whylog.constraints import (DifferentConstraint, HeteroConstraint, IdenticalConstraint,
-                                TimeConstraint, ValueDeltaConstraint) # yapf: disable
+from whylog.constraints import (DifferentConstraint, HeteroConstraint,  # yapf: disable
+                                IdenticalConstraint, TimeConstraint, ValueDeltaConstraint)
 from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 
