@@ -3,7 +3,7 @@ from whylog.config.log_type import LogType
 from whylog.tests.tests_teacher import TestBase
 
 from whylog.teacher.rule_validation_problems import (  # isort:skip
-    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, OneParserRuleProblem
+    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ParserCountProblem
 )  # yapf: disable
 
 
@@ -28,7 +28,7 @@ class TestValidationBase(TestBase):
         assert not validation_result.constraint_problems
 
         assert self._in_parser_problems(self.effect_id, NotSetLogTypeProblem())
-        assert self._in_rule_problems(OneParserRuleProblem())
+        assert self._in_rule_problems(ParserCountProblem())
 
 
 class TestRuleValidation(TestValidationBase):
@@ -42,11 +42,11 @@ class TestRuleValidation(TestValidationBase):
         self._initial_validation_check()
 
     def test_one_parser_rule(self):
-        assert self._in_rule_problems(OneParserRuleProblem())
+        assert self._in_rule_problems(ParserCountProblem())
 
         self.teacher.add_line(self.cause1_id, self.cause1_front_input)
 
-        assert not self._in_rule_problems(OneParserRuleProblem())
+        assert not self._in_rule_problems(ParserCountProblem())
 
         self.teacher.remove_line(self.cause1_id)
         self._initial_validation_check()

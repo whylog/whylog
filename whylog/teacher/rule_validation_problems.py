@@ -56,8 +56,8 @@ class NoEffectParserProblem(RuleValidationProblem):
     MESSAGE = 'No effect parser'
 
 
-class OneParserRuleProblem(RuleValidationProblem):
-    MESSAGE = 'Rule should consist of more than one parser.'
+class ParserCountProblem(RuleValidationProblem):
+    MESSAGE = 'Rule should consist of at least 2 parsers.'
 
 
 class NotUniqueParserNameProblem(ParserValidationProblem):

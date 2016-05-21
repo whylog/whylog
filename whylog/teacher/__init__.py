@@ -4,7 +4,7 @@ from whylog.teacher.constraint_links_base import ConstraintLinksBase
 from whylog.teacher.user_intent import UserParserIntent, UserRuleIntent
 
 from whylog.teacher.rule_validation_problems import (  # isort:skip
-    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, OneParserRuleProblem,
+    NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ParserCountProblem,
     ValidationResult
 )
 
@@ -178,7 +178,7 @@ class Teacher(object):
         if self.effect_id is None:
             problems.append(NoEffectParserProblem())
         if len(self._parsers) < 2:
-            problems.append(OneParserRuleProblem())
+            problems.append(ParserCountProblem())
         return problems
 
     def _parser_problems(self):
