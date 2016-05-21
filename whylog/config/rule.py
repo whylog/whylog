@@ -4,7 +4,8 @@ from abc import ABCMeta, abstractmethod
 import six
 
 from whylog.config.parsers import RegexParserFactory
-from whylog.constraints.verifier import ConstraintManager, Verifier
+from whylog.constraints.constraint_manager import ConstraintManager
+from whylog.constraints.verifier import Verifier
 
 
 class Rule(object):
