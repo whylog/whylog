@@ -22,7 +22,7 @@ class ValidationResult(object):
         parser_problems_list = itertools.chain.from_iterable(six.itervalues(self.parser_problems))
         constraint_problems_list = itertools.chain.from_iterable(
             six.itervalues(self.constraint_problems)
-        )  # yapf: disable
+        )
 
         all_problems = itertools.chain.from_iterable(
             (self.rule_problems, parser_problems_list, constraint_problems_list)
