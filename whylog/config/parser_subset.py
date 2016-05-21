@@ -49,9 +49,7 @@ class ConcatenatedRegexParser(AbstractParserSubset):
         self._backward_regex = regex.compile(backward)
         self._forward_parsers_indexes = self._get_indexes_of_groups_for_parsers(self._parsers)
         self._backward_parsers_indexes = self._get_indexes_of_groups_for_parsers(
-            reversed(
-                self._parsers
-            )
+            reversed(self._parsers)
         )
         self._numbers_in_list = self._number_in_list()
         self._forward_group_index_to_regex = self._create_group_index_to_regex_name(

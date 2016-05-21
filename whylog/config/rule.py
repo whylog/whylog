@@ -35,7 +35,9 @@ class Rule(object):
 
     def serialize(self):
         return {
-            "causes": [cause.name for cause in self._causes],
+            "causes": [
+                cause.name for cause in self._causes
+            ],
             "effect": self._effect.name,
             "constraints": self._constraints,
         }
@@ -147,7 +149,6 @@ class RegexRuleFactory(AbstractRuleFactory):
     @classmethod
     def _create_parsers_from_intents(cls, user_rule_intent):
         return dict(
-            (
-                intent_id, RegexParserFactory.create_from_intent(parser_intent)
-            ) for intent_id, parser_intent in six.iteritems(user_rule_intent.parsers)
+            (intent_id, RegexParserFactory.create_from_intent(parser_intent))
+            for intent_id, parser_intent in six.iteritems(user_rule_intent.parsers)
         )

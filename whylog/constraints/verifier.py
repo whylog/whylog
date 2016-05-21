@@ -140,8 +140,9 @@ class Verifier(object):
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(
-                cls._verify_constraint(combination, effect, constraint, constraint_manager)
-                for constraint in constraints
+                cls._verify_constraint(
+                    combination, effect, constraint, constraint_manager
+                ) for constraint in constraints
             ):
                 causes.append(
                     cls._create_investigation_result(
