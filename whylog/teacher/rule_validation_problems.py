@@ -1,5 +1,5 @@
 import itertools
-from abc import ABCMeta
+from abc import ABCMeta, abstractproperty
 
 import six
 
@@ -32,7 +32,13 @@ class ValidationResult(object):
 
 @six.add_metaclass(ABCMeta)
 class RuleValidationProblem(object):
-    TEMPLATE = None
+    @abstractproperty
+    def TEMPLATE(self):
+        """
+        Text that explains problem
+        """
+        pass
+
     IS_FATAL = True
 
     def __init__(self):
