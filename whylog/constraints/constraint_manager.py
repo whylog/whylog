@@ -1,12 +1,13 @@
 from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
+from whylog.constraints.const import ConstraintType
 
 
 class ConstraintRegistry(object):
     CONSTRAINTS = {
-        'identical': IdenticalConstraint,
-        'time': TimeConstraint,
-        'different': DifferentConstraint
+        ConstraintType.IDENTICAL: IdenticalConstraint,
+        ConstraintType.TIME_DELTA: TimeConstraint,
+        ConstraintType.DIFFERENT: DifferentConstraint
         # register your constraint here
     }  # yapf: disable
 

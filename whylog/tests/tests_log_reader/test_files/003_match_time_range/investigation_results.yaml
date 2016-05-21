@@ -4,5 +4,5 @@
   - clues_groups:
     - [1, 1]
     - [0, 1]
-    name: time
+    name: time_delta
     params: {max_delta: 1}
