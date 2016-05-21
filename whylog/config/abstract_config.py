@@ -70,6 +70,9 @@ class AbstractConfig(object):
     def _save_filename_matcher_definition(self, matcher_definition):
         pass
 
+    def get_all_log_types(self):
+        return six.itervalues(self._log_types)
+
     def get_log_type(self, front_input):
         line_source = front_input.line_source
         for log_type in six.itervalues(self._log_types):
@@ -96,7 +99,7 @@ class AbstractConfig(object):
                 parser.convert_params(
                     params
                 ), front_input.line_content, front_input.offset, front_input.line_source
-            )
+            ) # yapf: disable
             effect_clues[parser_name] = clue
         return effect_clues
 
