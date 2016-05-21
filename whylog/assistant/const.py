@@ -1,6 +1,6 @@
-class AssistantType:
+class AssistantType(object):
     REGEX = 'regex_assistant'
 
 
-class DateParams:
+class DateParams(object):
     MIN_DATE_LENGTH = 8

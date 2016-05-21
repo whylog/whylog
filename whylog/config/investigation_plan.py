@@ -86,12 +86,12 @@ class Clue(object):
         )
 
     def __eq__(self, other):
-        return all([
+        return all((
             self.regex_parameters == other.regex_parameters,
             self.line_prefix_content == other.line_prefix_content,
             self.line_offset == other.line_offset,
             self.line_source == other.line_source
-        ])  # yapf: disable
+        ))  # yapf: disable
 
 
 class LineSource(object):

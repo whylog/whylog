@@ -18,9 +18,7 @@ class TestBacktrackSearcher(TestCase):
         Be careful when modifying a_few_lines.log.
         """
         assert line_num <= self._count_lines_in_file(
-            TestPaths.get_file_path(
-                AFewLinesLogParams.FILE_NAME
-            )
+            TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME)
         )
         return line_num * AFewLinesLogParams.SINGLE_LINE_LENGTH
 

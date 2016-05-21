@@ -95,7 +95,6 @@ class TestBasic(TestCase):
         results = rule.constraints_check(clues, effect_clues_dict)
 
         assert len(results) == 1
-        assert all(isinstance(cause, InvestigationResult) for cause in results)
 
         assert results[0].lines == [
             FrontInput.from_clue(
@@ -129,7 +128,6 @@ class TestBasic(TestCase):
         results = rule.constraints_check(clues, effect_clues_dict)
 
         assert len(results) == 1
-        assert all(isinstance(cause, InvestigationResult) for cause in results)
 
         assert results[0].lines == [
             FrontInput.from_clue(
@@ -163,7 +161,6 @@ class TestBasic(TestCase):
         results = rule.constraints_check(clues, effect_clues_dict)
 
         assert len(results) == 2
-        assert all(isinstance(cause, InvestigationResult) for cause in results)
 
         assert results[0].lines == [
             FrontInput.from_clue(

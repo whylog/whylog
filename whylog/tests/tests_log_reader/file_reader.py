@@ -57,8 +57,7 @@ class DataGeneratorLogSource(object):
             lines_between = self._get_all_lines_between(first_line_no, last_line_no)
             content = "".join(
                 itertools.chain(
-                    (first_line_fragment,), lines_between, (last_line_fragment,)
-                )
+                    (first_line_fragment,), lines_between, (last_line_fragment,))
             )
             return content
 

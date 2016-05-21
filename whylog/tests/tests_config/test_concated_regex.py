@@ -128,15 +128,11 @@ class TestConcatedRegexParser(TestCase):
         assert concatenated.get_extracted_parsers_params("aaaaa") == {}
 
         assert concatenated.get_extracted_parsers_params(self.connection_error_line) == {
-            self.connection_error.name: (
-                "2015-12-03 12:08:09", "alfa36", "2"
-            )
+            self.connection_error.name: ("2015-12-03 12:08:09", "alfa36", "2")
         }
 
         assert concatenated.get_extracted_parsers_params(self.data_migration_line) == {
-            self.data_migration.name: (
-                "2015-12-03 12:10:10", "alfa36", "alfa21", "2"
-            )
+            self.data_migration.name: ("2015-12-03 12:10:10", "alfa36", "alfa21", "2")
         }
 
         self.is_three_lost_data_parsers_matched(concatenated)

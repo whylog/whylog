@@ -17,9 +17,7 @@ class AbstractConfig(object):
     def __init__(self):
         self._parsers = self._load_parsers()
         self._parsers_grouped_by_log_type = self._index_parsers_by_log_type(
-            six.itervalues(
-                self._parsers
-            )
+            six.itervalues(self._parsers)
         )
         self._parser_name_generator = ParserNameGenerator(self._parsers)
         self._rules = self._load_rules()
@@ -95,8 +93,9 @@ class AbstractConfig(object):
         for parser_name, params in six.iteritems(effect_params):
             parser = self._parsers[parser_name]
             clue = Clue(
-                parser.convert_params(params), front_input.line_content, front_input.offset,
-                front_input.line_source
+                parser.convert_params(
+                    params
+                ), front_input.line_content, front_input.offset, front_input.line_source
             )
             effect_clues[parser_name] = clue
         return effect_clues

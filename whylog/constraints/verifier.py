@@ -140,8 +140,9 @@ class Verifier(object):
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(
-                cls._verify_constraint(combination, effect, constraint, constraint_manager)
-                for constraint in constraints
+                cls._verify_constraint(
+                    combination, effect, constraint, constraint_manager
+                ) for constraint in constraints
             ):
                 causes.append(
                     cls._create_investigation_result(
@@ -175,9 +176,7 @@ class Verifier(object):
             ]  # yapf: disable
             if verified_constraints:
                 causes.append(
-                    cls._pack_results_for_constraint_or(
-                        combination, verified_constraints
-                    )
+                    cls._pack_results_for_constraint_or(combination, verified_constraints)
                 )
         return causes
 
@@ -236,8 +235,8 @@ class InvestigationResult(object):
             )
 
     def __eq__(self, other):
-        return all([
+        return all((
             self.lines == other.lines,
             self.constraints == other.constraints,
             self.constraints_linkage == other.constraints_linkage
-        ])  # yapf: disable
+        ))  # yapf: disable
