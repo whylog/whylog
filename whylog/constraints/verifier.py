@@ -1,7 +1,6 @@
 import itertools
 
 from whylog.config.investigation_plan import Clue
-# from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
 from whylog.constraints.constraint_manager import ConstraintManager
 from whylog.constraints.exceptions import UnsupportedConstraintTypeError
 from whylog.front.utils import FrontInput
