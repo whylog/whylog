@@ -20,7 +20,7 @@ class TestValidationBase(TestBase):
         assert validation_result.in_rule_problems(OneParserRuleProblem())
 
 
-class TestRuleValidationTest(TestValidationBase):
+class TestRuleValidation(TestValidationBase):
     def test_no_effect_parser(self):
         self.teacher.remove_line(self.effect_id)
 
@@ -46,7 +46,7 @@ class TestRuleValidationTest(TestValidationBase):
         self._initial_validation_check()
 
 
-class TestParserValidationTest(TestValidationBase):
+class TestParserValidation(TestValidationBase):
     def test_not_unique_parser_name(self):
         effect_parser_name = self.teacher.get_rule().parsers[self.effect_id].pattern_name
 
