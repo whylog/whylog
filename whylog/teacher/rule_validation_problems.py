@@ -2,6 +2,8 @@ import itertools
 
 import six
 
+from abc import ABCMeta, abstractmethod, abstractproperty
+
 
 class ValidationResult(object):
     def __init__(self, rule_problems, parser_problems, constraint_problems):
@@ -24,14 +26,14 @@ class ValidationResult(object):
         )  # yapf: disable
 
         all_problems = itertools.chain.from_iterable(
-            [self.rule_problems, parser_problems_list, constraint_problems_list]
+            (self.rule_problems, parser_problems_list, constraint_problems_list)
         )
-        return all([not problem.IS_FATAL for problem in all_problems])
+        return all(not problem.IS_FATAL for problem in all_problems)
 
 
+@six.add_metaclass(ABCMeta)
 class RuleValidationProblem(object):
-    MESSAGE_TEMPLATE = 'Rule problem: %s'
-    MESSAGE = ''
+    TEMPLATE = None
     IS_FATAL = True
 
     def __init__(self):
@@ -41,35 +43,35 @@ class RuleValidationProblem(object):
         return str(self) == str(other)
 
     def __str__(self):
-        return self.MESSAGE_TEMPLATE % (self.MESSAGE,)
+        return self.TEMPLATE
 
 
 class ConstraintValidationProblem(RuleValidationProblem):
-    MESSAGE_TEMPLATE = 'Constraint problem: %s'
+    pass
 
 
 class ParserValidationProblem(RuleValidationProblem):
-    MESSAGE_TEMPLATE = 'Parser problem: %s'
+    pass
 
 
 class NoEffectParserProblem(RuleValidationProblem):
-    MESSAGE = 'No effect parser'
+    TEMPLATE = 'No effect parser'
 
 
 class ParserCountProblem(RuleValidationProblem):
-    MESSAGE = 'Rule should consist of at least 2 parsers.'
+    TEMPLATE = 'Rule should consist of at least 2 parsers.'
 
 
 class NotUniqueParserNameProblem(ParserValidationProblem):
-    MESSAGE = 'Parser name is not unique.'
+    TEMPLATE = 'Parser name is not unique.'
 
 
 class NotSetLogTypeProblem(ParserValidationProblem):
-    MESSAGE = 'Log type is not set.'
+    TEMPLATE = 'Log type is not set.'
 
 
 class InvalidPrimaryKeyProblem(ParserValidationProblem):
-    MESSAGE = 'Primary key %s should be subset of pattern groups %s.'
+    TEMPLATE = 'Primary key %s should be subset of pattern groups %s.'
 
     def __init__(self, primary_key, group_numbers):
         super(InvalidPrimaryKeyProblem, self).__init__()
@@ -77,4 +79,4 @@ class InvalidPrimaryKeyProblem(ParserValidationProblem):
         self.group_numbers = group_numbers
 
     def __str__(self):
-        return self.MESSAGE_TEMPLATE % (self.MESSAGE % (self.primary_key, self.group_numbers))
+        return self.TEMPLATE % (self.primary_key, self.group_numbers)

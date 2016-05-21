@@ -184,21 +184,19 @@ class Teacher(object):
     def _parser_problems(self):
         problems = {}
         names_blacklist = self._get_names_blacklist()
-        for parser_id in six.iterkeys(self._parsers):
-            parser = self._parsers[parser_id]
+        for parser_id, parser in six.iteritems(self._parsers):
             parser_problems = []
-            parser_problems += parser.validate_name(self.config, names_blacklist)
-            parser_problems += parser.validate_log_type()
-            parser_problems += self.pattern_assistant.validate(parser_id)
+            parser_problems.extend(parser.validate_name(self.config, names_blacklist))
+            parser_problems.extend(parser.validate_log_type())
+            parser_problems.extend(self.pattern_assistant.validate(parser_id))
             problems[parser_id] = parser_problems
         return problems
 
     def _constraint_problems(self):
-        problems = {}
-        for constraint_id in six.iterkeys(self._constraint_base):
-            constraint = self._constraint_base[constraint_id]
-            problems[constraint_id] = constraint.validate()
-        return problems
+        return dict([
+            (constraint_id, constraint.validate())
+            for constraint_id, constraint in six.iteritems(self._constraint_base)
+        ])
 
     def validate(self):
         """
