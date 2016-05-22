@@ -25,6 +25,7 @@ class Rule(object):
 
     EFFECT_NUMBER = 0
     NO_RANGE = frozendict()
+    DELTA_CONSTRAINTS = set(['time'])
 
     def __init__(self, causes, effect, constraints, linkage):
         self._causes = causes
@@ -67,6 +68,26 @@ class Rule(object):
         group, group_type = self._effect.get_primary_key_group()
         if not group:
             return self.NO_RANGE
+        parser_ranges = self._calculate_parsers_ranges(effect_clues, group, group_type)
+        if self._linkage == self.LINKAGE_OR:
+            self.fix_ranges_for_unconnected_constraints(
+                effect_clues, group, group_type, parser_ranges
+            )
+        return self._aggregate_by_log_type(parser_ranges)
+
+    def fix_ranges_for_unconnected_constraints(
+        self, effect_clues, group, group_type, parser_ranges
+    ):
+        for constraint in self._constraints:
+            if constraint['name'] not in self.DELTA_CONSTRAINTS:
+                parser_number = constraint['clues_groups'][0][0]
+                converter = CONVERTION_MAPPING[group_type]
+                primary_group_value = \
+                    effect_clues[self.get_effect_name()].regex_parameters[group - 1]
+                parser_ranges[parser_number][group_type]["left_bound"] = converter.MIN_VALUE
+                parser_ranges[parser_number][group_type]["right_bound"] = primary_group_value
+
+    def _calculate_parsers_ranges(self, effect_clues, group, group_type):
         parser_ranges = {
             self.EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
         }
@@ -89,8 +110,22 @@ class Rule(object):
                 )
                 queue.append(depended_parser_number)
                 used_parsers.add(depended_parser_number)
+        self.create_ranges_for_unused_parsers(effect_clues, group, group_type, parser_ranges)
         parser_ranges.pop(self.EFFECT_NUMBER)
-        return self._aggregate_by_log_type(parser_ranges)
+        return parser_ranges
+
+    def create_ranges_for_unused_parsers(self, effect_clues, group, group_type, parser_ranges):
+        for i in six.moves.range(len(self._causes)):
+            if (i + 1) not in parser_ranges:
+                converter = CONVERTION_MAPPING[group_type]
+                primary_group_value = \
+                    effect_clues[self.get_effect_name()].regex_parameters[group - 1]
+                parser_ranges[(i + 1)] = {
+                    group_type: {
+                        'left_bound': converter.MIN_VALUE,
+                        'right_bound': primary_group_value
+                    }
+                }
 
     def _get_effect_range(self, effect_clues, group, group_type):
         # Here assumption that len of primary_keys_groups equals 1
@@ -156,10 +191,9 @@ class Rule(object):
     def _aggregate_constraints(self):
         # Aggregate constraints have to have min_delta and max_delta params
         # At this moment only TimeConstraint has this property
-        delta_constraints = set(['time'])
         parser_with_constraints = defaultdict(list)
         for constraint in self._constraints:
-            if constraint['name'] in delta_constraints:
+            if constraint['name'] in self.DELTA_CONSTRAINTS:
                 base_parser = constraint['clues_groups'][1][0]
                 parser_with_constraints[base_parser].append(constraint)
         return parser_with_constraints
