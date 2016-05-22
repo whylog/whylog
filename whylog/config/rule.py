@@ -1,9 +1,9 @@
-from collections import defaultdict, deque
 import itertools
-from frozendict import frozendict
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict, deque
 
 import six
+from frozendict import frozendict
 
 from whylog.config.parsers import RegexParserFactory
 from whylog.constraints.constraint_manager import ConstraintManager
