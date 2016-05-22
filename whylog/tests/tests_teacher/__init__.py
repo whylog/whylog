@@ -37,38 +37,31 @@ class TestBase(TestCase):
         yaml_config = YamlConfig(parsers_path, rules_path, log_types_path)
         regex_assistant = RegexAssistant()
         self.teacher = Teacher(yaml_config, regex_assistant)
+
+        self.effect_id = 0
+        self.effect_front_input = FrontInput(
+            offset=42,
+            line_content=r'2015-12-03 12:11:00 Error occurred in reading test',
+            line_source=LineSource('sample_host', 'sample_path')
+        )
+
+        self.cause1_id = 1
+        self.cause1_front_input = FrontInput(
+            offset=30,
+            line_content=r'2015-12-03 12:10:55 Data is missing on comp21',
+            line_source=LineSource('sample_host1', 'sample_path1')
+        )
+
+        self.cause2_id = 2
+        self.cause2_front_input = FrontInput(
+            offset=21,
+            line_content=r'2015-12-03 12:10:50 Data migration to comp21 failed in test 123',
+            line_source=LineSource('sample_host2', 'sample_path2')
+        )
         self._add_test_rule()
 
     def _add_test_rule(self):
-        """
-        Adds Rule with no constraints.
-        """
-        line_content = r'2015-12-03 12:11:00 Error occurred in reading test'
-        line_source = LineSource('sample_host', 'sample_path')
-        offset = 42
-        self.effect_front_input = FrontInput(offset, line_content, line_source)
-        self.effect_id = 0
         self.teacher.add_line(self.effect_id, self.effect_front_input, effect=True)
-
-        cause1_line_content = r'2015-12-03 12:10:55 Data is missing on comp21'
-        cause1_line_source = LineSource('sample_host1', 'sample_path1')
-        cause1_offset = 30
-        cause1_front_input = FrontInput(cause1_offset, cause1_line_content, cause1_line_source)
-        self.cause1_id = 1
-        self.teacher.add_line(self.cause1_id, cause1_front_input)
-        self.cause1_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$'
-        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
-
-        cause2_line_content = r'2015-12-03 12:10:50 Data migration to comp21 failed in test 123'
-        cause2_line_source = LineSource('sample_host2', 'sample_path2')
-        cause2_offset = 21
-        cause2_front_input = FrontInput(cause2_offset, cause2_line_content, cause2_line_source)
-        self.cause2_id = 2
-        self.teacher.add_line(self.cause2_id, cause2_front_input)
-        cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
-        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
-
-        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
 
     def tearDown(self):
         self._clean_test_files()
@@ -78,11 +71,25 @@ class TestBase(TestCase):
             open(test_file, 'w').close()
 
 
-class TestParser(TestBase):
+class TestRuleUpdateBase(TestBase):
+    def _add_test_rule(self):
+        super(TestRuleUpdateBase, self)._add_test_rule()
+
+        self.teacher.add_line(self.cause1_id, self.cause1_front_input)
+        self.cause1_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$'
+        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
+
+        self.teacher.add_line(self.cause2_id, self.cause2_front_input)
+        cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
+        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
+
+        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
+
+
+class TestParser(TestRuleUpdateBase):
     def test_default_user_parser(self):
         user_rule = self.teacher.get_rule()
         effect_parser = user_rule.parsers[self.effect_id]
-
         wanted_effect_parser = UserParserIntent(
             'regex_assistant',
             'error_occurred_in_reading',
@@ -107,9 +114,6 @@ class TestParser(TestBase):
         self.teacher.set_pattern_name(self.effect_id, new_name)
         rule = self.teacher.get_rule()
         assert new_name == rule.parsers[self.effect_id].pattern_name
-
-        problems = self.teacher.set_pattern_name(self.cause1_id, new_name)
-        assert str(problems[0]) == 'Name is not unique, name: error_occurred_in_reading_hello'
 
     def test_setting_converter(self):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
@@ -144,11 +148,6 @@ class TestParser(TestBase):
         updated_pattern = self.teacher.get_rule().parsers[self.effect_id].pattern
         assert new_effect_pattern == updated_pattern
 
-        not_matching_pattern = new_effect_pattern + 'not_matching_part_of_regex'
-        problems = self.teacher.update_pattern(self.effect_id, not_matching_pattern)
-        assert str(problems[0]) == \
-               'Pattern does not match line, pattern: ^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in (.*) test$not_matching_part_of_regex, line: 2015-12-03 12:11:00 Error occurred in reading test'
-
     def test_guess_patterns(self):
         effect_guessed_patterns = self.teacher.guess_patterns(self.effect_id)
         assert len(effect_guessed_patterns) > 1
@@ -159,7 +158,7 @@ class TestParser(TestBase):
         assert effect_obvious_regex in effect_guessed_regexes
 
 
-class TestConstraints(TestBase):
+class TestConstraints(TestRuleUpdateBase):
     def _register_identical_constraint(self, constraint_id=1):
         constraint = IdenticalConstraint(groups=self.identical_groups)
         self.teacher.register_constraint(constraint_id, constraint)
