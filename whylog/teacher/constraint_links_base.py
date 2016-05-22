@@ -3,7 +3,7 @@ from collections import namedtuple
 ConstraintLink = namedtuple('ConstraintLink', ['line_id', 'group_no', 'constraint_id'])
 
 
-class ConstraintLinksBase:
+class ConstraintLinksBase(object):
     """
     Container for links between group and constraint
 

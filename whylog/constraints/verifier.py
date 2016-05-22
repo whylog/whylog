@@ -1,43 +1,8 @@
 import itertools
 
 from whylog.config.investigation_plan import Clue
-from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
-from whylog.constraints.exceptions import TooManyConstraintsToNegate, UnsupportedConstraintTypeError
+from whylog.constraints.exceptions import TooManyConstraintsToNegate
 from whylog.front.utils import FrontInput
-
-
-class ConstraintRegistry(object):
-    CONSTRAINTS = {
-        'identical': IdenticalConstraint,
-        'time': TimeConstraint,
-        'different': DifferentConstraint
-        # register your constraint here
-    }  # yapf: disable
-
-    @classmethod
-    def get_constraint(cls, constraint_data):
-        if constraint_data['name'] in cls.CONSTRAINTS:
-            return cls.CONSTRAINTS[constraint_data['name']](
-                param_dict=constraint_data['params'],
-                params_checking=False
-            )
-        raise UnsupportedConstraintTypeError(constraint_data)
-
-
-class ConstraintManager(object):
-    """
-    there should be one such object per rule being verified
-    """
-
-    def __init__(self):
-        self._actual_constraints = {}
-
-    def __getitem__(self, constraint_data):
-        constraint = self._actual_constraints.get(constraint_data['name'])
-        if constraint is None:
-            constraint_verifier = ConstraintRegistry.get_constraint(constraint_data)
-            self._actual_constraints[constraint_data['name']] = constraint_verifier
-        return self._actual_constraints[constraint_data['name']]
 
 
 class Verifier(object):
@@ -140,8 +105,9 @@ class Verifier(object):
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(
-                cls._verify_constraint(combination, effect, constraint, constraint_manager)
-                for constraint in constraints
+                cls._verify_constraint(
+                    combination, effect, constraint, constraint_manager
+                ) for constraint in constraints
             ):
                 causes.append(
                     cls._create_investigation_result(
@@ -175,9 +141,7 @@ class Verifier(object):
             ]  # yapf: disable
             if verified_constraints:
                 causes.append(
-                    cls._pack_results_for_constraint_or(
-                        combination, verified_constraints
-                    )
+                    cls._pack_results_for_constraint_or(combination, verified_constraints)
                 )
         return causes
 
@@ -236,8 +200,8 @@ class InvestigationResult(object):
             )
 
     def __eq__(self, other):
-        return all([
+        return all((
             self.lines == other.lines,
             self.constraints == other.constraints,
             self.constraints_linkage == other.constraints_linkage
-        ])  # yapf: disable
+        ))  # yapf: disable

@@ -39,8 +39,7 @@ class TestBasic(TestCase):
         effect_line = '2016-04-12 23:54:43 effect internal server error Host: apache_host'
         cls.effect_clues = {
             'effect': Clue(
-                (cls.effect_time, 'apache_host'), effect_line, 40, line_source
-            )
+                (cls.effect_time, 'apache_host'), effect_line, 40, line_source)
         }
 
         cls.earliest_date = datetime(1, 1, 1, 1, 1, 1)
@@ -223,8 +222,9 @@ class TestBasic(TestCase):
             }
         ] # yapf: disable
         rule = Rule(
-            [self.cause1, self.cause2, self.cause1, self.cause2], self.effect, constraints1,
-            Rule.LINKAGE_AND
+            [
+                self.cause1, self.cause2, self.cause1, self.cause2
+            ], self.effect, constraints1, Rule.LINKAGE_AND
         )
         calculated_ranges = self.calculate_range([rule])
 

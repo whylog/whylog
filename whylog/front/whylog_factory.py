@@ -12,4 +12,4 @@ def whylog_factory():
     settings = SettingsFactorySelector.get_settings()
     pattern_assistant = settings['assistant']()
     config = settings['config']
-    return LogReader(config), partial(Teacher, config, pattern_assistant)
+    return LogReader(config), partial(Teacher, config, pattern_assistant), config

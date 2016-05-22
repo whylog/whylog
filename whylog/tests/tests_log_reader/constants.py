@@ -1,7 +1,7 @@
 import os.path
 
 
-class AFewLinesLogParams:
+class AFewLinesLogParams(object):
     FILE_NAME = "a_few_lines.log"
     SINGLE_LINE_LENGTH = 10
     NUMBER_OF_LINES = 10

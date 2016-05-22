@@ -5,7 +5,7 @@ import six
 from frozendict import frozendict
 
 
-class ConverterType:
+class ConverterType(object):
     TO_DATE = 'date'
     TO_FLOAT = 'float'
     TO_INT = 'int'

@@ -51,7 +51,6 @@ class TestBasic(TestCase):
         assert matcher.path_pattern == 'node_1.log'
         assert matcher.log_type_name == 'default'
         assert matcher.super_parser == super_parser
-        assert isinstance(matcher, WildCardFilenameMatcher)
 
         shutil.rmtree(whylog_dir)
 
