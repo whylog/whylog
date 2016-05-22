@@ -28,7 +28,7 @@ class ReadUtils(object):
         line = fd.readline()
         if not line:
             raise OffsetBiggerThanFileSize(position)
-        return line.strip()
+        return line.strip('\n')
 
     @classmethod
     def _expand_before(cls, fd, position, buf_size):
