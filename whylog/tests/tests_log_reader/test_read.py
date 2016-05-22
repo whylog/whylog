@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
 from unittest import TestCase
 
+import six
 from nose.plugins.skip import SkipTest
 
+from whylog.log_reader.read_utils import ReadUtils
 from whylog.log_reader.searchers import BacktrackSearcher
+from whylog.tests.tests_log_reader.constants import AFewLinesLogParams, TestPaths
 from whylog.tests.tests_log_reader.file_reader import (
     DataGeneratorLogSource, OperationCountingFileWrapper
 )
@@ -28,6 +31,24 @@ class TestLogsReading(TestCase):
                 datetime_format="%c"
             )
         )  # yapf: disable
+
+    def test_getting_line_by_offset_huge(self):
+        with open(TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME)) as fh:
+            for j in six.moves.range(1, 120, 7):
+                for i in six.moves.range(100):
+                    assert ReadUtils.get_line_containing_offset(fh, i, j) == \
+                           AFewLinesLogParams.get_line_with_borders(i)
+
+    def test_getting_line_by_offset_basic(self):
+        with open(TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME)) as fh:
+            read_line = ReadUtils._read_entire_line(fh, 2, 10)
+            assert read_line == ('aaa-0-bbb', 0, 9)
+            read_line = ReadUtils._read_entire_line(fh, 2, 200)
+            assert read_line == ('aaa-0-bbb', 0, 9)
+            read_line = ReadUtils._read_entire_line(fh, 42, 10)
+            assert read_line == ('aaa-4-bbb', 40, 49)
+            read_line = ReadUtils._read_entire_line(fh, 99, 10)
+            assert read_line == ('aaa-9-bbb', 90, 99)
 
     def test_bisect_line_finding(self):
         secs = 3
