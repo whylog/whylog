@@ -25,12 +25,20 @@ class IntConverter(AbstractConverter):
     MIN_VALUE = -2000000000
 
     @classmethod
+    def switch_by_delta(cls, value, delta, delta_type=None):
+        return value - delta
+
+    @classmethod
     def convert(cls, pattern_group):
         return int(pattern_group)
 
 
 class FloatConverter(AbstractConverter):
     MIN_VALUE = float('-inf')
+
+    @classmethod
+    def switch_by_delta(cls, value, delta, delta_type=None):
+        return value - delta
 
     @classmethod
     def convert(cls, pattern_group):

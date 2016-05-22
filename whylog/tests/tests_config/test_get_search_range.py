@@ -3,8 +3,6 @@ import shutil
 from datetime import datetime
 from unittest import TestCase
 
-from nose.plugins.skip import SkipTest
-
 from whylog.config import SettingsFactorySelector
 from whylog.config.investigation_plan import Clue, LineSource
 from whylog.config.parsers import RegexParser
@@ -395,49 +393,48 @@ class TestBasic(TestCase):
 
         assert calculated_ranges == expected_ranges
 
-    # def test_search_range_multiple_rules(self):
-    #     constraints1 = [
-    #         {
-    #             'clues_groups': [[1, 1], [0, 1]],
-    #             'name': 'time',
-    #             'params': {'max_delta': 10}
-    #         }
-    #     ] # yapf: disable
-    #     rule1 = Rule([self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
-    #     constraints2 = [
-    #         {
-    #             'clues_groups': [[1, 1], [0, 1]],
-    #             'name': 'time',
-    #             'params': {
-    #                 'max_delta': 100,
-    #                 'min_delta': 10
-    #             }
-    #         }, {
-    #             'clues_groups': [[2, 1], [0, 1]],
-    #             'name': 'time',
-    #             'params': {'max_delta': 100}
-    #         }
-    #     ] # yapf: disable
-    #     rule2 = Rule([self.cause1, self.cause2], self.effect, constraints2, Rule.LINKAGE_AND)
-    #     calculated_ranges = self.calculate_range([rule1, rule2])
-    #
-    #     expected_ranges = {
-    #         'database': {
-    #             'date': {
-    #                 'left_bound': self.one_hundred_second_earlier,
-    #                 'right_bound': self.ten_second_earlier
-    #             }
-    #         },
-    #         'apache': {
-    #             'date': {
-    #                 'left_bound': self.one_hundred_second_earlier,
-    #                 'right_bound': self.effect_time
-    #             }
-    #         }
-    #     } # yapf: disable
-    #
-    #     raise SkipTest('Not implemented yet')
-    #     assert calculated_ranges == expected_ranges
+    def test_search_range_multiple_rules(self):
+        constraints1 = [
+            {
+                'clues_groups': [[1, 1], [0, 1]],
+                'name': 'time',
+                'params': {'max_delta': 10}
+            }
+        ] # yapf: disable
+        rule1 = Rule([self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        constraints2 = [
+            {
+                'clues_groups': [[1, 1], [0, 1]],
+                'name': 'time',
+                'params': {
+                    'max_delta': 100,
+                    'min_delta': 10
+                }
+            }, {
+                'clues_groups': [[2, 1], [0, 1]],
+                'name': 'time',
+                'params': {'max_delta': 100}
+            }
+        ] # yapf: disable
+        rule2 = Rule([self.cause1, self.cause2], self.effect, constraints2, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range([rule1, rule2])
+
+        expected_ranges = {
+            'database': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.ten_second_earlier
+                }
+            },
+            'apache': {
+                'date': {
+                    'left_bound': self.one_hundred_second_earlier,
+                    'right_bound': self.effect_time
+                }
+            }
+        } # yapf: disable
+
+        assert calculated_ranges == expected_ranges
 
     @classmethod
     def tearDownClass(cls):

@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
-from datetime import datetime
 
 import six
 
@@ -158,8 +157,28 @@ class AbstractConfig(object):
     def _get_search_ranges(self, suspected_rules, effect_clues):
         # This implementation assumes that all primary key groups is a one element list
         # TODO implementation for longer primary key groups
-        rule = suspected_rules[0]
-        return rule.get_search_ranges(effect_clues)
+        search_ranges = {}
+        for rule in suspected_rules:
+            rule_search_ranges = rule.get_search_ranges(effect_clues)
+            for log_type_name, log_type_ranges in six.iteritems(rule_search_ranges):
+                if log_type_name not in search_ranges:
+                    search_ranges[log_type_name] = log_type_ranges
+                    continue
+                for key_type, type_range in six.iteritems(rule_search_ranges[log_type_name]):
+                    if key_type not in search_ranges[log_type_name]:
+                        search_ranges[log_type_name][key_type] = type_range
+                        continue
+                    left_bound_candidate = type_range['left_bound']
+                    right_bound_candidate = type_range['right_bound']
+                    left_bound = search_ranges[log_type_name][key_type]['left_bound']
+                    right_bound = search_ranges[log_type_name][key_type]['right_bound']
+                    search_ranges[log_type_name][key_type]['left_bound'] = min(
+                        left_bound, left_bound_candidate
+                    )
+                    search_ranges[log_type_name][key_type]['right_bound'] = max(
+                        right_bound, right_bound_candidate
+                    )
+        return search_ranges
 
     def is_free_parser_name(self, parser_name, black_list):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
