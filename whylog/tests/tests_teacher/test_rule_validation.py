@@ -114,8 +114,7 @@ class TestConstraintProblems(TestRuleValidationBase):
 
         self.teacher.register_constraint(constraint_id, time_constraint)
         assert self._in_constraint_problems(
-            constraint_id,
-            ParamConversionProblem(
+            constraint_id, ParamConversionProblem(
                 TimeConstraint.MIN_DELTA, min_delta, TimeConstraint.PARAMS[TimeConstraint.MIN_DELTA]
             )
         )
