@@ -1,6 +1,6 @@
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
-from whylog.tests.tests_teacher import TestBase
+from whylog.tests.tests_teacher import TestBase, TestEffectBase, TestRuleBase
 
 from whylog.teacher.rule_validation_problems import (  # isort:skip
     NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ParserCountProblem
@@ -8,10 +8,6 @@ from whylog.teacher.rule_validation_problems import (  # isort:skip
 
 
 class TestValidationBase(TestBase):
-    def _in_rule_problems(self, problem):
-        validation_result = self.teacher.validate()
-        return problem in validation_result.rule_problems
-
     def _in_parser_problems(self, parser_id, problem):
         validation_result = self.teacher.validate()
         problems = validation_result.parser_problems.get(parser_id)
@@ -19,6 +15,19 @@ class TestValidationBase(TestBase):
             return False
         return problem in problems
 
+    def _in_rule_problems(self, problem):
+        validation_result = self.teacher.validate()
+        return problem in validation_result.rule_problems
+
+    def _in_constraint_problems(self, constraint_id, problem):
+        validation_result = self.teacher.validate()
+        problems = validation_result.constraint_problems.get(constraint_id)
+        if problems is None:
+            return False
+        return problem in problems
+
+
+class TestEffectValidationBase(TestEffectBase, TestValidationBase):
     def _initial_validation_check(self):
         validation_result = self.teacher.validate()
         assert not validation_result.is_acceptable()
@@ -31,7 +40,21 @@ class TestValidationBase(TestBase):
         assert self._in_rule_problems(ParserCountProblem())
 
 
-class TestRuleValidation(TestValidationBase):
+class TestRuleValidationBase(TestRuleBase, TestValidationBase):
+    def _initial_validation_check(self):
+        validation_result = self.teacher.validate()
+        assert not validation_result.is_acceptable()
+
+        assert len(validation_result.parser_problems) == 3
+        assert not validation_result.rule_problems
+        assert not validation_result.constraint_problems
+
+        assert self._in_parser_problems(self.effect_id, NotSetLogTypeProblem())
+        assert self._in_parser_problems(self.cause1_id, NotSetLogTypeProblem())
+        assert self._in_parser_problems(self.cause2_id, NotSetLogTypeProblem())
+
+
+class TestRuleProblems(TestEffectValidationBase):
     def test_no_effect_parser(self):
         self.teacher.remove_line(self.effect_id)
         assert self._in_rule_problems(NoEffectParserProblem())
@@ -52,7 +75,7 @@ class TestRuleValidation(TestValidationBase):
         self._initial_validation_check()
 
 
-class TestParserValidation(TestValidationBase):
+class TestParserProblems(TestEffectValidationBase):
     def test_not_unique_parser_name(self):
         effect_parser_name = self.teacher.get_rule().parsers[self.effect_id].pattern_name
 
