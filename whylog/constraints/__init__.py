@@ -5,12 +5,14 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 import six
 
 from whylog.constraints.const import ConstraintType
-from whylog.constraints.validation_problems import MinGreaterThatMaxProblem, ParamConversionProblem
 from whylog.converters import ConverterType, get_converter
 from whylog.teacher.user_intent import UserConstraintIntent
 
 from whylog.constraints.exceptions import (  # isort:skip
     ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
+)
+from whylog.constraints.validation_problems import (  # isort:skip
+    MinGreaterThatMaxProblem, ParamConversionProblem
 )
 
 

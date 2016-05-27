@@ -1,10 +1,10 @@
 from datetime import datetime
 from unittest import TestCase
 
-from whylog.constraints import IdenticalConstraint, TimeConstraint, ParamConversionProblem
+from whylog.constraints import IdenticalConstraint, TimeConstraint
 
 from whylog.constraints.exceptions import (  # isort:skip
-    ConstructorGroupsCountError, ConstructorParamsError, ParamConversionError
+    ConstructorGroupsCountError, ConstructorParamsError
 )
 
 

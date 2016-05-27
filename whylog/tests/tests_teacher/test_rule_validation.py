@@ -1,12 +1,14 @@
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
 from whylog.constraints import TimeConstraint
-from whylog.constraints.validation_problems import MinGreaterThatMaxProblem, ParamConversionProblem
 from whylog.tests.tests_teacher import TestBase, TestEffectBase, TestRuleBase
 
 from whylog.teacher.rule_validation_problems import (  # isort:skip
     NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ParserCountProblem
 )  # yapf: disable
+from whylog.constraints.validation_problems import (  # isort:skip
+    MinGreaterThatMaxProblem, ParamConversionProblem
+)
 
 
 class TestValidationBase(TestBase):
