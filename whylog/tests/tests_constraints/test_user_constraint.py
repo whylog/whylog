@@ -6,6 +6,7 @@ from whylog.constraints.exceptions import (
     ConstructorGroupsCountError, ConstructorParamsError, ParamConversionError
 )
 
+
 class TestIdenticalConstraint(TestCase):
     def test_constructor_insufficient_groups(self):
         insufficient_groups = [(0, 1)]
