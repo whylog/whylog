@@ -57,10 +57,6 @@ class AbstractConstraint(object):
             self._check_constructor_groups()
             self._check_constructor_params_occurrence()
 
-    def make_and_check(self, groups=None, param_dict=None):
-        super(AbstractConstraint, self).__init__(groups=groups, param_dict=param_dict)
-        return self.validate()
-
     def _check_constructor_groups(self):
         groups_count = len(self.groups)
         if (self.MIN_GROUPS_COUNT is not None and groups_count < self.MIN_GROUPS_COUNT) \
