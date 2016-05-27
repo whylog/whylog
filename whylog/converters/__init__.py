@@ -47,3 +47,7 @@ CONVERTION_MAPPING = frozendict(
         ConverterType.TO_FLOAT: FloatConverter
     }
 )
+
+
+def get_converter(converter_type):
+    return CONVERTION_MAPPING[converter_type]

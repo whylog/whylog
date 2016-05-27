@@ -7,8 +7,11 @@ import six
 
 from whylog.constraints.const import ConstraintType
 from whylog.constraints.exceptions import (
-    ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
+    ConstructorGroupsCountError, ConstructorParamsError, ParamConversionError,
+    WrongConstraintClassSetup
 )
+from whylog.constraints.validation_problems import MinGreaterThatMaxProblem
+from whylog.converters import ConverterType, get_converter
 from whylog.teacher.user_intent import UserConstraintIntent
 
 
@@ -33,7 +36,7 @@ class AbstractConstraint(object):
     @abstractproperty
     def PARAMS(self):
         """
-        Params names.
+        Params names and converters.
         Constraint construction requires a dict[param name, param value].
         Some of then can be optional.
         """
@@ -51,7 +54,19 @@ class AbstractConstraint(object):
         self.params = param_dict or {}
         if params_checking:
             self._check_constructor_groups()
-            self._check_constructor_params()
+            self._check_constructor_params_occurrence()
+            self._convert_params_values()
+
+    def _convert_params_values(self):
+        for param_name, converter_type in six.iteritems(self.PARAMS):
+            param_val = self.params.get(param_name)
+            if param_val is not None:
+                converter = get_converter(converter_type)
+                try:
+                    converted_val = converter.convert(param_val)
+                except ValueError:
+                    raise ParamConversionError(self.TYPE, param_name, param_val, converter_type)
+                self.params[param_name] = converted_val
 
     def _check_constructor_groups(self):
         groups_count = len(self.groups)
@@ -61,7 +76,7 @@ class AbstractConstraint(object):
                 self.TYPE, len(self.groups), self.MIN_GROUPS_COUNT, self.MAX_GROUPS_COUNT
             )
 
-    def _check_constructor_params(self):
+    def _check_constructor_params_occurrence(self):
         correct_param_names = set(self.get_param_names())
         actual_param_names = set(self.params.keys())
         self._check_useless_params(correct_param_names, actual_param_names)
@@ -100,7 +115,7 @@ class AbstractConstraint(object):
         Returns names of constraint additional params.
         For Front to display param names to user and then ask user for param contents.
         """
-        return cls.PARAMS
+        return cls.PARAMS.keys()
 
     @classmethod
     def get_groups_count(cls):
@@ -126,12 +141,18 @@ class AbstractConstraint(object):
 
         pass
 
+    def _validate_params(self):
+        return []
+
+    def _validate_groups(self):
+        # TODO: implement
+        return []
+
     def validate(self):
         """
         Validates constraint: verifies if it is ready to save
         """
-        # TODO: implement in subclass and test it
-        return {}
+        return self._validate_params() + self._validate_groups()
 
 
 class TimeConstraint(AbstractConstraint):
@@ -153,7 +174,7 @@ class TimeConstraint(AbstractConstraint):
     MIN_DELTA = 'min_delta'
     MAX_DELTA = 'max_delta'
 
-    PARAMS = sorted([MIN_DELTA, MAX_DELTA])
+    PARAMS = {MIN_DELTA: ConverterType.TO_FLOAT, MAX_DELTA: ConverterType.TO_FLOAT}
 
     def __init__(self, groups=None, param_dict=None, params_checking=True):
         super(TimeConstraint, self).__init__(groups, param_dict, params_checking)
@@ -191,6 +212,14 @@ class TimeConstraint(AbstractConstraint):
     def verify(self, group_contents, param_dict):
         pass
 
+    def _validate_params(self):
+        param_min_delta = self.params.get(self.MIN_DELTA)
+        param_max_delta = self.params.get(self.MAX_DELTA)
+        if param_min_delta is not None and param_max_delta is not None:
+            if param_min_delta > param_max_delta:
+                return [MinGreaterThatMaxProblem()]
+        return []
+
 
 class IdenticalConstraint(AbstractConstraint):
     """
@@ -201,7 +230,7 @@ class IdenticalConstraint(AbstractConstraint):
 
     TYPE = ConstraintType.IDENTICAL
 
-    PARAMS = []
+    PARAMS = {}
 
     def verify(self, group_contents, param_dict=None):
         """
@@ -219,7 +248,7 @@ class DifferentConstraint(AbstractConstraint):
     """
 
     TYPE = ConstraintType.DIFFERENT
-    PARAMS = []
+    PARAMS = {}
 
     def verify(self, group_contents, param_dict):
         param = param_dict.get("value")
