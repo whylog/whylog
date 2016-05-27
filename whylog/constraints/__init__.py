@@ -5,13 +5,12 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 import six
 
 from whylog.constraints.const import ConstraintType
-from whylog.constraints.validation_problems import MinGreaterThatMaxProblem
+from whylog.constraints.validation_problems import MinGreaterThatMaxProblem, ParamConversionProblem
 from whylog.converters import ConverterType, get_converter
 from whylog.teacher.user_intent import UserConstraintIntent
 
 from whylog.constraints.exceptions import (  # isort:skip
-    ConstructorGroupsCountError, ConstructorParamsError, ParamConversionError,
-    WrongConstraintClassSetup
+    ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
 )
 
 
@@ -55,18 +54,10 @@ class AbstractConstraint(object):
         if params_checking:
             self._check_constructor_groups()
             self._check_constructor_params_occurrence()
-            self._convert_params_values()
 
-    def _convert_params_values(self):
-        for param_name, converter_type in six.iteritems(self.PARAMS):
-            param_val = self.params.get(param_name)
-            if param_val is not None:
-                converter = get_converter(converter_type)
-                try:
-                    converted_val = converter.convert(param_val)
-                except ValueError:
-                    raise ParamConversionError(self.TYPE, param_name, param_val, converter_type)
-                self.params[param_name] = converted_val
+    def make_and_check(self, groups=None, param_dict=None):
+        super(AbstractConstraint, self).__init__(groups=groups, param_dict=param_dict)
+        return self.validate()
 
     def _check_constructor_groups(self):
         groups_count = len(self.groups)
@@ -141,8 +132,22 @@ class AbstractConstraint(object):
 
         pass
 
+    def _convert_params_values(self):
+        problems = []
+        for param_name, converter_type in six.iteritems(self.PARAMS):
+            param_val = self.params.get(param_name)
+            if param_val is not None:
+                converter = get_converter(converter_type)
+                try:
+                    converted_val = converter.convert(param_val)
+                except ValueError:
+                    problems.append(ParamConversionProblem(param_name, param_val, converter_type))
+                else:
+                    self.params[param_name] = converted_val
+        return problems
+
     def _validate_params(self):
-        return []
+        return self._convert_params_values()
 
     def _validate_groups(self):
         # TODO: implement
@@ -178,20 +183,21 @@ class TimeConstraint(AbstractConstraint):
 
     def __init__(self, groups=None, param_dict=None, params_checking=True):
         super(TimeConstraint, self).__init__(groups, param_dict, params_checking)
-        param_min_delta = self.params.get(self.MIN_DELTA)
-        param_max_delta = self.params.get(self.MAX_DELTA)
-        if param_min_delta is not None and param_max_delta is not None:
-            self.verify = self._verify_both
-            self._min_delta = datetime.timedelta(seconds=param_min_delta)
-            self._max_delta = datetime.timedelta(seconds=param_max_delta)
-        elif param_max_delta is not None:
-            self.verify = self._verify_max
-            self._max_delta = datetime.timedelta(seconds=param_max_delta)
-        elif param_min_delta is not None:
-            self.verify = self._verify_min
-            self._min_delta = datetime.timedelta(seconds=param_min_delta)
-        else:
-            raise WrongConstraintClassSetup(self.TYPE)
+        if not params_checking:
+            param_min_delta = self.params.get(self.MIN_DELTA)
+            param_max_delta = self.params.get(self.MAX_DELTA)
+            if param_min_delta is not None and param_max_delta is not None:
+                self.verify = self._verify_both
+                self._min_delta = datetime.timedelta(seconds=param_min_delta)
+                self._max_delta = datetime.timedelta(seconds=param_max_delta)
+            elif param_max_delta is not None:
+                self.verify = self._verify_max
+                self._max_delta = datetime.timedelta(seconds=param_max_delta)
+            elif param_min_delta is not None:
+                self.verify = self._verify_min
+                self._min_delta = datetime.timedelta(seconds=param_min_delta)
+            else:
+                raise WrongConstraintClassSetup(self.TYPE)
 
     def _check_optional_params(self, correct_param_names, actual_param_names):
         if self.MIN_DELTA not in actual_param_names and self.MAX_DELTA not in actual_param_names:
@@ -213,12 +219,13 @@ class TimeConstraint(AbstractConstraint):
         pass
 
     def _validate_params(self):
+        problems = super(TimeConstraint, self)._validate_params()
         param_min_delta = self.params.get(self.MIN_DELTA)
         param_max_delta = self.params.get(self.MAX_DELTA)
         if param_min_delta is not None and param_max_delta is not None:
             if param_min_delta > param_max_delta:
-                return [MinGreaterThatMaxProblem()]
-        return []
+                problems.append(MinGreaterThatMaxProblem())
+        return problems
 
 
 class IdenticalConstraint(AbstractConstraint):

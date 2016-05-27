@@ -49,19 +49,6 @@ class ConstructorParamsError(ConstructorError):
         )
 
 
-class ParamConversionError(ConstructorParamsError):
-    def __init__(self, constraint_type, param_name, param_value, conversion):
-        self.constraint_type = constraint_type
-        self.param_name = param_name
-        self.param_value = param_value
-        self.conversion = conversion
-
-    def __str__(self):
-        return 'Cannot convert param value properly, constraint: %s, param: %s, param value: %s, ' \
-               'conversion: %s' % (self.constraint_type, self.param_name, self.param_value,
-                                   self.conversion)
-
-
 class ConstructorGroupsCountError(ConstructorError):
     def __init__(self, constraint_type, groups_count, minimal_groups_count, maximal_groups_count):
         self.constraint_type = constraint_type

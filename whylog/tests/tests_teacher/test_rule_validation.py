@@ -1,7 +1,7 @@
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
 from whylog.constraints import TimeConstraint
-from whylog.constraints.validation_problems import MinGreaterThatMaxProblem
+from whylog.constraints.validation_problems import MinGreaterThatMaxProblem, ParamConversionProblem
 from whylog.tests.tests_teacher import TestBase, TestEffectBase, TestRuleBase
 
 from whylog.teacher.rule_validation_problems import (  # isort:skip
@@ -106,9 +106,23 @@ class TestParserProblems(TestEffectValidationBase):
 
 
 class TestConstraintProblems(TestRuleValidationBase):
+    def test_wrong_params_types(self):
+        min_delta = 'foo'
+        params = {TimeConstraint.MIN_DELTA: min_delta}
+        time_constraint = TimeConstraint(self.date_groups, params)
+        constraint_id = 1
+
+        self.teacher.register_constraint(constraint_id, time_constraint)
+        assert self._in_constraint_problems(
+            constraint_id,
+            ParamConversionProblem(
+                TimeConstraint.MIN_DELTA, min_delta, TimeConstraint.PARAMS[TimeConstraint.MIN_DELTA]
+            )
+        )
+
     def test_time_constraint_problem(self):
-        self.params = {TimeConstraint.MIN_DELTA: 2, TimeConstraint.MAX_DELTA: 1}
-        time_constraint = TimeConstraint(self.date_groups, self.params)
+        params = {TimeConstraint.MIN_DELTA: 2, TimeConstraint.MAX_DELTA: 1}
+        time_constraint = TimeConstraint(self.date_groups, params)
         constraint_id = 1
 
         self.teacher.register_constraint(constraint_id, time_constraint)

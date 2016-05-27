@@ -1,7 +1,7 @@
 from datetime import datetime
 from unittest import TestCase
 
-from whylog.constraints import IdenticalConstraint, TimeConstraint
+from whylog.constraints import IdenticalConstraint, TimeConstraint, ParamConversionProblem
 
 from whylog.constraints.exceptions import (  # isort:skip
     ConstructorGroupsCountError, ConstructorParamsError, ParamConversionError
@@ -61,11 +61,6 @@ class TestTimeConstraint(TestCase):
 
         mixed_params = {TimeConstraint.MIN_DELTA: 33, "sth": 1}
         self.assertRaises(ConstructorParamsError, TimeConstraint, groups, mixed_params)
-
-    def test_constructor_wrong_params_values(self):
-        groups = [(0, 1), (2, 1)]
-        params = {TimeConstraint.MIN_DELTA: 'foo'}
-        self.assertRaises(ParamConversionError, TimeConstraint, groups, params)
 
     def test_get_group_count(self):
         assert TimeConstraint.get_groups_count() == (2, 2)
