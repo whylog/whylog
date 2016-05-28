@@ -73,8 +73,7 @@ class AbstractConfig(object):
     def get_all_log_types(self):
         return six.itervalues(self._log_types)
 
-    def get_log_type(self, front_input):
-        line_source = front_input.line_source
+    def get_log_type(self, line_source):
         for log_type in six.itervalues(self._log_types):
             if line_source in log_type:
                 return log_type
