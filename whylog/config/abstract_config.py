@@ -17,7 +17,7 @@ from whylog.config.super_parser import RegexSuperParser
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
     words_count_in_name = 4
-    DEFAULT_LOG_TYPE = default_log_type = LogType(
+    DEFAULT_LOG_TYPE = LogType(
         "default", [
             WildCardFilenameMatcher("", "", "default", RegexSuperParser("", [], {}))
         ]
@@ -80,7 +80,7 @@ class AbstractConfig(object):
         pass
 
     def get_all_log_types(self):
-        return itertools.chain(six.itervalues(self._log_types), self.DEFAULT_LOG_TYPE)
+        return itertools.chain(self.DEFAULT_LOG_TYPE, six.itervalues(self._log_types))
 
     def get_log_type(self, line_source):
         for log_type in six.itervalues(self._log_types):
