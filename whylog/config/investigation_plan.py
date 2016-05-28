@@ -58,7 +58,12 @@ class InvestigationStep(object):
         type_bounds = self._search_ranges.get(group_type)
         if type_bounds is None:
             return self._compare_with_undefined_bound(bound)
-        return cmp(group_value, type_bounds[bound])
+        bound_value = type_bounds[bound]
+        if group_value < bound_value:
+            return CompareResult.LT
+        elif group_value > bound_value:
+            return CompareResult.GT
+        return CompareResult.EQ
 
     def _compare_with_undefined_bound(self, bound):
         if bound == self.LEFT_BOUND:
