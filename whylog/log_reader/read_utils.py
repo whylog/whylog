@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from whylog.log_reader.exceptions import EmptyFile, OffsetBiggerThanFileSize
@@ -7,7 +8,7 @@ class ReadUtils(object):
     @classmethod
     def size_of_opened_file(cls, fh):
         prev_position = fh.tell()
-        fh.seek(0, 2)
+        fh.seek(0, os.SEEK_END)
         size = fh.tell()
         fh.seek(prev_position)
         return size
