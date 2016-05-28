@@ -20,7 +20,7 @@ from whylog.tests.utils import ConfigPathFactory
 path_test_files = ['whylog', 'tests', 'tests_teacher', 'test_files']
 
 
-class TestBase(TestCase):
+class TestRuleBase(TestCase):
     def setUp(self):
         """
         Creates teacher with sample Rule.
@@ -62,26 +62,6 @@ class TestBase(TestCase):
         self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
         self.date_groups = [(self.effect_id, 1), (self.effect_id, 1)]
 
-    def tearDown(self):
-        self._clean_test_files()
-
-    def _clean_test_files(self):
-        for test_file in self.test_files:
-            open(test_file, 'w').close()
-
-
-class TestEffectBase(TestBase):
-    def setUp(self):
-        super(TestEffectBase, self).setUp()
-        self._add_effect()
-
-    def _add_effect(self):
-        self.teacher.add_line(self.effect_id, self.effect_front_input, effect=True)
-
-
-class TestRuleBase(TestBase):
-    def setUp(self):
-        super(TestRuleBase, self).setUp()
         self._add_rule()
 
     def _add_rule(self):
@@ -93,6 +73,13 @@ class TestRuleBase(TestBase):
         self.teacher.add_line(self.cause2_id, self.cause2_front_input)
         cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
         self.teacher.update_pattern(self.cause2_id, cause2_pattern)
+
+    def tearDown(self):
+        self._clean_test_files()
+
+    def _clean_test_files(self):
+        for test_file in self.test_files:
+            open(test_file, 'w').close()
 
 
 class TestParser(TestRuleBase):
