@@ -50,8 +50,20 @@ class InvestigationStep(object):
         Basing on super_parser_groups extracted from line, returns information
         how relative to bound this line is.
         """
-        #TODO: remove mock
-        return CompareResult.EQ
+        # This implementation assume that super_parser_groups length equals 1 or 0
+        # TODO implementation for longer super_parser_groups_list
+        if not super_parser_groups:
+            return self._compare_with_undefined_bound(bound)
+        group_type, group_value = super_parser_groups[0]
+        type_bounds = self._search_ranges.get(group_type)
+        if type_bounds is None:
+            return self._compare_with_undefined_bound(bound)
+        return cmp(group_value, type_bounds[bound])
+
+    def _compare_with_undefined_bound(self, bound):
+        if bound == self.LEFT_BOUND:
+            return CompareResult.LT
+        return CompareResult.GT
 
     def get_clues(self, line, offset, line_source):
         converted_params = self._parser_subset.convert_parsers_groups_from_matched_line(line)
