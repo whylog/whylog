@@ -6,6 +6,7 @@ import six
 
 from whylog.constraints.const import ConstraintType
 from whylog.converters import ConverterType, get_converter
+from whylog.converters.exceptions import ConverterError
 from whylog.teacher.user_intent import UserConstraintIntent
 
 from whylog.constraints.exceptions import (  # isort:skip
@@ -137,8 +138,8 @@ class AbstractConstraint(object):
             if param_val is not None:
                 converter = get_converter(converter_type)
                 try:
-                    converted_val = converter.convert(param_val)
-                except ValueError:
+                    converted_val = converter.safe_convert(param_val)
+                except ConverterError:
                     problems.append(ParamConversionProblem(param_name, param_val, converter_type))
                 else:
                     self.params[param_name] = converted_val
