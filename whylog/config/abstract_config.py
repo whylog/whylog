@@ -1,18 +1,27 @@
+import itertools
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
 
 import six
 
+from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
+from whylog.config.log_type import LogType
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parser_subset import ConcatenatedRegexParser
 from whylog.config.rule import RegexRuleFactory
+from whylog.config.super_parser import RegexSuperParser
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
     words_count_in_name = 4
+    DEFAULT_LOG_TYPE = default_log_type = LogType(
+        "default", [
+            WildCardFilenameMatcher("", "", "default", RegexSuperParser("", [], {}))
+        ]
+    ) # yapf: disable
 
     def __init__(self):
         self._parsers = self._load_parsers()
@@ -71,7 +80,7 @@ class AbstractConfig(object):
         pass
 
     def get_all_log_types(self):
-        return six.itervalues(self._log_types)
+        return itertools.chain(six.itervalues(self._log_types), self.DEFAULT_LOG_TYPE)
 
     def get_log_type(self, line_source):
         for log_type in six.itervalues(self._log_types):
@@ -98,7 +107,7 @@ class AbstractConfig(object):
                 parser.convert_params(
                     params
                 ), front_input.line_content, front_input.offset, front_input.line_source
-            ) # yapf: disable
+            )  # yapf: disable
             effect_clues[parser_name] = clue
         return effect_clues
 
@@ -155,7 +164,7 @@ class AbstractConfig(object):
         return steps
 
     def _get_search_ranges(self, suspected_rules, effect_clues):
-        #TODO: remove mock
+        # TODO: remove mock
         return {
             'database': {
                 'date': {
