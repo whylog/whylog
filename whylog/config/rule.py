@@ -65,13 +65,13 @@ class Rule(object):
         return self._effect.name
 
     def get_search_ranges(self, effect_clues):
-        group, group_type = self._effect.get_primary_key_group()
-        if not group:
+        group_number, group_type = self._effect.get_primary_key_group()
+        if not group_number:
             return self.NO_RANGE
-        parser_ranges = self._calculate_parsers_ranges(effect_clues, group, group_type)
+        parser_ranges = self._calculate_parsers_ranges(effect_clues, group_number, group_type)
         if self._linkage == self.LINKAGE_OR:
             self.fix_ranges_for_unconnected_constraints(
-                effect_clues, group, group_type, parser_ranges
+                effect_clues, group_number, group_type, parser_ranges
             )
         return self._aggregate_by_log_type(parser_ranges)
 
