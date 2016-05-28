@@ -25,7 +25,7 @@ class LogReader(AbstractLogReader):
         self.config = config
 
     def get_causes(self, front_input):
-        input_log_type = self.config.get_log_type(front_input)
+        input_log_type = self.config.get_log_type(front_input.line_source)
         if not input_log_type:
             raise NoLogTypeError(front_input)
         investigation_plan = self.config.create_investigation_plan(front_input, input_log_type)
