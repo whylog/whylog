@@ -68,7 +68,7 @@ class DateConverter(AbstractConverter):
 STRING = ConverterType.TO_STRING
 CONVERTION_MAPPING = frozendict(
     {
-        ConverterType.TO_STRING : StringConverter,
+        ConverterType.TO_STRING: StringConverter,
         ConverterType.TO_DATE: DateConverter,
         ConverterType.TO_INT: IntConverter,
         ConverterType.TO_FLOAT: FloatConverter
