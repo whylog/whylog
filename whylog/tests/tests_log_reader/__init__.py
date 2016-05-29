@@ -17,6 +17,21 @@ from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
+test_names = (
+    '001_most_basic',
+    # '002_match_latest',
+    '003_match_time_range',
+    # '005_match_tree',
+    '006_match_parameter',
+    '007_match_or',
+    '008_match_and',
+    '009_match_negation',
+    '010_multiple_files',
+    '011_different_entry',
+    # '012_multiple_rulebooks',
+    # '013_match_and_incomplete',
+)  # yapf: disable
+
 
 @generator
 class TestBasic(TestCase):
@@ -95,20 +110,7 @@ class TestBasic(TestCase):
         effect_line_offset = self._deduce_line_offset(original_log_file, line_number)
         return effect_line_offset, line_content
 
-    @generate(
-        '001_most_basic',
-        # '002_match_latest',
-        '003_match_time_range',
-        # '005_match_tree',
-        '006_match_parameter',
-        '007_match_or',
-        '008_match_and',
-        '009_match_negation',
-        '010_multiple_files',
-        '011_different_entry',
-        # '012_multiple_rulebooks',
-        # '013_match_and_incomplete',
-    )  # yapf: disable
+    @generate(*test_names)
     def test_one(self, test_name):
         input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(
             test_name
@@ -130,21 +132,8 @@ class TestBasic(TestCase):
         expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
         self._check_results(results, expected_results)
 
-    @generate(
-        '001_most_basic',
-        # '002_match_latest',
-        '003_match_time_range',
-        # '005_match_tree',
-        '006_match_parameter',
-        '007_match_or',
-        '008_match_and',
-        '009_match_negation',
-        '010_multiple_files',
-        '011_different_entry',
-        # '012_multiple_rulebooks',
-        # '013_match_and_incomplete',
-    )  # yapf: disable
-    def test_temporary_file_assing_to_logtype(self, test_name):
+    @generate(*test_names)
+    def test_temporary_file_assign_to_logtype(self, test_name):
         input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(
             test_name
         )
