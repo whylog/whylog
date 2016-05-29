@@ -85,32 +85,6 @@ class Rule(object):
             )
         return self._aggregate_by_log_type(parser_ranges)
 
-    def _update_parser_ranges_with_or_linkage(
-        self, effect_clues, effect_group, effect_group_type, parser_ranges
-    ):
-        """
-        This method updates parsers ranges, when rule constraints are connected
-        by OR linkage to maximal possibly range. If we find constraint that hasn't delta we can't
-        limit parser's search ranges for all parser connected by this constraint.
-        """
-        effect_group_value = \
-            effect_clues[self.get_effect_name()].regex_parameters[effect_group - 1]
-        for constraint in self._constraints:
-            if constraint['name'] in self.DELTA_CONSTRAINTS:
-                continue
-            for clue_group in constraint['clues_groups']:
-                parser_number = clue_group[0]
-                if parser_number == self.EFFECT_NUMBER:
-                    continue
-                _, primary_group_type = self._causes[parser_number - 1].get_primary_key_group()
-                converter = CONVERTION_MAPPING[primary_group_type]
-                primary_group_type_bound = parser_ranges[parser_number][primary_group_type]
-                new_right_bound = converter.MAX_VALUE
-                if primary_group_type == effect_group_type:
-                    new_right_bound = effect_group_value
-                primary_group_type_bound[InvestigationStep.RIGHT_BOUND] = new_right_bound
-                primary_group_type_bound[InvestigationStep.LEFT_BOUND] = converter.MIN_VALUE
-
     def _calculate_parsers_ranges(self, effect_clues, group, group_type):
         parser_ranges = {
             self.EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
@@ -154,7 +128,12 @@ class Rule(object):
     def _get_effect_range(self, effect_clues, group, group_type):
         # Here assumption that len of primary_keys_groups equals 1
         primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group - 1]
-        return {group_type: {InvestigationStep.LEFT_BOUND: primary_group_value, InvestigationStep.RIGHT_BOUND: primary_group_value}}
+        return {
+            group_type: {
+                InvestigationStep.LEFT_BOUND: primary_group_value,
+                InvestigationStep.RIGHT_BOUND: primary_group_value
+            }
+        }
 
     def _is_primary_key_constraint(self, clues_groups):
         base_parser_number = clues_groups[1][0]
@@ -173,39 +152,18 @@ class Rule(object):
         converter = CONVERTION_MAPPING[group_type]
         new_left_bound = converter.switch_by_delta(left_bound, max_delta, "max")
         new_right_bound = converter.switch_by_delta(right_bound, min_delta, "min")
-        return {group_type: {InvestigationStep.LEFT_BOUND: new_left_bound, InvestigationStep.RIGHT_BOUND: new_right_bound}}
+        return {
+            group_type: {
+                InvestigationStep.LEFT_BOUND: new_left_bound,
+                InvestigationStep.RIGHT_BOUND: new_right_bound
+            }
+        }
 
     @classmethod
     def _get_base_bounds(cls, base_parser_number, group_type, parser_ranges):
         left_bound = parser_ranges[base_parser_number][group_type][InvestigationStep.LEFT_BOUND]
         right_bound = parser_ranges[base_parser_number][group_type][InvestigationStep.RIGHT_BOUND]
         return left_bound, right_bound
-
-    def _aggregate_by_log_type(self, parser_ranges):
-        search_ranges = {}
-        for parser_number, ranges in six.iteritems(parser_ranges):
-            parser_log_type = self._causes[parser_number - 1].log_type
-            if parser_log_type not in search_ranges:
-                search_ranges[parser_log_type] = ranges
-                continue
-            self._update_log_type_ranges(parser_log_type, ranges, search_ranges)
-        return search_ranges
-
-    def _update_log_type_ranges(self, parser_log_type, ranges, search_ranges):
-        for group_type in ranges:
-            if group_type not in search_ranges[parser_log_type]:
-                search_ranges[parser_log_type][group_type] = ranges[group_type]
-                continue
-            self._update_bounds(search_ranges[parser_log_type][group_type], ranges[group_type])
-
-    @classmethod
-    def _update_bounds(cls, old_bounds_dict, parser_bound_dict):
-        old_bounds_dict[InvestigationStep.LEFT_BOUND] = min(
-            old_bounds_dict[InvestigationStep.LEFT_BOUND], parser_bound_dict[InvestigationStep.LEFT_BOUND]
-        )
-        old_bounds_dict[InvestigationStep.RIGHT_BOUND] = max(
-            old_bounds_dict[InvestigationStep.RIGHT_BOUND], parser_bound_dict[InvestigationStep.RIGHT_BOUND]
-        )
 
     def _is_primary_key_group(self, parser_group_number, parser_number):
         if parser_number == self.EFFECT_NUMBER:
@@ -221,6 +179,85 @@ class Rule(object):
                 base_parser = constraint['clues_groups'][1][0]
                 parser_with_constraints[base_parser].append(constraint)
         return parser_with_constraints
+
+    def _update_parser_ranges_with_or_linkage(
+        self, effect_clues, effect_group, effect_group_type, parser_ranges
+    ):
+        """
+        This method updates parsers ranges, when rule constraints are connected
+        by OR linkage to maximal possibly range. If we find constraint that hasn't delta we can't
+        limit parser's search ranges for all parser connected by this constraint.
+        """
+        effect_group_value = \
+            effect_clues[self.get_effect_name()].regex_parameters[effect_group - 1]
+        for constraint in self._constraints:
+            if constraint['name'] in self.DELTA_CONSTRAINTS:
+                continue
+            for clue_group in constraint['clues_groups']:
+                parser_number = clue_group[0]
+                if parser_number == self.EFFECT_NUMBER:
+                    continue
+                _, primary_group_type = self._causes[parser_number - 1].get_primary_key_group()
+                converter = CONVERTION_MAPPING[primary_group_type]
+                new_right_bound = converter.MAX_VALUE
+                if primary_group_type == effect_group_type:
+                    new_right_bound = effect_group_value
+                primary_group_type_bound = parser_ranges[parser_number][primary_group_type]
+                primary_group_type_bound[InvestigationStep.RIGHT_BOUND] = new_right_bound
+                primary_group_type_bound[InvestigationStep.LEFT_BOUND] = converter.MIN_VALUE
+
+    def _aggregate_by_log_type(self, parsers_ranges):
+        """
+        This method joins parser's search ranges belongs to single
+        log type. LEFT_BOUND of primary key type from log type is a
+        minimum of all LEFT_BOUND from parsers has a this primary key type belongs
+        to this log type. Similarly for RIGHT_BOUND takes maximum over parsers RIGHT_BOUND
+        Example:
+            parsers_ranges = {
+                1: {
+                    'int' : { LEFT_BOUND: 10, RIGHT_BOUND: 20}
+                },
+                2: {
+                    'int' : { LEFT_BOUND: 5, RIGHT_BOUND: 30}
+                },
+                3: {
+                    'int' : {LEFT_BOUND: 30, RIGHT_BOUND: 40}
+                }
+            }
+            where 1 and 2 parser belongs to apache log type, but
+            3 belongs to database log type
+            expected returned value: {
+                'apache' : {'int': {LEFT_BOUND: 5, RIGHT_BOUND: 30}},
+                'database': {'int': {LEFT_BOUND: 30, RIGHT_BOUND: 40}}
+            }
+        """
+        search_ranges = {}
+        for parser_number, ranges in six.iteritems(parsers_ranges):
+            parser_log_type = self._causes[parser_number - 1].log_type
+            if parser_log_type not in search_ranges:
+                search_ranges[parser_log_type] = ranges
+                continue
+            self._update_log_type_ranges(parser_log_type, ranges, search_ranges)
+        return search_ranges
+
+    @classmethod
+    def _update_log_type_ranges(cls, parser_log_type, ranges, search_ranges):
+        for group_type in ranges:
+            if group_type not in search_ranges[parser_log_type]:
+                search_ranges[parser_log_type][group_type] = ranges[group_type]
+                continue
+            cls._update_bounds(search_ranges[parser_log_type][group_type], ranges[group_type])
+
+    @classmethod
+    def _update_bounds(cls, bounds, update_bounds):
+        bounds[InvestigationStep.LEFT_BOUND] = min(
+            bounds[InvestigationStep.LEFT_BOUND],
+            update_bounds[InvestigationStep.LEFT_BOUND]
+        )
+        bounds[InvestigationStep.RIGHT_BOUND] = max(
+            bounds[InvestigationStep.RIGHT_BOUND],
+            update_bounds[InvestigationStep.RIGHT_BOUND]
+        )
 
     def constraints_check(self, clues, effect_clues_dict):
         """
