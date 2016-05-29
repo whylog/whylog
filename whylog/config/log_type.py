@@ -17,6 +17,9 @@ class LogType(object):
                     parsed_files.add(file_source)
                     yield host, path, super_parser
 
+    def __hash__(self):
+        return self.name.__hash__()
+
     def __eq__(self, other):
         return self.name == other.name
 
