@@ -86,6 +86,27 @@ class Rule(object):
         return self._aggregate_by_log_type(parser_ranges)
 
     def _calculate_parsers_ranges(self, effect_clues, group, group_type):
+        """
+        This method calculate search ranges for every parser in rule.
+        This algorithm working only on delta constraints these allow reasoning about
+        parser search range.
+        Delta constraints analysis:
+            Such constraint contains clues_groups list that contains two elements. Each of
+            elements is a two element list.
+            For example:
+                clues_groups = [[1,1], [0,1]]
+                It means that first group of first parser depend to first group o zero parser.
+                If these first groups of these parsers are in primary key, we can predict
+                first parser search ranges basing on zero parser search range.
+                Assume that:
+                params = { min_delta: 10, max_delta: 100}
+                zero parser search ranges = {'int': {LEFT_BOUND: 200, RIGHT_BOUND: 250}
+                then
+                first parser search range = {'int': {LEFT_BOUND: 200 - 100, RIGHT_BOUND: 250 - 10}
+        Algorithm steps:
+            1. Calculate effect parser search range. Give primary key values
+                from effect_clues.
+        """
         parser_ranges = {
             self.EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
         }
