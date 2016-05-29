@@ -84,9 +84,9 @@ class SearchManager(object):
         for step, log_type in self._investigation_plan.investigation_steps_with_log_types:
             search_handler = SearchHandler(step, log_type)
             InvestigationUtils.merge_clue_dicts(
-                clues_collector,
-                search_handler.investigate(original_front_input,
-                                           tmp_assign_to_log_type.get(log_type, self.NO_TMP_FILES))
+                clues_collector, search_handler.investigate(
+                    original_front_input, tmp_assign_to_log_type.get(log_type, self.NO_TMP_FILES)
+                )
             )
         clues = self._save_clues_in_normal_dict(clues_collector)
         return self._constraints_verification(clues)
@@ -99,7 +99,9 @@ class SearchHandler(object):
 
     def investigate(self, original_front_input, tmp_assigned):
         clues = defaultdict(itertools.chain)
-        for host, path, super_parser in itertools.chain(self._generate_tmp_files(tmp_assigned), self._log_type.files_to_parse()):
+        for host, path, super_parser in itertools.chain(
+            self._generate_tmp_files(tmp_assigned), self._log_type.files_to_parse()
+        ):
             if host == "localhost":
                 searcher = BacktrackSearcher(path, self._investigation_step, super_parser)
                 InvestigationUtils.merge_clue_dicts(clues, searcher.search(original_front_input))
@@ -111,5 +113,8 @@ class SearchHandler(object):
 
     @classmethod
     def _generate_tmp_files(cls, tmp_assigned):
-        return ((line_source.host, line_source.path, AbstractConfig.DEFAULT_SUPER_REGEX) for line_source in
-                tmp_assigned)
+        return (
+            (
+                line_source.host, line_source.path, AbstractConfig.DEFAULT_SUPER_REGEX
+            ) for line_source in tmp_assigned
+        )

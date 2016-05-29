@@ -110,8 +110,12 @@ class TestBasic(TestCase):
         # '013_match_and_incomplete',
     )  # yapf: disable
     def test_one(self, test_name):
-        input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(test_name)
-        effect_line_offset, line_content = self._gather_effect_line_data(input_path, original_log_file)
+        input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(
+            test_name
+        )
+        effect_line_offset, line_content = self._gather_effect_line_data(
+            input_path, original_log_file
+        )
 
         # preparing Whylog structures, normally prepared by Front
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
@@ -141,8 +145,12 @@ class TestBasic(TestCase):
         # '013_match_and_incomplete',
     )  # yapf: disable
     def test_temporary_file_assing_to_logtype(self, test_name):
-        input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(test_name)
-        effect_line_offset, line_content = self._gather_effect_line_data(input_path, original_log_file)
+        input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(
+            test_name
+        )
+        effect_line_offset, line_content = self._gather_effect_line_data(
+            input_path, original_log_file
+        )
 
         whylog_config = self._prepare_config(path)
         log_reader = LogReader(whylog_config)
@@ -159,7 +167,11 @@ class TestBasic(TestCase):
         if test_name == "010_multiple_files":
             temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source]}
         if test_name == "011_different_entry":
-            temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source, node3_source]}
+            temp_assign = {
+                AbstractConfig.DEFAULT_LOG_TYPE: [
+                    node1_source, node2_source, node3_source
+                ]
+            }
 
         results = log_reader.get_causes(effect_line, temp_assign)
         expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
@@ -173,6 +185,7 @@ class TestBasic(TestCase):
         for parser in six.itervalues(whylog_config._parsers):
             parser.log_type = "default"
         whylog_config._parser_name_generator = ParserNameGenerator(whylog_config._parsers)
-        whylog_config._parsers_grouped_by_log_type["default"] = whylog_config._parsers_grouped_by_log_type.pop(
-            "test_log_type")
+        whylog_config._parsers_grouped_by_log_type[
+            "default"
+        ] = whylog_config._parsers_grouped_by_log_type.pop("test_log_type")
         return whylog_config
