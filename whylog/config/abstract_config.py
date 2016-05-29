@@ -163,6 +163,36 @@ class AbstractConfig(object):
         return steps
 
     def _get_search_ranges(self, suspected_rules, effect_clues):
+        """
+        Search range is a dictionary with two keys InvesitgationStep.LEFT_BOUND and
+        InvesitgationStep.RIGHT_BOUND. Values in this dict are concrete value that
+        represents interval of primary key values. This interval can be map to
+        interval of offsets in file that has compatible primary key with concrete search range.
+        It allowed to cut out lines in parsed file, without parsing every single line.
+        This method basing on search ranges from suspected rules calculates
+        search ranges for every primary key type that can be predicted. Returned search ranges are
+        grouped by log type.
+        Sample search ranges: {
+            'apache': {
+                'date': {
+                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),
+                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)
+                }
+            },
+            'database': {
+                'date': {
+                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),
+                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)
+                }
+            }
+        }
+        Meaning of this search ranges:
+        Algorithm returns ranges only for two log types: apache i database.
+        For every log type calculated range only for files with primary key
+        based on date. Values in range for apache log type means that LogReader
+        must only parse lines in compatible files these has a date between datetime(2016, 5, 29, 12, 33, 0)
+        and datetime(2016, 5, 29, 12, 33, 30)
+        """
         # This implementation assumes that all primary key groups is a one element list
         # TODO implementation for longer primary key groups
         search_ranges = {}
