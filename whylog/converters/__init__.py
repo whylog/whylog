@@ -22,9 +22,9 @@ class AbstractConverter(object):
         raise NotImplementedError
 
     @classmethod
-    def safe_convert(self, pattern_group):
+    def safe_convert(cls, pattern_group):
         try:
-            converted_val = self.convert(pattern_group)
+            converted_val = cls.convert(pattern_group)
         except (ValueError, TypeError):
             raise ConverterError(pattern_group)
         else:
@@ -56,9 +56,9 @@ class DateConverter(AbstractConverter):
         return dateutil.parser.parse(pattern_group, fuzzy=True)
 
     @classmethod
-    def safe_convert(self, pattern_group):
+    def safe_convert(cls, pattern_group):
         try:
-            converted_val = self.convert(pattern_group)
+            converted_val = cls.convert(pattern_group)
         except (ValueError, AttributeError):
             raise ConverterError(pattern_group)
         else:
