@@ -66,19 +66,31 @@ class Rule(object):
         return self._effect.name
 
     def get_search_ranges(self, effect_clues):
+        """
+        This method calculate search ranges for single rule based on its
+        constraints and effect clues.
+        Algorithm steps:
+            1. Check that effect parser has no empty primary key. If is empty
+             return NO_RANGE
+            2. Calculate search range for every cause parser.
+            3. Join parsers ranges with this same log type
+        """
         group_number, group_type = self._effect.get_primary_key_group()
         if not group_number:
             return self.NO_RANGE
         parser_ranges = self._calculate_parsers_ranges(effect_clues, group_number, group_type)
         if self._linkage == self.LINKAGE_OR:
-            self.fix_ranges_for_unconnected_constraints(
+            self._update_parser_ranges_with_or_linkage(
                 effect_clues, group_number, group_type, parser_ranges
             )
         return self._aggregate_by_log_type(parser_ranges)
 
-    def fix_ranges_for_unconnected_constraints(
+    def _update_parser_ranges_with_or_linkage(
         self, effect_clues, group, group_type, parser_ranges
     ):
+        """
+        This method updates parsers ranges, when rule constraints are con
+        """
         for constraint in self._constraints:
             if constraint['name'] not in self.DELTA_CONSTRAINTS:
                 parser_number = constraint['clues_groups'][0][0]

@@ -191,7 +191,7 @@ class AbstractConfig(object):
         For every log type calculated range only for files with primary key
         based on date. Values in range for apache log type means that LogReader
         must only parse lines in compatible files these has a date between datetime(2016, 5, 29, 12, 33, 0)
-        and datetime(2016, 5, 29, 12, 33, 30)
+        and datetime(2016, 5, 29, 12, 33, 30).
         """
         # This implementation assumes that all primary key groups is a one element list
         # TODO implementation for longer primary key groups
