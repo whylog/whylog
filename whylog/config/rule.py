@@ -86,19 +86,30 @@ class Rule(object):
         return self._aggregate_by_log_type(parser_ranges)
 
     def _update_parser_ranges_with_or_linkage(
-        self, effect_clues, group, group_type, parser_ranges
+        self, effect_clues, effect_group, effect_group_type, parser_ranges
     ):
         """
-        This method updates parsers ranges, when rule constraints are con
+        This method updates parsers ranges, when rule constraints are connected
+        by OR linkage to maximal possibly range. If we find constraint that hasn't delta we can't
+        limit parser's search ranges for all parser connected by this constraint.
         """
+        effect_group_value = \
+            effect_clues[self.get_effect_name()].regex_parameters[effect_group - 1]
         for constraint in self._constraints:
-            if constraint['name'] not in self.DELTA_CONSTRAINTS:
-                parser_number = constraint['clues_groups'][0][0]
-                converter = CONVERTION_MAPPING[group_type]
-                primary_group_value = \
-                    effect_clues[self.get_effect_name()].regex_parameters[group - 1]
-                parser_ranges[parser_number][group_type][InvestigationStep.LEFT_BOUND] = converter.MIN_VALUE
-                parser_ranges[parser_number][group_type][InvestigationStep.RIGHT_BOUND] = primary_group_value
+            if constraint['name'] in self.DELTA_CONSTRAINTS:
+                continue
+            for clue_group in constraint['clues_groups']:
+                parser_number = clue_group[0]
+                if parser_number == self.EFFECT_NUMBER:
+                    continue
+                _, primary_group_type = self._causes[parser_number - 1].get_primary_key_group()
+                converter = CONVERTION_MAPPING[primary_group_type]
+                primary_group_type_bound = parser_ranges[parser_number][primary_group_type]
+                new_right_bound = converter.MAX_VALUE
+                if primary_group_type == effect_group_type:
+                    new_right_bound = effect_group_value
+                primary_group_type_bound[InvestigationStep.RIGHT_BOUND] = new_right_bound
+                primary_group_type_bound[InvestigationStep.LEFT_BOUND] = converter.MIN_VALUE
 
     def _calculate_parsers_ranges(self, effect_clues, group, group_type):
         parser_ranges = {

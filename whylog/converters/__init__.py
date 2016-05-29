@@ -23,6 +23,7 @@ class AbstractConverter(object):
 
 class IntConverter(AbstractConverter):
     MIN_VALUE = -2000000000
+    MAX_VALUE = 2000000000
 
     @classmethod
     def switch_by_delta(cls, value, delta, delta_type=None):
@@ -35,6 +36,7 @@ class IntConverter(AbstractConverter):
 
 class FloatConverter(AbstractConverter):
     MIN_VALUE = float('-inf')
+    MAX_VALUE = float('inf')
 
     @classmethod
     def switch_by_delta(cls, value, delta, delta_type=None):
@@ -48,6 +50,7 @@ class FloatConverter(AbstractConverter):
 #TODO: Simple date convertion will replace for concreate date format converter in the future
 class DateConverter(AbstractConverter):
     MIN_VALUE = datetime.min
+    MAX_VALUE = datetime.max
 
     @classmethod
     def switch_by_delta(cls, date, delta, delta_type):
