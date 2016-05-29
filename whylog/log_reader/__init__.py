@@ -1,9 +1,9 @@
 import itertools
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
-from frozendict import frozendict
 
 import six
+from frozendict import frozendict
 
 from whylog.config.abstract_config import AbstractConfig
 from whylog.log_reader.exceptions import NoLogTypeError

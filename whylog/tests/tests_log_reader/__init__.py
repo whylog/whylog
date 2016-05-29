@@ -7,8 +7,8 @@ from generator import generate, generator
 
 from whylog.config import YamlConfig
 from whylog.config.abstract_config import AbstractConfig
-from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.investigation_plan import LineSource
+from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.constraints.verifier import InvestigationResult
 from whylog.front.utils import FrontInput
 from whylog.log_reader import LogReader
