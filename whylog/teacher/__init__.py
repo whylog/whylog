@@ -218,7 +218,7 @@ class Teacher(object):
             pattern_type, teacher_parser.name, pattern_match.pattern, teacher_parser.log_type,
             teacher_parser.primary_key, pattern_match.param_groups,
             teacher_parser.line.line_content, teacher_parser.line.offset,
-            teacher_parser.line.line_source
+            teacher_parser.line.line_source, line_id
         )  # yapf: disable
 
     def get_rule(self):
