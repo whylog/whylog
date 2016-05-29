@@ -6,7 +6,7 @@ from unittest import TestCase
 from nose.plugins.skip import SkipTest
 
 from whylog.config import SettingsFactorySelector
-from whylog.config.investigation_plan import Clue, LineSource
+from whylog.config.investigation_plan import Clue, InvestigationStep, LineSource
 from whylog.config.parsers import RegexParser
 from whylog.config.rule import Rule
 from whylog.tests.consts import TestPaths
@@ -75,8 +75,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': self.ten_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.ten_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
@@ -105,14 +105,14 @@ class TestBasic(TestCase):
         expected_ranges = {
             'database': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.ten_second_earlier
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.ten_second_earlier
                 }
             },
             'apache': {
                 'date': {
-                    'left_bound': self.ten_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.ten_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
@@ -134,8 +134,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'database': {
                 'date': {
-                    'left_bound': self.earliest_date,
-                    'right_bound': self.ten_second_earlier
+                    InvestigationStep.LEFT_BOUND: self.earliest_date,
+                    InvestigationStep.RIGHT_BOUND: self.ten_second_earlier
                 }
             },
         } # yapf: disable
@@ -157,8 +157,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'database': {
                 'date': {
-                    'left_bound': self.ten_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.ten_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             },
         } # yapf: disable
@@ -183,8 +183,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'database': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.ten_second_later
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.ten_second_later
                 }
             },
         } # yapf: disable
@@ -231,14 +231,14 @@ class TestBasic(TestCase):
         expected_ranges = {
             'database': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.ten_second_earlier
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.ten_second_earlier
                 }
             },
             'apache': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
@@ -268,8 +268,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
@@ -299,8 +299,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
@@ -330,8 +330,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.ten_second_earlier
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.ten_second_earlier
                 }
             }
         } # yapf: disable
@@ -368,8 +368,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
@@ -383,8 +383,8 @@ class TestBasic(TestCase):
         expected_ranges = {
             'apache': {
                 'date': {
-                    'left_bound': self.earliest_date,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.earliest_date,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
@@ -420,14 +420,14 @@ class TestBasic(TestCase):
         expected_ranges = {
             'database': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.ten_second_earlier
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.ten_second_earlier
                 }
             },
             'apache': {
                 'date': {
-                    'left_bound': self.one_hundred_second_earlier,
-                    'right_bound': self.effect_time
+                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
         } # yapf: disable
