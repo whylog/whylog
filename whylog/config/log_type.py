@@ -17,6 +17,9 @@ class LogType(object):
                     parsed_files.add(file_source)
                     yield host, path, super_parser
 
+    def __eq__(self, other):
+        return self.name == other.name
+
     def __contains__(self, line_source):
         return any(line_source in matcher for matcher in self.filename_matchers)
 

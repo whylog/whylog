@@ -7,6 +7,7 @@ from generator import generate, generator
 
 from whylog.config import YamlConfig
 from whylog.config.abstract_config import AbstractConfig
+from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.investigation_plan import LineSource
 from whylog.constraints.verifier import InvestigationResult
 from whylog.front.utils import FrontInput
@@ -159,8 +160,13 @@ class TestBasic(TestCase):
         # preparing Whylog structures, normally prepared by Front
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         # Erasing saved log types
-        whylog_config._log_types = {}
+
+        whylog_config._log_types = {"default": AbstractConfig.DEFAULT_LOG_TYPE}
         log_reader = LogReader(whylog_config)
+        for parser in six.itervalues(whylog_config._parsers):
+            parser.log_type = "default"
+        whylog_config._parser_name_generator = ParserNameGenerator(whylog_config._parsers)
+        whylog_config._parsers_grouped_by_log_type["default"] = whylog_config._parsers_grouped_by_log_type.pop("test_log_type")
         effect_line = FrontInput(
             effect_line_offset, line_content, LineSource(
                 'localhost', os.path.join(path, self._get_starting_file_name(input_path))
@@ -176,7 +182,7 @@ class TestBasic(TestCase):
         if test_name == "011_different_entry":
             temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source, node3_source]}
 
-        raise SkipTest
+        # raise SkipTest
         results = log_reader.get_causes(effect_line, temp_assign)
         expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
         self._check_results(results, expected_results)

@@ -5,6 +5,7 @@ from frozendict import frozendict
 
 import six
 
+from whylog.config.abstract_config import AbstractConfig
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
 from whylog.log_reader.searchers import BacktrackSearcher
@@ -34,7 +35,7 @@ class LogReader(AbstractLogReader):
             input_log_type = self._get_input_log_type(tmp_assign_to_log_type, input_line_source)
         investigation_plan = self.config.create_investigation_plan(front_input, input_log_type)
         manager = SearchManager(investigation_plan)
-        return manager.investigate(front_input)
+        return manager.investigate(front_input, tmp_assign_to_log_type)
 
     @classmethod
     def _get_input_log_type(cls, tmp_assign_to_log_type, input_line_source):
@@ -49,6 +50,8 @@ class LogReader(AbstractLogReader):
 
 
 class SearchManager(object):
+    NO_TMP_FILES = frozenset()
+
     def __init__(self, investigation_plan):
         self._investigation_plan = investigation_plan
 
@@ -69,7 +72,7 @@ class SearchManager(object):
             causes.extend(results_from_rule)
         return causes
 
-    def investigate(self, original_front_input):
+    def investigate(self, original_front_input, tmp_assign_to_log_type):
         """
         this function collects clues from SearchHandlers
         (each of them corresponds to one InvestigationStep)
@@ -81,7 +84,9 @@ class SearchManager(object):
         for step, log_type in self._investigation_plan.investigation_steps_with_log_types:
             search_handler = SearchHandler(step, log_type)
             InvestigationUtils.merge_clue_dicts(
-                clues_collector, search_handler.investigate(original_front_input)
+                clues_collector,
+                search_handler.investigate(original_front_input,
+                                           tmp_assign_to_log_type.get(log_type, self.NO_TMP_FILES))
             )
         clues = self._save_clues_in_normal_dict(clues_collector)
         return self._constraints_verification(clues)
@@ -92,9 +97,9 @@ class SearchHandler(object):
         self._investigation_step = investigation_step
         self._log_type = log_type
 
-    def investigate(self, original_front_input):
+    def investigate(self, original_front_input, tmp_assigned):
         clues = defaultdict(itertools.chain)
-        for host, path, super_parser in self._log_type.files_to_parse():
+        for host, path, super_parser in itertools.chain(self._generate_tmp_files(tmp_assigned), self._log_type.files_to_parse()):
             if host == "localhost":
                 searcher = BacktrackSearcher(path, self._investigation_step, super_parser)
                 InvestigationUtils.merge_clue_dicts(clues, searcher.search(original_front_input))
@@ -103,3 +108,8 @@ class SearchHandler(object):
                     "Cannot operate on %s which is different than %s" % (host, "localhost")
                 )
         return clues
+
+    @classmethod
+    def _generate_tmp_files(cls, tmp_assigned):
+        return ((line_source.host, line_source.path, AbstractConfig.DEFAULT_SUPER_REGEX) for line_source in
+                tmp_assigned)

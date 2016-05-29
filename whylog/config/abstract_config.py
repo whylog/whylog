@@ -20,7 +20,7 @@ class AbstractConfig(object):
     DEFAULT_SUPER_REGEX = RegexSuperParser("", [], {})
     DEFAULT_LOG_TYPE = LogType(
         "default", [
-            WildCardFilenameMatcher("", "", "default", DEFAULT_SUPER_REGEX)
+            WildCardFilenameMatcher("localhost", "", "default", DEFAULT_SUPER_REGEX)
         ]
     ) # yapf: disable
 
@@ -160,8 +160,6 @@ class AbstractConfig(object):
         steps = []
         search_ranges = self._get_search_ranges(suspected_rules, effect_clues)
         for log_type_name, parser in six.iteritems(concatenated_parsers):
-            print self._log_types
-            print log_type_name
             log_type = self._log_types[log_type_name]
             investigation_step = InvestigationStep(parser, search_ranges.get(log_type_name, {}))
             steps.append((investigation_step, log_type))

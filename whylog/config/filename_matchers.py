@@ -22,6 +22,7 @@ class WildCardFilenameMatcher(AbstractFilenameMatcher):
         self.super_parser = super_parser
 
     def get_matched_files(self):
+        print self.host_pattern
         if self.host_pattern == 'localhost':
             for path in glob.iglob(self.path_pattern):
                 yield 'localhost', path, self.super_parser
