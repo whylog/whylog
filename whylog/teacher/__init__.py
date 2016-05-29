@@ -75,9 +75,7 @@ class Teacher(object):
         )
         default_log_type_name = None
 
-        new_teacher_parser = TeacherParser(
-            line_object, default_name, default_log_type_name
-        )
+        new_teacher_parser = TeacherParser(line_object, default_name, default_log_type_name)
         self._parsers[line_id] = new_teacher_parser
 
     def remove_line(self, line_id):

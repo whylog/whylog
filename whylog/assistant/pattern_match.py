@@ -1,6 +1,3 @@
-from collections import namedtuple
-
-
 class ParamGroup(object):
     def __init__(self, content, converter):
         self.content = content
