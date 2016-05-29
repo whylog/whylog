@@ -13,6 +13,8 @@ from whylog.log_reader import LogReader
 from whylog.tests.tests_log_reader.constants import TestPaths
 from whylog.tests.utils import ConfigPathFactory
 
+from nose import SkipTest
+
 path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
 
 
@@ -60,6 +62,16 @@ class TestBasic(TestCase):
             results.append(InvestigationResult(causes, result['constraints'], result['linkage']))
         return results
 
+    @classmethod
+    def _check_results(cls, results, expected_results):
+        # action and checking the result
+        assert results
+        assert len(results) == len(expected_results)
+        for got, real in six.moves.zip(results, expected_results):
+            assert got.lines == real.lines
+            for constr_got, constr_real in zip(got.constraints, real.constraints):
+                assert constr_got['name'] == constr_real['name']
+
     @generate(
         '001_most_basic',
         # '002_match_latest',
@@ -104,12 +116,66 @@ class TestBasic(TestCase):
             )
         )
 
-        # action and checking the result
         results = log_reader.get_causes(effect_line)
         expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
-        assert results
-        assert len(results) == len(expected_results)
-        for got, real in six.moves.zip(results, expected_results):
-            assert got.lines == real.lines
-            for constr_got, constr_real in zip(got.constraints, real.constraints):
-                assert constr_got['name'] == constr_real['name']
+        self._check_results(results, expected_results)
+
+    @generate(
+        '001_most_basic',
+        # '002_match_latest',
+        '003_match_time_range',
+        # '005_match_tree',
+        '006_match_parameter',
+        '007_match_or',
+        '008_match_and',
+        '009_match_negation',
+        '010_multiple_files',
+        '011_different_entry',
+        # '012_multiple_rulebooks',
+        # '013_match_and_incomplete',
+    )  # yapf: disable
+    def test_temporary_file_assing_to_logtype(self, test_name):
+        # paths files setup
+        prefix_path = os.path.join(*TestPaths.path_test_files)
+        path = os.path.join(prefix_path, test_name)
+        input_path = os.path.join(path, 'input.txt')
+        # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
+
+        original_log_file = os.path.join(path, 'node_1.log')
+        result_log_file = original_log_file
+        if test_name == "010_multiple_files":
+            result_log_file = os.path.join(path, 'node_2.log')
+        if test_name == "011_different_entry":
+            result_log_file = os.path.join(path, 'node_3.log')
+
+        results_yaml_file = os.path.join(path, 'investigation_results.yaml')
+
+        # gathering information about effect line
+        line_number = self._get_cause_line_number(input_path)
+        line_content = self._get_concrete_line_from_file(original_log_file, line_number)
+        effect_line_offset = self._deduce_line_offset(original_log_file, line_number)
+
+        # preparing Whylog structures, normally prepared by Front
+        whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
+        # Erasing saved log types
+        whylog_config._log_types = {}
+        log_reader = LogReader(whylog_config)
+        effect_line = FrontInput(
+            effect_line_offset, line_content, LineSource(
+                'localhost', os.path.join(path, self._get_starting_file_name(input_path))
+            )
+        )
+
+        node1_source = LineSource('localhost', os.path.join(path, 'node_1.log'))
+        node2_source = LineSource('localhost', os.path.join(path, 'node_2.log'))
+        node3_source = LineSource('localhost', os.path.join(path, 'node_3.log'))
+        temp_assign = {'default': [node1_source]}
+        if test_name == "010_multiple_files":
+            temp_assign = {'default': [node1_source, node2_source]}
+        if test_name == "011_different_entry":
+            temp_assign = {'default': [node1_source, node2_source, node3_source]}
+
+        raise SkipTest
+        results = log_reader.get_causes(effect_line, temp_assign)
+        expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
+        self._check_results(results, expected_results)

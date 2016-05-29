@@ -1,6 +1,7 @@
 import itertools
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+from frozendict import frozendict
 
 import six
 
@@ -21,10 +22,12 @@ class AbstractLogReader(object):
 
 
 class LogReader(AbstractLogReader):
+    NO_TEMP = frozendict()
+
     def __init__(self, config):
         self.config = config
 
-    def get_causes(self, front_input):
+    def get_causes(self, front_input, tmp_assign_to_log_type=NO_TEMP):
         input_log_type = self.config.get_log_type(front_input.line_source)
         if not input_log_type:
             raise NoLogTypeError(front_input)
