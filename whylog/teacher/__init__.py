@@ -218,7 +218,7 @@ class Teacher(object):
         """
         user_parsers = dict(
             (line_id, self._prepare_user_parser(line_id)) for line_id in six.iterkeys(self._parsers)
-        )
+        )  # yapf: disable
         user_constraints = [
             constraint.convert_to_user_constraint_intent()
             for constraint in six.itervalues(self._constraint_base)
