@@ -10,10 +10,9 @@ from whylog.teacher.rule_validation_problems import (  # isort:skip
 
 
 class TeacherParser(object):
-    def __init__(self, line_object, name, primary_key, log_type):
+    def __init__(self, line_object, name, log_type):
         self.line = line_object
         self.name = name
-        self.primary_key = primary_key
         self.log_type = log_type
 
     def validate_name(self, config, names_blacklist):
@@ -70,19 +69,14 @@ class Teacher(object):
 
         default_pattern_match = self.pattern_assistant.get_pattern_match(line_id)
         default_pattern = default_pattern_match.pattern
-        default_groups = default_pattern_match.param_groups
 
         default_name = self.config.propose_parser_name(
             line_object.line_content, default_pattern, self._get_names_blacklist()
         )
-        if default_groups:
-            default_primary_key = [min(default_groups.keys())]
-        else:
-            default_primary_key = []
         default_log_type_name = None
 
         new_teacher_parser = TeacherParser(
-            line_object, default_name, default_primary_key, default_log_type_name
+            line_object, default_name, default_log_type_name
         )
         self._parsers[line_id] = new_teacher_parser
 
@@ -126,8 +120,7 @@ class Teacher(object):
 
     def set_primary_key(self, line_id, group_numbers):
         # Assumption: group_numbers is list of integers
-        # TODO: move it to pattern_assistant and validate there
-        self._parsers[line_id].primary_key = group_numbers
+        self.pattern_assistant.set_primary_key(line_id, group_numbers)
 
     def set_log_type(self, line_id, log_type):
         # Assumption: log_type is accepted by Config
@@ -216,7 +209,7 @@ class Teacher(object):
         pattern_type = self.pattern_assistant.TYPE
         return UserParserIntent(
             pattern_type, teacher_parser.name, pattern_match.pattern, teacher_parser.log_type,
-            teacher_parser.primary_key, pattern_match.param_groups,
+            pattern_match.primary_key, pattern_match.param_groups,
             teacher_parser.line.line_content, teacher_parser.line.offset,
             teacher_parser.line.line_source
         )  # yapf: disable
