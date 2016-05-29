@@ -60,17 +60,16 @@ class InvestigationStep(object):
                 }
             }
             returned value: CompareResult.GT
-        When self._search_ranges hasn't subdictonary for given super_parser_groups's type or
-        super_parser_groups parameter is empty list return CompareResult.LT/CompareResult.GT
-        when compare with LEFT_BOUND/RIGHT_BOUND. This means that InvestigationStep object hasn't
-        information about order in parsed file.
+        When self._search_ranges hasn't defined bounds for given primary key type this method
+        return GT/LT when compare with RIGHT_BOUND/LEFT_BOUND.
+        This means that InvestigationStep object hasn't information about order in parsed file.
         """
         # This implementation assume that super_parser_groups length equals 1 or 0
         # TODO implementation for longer super_parser_groups_list
         group_value, bound_value = self._extract_values_to_compare(bound, super_parser_groups)
         if bound_value is None:
             return self._compare_with_undefined_bound(bound)
-        return self._compare_extracted_values(bound_value, group_value)
+        return self._compare_values(bound_value, group_value)
 
     def _extract_values_to_compare(self, bound, super_parser_groups):
         if not super_parser_groups:
@@ -89,7 +88,7 @@ class InvestigationStep(object):
         return CompareResult.GT
 
     @classmethod
-    def _compare_extracted_values(cls, bound_value, group_value):
+    def _compare_values(cls, bound_value, group_value):
         if group_value < bound_value:
             return CompareResult.LT
         elif group_value > bound_value:
