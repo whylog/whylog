@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 import six
 from frozendict import frozendict
 
+from whylog.config.investigation_plan import InvestigationStep
 from whylog.config.parsers import RegexParserFactory
 from whylog.constraints.constraint_manager import ConstraintManager
 from whylog.constraints.verifier import Verifier
@@ -84,8 +85,8 @@ class Rule(object):
                 converter = CONVERTION_MAPPING[group_type]
                 primary_group_value = \
                     effect_clues[self.get_effect_name()].regex_parameters[group - 1]
-                parser_ranges[parser_number][group_type]["left_bound"] = converter.MIN_VALUE
-                parser_ranges[parser_number][group_type]["right_bound"] = primary_group_value
+                parser_ranges[parser_number][group_type][InvestigationStep.LEFT_BOUND] = converter.MIN_VALUE
+                parser_ranges[parser_number][group_type][InvestigationStep.RIGHT_BOUND] = primary_group_value
 
     def _calculate_parsers_ranges(self, effect_clues, group, group_type):
         parser_ranges = {
@@ -122,15 +123,15 @@ class Rule(object):
                     effect_clues[self.get_effect_name()].regex_parameters[group - 1]
                 parser_ranges[(i + 1)] = {
                     group_type: {
-                        'left_bound': converter.MIN_VALUE,
-                        'right_bound': primary_group_value
+                        InvestigationStep.LEFT_BOUND: converter.MIN_VALUE,
+                        InvestigationStep.RIGHT_BOUND: primary_group_value
                     }
                 }
 
     def _get_effect_range(self, effect_clues, group, group_type):
         # Here assumption that len of primary_keys_groups equals 1
         primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group - 1]
-        return {group_type: {"left_bound": primary_group_value, "right_bound": primary_group_value}}
+        return {group_type: {InvestigationStep.LEFT_BOUND: primary_group_value, InvestigationStep.RIGHT_BOUND: primary_group_value}}
 
     def _is_primary_key_constraint(self, clues_groups):
         base_parser_number = clues_groups[1][0]
@@ -149,12 +150,12 @@ class Rule(object):
         converter = CONVERTION_MAPPING[group_type]
         new_left_bound = converter.switch_by_delta(left_bound, max_delta, "max")
         new_right_bound = converter.switch_by_delta(right_bound, min_delta, "min")
-        return {group_type: {"left_bound": new_left_bound, "right_bound": new_right_bound}}
+        return {group_type: {InvestigationStep.LEFT_BOUND: new_left_bound, InvestigationStep.RIGHT_BOUND: new_right_bound}}
 
     @classmethod
     def _get_base_bounds(cls, base_parser_number, group_type, parser_ranges):
-        left_bound = parser_ranges[base_parser_number][group_type]["left_bound"]
-        right_bound = parser_ranges[base_parser_number][group_type]["right_bound"]
+        left_bound = parser_ranges[base_parser_number][group_type][InvestigationStep.LEFT_BOUND]
+        right_bound = parser_ranges[base_parser_number][group_type][InvestigationStep.RIGHT_BOUND]
         return left_bound, right_bound
 
     def _aggregate_by_log_type(self, parser_ranges):
@@ -176,11 +177,11 @@ class Rule(object):
 
     @classmethod
     def _update_bounds(cls, old_bounds_dict, parser_bound_dict):
-        old_bounds_dict["left_bound"] = min(
-            old_bounds_dict["left_bound"], parser_bound_dict["left_bound"]
+        old_bounds_dict[InvestigationStep.LEFT_BOUND] = min(
+            old_bounds_dict[InvestigationStep.LEFT_BOUND], parser_bound_dict[InvestigationStep.LEFT_BOUND]
         )
-        old_bounds_dict["right_bound"] = max(
-            old_bounds_dict["right_bound"], parser_bound_dict["right_bound"]
+        old_bounds_dict[InvestigationStep.RIGHT_BOUND] = max(
+            old_bounds_dict[InvestigationStep.RIGHT_BOUND], parser_bound_dict[InvestigationStep.RIGHT_BOUND]
         )
 
     def _is_primary_key_group(self, parser_group_number, parser_number):
