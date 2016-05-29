@@ -231,8 +231,8 @@ class Teacher(object):
             )
         )
         user_constraints = [
-            constraint.convert_to_user_constraint_intent()
-            for constraint in six.itervalues(self._constraint_base)
+            constraint.convert_to_user_constraint_intent(constraint_id)
+            for constraint_id, constraint in six.iteritems(self._constraint_base)
         ]
         return UserRuleIntent(self.effect_id, user_parsers, user_constraints)
 

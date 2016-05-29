@@ -86,13 +86,13 @@ class AbstractConstraint(object):
         """
         pass
 
-    def convert_to_user_constraint_intent(self):
+    def convert_to_user_constraint_intent(self, constraint_id=None):
         """
         Converts constraint to UserConstraintIntent object.
 
         For Teacher and Config use while saving constraint into Whylog knowledge base.
         """
-        return UserConstraintIntent(self.TYPE, self.groups, self.params)
+        return UserConstraintIntent(self.TYPE, self.groups, self.params, constraint_id)
 
     @classmethod
     def get_param_names(cls):

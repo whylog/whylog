@@ -182,8 +182,9 @@ class TestConstraints(TestRuleUpdateBase):
         constraint = IdenticalConstraint(groups=self.identical_groups)
         self.teacher.register_constraint(constraint_id, constraint)
         user_rule = self.teacher.get_rule()
-
-        wanted_constraint = UserConstraintIntent(IdenticalConstraint.TYPE, self.identical_groups)
+        wanted_constraint = UserConstraintIntent(
+            IdenticalConstraint.TYPE, self.identical_groups, constraint_id=constraint_id
+        )
         assert wanted_constraint == user_rule.constraints[0]
 
         self._constraints_presence_check()
