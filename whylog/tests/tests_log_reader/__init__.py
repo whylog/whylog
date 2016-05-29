@@ -6,6 +6,7 @@ import yaml
 from generator import generate, generator
 
 from whylog.config import YamlConfig
+from whylog.config.abstract_config import AbstractConfig
 from whylog.config.investigation_plan import LineSource
 from whylog.constraints.verifier import InvestigationResult
 from whylog.front.utils import FrontInput
@@ -169,13 +170,13 @@ class TestBasic(TestCase):
         node1_source = LineSource('localhost', os.path.join(path, 'node_1.log'))
         node2_source = LineSource('localhost', os.path.join(path, 'node_2.log'))
         node3_source = LineSource('localhost', os.path.join(path, 'node_3.log'))
-        temp_assign = {'default': [node1_source]}
+        temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source]}
         if test_name == "010_multiple_files":
-            temp_assign = {'default': [node1_source, node2_source]}
+            temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source]}
         if test_name == "011_different_entry":
-            temp_assign = {'default': [node1_source, node2_source, node3_source]}
+            temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source, node3_source]}
 
-        raise SkipTest
+        # raise SkipTest
         results = log_reader.get_causes(effect_line, temp_assign)
         expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
         self._check_results(results, expected_results)

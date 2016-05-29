@@ -17,9 +17,10 @@ from whylog.config.super_parser import RegexSuperParser
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
     words_count_in_name = 4
+    DEFAULT_SUPER_REGEX = RegexSuperParser("", [], {})
     DEFAULT_LOG_TYPE = LogType(
         "default", [
-            WildCardFilenameMatcher("", "", "default", RegexSuperParser("", [], {}))
+            WildCardFilenameMatcher("", "", "default", DEFAULT_SUPER_REGEX)
         ]
     ) # yapf: disable
 
@@ -31,6 +32,7 @@ class AbstractConfig(object):
         self._parser_name_generator = ParserNameGenerator(self._parsers)
         self._rules = self._load_rules()
         self._log_types = self._load_log_types()
+        self._log_types["default"] = self.DEFAULT_LOG_TYPE
 
     @abstractmethod
     def _load_parsers(self):
@@ -158,6 +160,8 @@ class AbstractConfig(object):
         steps = []
         search_ranges = self._get_search_ranges(suspected_rules, effect_clues)
         for log_type_name, parser in six.iteritems(concatenated_parsers):
+            print self._log_types
+            print log_type_name
             log_type = self._log_types[log_type_name]
             investigation_step = InvestigationStep(parser, search_ranges.get(log_type_name, {}))
             steps.append((investigation_step, log_type))

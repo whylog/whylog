@@ -28,12 +28,21 @@ class LogReader(AbstractLogReader):
         self.config = config
 
     def get_causes(self, front_input, tmp_assign_to_log_type=NO_TEMP):
-        input_log_type = self.config.get_log_type(front_input.line_source)
+        input_line_source = front_input.line_source
+        input_log_type = self.config.get_log_type(input_line_source)
         if not input_log_type:
-            raise NoLogTypeError(front_input)
+            input_log_type = self._get_input_log_type(tmp_assign_to_log_type, input_line_source)
         investigation_plan = self.config.create_investigation_plan(front_input, input_log_type)
         manager = SearchManager(investigation_plan)
         return manager.investigate(front_input)
+
+    @classmethod
+    def _get_input_log_type(cls, tmp_assign_to_log_type, input_line_source):
+        for log_type, line_sources in six.iteritems(tmp_assign_to_log_type):
+            for line_source in line_sources:
+                if line_source == input_line_source:
+                    return log_type
+        raise NoLogTypeError(input_line_source)
 
     def get_causes_tree(self, front_input):
         pass
