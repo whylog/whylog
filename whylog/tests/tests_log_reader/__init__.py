@@ -176,7 +176,7 @@ class TestBasic(TestCase):
         if test_name == "011_different_entry":
             temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source, node3_source]}
 
-        # raise SkipTest
+        raise SkipTest
         results = log_reader.get_causes(effect_line, temp_assign)
         expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
         self._check_results(results, expected_results)

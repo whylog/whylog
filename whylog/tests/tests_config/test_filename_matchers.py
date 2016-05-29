@@ -19,12 +19,12 @@ class TestBasic(TestCase):
         suffix_2 = 'node_[12].log'
         super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
         matcher_1 = WildCardFilenameMatcher(
-            'localhost', os.path.join(path, suffix_1), 'default', super_parser
+            'localhost', os.path.join(path, suffix_1), 'test_log_type', super_parser
         )
         matcher_2 = WildCardFilenameMatcher(
-            'localhost', os.path.join(path, suffix_2), 'default', super_parser
+            'localhost', os.path.join(path, suffix_2), 'test_log_type', super_parser
         )
-        log_type = LogType('default', [matcher_1, matcher_2])
+        log_type = LogType('test_log_type', [matcher_1, matcher_2])
 
         assert sorted(log_type.files_to_parse()) == [
             ('localhost', os.path.join(path, 'node_1.log'), super_parser),
@@ -37,19 +37,19 @@ class TestBasic(TestCase):
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
 
         super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
-        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default', super_parser)
-        default_log_type = LogType('default', [matcher])
+        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'test_log_type', super_parser)
+        default_log_type = LogType('test_log_type', [matcher])
         config.add_log_type(default_log_type)
 
         config = SettingsFactorySelector.get_settings()['config']
-        assert len(config._log_types) == 1
-        log_type = config._log_types['default']
-        assert log_type.name == 'default'
+        assert len(config._log_types) == 2
+        log_type = config._log_types['test_log_type']
+        assert log_type.name == 'test_log_type'
         assert len(log_type.filename_matchers) == 1
         matcher = log_type.filename_matchers[0]
         assert matcher.host_pattern == 'localhost'
         assert matcher.path_pattern == 'node_1.log'
-        assert matcher.log_type_name == 'default'
+        assert matcher.log_type_name == 'test_log_type'
         assert matcher.super_parser == super_parser
 
         shutil.rmtree(whylog_dir)
