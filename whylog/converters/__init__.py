@@ -56,10 +56,8 @@ class DateConverter(AbstractConverter):
                 return cls.MIN_VALUE
             else:
                 return date
-        converted_delta = timedelta(seconds=abs(delta))
-        if delta > 0:
-            return date - converted_delta
-        return date + converted_delta
+        converted_delta = timedelta(seconds=delta)
+        return date - converted_delta
 
     @classmethod
     def convert(cls, pattern_group):
