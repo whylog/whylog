@@ -51,8 +51,8 @@ class RegexMatch(object):
 
         default_converter = ConverterType.TO_STRING
         self.param_groups = dict(
-            (key + 1,
-             ParamGroup(groups[key], default_converter)) for key in six.moves.range(len(groups))
+            (key + 1, ParamGroup(groups[key], default_converter))
+            for key in six.moves.range(len(groups))
         )
         self.regex = new_regex
 
@@ -67,8 +67,8 @@ class RegexMatch(object):
     def _guess_regexes(self):
         guessed_pattern_matches = guess_pattern_match(self.line_text)
         guessed_dict = dict(
-            (key,
-             guessed_pattern_matches[key]) for key in six.moves.range(len(guessed_pattern_matches))
+            (key, guessed_pattern_matches[key])
+            for key in six.moves.range(len(guessed_pattern_matches))
         )
         self.guessed_pattern_matches = guessed_dict
 

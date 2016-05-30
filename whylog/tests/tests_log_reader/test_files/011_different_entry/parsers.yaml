@@ -2,13 +2,13 @@
 name: entry
 regex_str: ^(\w+) entry$
 primary_key_groups: []
-log_type: default
+log_type: test_log_type
 convertions: {}
 line_content: normal entry
 ---
 name: effect
 regex_str: ^visible effect$
-log_type: default
+log_type: test_log_type
 primary_key_groups: []
 convertions: {}
 line_content: visible effect
