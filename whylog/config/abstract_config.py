@@ -205,20 +205,21 @@ class AbstractConfig(object):
                 if log_type_name not in search_ranges:
                     search_ranges[log_type_name] = log_type_ranges
                     continue
+                log_type_search_range = search_ranges[log_type_name]
                 for key_type, type_range in six.iteritems(rule_search_ranges[log_type_name]):
-                    if key_type not in search_ranges[log_type_name]:
-                        search_ranges[log_type_name][key_type] = type_range
+                    if key_type not in log_type_search_range:
+                        log_type_search_range[key_type] = type_range
                         continue
                     left_bound_candidate = type_range[InvestigationStep.LEFT_BOUND]
                     right_bound_candidate = type_range[InvestigationStep.RIGHT_BOUND]
-                    left_bound = search_ranges[log_type_name][key_type][InvestigationStep.LEFT_BOUND
+                    left_bound = log_type_search_range[key_type][InvestigationStep.LEFT_BOUND
                                                                        ]
-                    right_bound = search_ranges[log_type_name][
+                    right_bound = log_type_search_range[
                         key_type][InvestigationStep.RIGHT_BOUND]
-                    search_ranges[log_type_name][key_type][InvestigationStep.LEFT_BOUND] = min(
+                    log_type_search_range[key_type][InvestigationStep.LEFT_BOUND] = min(
                         left_bound, left_bound_candidate
                     )
-                    search_ranges[log_type_name][key_type][InvestigationStep.RIGHT_BOUND] = max(
+                    log_type_search_range[key_type][InvestigationStep.RIGHT_BOUND] = max(
                         right_bound, right_bound_candidate
                     )
         return search_ranges
