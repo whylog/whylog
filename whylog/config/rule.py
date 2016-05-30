@@ -96,16 +96,25 @@ class Rule(object):
             For example:
                 clues_groups = [[1,1], [0,1]]
                 It means that first group of first parser depend to first group o zero parser.
-                If these first groups of these parsers are in primary key, we can predict
+                If these first groups of these parsers are in primary keys, we can predict
                 first parser search ranges basing on zero parser search range.
                 Assume that:
                 params = { min_delta: 10, max_delta: 100}
                 zero parser search ranges = {'int': {LEFT_BOUND: 200, RIGHT_BOUND: 250}
                 then
                 first parser search range = {'int': {LEFT_BOUND: 200 - 100, RIGHT_BOUND: 250 - 10}
+                In code first parser calls depended parser, zero parser calls base parser.
+        Connectivity parsers graph is directed graph were two parsers from rule are connected when
+        are connected by delta constraint. This edge is directed from base to depended parser.
+        This implementation assume that connectivity parsers graph is a tree.
         Algorithm steps:
-            1. Calculate effect parser search range. Give primary key values
-                from effect_clues.
+            1. Calculate effect parser search range. Take primary key values from effect_clues.
+            2. For every parser in rule find its all delta constraints where is a base parser
+                (_aggregate_constraints method). It is connectivity parsers graph creator.
+            3. Do a BFS order start from effect parser which is a root in tree.
+                Calculate parser search range for every child parser of actual parser if it is possible.
+            4. Set maximal search range for all unreachable parser from effect parser in graph
+            5. Pop effect parser search range.
         """
         parser_ranges = {
             self.EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
@@ -132,6 +141,16 @@ class Rule(object):
         self.create_ranges_for_unused_parsers(effect_clues, group, group_type, parser_ranges)
         parser_ranges.pop(self.EFFECT_NUMBER)
         return parser_ranges
+
+    def _aggregate_constraints(self):
+        # Aggregate constraints have to have min_delta and max_delta params
+        # At this moment only TimeConstraint has this property
+        parser_with_constraints = defaultdict(list)
+        for constraint in self._constraints:
+            if constraint['name'] in self.DELTA_CONSTRAINTS:
+                base_parser = constraint['clues_groups'][1][0]
+                parser_with_constraints[base_parser].append(constraint)
+        return parser_with_constraints
 
     def create_ranges_for_unused_parsers(self, effect_clues, group, group_type, parser_ranges):
         for i in six.moves.range(len(self._causes)):
@@ -190,16 +209,6 @@ class Rule(object):
         if parser_number == self.EFFECT_NUMBER:
             return self._effect.is_primary_key(parser_group_number)
         return self._causes[parser_number - 1].is_primary_key(parser_group_number)
-
-    def _aggregate_constraints(self):
-        # Aggregate constraints have to have min_delta and max_delta params
-        # At this moment only TimeConstraint has this property
-        parser_with_constraints = defaultdict(list)
-        for constraint in self._constraints:
-            if constraint['name'] in self.DELTA_CONSTRAINTS:
-                base_parser = constraint['clues_groups'][1][0]
-                parser_with_constraints[base_parser].append(constraint)
-        return parser_with_constraints
 
     def _update_parser_ranges_with_or_linkage(
         self, effect_clues, effect_group, effect_group_type, parser_ranges
