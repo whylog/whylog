@@ -1,12 +1,12 @@
-from whylog.assistant.validation_problems import (
-    InvalidPrimaryKeyProblem, NotMatchingPatternProblem, InvalidConverterProblem
-)
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
 from whylog.constraints import TimeConstraint
 from whylog.converters import ConverterType
 from whylog.tests.tests_teacher import TestRuleBase
 
+from whylog.assistant.validation_problems import (  # isort:skip
+    InvalidConverterProblem, InvalidPrimaryKeyProblem, NotMatchingPatternProblem
+)
 from whylog.teacher.rule_validation_problems import (  # isort:skip
     NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ParserCountProblem
 )  # yapf: disable
