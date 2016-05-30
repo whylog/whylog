@@ -57,18 +57,21 @@ class TestLogsReading(TestCase):
         offset = backtracker._find_left(self.opened_file, date, {})
 
         assert offset == secs * self.line_padding
-        assert self.opened_file._seek_count < 100
+        assert self.opened_file._seek_count < 35
 
     def test_bisect_first_line_of_file(self):
         backtracker = BacktrackSearcher("", None, None)
         offset = backtracker._find_left(self.opened_file, datetime.min, {})
 
         assert offset == 0
-        assert self.opened_file._seek_count < 100
+        assert self.opened_file._seek_count < 35
 
     def test_bisect_last_line_of_file(self):
         backtracker = BacktrackSearcher("", None, None)
         offset = backtracker._find_right(self.opened_file, datetime.max, {})
 
         assert offset == (self.number_of_lines - 1) * self.line_padding
-        assert self.opened_file._seek_count < 100
+        assert self.opened_file._seek_count < 35
+
+    def tearDown(self):
+        self.opened_file.reset_stats()

@@ -106,3 +106,7 @@ class OperationCountingFileWrapper(object):
     def seek(self, *args):
         self._seek_count += 1
         self._opened_file.seek(*args)
+
+    def reset_stats(self):
+        self._seek_count = 0
+        self._read_bytes = 0

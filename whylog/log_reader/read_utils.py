@@ -5,6 +5,8 @@ from whylog.log_reader.exceptions import EmptyFile, OffsetBiggerThanFileSize
 
 
 class ReadUtils(object):
+    STANDARD_BUFFER_SIZE = 512
+
     @classmethod
     def size_of_opened_file(cls, fh):
         prev_position = fh.tell()
@@ -75,7 +77,9 @@ class ReadUtils(object):
     def binary_search_left(cls, fd, left, right, value, super_parser):
         while left + 1 < right:
             curr = (left + right) // 2
-            line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
+            line, line_begin, line_end = cls.get_line_containing_offset(
+                fd, curr, cls.STANDARD_BUFFER_SIZE
+            )
             # TODO: mock fragment begin, replace it with right implementation
             date = datetime.strptime(line.split(' r')[0], "%c")
             # hack basing on specific lines construction in file_reader.py, it's mock, it should be removed later
@@ -92,7 +96,9 @@ class ReadUtils(object):
     def binary_search_right(cls, fd, left, right, value, super_parser):
         while left + 1 < right:
             curr = (left + right) // 2
-            line, line_begin, line_end = cls.get_line_containing_offset(fd, curr, 512)
+            line, line_begin, line_end = cls.get_line_containing_offset(
+                fd, curr, cls.STANDARD_BUFFER_SIZE
+            )
             # TODO: mock fragment begin, replace it with right implementation
             date = datetime.strptime(line.split(' r')[0], "%c")
             # hack basing on specific lines construction in file_reader.py, it's mock, it should be removed later
@@ -105,5 +111,5 @@ class ReadUtils(object):
                 right = line_begin - 1
         if right == 0:
             return 0
-        _, offset, _ = cls.get_line_containing_offset(fd, right - 1, 512)
+        _, offset, _ = cls.get_line_containing_offset(fd, right - 1, cls.STANDARD_BUFFER_SIZE)
         return offset
