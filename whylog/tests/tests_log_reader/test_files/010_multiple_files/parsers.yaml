@@ -1,14 +1,14 @@
 ---
 name: cause
 regex_str: ^root cause$
-log_type: default
+log_type: test_log_type
 primary_key_groups: []
 convertions: {}
 line_content: root cause
 ---
 name: effect
 regex_str: ^visible effect$
-log_type: default
+log_type: test_log_type
 primary_key_groups: []
 convertions: {}
 line_content: visible effect

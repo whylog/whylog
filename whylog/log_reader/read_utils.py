@@ -1,7 +1,20 @@
+import os
+from datetime import datetime
+
 from whylog.log_reader.exceptions import EmptyFile, OffsetBiggerThanFileSize
 
 
 class ReadUtils(object):
+    STANDARD_BUFFER_SIZE = 512
+
+    @classmethod
+    def size_of_opened_file(cls, fh):
+        prev_position = fh.tell()
+        fh.seek(0, os.SEEK_END)
+        size = fh.tell()
+        fh.seek(prev_position)
+        return size
+
     @classmethod
     def _read_content(cls, fd, position, buf_size):
         fd.seek(position)
@@ -28,7 +41,7 @@ class ReadUtils(object):
         line = fd.readline()
         if not line:
             raise OffsetBiggerThanFileSize(position)
-        return line.strip('\n')
+        return line.rstrip('\n')
 
     @classmethod
     def _expand_before(cls, fd, position, buf_size):
@@ -59,3 +72,44 @@ class ReadUtils(object):
         if there is '\n' on specified offset, the previous line is returned
         """
         return cls._read_entire_line(fd, offset, buf_size)
+
+    @classmethod
+    def binary_search_left(cls, fd, left, right, value, super_parser):
+        while left + 1 < right:
+            curr = (left + right) // 2
+            line, line_begin, line_end = cls.get_line_containing_offset(
+                fd, curr, cls.STANDARD_BUFFER_SIZE
+            )
+            # TODO: mock fragment begin, replace it with right implementation
+            date = datetime.strptime(line.split(' r')[0], "%c")
+            # hack basing on specific lines construction in file_reader.py, it's mock, it should be removed later
+            if date < value:  # TODO: comparison between value and lines primary key value
+                # TODO: mock fragment end
+                # omit actual line and go right
+                left = line_end + 1
+            else:
+                # going left, omit actual line, but maybe it will be returned
+                right = line_begin
+        return right
+
+    @classmethod
+    def binary_search_right(cls, fd, left, right, value, super_parser):
+        while left + 1 < right:
+            curr = (left + right) // 2
+            line, line_begin, line_end = cls.get_line_containing_offset(
+                fd, curr, cls.STANDARD_BUFFER_SIZE
+            )
+            # TODO: mock fragment begin, replace it with right implementation
+            date = datetime.strptime(line.split(' r')[0], "%c")
+            # hack basing on specific lines construction in file_reader.py, it's mock, it should be removed later
+            if value >= date:  # TODO: comparison between value and lines primary key value
+                # TODO: mock fragment end
+                # go to the end of current line, maybe it will be returned
+                left = line_end
+            else:
+                # going left, current line is not interesting
+                right = line_begin - 1
+        if right == 0:
+            return 0
+        _, offset, _ = cls.get_line_containing_offset(fd, right - 1, cls.STANDARD_BUFFER_SIZE)
+        return offset

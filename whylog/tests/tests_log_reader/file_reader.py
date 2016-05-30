@@ -14,7 +14,7 @@ class DataGeneratorLogSource(object):
         self._position = 0
 
     def _deduce_line_no(self, offset):
-        return offset / self._line_padding
+        return offset // self._line_padding
 
     def _position_in_line(self, offset):
         return offset % self._line_padding
@@ -44,7 +44,6 @@ class DataGeneratorLogSource(object):
         assert size >= 0
         first_line_no = self._deduce_line_no(self._position)
         last_line_no = self._deduce_line_no(self._position + size)
-        assert last_line_no < self._number_of_lines
         if first_line_no == last_line_no:
             line = self._get_line(first_line_no)
             position_in_line = self._position_in_line(self._position)
@@ -107,3 +106,7 @@ class OperationCountingFileWrapper(object):
     def seek(self, *args):
         self._seek_count += 1
         self._opened_file.seek(*args)
+
+    def reset_stats(self):
+        self._seek_count = 0
+        self._read_bytes = 0
