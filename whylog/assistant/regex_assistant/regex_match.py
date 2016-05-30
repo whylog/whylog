@@ -25,6 +25,7 @@ class RegexMatch(object):
         self.param_groups = dict()
 
         self.regex = None
+        self.primary_key = None
 
         self.guessed_pattern_matches = dict()
 
@@ -32,7 +33,7 @@ class RegexMatch(object):
         self.update_by_guessed_regex(0)
 
     def convert_to_pattern_match(self):
-        return PatternMatch(self.line_text, self.regex, self.param_groups)
+        return PatternMatch(self.line_text, self.regex, self.param_groups, self.primary_key)
 
     def update_by_regex(self, new_regex):
         """
@@ -58,6 +59,7 @@ class RegexMatch(object):
     def update_by_pattern_match(self, pattern_match):
         self.update_by_regex(pattern_match.pattern)
         self.param_groups = pattern_match.param_groups
+        self.primary_key = pattern_match.primary_key
 
     def update_by_guessed_regex(self, regex_id):
         self.update_by_pattern_match(self.guessed_pattern_matches[regex_id])
@@ -73,6 +75,10 @@ class RegexMatch(object):
     def set_converter(self, group_no, converter):
         #TODO: verify converter
         self.param_groups[group_no].converter = converter
+
+    def set_primary_key(self, primary_key):
+        #TODO: validate primary key
+        self.primary_key = primary_key
 
     def verify(self):
         """

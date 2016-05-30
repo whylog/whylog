@@ -41,6 +41,9 @@ class RegexAssistant(AbstractAssistant):
     def set_converter(self, line_id, group_no, converter):
         self.regex_matches[line_id].set_converter(group_no, converter)
 
+    def set_primary_key(self, line_id, primary_key):
+        self.regex_matches[line_id].set_primary_key(primary_key)
+
     def validate(self, line_id):
         """
         Verifies regex properties such as:

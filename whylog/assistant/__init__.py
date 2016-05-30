@@ -41,5 +41,9 @@ class AbstractAssistant(object):
         pass
 
     @abstractmethod
+    def set_primary_key(self, line_id, primary_key):
+        pass
+
+    @abstractmethod
     def validate(self, line_id):
         pass
