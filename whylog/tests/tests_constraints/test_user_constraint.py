@@ -1,11 +1,8 @@
 from datetime import datetime
 from unittest import TestCase
 
-from whylog.constraints import IdenticalConstraint, TimeConstraint
-
-from whylog.constraints.exceptions import (  # isort:skip
-    ConstructorGroupsCountError, ConstructorParamsError
-)
+from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
+from whylog.constraints.exceptions import ConstructorGroupsCountError, ConstructorParamsError
 
 
 class TestIdenticalConstraint(TestCase):
@@ -28,11 +25,21 @@ class TestIdenticalConstraint(TestCase):
 
     def test_verify_success(self):
         ic = IdenticalConstraint(params_checking=False)
-        assert ic.verify(['comp1', 'comp1', 'comp1'])
+        assert ic.verify(['comp1', 'comp1', 'comp1'], {})
 
     def test_verify_fail(self):
         ic = IdenticalConstraint(params_checking=False)
-        assert not ic.verify(['comp1', 'hello', 'comp1'])
+        assert not ic.verify(['comp1', 'hello', 'comp1'], {})
+
+
+class TestDifferentConstraint(TestCase):
+    def test_verify_success(self):
+        ic = DifferentConstraint(params_checking=False)
+        assert ic.verify(['foo', 'bar', 'juj'], {})
+
+    def test_verify_fail(self):
+        ic = DifferentConstraint(params_checking=False)
+        assert not ic.verify(['comp1', 'comp1', 'foo'], {})
 
 
 class TestTimeConstraint(TestCase):
