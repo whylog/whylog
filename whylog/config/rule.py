@@ -156,7 +156,7 @@ class Rule(object):
             expected returned value : {EFFECT_NUMBER: {'int': {LEFT_BOUND: 11, RIGHT_BOUND: 11}}}
         """
         # Here assumption that len of primary_keys_groups equals 1
-        primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group_number - 1]
+        primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group_number - 1] # yapf: disable
         return {
             group_type: {
                 InvestigationStep.LEFT_BOUND: primary_group_value,
@@ -217,11 +217,14 @@ class Rule(object):
         right_bound = base_parser_bounds[InvestigationStep.RIGHT_BOUND]
         return left_bound, right_bound
 
-    def create_ranges_for_unconnected_parsers(self, effect_clues, effect_primary_group, effect_group_type, parser_ranges):
+    def create_ranges_for_unconnected_parsers(
+        self, effect_clues, effect_primary_group, effect_group_type, parser_ranges
+    ):
         """
         Create maximal search range for parsers which are unreachable by delta constraints.
         """
-        effect_primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[effect_primary_group - 1]
+        effect_primary_group_value = effect_clues[self.get_effect_name(
+        )].regex_parameters[effect_primary_group - 1]
         for i in six.moves.range(len(self._causes)):
             if (i + 1) not in parser_ranges:
                 _, primary_group_type = self._causes[i].get_primary_key_group()
@@ -307,12 +310,10 @@ class Rule(object):
     @classmethod
     def _update_bounds(cls, bounds, update_bounds):
         bounds[InvestigationStep.LEFT_BOUND] = min(
-            bounds[InvestigationStep.LEFT_BOUND],
-            update_bounds[InvestigationStep.LEFT_BOUND]
+            bounds[InvestigationStep.LEFT_BOUND], update_bounds[InvestigationStep.LEFT_BOUND]
         )
         bounds[InvestigationStep.RIGHT_BOUND] = max(
-            bounds[InvestigationStep.RIGHT_BOUND],
-            update_bounds[InvestigationStep.RIGHT_BOUND]
+            bounds[InvestigationStep.RIGHT_BOUND], update_bounds[InvestigationStep.RIGHT_BOUND]
         )
 
     def constraints_check(self, clues, effect_clues_dict):

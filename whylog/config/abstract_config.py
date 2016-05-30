@@ -212,10 +212,8 @@ class AbstractConfig(object):
                         continue
                     left_bound_candidate = type_range[InvestigationStep.LEFT_BOUND]
                     right_bound_candidate = type_range[InvestigationStep.RIGHT_BOUND]
-                    left_bound = log_type_search_range[key_type][InvestigationStep.LEFT_BOUND
-                                                                       ]
-                    right_bound = log_type_search_range[
-                        key_type][InvestigationStep.RIGHT_BOUND]
+                    left_bound = log_type_search_range[key_type][InvestigationStep.LEFT_BOUND]
+                    right_bound = log_type_search_range[key_type][InvestigationStep.RIGHT_BOUND]
                     log_type_search_range[key_type][InvestigationStep.LEFT_BOUND] = min(
                         left_bound, left_bound_candidate
                     )
