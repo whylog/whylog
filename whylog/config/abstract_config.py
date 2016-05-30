@@ -63,6 +63,9 @@ class AbstractConfig(object):
             self._parsers_grouped_by_log_type[parser.log_type].append(parser)
         self._parser_name_generator = ParserNameGenerator(self._parsers)
 
+    def rename_log_type(self, old_name, new_name):
+        pass
+
     def add_log_type(self, log_type):
         for matcher in log_type.filename_matchers:
             self.add_filename_matcher_to_log_type(matcher)
