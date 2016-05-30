@@ -5,10 +5,11 @@ from collections import defaultdict
 import six
 from frozendict import frozendict
 
-from whylog.config.abstract_config import AbstractConfig
 from whylog.log_reader.exceptions import NoLogTypeError
 from whylog.log_reader.investiagtion_utils import InvestigationUtils
 from whylog.log_reader.searchers import BacktrackSearcher
+
+EMPTY_FROZEN_DICT = frozendict()
 
 
 @six.add_metaclass(ABCMeta)
@@ -23,16 +24,15 @@ class AbstractLogReader(object):
 
 
 class LogReader(AbstractLogReader):
-    NO_TEMP = frozendict()
-
     def __init__(self, config):
         self.config = config
 
-    def get_causes(self, front_input, tmp_assign_to_log_type=NO_TEMP):
+    def get_causes(self, front_input, tmp_assign_to_log_type=EMPTY_FROZEN_DICT):
         input_line_source = front_input.line_source
-        input_log_type = self.config.get_log_type(input_line_source)
+        input_log_type = self._get_input_log_type(tmp_assign_to_log_type, input_line_source) or \
+                         self.config.get_log_type(input_line_source)
         if not input_log_type:
-            input_log_type = self._get_input_log_type(tmp_assign_to_log_type, input_line_source)
+            raise NoLogTypeError(input_line_source)
         investigation_plan = self.config.create_investigation_plan(front_input, input_log_type)
         manager = SearchManager(investigation_plan)
         return manager.investigate(front_input, tmp_assign_to_log_type)
@@ -40,18 +40,14 @@ class LogReader(AbstractLogReader):
     @classmethod
     def _get_input_log_type(cls, tmp_assign_to_log_type, input_line_source):
         for log_type, line_sources in six.iteritems(tmp_assign_to_log_type):
-            for line_source in line_sources:
-                if line_source == input_line_source:
-                    return log_type
-        raise NoLogTypeError(input_line_source)
+            if input_line_source in line_sources:
+                return log_type
 
     def get_causes_tree(self, front_input):
         pass
 
 
 class SearchManager(object):
-    NO_TMP_FILES = frozenset()
-
     def __init__(self, investigation_plan):
         self._investigation_plan = investigation_plan
 
@@ -72,7 +68,7 @@ class SearchManager(object):
             causes.extend(results_from_rule)
         return causes
 
-    def investigate(self, original_front_input, tmp_assign_to_log_type):
+    def investigate(self, original_front_input, tmp_assign_to_log_type=EMPTY_FROZEN_DICT):
         """
         this function collects clues from SearchHandlers
         (each of them corresponds to one InvestigationStep)
@@ -85,7 +81,7 @@ class SearchManager(object):
             search_handler = SearchHandler(step, log_type)
             InvestigationUtils.merge_clue_dicts(
                 clues_collector, search_handler.investigate(
-                    original_front_input, tmp_assign_to_log_type.get(log_type, self.NO_TMP_FILES)
+                    original_front_input, tmp_assign_to_log_type.get(log_type)
                 )
             )
         clues = self._save_clues_in_normal_dict(clues_collector)
@@ -97,11 +93,9 @@ class SearchHandler(object):
         self._investigation_step = investigation_step
         self._log_type = log_type
 
-    def investigate(self, original_front_input, tmp_assigned):
+    def investigate(self, original_front_input, forced_log_type=None):
         clues = defaultdict(itertools.chain)
-        for host, path, super_parser in itertools.chain(
-            self._generate_tmp_files(tmp_assigned), self._log_type.files_to_parse()
-        ):
+        for host, path, super_parser in self._log_type.files_to_parse(forced_log_type):
             if host == "localhost":
                 searcher = BacktrackSearcher(path, self._investigation_step, super_parser)
                 InvestigationUtils.merge_clue_dicts(clues, searcher.search(original_front_input))
@@ -110,11 +104,3 @@ class SearchHandler(object):
                     "Cannot operate on %s which is different than %s" % (host, "localhost")
                 )
         return clues
-
-    @classmethod
-    def _generate_tmp_files(cls, tmp_assigned):
-        return (
-            (
-                line_source.host, line_source.path, AbstractConfig.DEFAULT_SUPER_REGEX
-            ) for line_source in tmp_assigned
-        )
