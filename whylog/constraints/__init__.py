@@ -126,6 +126,13 @@ class AbstractConstraint(object):
 
         pass
 
+    def validate(self):
+        """
+        Validates constraint: verifies if it is ready to save
+        """
+        # TODO: implement in subclass and test it
+        return {}
+
 
 class TimeConstraint(AbstractConstraint):
     """
