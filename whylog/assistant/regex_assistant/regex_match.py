@@ -2,7 +2,8 @@ import six
 
 from whylog.assistant.pattern_match import ParamGroup, PatternMatch
 from whylog.assistant.regex_assistant.guessing import guess_pattern_match
-from whylog.assistant.regex_assistant.regex import regex_groups
+from whylog.assistant.regex_assistant.regex import NotMatchingRegexError, regex_groups, verify_regex
+from whylog.assistant.validation_problems import NotMatchingPatternProblem
 from whylog.converters import ConverterType
 
 
@@ -44,11 +45,18 @@ class RegexMatch(object):
         Updates self.param_groups so that they correspond to new_regex groups
         """
 
-        groups = regex_groups(new_regex, self.line_text)
-
         if new_regex[-1] != '$':
             new_regex += '$'
 
+        try:
+            verify_regex(new_regex, self.line_text)
+        except NotMatchingRegexError:
+            self.regex = new_regex
+            self.param_groups = {}
+            self.primary_key = []
+            return
+
+        groups = regex_groups(new_regex, self.line_text)
         default_converter = ConverterType.TO_STRING
         self.param_groups = dict(
             (key + 1, ParamGroup(groups[key], default_converter))
@@ -73,19 +81,27 @@ class RegexMatch(object):
         self.guessed_pattern_matches = guessed_dict
 
     def set_converter(self, group_no, converter):
-        #TODO: verify converter
         self.param_groups[group_no].converter = converter
 
     def set_primary_key(self, primary_key):
-        #TODO: validate primary key
         self.primary_key = primary_key
 
-    def verify(self):
+    def _validate_pattern(self):
+        try:
+            verify_regex(self.regex, self.line_text)
+        except NotMatchingRegexError:
+            return [NotMatchingPatternProblem()]
+        else:
+            return []
+
+    def validate(self):
         """
-        Verifies properties such as:
+        Verifies:
         - regex matching a whole text
-        - regex matching text in a one way only
-        - group_spans converters (Span.converter) are proper
-        If properties are not met, proper exceptions are returned.
+        - proper group converters
+        - primary key is subset of group numbers
         """
-        return NotImplementedError
+
+        pattern_match = self.convert_to_pattern_match()
+        return self._validate_pattern() + pattern_match.validate_converters() + \
+               pattern_match.validate_primary_key()

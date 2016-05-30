@@ -53,7 +53,7 @@ class StringConverter(AbstractConverter):
 class DateConverter(AbstractConverter):
     @classmethod
     def convert(cls, pattern_group):
-        return dateutil.parser.parse(pattern_group, fuzzy=True)
+        return dateutil.parser.parse(pattern_group)
 
     @classmethod
     def safe_convert(cls, pattern_group):
