@@ -111,7 +111,7 @@ class Rule(object):
             1. Calculate effect parser search range. Take primary key values from effect_clues.
             2. For every parser in rule find its all delta constraints where is a base parser
                 (_aggregate_constraints method). It is connectivity parsers graph creator.
-            3. Do a BFS order start from effect parser which is a root in tree.
+            3. Do a BFS order over connectivity parser graph. Start from effect parser which is a root in tree.
                 Calculate parser search range for every child parser of actual parser if it is possible.
             4. Set maximal search range for all unreachable parser from effect parser in graph
             5. Pop effect parser search range.
@@ -217,19 +217,22 @@ class Rule(object):
         right_bound = base_parser_bounds[InvestigationStep.RIGHT_BOUND]
         return left_bound, right_bound
 
-    def create_ranges_for_unconnected_parsers(self, effect_clues, group, group_type, parser_ranges):
+    def create_ranges_for_unconnected_parsers(self, effect_clues, effect_primary_group, effect_group_type, parser_ranges):
         """
         Create maximal search range for parsers which are unreachable by delta constraints.
         """
+        effect_primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[effect_primary_group - 1]
         for i in six.moves.range(len(self._causes)):
             if (i + 1) not in parser_ranges:
-                converter = CONVERTION_MAPPING[group_type]
-                primary_group_value = \
-                    effect_clues[self.get_effect_name()].regex_parameters[group - 1]
+                _, primary_group_type = self._causes[i].get_primary_key_group()
+                converter = CONVERTION_MAPPING[primary_group_type]
+                right_bound = converter.MAX_VALUE
+                if primary_group_type == effect_group_type:
+                    right_bound = effect_primary_group_value
                 parser_ranges[(i + 1)] = {
-                    group_type: {
+                    primary_group_type: {
                         InvestigationStep.LEFT_BOUND: converter.MIN_VALUE,
-                        InvestigationStep.RIGHT_BOUND: primary_group_value
+                        InvestigationStep.RIGHT_BOUND: right_bound
                     }
                 }
 
