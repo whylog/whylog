@@ -1,25 +1,33 @@
+import itertools
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from datetime import datetime
 
 import six
 
+from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
+from whylog.config.log_type import LogType
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parser_subset import ConcatenatedRegexParser
 from whylog.config.rule import RegexRuleFactory
+from whylog.config.super_parser import RegexSuperParser
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
     words_count_in_name = 4
+    DEFAULT_NAME = "default"
+    DEFAULT_LOG_TYPE = LogType(
+        DEFAULT_NAME, [
+            WildCardFilenameMatcher("localhost", "", DEFAULT_NAME, RegexSuperParser("", [], {}))
+        ]
+    ) # yapf: disable
 
     def __init__(self):
         self._parsers = self._load_parsers()
         self._parsers_grouped_by_log_type = self._index_parsers_by_log_type(
-            six.itervalues(
-                self._parsers
-            )
+            six.itervalues(self._parsers)
         )
         self._parser_name_generator = ParserNameGenerator(self._parsers)
         self._rules = self._load_rules()
@@ -72,8 +80,12 @@ class AbstractConfig(object):
     def _save_filename_matcher_definition(self, matcher_definition):
         pass
 
-    def get_log_type(self, front_input):
-        line_source = front_input.line_source
+    def get_all_log_types(self):
+        if self.DEFAULT_NAME in self._log_types:
+            return six.itervalues(self._log_types)
+        return itertools.chain([self.DEFAULT_LOG_TYPE], six.itervalues(self._log_types))
+
+    def get_log_type(self, line_source):
         for log_type in six.itervalues(self._log_types):
             if line_source in log_type:
                 return log_type
@@ -95,9 +107,10 @@ class AbstractConfig(object):
         for parser_name, params in six.iteritems(effect_params):
             parser = self._parsers[parser_name]
             clue = Clue(
-                parser.convert_params(params), front_input.line_content, front_input.offset,
-                front_input.line_source
-            )
+                parser.convert_params(
+                    params
+                ), front_input.line_content, front_input.offset, front_input.line_source
+            )  # yapf: disable
             effect_clues[parser_name] = clue
         return effect_clues
 
@@ -154,7 +167,7 @@ class AbstractConfig(object):
         return steps
 
     def _get_search_ranges(self, suspected_rules, effect_clues):
-        #TODO: remove mock
+        # TODO: remove mock
         return {
             'database': {
                 'date': {

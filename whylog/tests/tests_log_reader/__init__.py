@@ -6,7 +6,9 @@ import yaml
 from generator import generate, generator
 
 from whylog.config import YamlConfig
+from whylog.config.abstract_config import AbstractConfig
 from whylog.config.investigation_plan import LineSource
+from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.constraints.verifier import InvestigationResult
 from whylog.front.utils import FrontInput
 from whylog.log_reader import LogReader
@@ -14,6 +16,21 @@ from whylog.tests.tests_log_reader.constants import TestPaths
 from whylog.tests.utils import ConfigPathFactory
 
 path_test_files = ['whylog', 'tests', 'tests_log_reader', 'test_files']
+
+test_names = (
+    '001_most_basic',
+    # '002_match_latest',
+    '003_match_time_range',
+    # '005_match_tree',
+    '006_match_parameter',
+    '007_match_or',
+    '008_match_and',
+    '009_match_negation',
+    '010_multiple_files',
+    '011_different_entry',
+    # '012_multiple_rulebooks',
+    # '013_match_and_incomplete',
+)  # yapf: disable
 
 
 @generator
@@ -60,56 +77,102 @@ class TestBasic(TestCase):
             results.append(InvestigationResult(causes, result['constraints'], result['linkage']))
         return results
 
-    @generate(
-        '001_most_basic',
-        # '002_match_latest',
-        '003_match_time_range',
-        # '005_match_tree',
-        '006_match_parameter',
-        '007_match_or',
-        '008_match_and',
-        # '009_match_negation',
-        '010_multiple_files',
-        '011_different_entry',
-        # '012_multiple_rulebooks',
-        # '013_match_and_incomplete',
-    )  # yapf: disable
-    def test_one(self, test_name):
-        # paths files setup
-        prefix_path = os.path.join(*TestPaths.path_test_files)
-        path = os.path.join(prefix_path, test_name)
-        input_path = os.path.join(path, 'input.txt')
-        # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
-
-        original_log_file = os.path.join(path, 'node_1.log')
-        result_log_file = original_log_file
-        if test_name == "010_multiple_files":
-            result_log_file = os.path.join(path, 'node_2.log')
-        if test_name == "011_different_entry":
-            result_log_file = os.path.join(path, 'node_3.log')
-
-        results_yaml_file = os.path.join(path, 'investigation_results.yaml')
-
-        # gathering information about effect line
-        line_number = self._get_cause_line_number(input_path)
-        line_content = self._get_concrete_line_from_file(original_log_file, line_number)
-        effect_line_offset = self._deduce_line_offset(original_log_file, line_number)
-
-        # preparing Whylog structures, normally prepared by Front
-        whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
-        log_reader = LogReader(whylog_config)
-        effect_line = FrontInput(
-            effect_line_offset, line_content, LineSource(
-                'localhost', os.path.join(path, self._get_starting_file_name(input_path))
-            )
-        )
-
+    @classmethod
+    def _check_results(cls, results, expected_results):
         # action and checking the result
-        results = log_reader.get_causes(effect_line)
-        expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
         assert results
         assert len(results) == len(expected_results)
         for got, real in six.moves.zip(results, expected_results):
             assert got.lines == real.lines
             for constr_got, constr_real in zip(got.constraints, real.constraints):
                 assert constr_got['name'] == constr_real['name']
+
+    @classmethod
+    def _prepare_files_path(cls, test_name):
+        # paths files setup
+        prefix_path = os.path.join(*TestPaths.path_test_files)
+        path = os.path.join(prefix_path, test_name)
+        input_path = os.path.join(path, 'input.txt')
+        # output_path = os.path.join(path, 'expected_output.txt')  # FIXME is it really unnecessary?
+        original_log_file = os.path.join(path, 'node_1.log')
+        result_log_file = original_log_file
+        if test_name == "010_multiple_files":
+            result_log_file = os.path.join(path, 'node_2.log')
+        if test_name == "011_different_entry":
+            result_log_file = os.path.join(path, 'node_3.log')
+        results_yaml_file = os.path.join(path, 'investigation_results.yaml')
+        return input_path, original_log_file, path, result_log_file, results_yaml_file
+
+    def _gather_effect_line_data(self, input_path, original_log_file):
+        # gathering information about effect line
+        line_number = self._get_cause_line_number(input_path)
+        line_content = self._get_concrete_line_from_file(original_log_file, line_number)
+        effect_line_offset = self._deduce_line_offset(original_log_file, line_number)
+        return effect_line_offset, line_content
+
+    @generate(*test_names)
+    def test_one(self, test_name):
+        input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(
+            test_name
+        )
+        effect_line_offset, line_content = self._gather_effect_line_data(
+            input_path, original_log_file
+        )
+
+        # preparing Whylog structures, normally prepared by Front
+        whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
+        log_reader = LogReader(whylog_config)
+        effect_line = FrontInput(
+            effect_line_offset, line_content,
+            LineSource('localhost', os.path.join(path, self._get_starting_file_name(input_path)))
+        )
+
+        results = log_reader.get_causes(effect_line)
+        expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
+        self._check_results(results, expected_results)
+
+    @generate(*test_names)
+    def test_temporary_file_assign_to_logtype(self, test_name):
+        input_path, original_log_file, path, result_log_file, results_yaml_file = self._prepare_files_path(
+            test_name
+        )
+        effect_line_offset, line_content = self._gather_effect_line_data(
+            input_path, original_log_file
+        )
+
+        whylog_config = self._prepare_config(path)
+        log_reader = LogReader(whylog_config)
+        effect_line = FrontInput(
+            effect_line_offset, line_content,
+            LineSource('localhost', os.path.join(path, self._get_starting_file_name(input_path)))
+        )
+
+        node1_source = LineSource('localhost', os.path.join(path, 'node_1.log'))
+        node2_source = LineSource('localhost', os.path.join(path, 'node_2.log'))
+        node3_source = LineSource('localhost', os.path.join(path, 'node_3.log'))
+        temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source]}
+        if test_name == "010_multiple_files":
+            temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source]}
+        if test_name == "011_different_entry":
+            temp_assign = {
+                AbstractConfig.DEFAULT_LOG_TYPE: [
+                    node1_source, node2_source, node3_source
+                ]
+            }
+
+        results = log_reader.get_causes(effect_line, temp_assign)
+        expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
+        self._check_results(results, expected_results)
+
+    @classmethod
+    def _prepare_config(cls, path):
+        # preparing Whylog structures special for temporary assign file to log type test
+        whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
+        whylog_config._log_types = {"default": AbstractConfig.DEFAULT_LOG_TYPE}
+        for parser in six.itervalues(whylog_config._parsers):
+            parser.log_type = "default"
+        whylog_config._parser_name_generator = ParserNameGenerator(whylog_config._parsers)
+        whylog_config._parsers_grouped_by_log_type[
+            "default"
+        ] = whylog_config._parsers_grouped_by_log_type.pop("test_log_type")
+        return whylog_config

@@ -18,9 +18,7 @@ class TestBacktrackSearcher(TestCase):
         Be careful when modifying a_few_lines.log.
         """
         assert line_num <= self._count_lines_in_file(
-            TestPaths.get_file_path(
-                AFewLinesLogParams.FILE_NAME
-            )
+            TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME)
         )
         return line_num * AFewLinesLogParams.SINGLE_LINE_LENGTH
 
@@ -44,7 +42,8 @@ class TestBacktrackSearcher(TestCase):
         how_many_last_lines,
         final_offset_should_be_zero=True
     ):
-        backtracker = searchers.BacktrackSearcher(log_file_path)
+        # for testing _reverse_from_offset investigation_step and super_parser are unnecessary
+        backtracker = searchers.BacktrackSearcher(log_file_path, None, None)
 
         lines = self._read_last_n_lines_from_file(log_file_path, how_many_last_lines)
         lines_reversed = [

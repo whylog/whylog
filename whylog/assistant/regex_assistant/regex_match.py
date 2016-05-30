@@ -1,9 +1,9 @@
 import six
 
-from whylog.assistant.const import ConverterType
 from whylog.assistant.pattern_match import ParamGroup, PatternMatch
 from whylog.assistant.regex_assistant.guessing import guess_pattern_match
 from whylog.assistant.regex_assistant.regex import regex_groups
+from whylog.converters import ConverterType
 
 
 class RegexMatch(object):
@@ -25,6 +25,7 @@ class RegexMatch(object):
         self.param_groups = dict()
 
         self.regex = None
+        self.primary_key = None
 
         self.guessed_pattern_matches = dict()
 
@@ -32,7 +33,7 @@ class RegexMatch(object):
         self.update_by_guessed_regex(0)
 
     def convert_to_pattern_match(self):
-        return PatternMatch(self.line_text, self.regex, self.param_groups)
+        return PatternMatch(self.line_text, self.regex, self.param_groups, self.primary_key)
 
     def update_by_regex(self, new_regex):
         """
@@ -50,15 +51,15 @@ class RegexMatch(object):
 
         default_converter = ConverterType.TO_STRING
         self.param_groups = dict(
-            (
-                key + 1, ParamGroup(groups[key], default_converter)
-            ) for key in six.moves.range(len(groups))
+            (key + 1, ParamGroup(groups[key], default_converter))
+            for key in six.moves.range(len(groups))
         )
         self.regex = new_regex
 
     def update_by_pattern_match(self, pattern_match):
         self.update_by_regex(pattern_match.pattern)
         self.param_groups = pattern_match.param_groups
+        self.primary_key = pattern_match.primary_key
 
     def update_by_guessed_regex(self, regex_id):
         self.update_by_pattern_match(self.guessed_pattern_matches[regex_id])
@@ -66,15 +67,18 @@ class RegexMatch(object):
     def _guess_regexes(self):
         guessed_pattern_matches = guess_pattern_match(self.line_text)
         guessed_dict = dict(
-            (
-                key, guessed_pattern_matches[key]
-            ) for key in six.moves.range(len(guessed_pattern_matches))
+            (key, guessed_pattern_matches[key])
+            for key in six.moves.range(len(guessed_pattern_matches))
         )
         self.guessed_pattern_matches = guessed_dict
 
     def set_converter(self, group_no, converter):
         #TODO: verify converter
         self.param_groups[group_no].converter = converter
+
+    def set_primary_key(self, primary_key):
+        #TODO: validate primary key
+        self.primary_key = primary_key
 
     def verify(self):
         """

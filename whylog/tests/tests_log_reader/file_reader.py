@@ -48,7 +48,7 @@ class DataGeneratorLogSource(object):
         if first_line_no == last_line_no:
             line = self._get_line(first_line_no)
             position_in_line = self._position_in_line(self._position)
-            return line[position_in_line:position_in_line + size]
+            result = line[position_in_line:position_in_line + size]
         else:
             first_line_position = self._position_in_line(self._position)
             first_line_fragment = self._get_line(first_line_no)[first_line_position:]
@@ -59,8 +59,17 @@ class DataGeneratorLogSource(object):
                 itertools.chain(
                     (first_line_fragment,), lines_between, (last_line_fragment,)
                 )
-            )
-            return content
+            )  # yapf: disable
+            result = content
+        self._position += size
+        return result
+
+    def readline(self):
+        line_no = self._deduce_line_no(self._position)
+        line = self._get_line(line_no)
+        position_in_line = self._position_in_line(self._position)
+        self._position += self._line_padding - position_in_line
+        return line[position_in_line:]
 
     def tell(self):
         return self._position
@@ -86,6 +95,11 @@ class OperationCountingFileWrapper(object):
         ret = self._opened_file.read(*args)
         self._read_bytes += len(ret)
         return ret
+
+    def readline(self):
+        line = self._opened_file.readline()
+        self._read_bytes += len(line)
+        return line
 
     def tell(self):
         return self._opened_file.tell()

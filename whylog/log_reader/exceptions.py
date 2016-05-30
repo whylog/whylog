@@ -13,3 +13,15 @@ class NoLogTypeError(LogReaderError):
         return 'Config did not match any log_type to the specified front_input: %s; cannot investigate' % (
             self._front_input
         )
+
+
+class EmptyFile(LogReaderError):
+    pass
+
+
+class OffsetBiggerThanFileSize(LogReaderError):
+    def __init__(self, offset):
+        self.offset = offset
+
+    def __str__(self):
+        return 'Captured offset (%s) is too big' % self.offset

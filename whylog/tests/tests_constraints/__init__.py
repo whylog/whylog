@@ -1,7 +1,8 @@
 from unittest import TestCase
 
 from whylog.config.investigation_plan import Clue, LineSource
-from whylog.constraints.verifier import ConstraintManager, InvestigationResult, Verifier
+from whylog.constraints.constraint_manager import ConstraintManager
+from whylog.constraints.verifier import InvestigationResult, Verifier
 from whylog.front.utils import FrontInput
 
 
@@ -50,7 +51,6 @@ class TestBasic(TestCase):
         ]
         causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 2
-        assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
         assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
         assert causes[0].lines == [
@@ -92,7 +92,6 @@ class TestBasic(TestCase):
         ]
         causes = Verifier.constraints_and(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
-        assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
         assert all(cause.constraints_linkage == InvestigationResult.AND for cause in causes)
         assert causes[0].lines == [
@@ -131,7 +130,6 @@ class TestBasic(TestCase):
         # testing 'or'
         causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
-        assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
         assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
         assert causes[0].lines == [
@@ -182,7 +180,6 @@ class TestBasic(TestCase):
         # testing 'or'
         causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 1
-        assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
         assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
         assert causes[0].lines == [
@@ -242,7 +239,6 @@ class TestBasic(TestCase):
 
         causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
         assert len(causes) == 2
-        assert all(isinstance(cause, InvestigationResult) for cause in causes)
 
         assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
         assert causes[0].lines == [
@@ -280,6 +276,5 @@ class TestBasic(TestCase):
         )
 
         assert len(causes) == 1
-        assert all(isinstance(cause, InvestigationResult) for cause in causes)
         assert causes[0].constraints_linkage == InvestigationResult.NOT
         assert causes[0].constraints[0] == constraint

@@ -4,7 +4,8 @@ from abc import ABCMeta, abstractmethod
 import six
 
 from whylog.config.parsers import RegexParserFactory
-from whylog.constraints.verifier import ConstraintManager, Verifier
+from whylog.constraints.constraint_manager import ConstraintManager
+from whylog.constraints.verifier import Verifier
 
 
 class Rule(object):
@@ -15,8 +16,8 @@ class Rule(object):
 
     LINKAGE_SELECTOR = {
         LINKAGE_AND: Verifier.constraints_and,
-        LINKAGE_OR: Verifier.constraints_or
-        # TODO: add support for NOT
+        LINKAGE_OR: Verifier.constraints_or,
+        LINKAGE_NOT: Verifier.constraints_not
     }
 
     def __init__(self, causes, effect, constraints, linkage):
@@ -35,7 +36,9 @@ class Rule(object):
 
     def serialize(self):
         return {
-            "causes": [cause.name for cause in self._causes],
+            "causes": [
+                cause.name for cause in self._causes
+            ],
             "effect": self._effect.name,
             "constraints": self._constraints,
         }
@@ -147,7 +150,6 @@ class RegexRuleFactory(AbstractRuleFactory):
     @classmethod
     def _create_parsers_from_intents(cls, user_rule_intent):
         return dict(
-            (
-                intent_id, RegexParserFactory.create_from_intent(parser_intent)
-            ) for intent_id, parser_intent in six.iteritems(user_rule_intent.parsers)
+            (intent_id, RegexParserFactory.create_from_intent(parser_intent))
+            for intent_id, parser_intent in six.iteritems(user_rule_intent.parsers)
         )

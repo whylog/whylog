@@ -9,10 +9,11 @@ from datetime import datetime
 import six
 from dateutil.parser import parse as date_parse
 
-from whylog.assistant.const import ConverterType, DateParams
+from whylog.assistant.const import DateParams
 from whylog.assistant.regex_assistant.regex import create_date_regex
 from whylog.assistant.span import Span
 from whylog.assistant.span_list import SpanList
+from whylog.converters import ConverterType
 
 possible_span_start_pattern = re.compile(r"(?<=[^\w])[\w]|^[\w]")
 possible_span_end_pattern = re.compile(r"\w(?=[^\w])|\w$")

@@ -41,12 +41,14 @@ class RegexAssistant(AbstractAssistant):
     def set_converter(self, line_id, group_no, converter):
         self.regex_matches[line_id].set_converter(group_no, converter)
 
-    def verify(self, line_id):
+    def set_primary_key(self, line_id, primary_key):
+        self.regex_matches[line_id].set_primary_key(primary_key)
+
+    def validate(self, line_id):
         """
         Verifies regex properties such as:
         - matching a whole text
-        - matching text in a one way only
-        - proper data type assigned to regex group
+        - proper data converter assigned to regex group
         If properties are not met, proper exceptions are returned.
         """
-        return self.regex_matches[line_id].verify()
+        return {}  # TODO: fix it

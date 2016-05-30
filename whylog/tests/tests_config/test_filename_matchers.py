@@ -1,10 +1,12 @@
 import os.path
 import shutil
+from datetime import datetime
 from unittest import TestCase
 
 from whylog.config import SettingsFactorySelector
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
+from whylog.config.super_parser import RegexSuperParser
 from whylog.tests.utils import TestPaths
 
 path_test_files = ['whylog', 'tests', 'tests_config', 'test_files', 'simple_logs_files']
@@ -15,13 +17,18 @@ class TestBasic(TestCase):
         path = os.path.join(*path_test_files)
         suffix_1 = 'node_1.log'
         suffix_2 = 'node_[12].log'
-        matcher_1 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_1), 'default')
-        matcher_2 = WildCardFilenameMatcher('localhost', os.path.join(path, suffix_2), 'default')
-        log_type = LogType('default', [matcher_1, matcher_2])
+        super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
+        matcher_1 = WildCardFilenameMatcher(
+            'localhost', os.path.join(path, suffix_1), 'test_log_type', super_parser
+        )
+        matcher_2 = WildCardFilenameMatcher(
+            'localhost', os.path.join(path, suffix_2), 'test_log_type', super_parser
+        )
+        log_type = LogType('test_log_type', [matcher_1, matcher_2])
 
         assert sorted(log_type.files_to_parse()) == [
-            ('localhost', os.path.join(path, 'node_1.log')),
-            ('localhost', os.path.join(path, 'node_2.log'))
+            ('localhost', os.path.join(path, 'node_1.log'), super_parser),
+            ('localhost', os.path.join(path, 'node_2.log'), super_parser)
         ]
 
     def test_add_log_type(self):
@@ -29,22 +36,42 @@ class TestBasic(TestCase):
         config = SettingsFactorySelector.get_settings()['config']
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
 
-        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default')
-        default_log_type = LogType('default', [matcher])
+        super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
+        matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'test_log_type', super_parser)
+        default_log_type = LogType('test_log_type', [matcher])
         config.add_log_type(default_log_type)
 
         config = SettingsFactorySelector.get_settings()['config']
         assert len(config._log_types) == 1
-        log_type = config._log_types['default']
-        assert log_type.name == 'default'
+        log_type = config._log_types['test_log_type']
+        assert log_type.name == 'test_log_type'
         assert len(log_type.filename_matchers) == 1
         matcher = log_type.filename_matchers[0]
         assert matcher.host_pattern == 'localhost'
         assert matcher.path_pattern == 'node_1.log'
-        assert matcher.log_type_name == 'default'
-        assert isinstance(matcher, WildCardFilenameMatcher)
+        assert matcher.log_type_name == 'test_log_type'
+        assert matcher.super_parser == super_parser
 
         shutil.rmtree(whylog_dir)
+
+    def test_super_parser(self):
+        line = '2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2'
+
+        super_parser1 = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
+        assert super_parser1.get_ordered_groups(line) == [('date', datetime(2015, 12, 3, 12, 8, 9))]
+
+        super_parser2 = RegexSuperParser(
+            '^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).* Host name: (\d+)', [2, 1], {
+                1: 'date',
+                2: 'int'
+            }
+        )
+        assert super_parser2.get_ordered_groups(line) == [
+            ('int', 2), ('date', datetime(2015, 12, 3, 12, 8, 9))
+        ]
+
+        super_parser3 = RegexSuperParser('foo bar', [], {})
+        assert super_parser3.get_ordered_groups(line) == tuple()
 
     @classmethod
     def tearDownClass(cls):

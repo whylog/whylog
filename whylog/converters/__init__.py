@@ -5,6 +5,13 @@ import six
 from frozendict import frozendict
 
 
+class ConverterType(object):
+    TO_DATE = 'date'
+    TO_FLOAT = 'float'
+    TO_INT = 'int'
+    TO_STRING = 'string'
+
+
 @six.add_metaclass(ABCMeta)
 class AbstractConverter(object):
     @classmethod
@@ -32,11 +39,11 @@ class DateConverter(AbstractConverter):
         return dateutil.parser.parse(pattern_group, fuzzy=True)
 
 
-STRING = 'string'
+STRING = ConverterType.TO_STRING
 CONVERTION_MAPPING = frozendict(
     {
-        'date': DateConverter,
-        'int': IntConverter,
-        'float': FloatConverter
+        ConverterType.TO_DATE: DateConverter,
+        ConverterType.TO_INT: IntConverter,
+        ConverterType.TO_FLOAT: FloatConverter
     }
 )

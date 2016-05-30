@@ -8,4 +8,6 @@ class TestBasic(TestCase):
     def test_search_manager_creation(self):
         investigation_plan = mocked_investigation_plan()
         manager = SearchManager(investigation_plan)
-        assert isinstance(manager, SearchManager)
+        # TODO: make a test once this works
+        assert manager
+        # manager.investigate(original_front_input)
