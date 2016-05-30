@@ -10,7 +10,7 @@ from whylog.converters.exceptions import ConverterError
 from whylog.teacher.user_intent import UserConstraintIntent
 
 from whylog.constraints.exceptions import (  # isort:skip
-    ConstructorGroupsCountError, ConstructorParamsError, NoTimeDeltasError
+    ConstructorGroupsCountError, ConstructorParamsError
 )
 from whylog.constraints.validation_problems import (  # isort:skip
     MinGreaterThatMaxProblem, NoTimeDeltasProblem, ParamConversionProblem
@@ -177,6 +177,7 @@ class TimeConstraint(AbstractConstraint):
         if not params_checking:
             param_min_delta = self.params.get(self.MIN_DELTA)
             param_max_delta = self.params.get(self.MAX_DELTA)
+            assert param_min_delta is not None or param_max_delta is not None
             if param_min_delta is not None and param_max_delta is not None:
                 self.verify = self._verify_both
                 self._min_delta = datetime.timedelta(seconds=param_min_delta)
@@ -187,8 +188,6 @@ class TimeConstraint(AbstractConstraint):
             elif param_min_delta is not None:
                 self.verify = self._verify_min
                 self._min_delta = datetime.timedelta(seconds=param_min_delta)
-            else:
-                raise NoTimeDeltasError(self.TYPE, self.MIN_DELTA, self.MAX_DELTA)
 
     def _verify_min(self, group_contents, param_dict):
         earlier_date, later_date = group_contents
