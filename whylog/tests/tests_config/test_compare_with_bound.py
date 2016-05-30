@@ -40,9 +40,7 @@ class TestBoundCompare(TestCase):
         ) == CompareResult.GT
 
     def test_empty_super_parser_groups(self):
-        assert self.investigation_step.compare_with_bound(
-            InvestigationStep.LEFT_BOUND, []
-        ) == CompareResult.LT
-        assert self.investigation_step.compare_with_bound(
-            InvestigationStep.RIGHT_BOUND, []
-        ) == CompareResult.GT
+        assert self.investigation_step.compare_with_bound(InvestigationStep.LEFT_BOUND, []
+                                                         ) == CompareResult.LT
+        assert self.investigation_step.compare_with_bound(InvestigationStep.RIGHT_BOUND, []
+                                                         ) == CompareResult.GT
