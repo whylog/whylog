@@ -7,6 +7,7 @@ import six
 
 from whylog.config.investigation_plan import LineSource
 from whylog.log_reader.const import BufsizeConsts
+from whylog.log_reader.read_utils import ReadUtils
 
 
 @six.add_metaclass(ABCMeta)
@@ -44,11 +45,24 @@ class BacktrackSearcher(AbstractSearcher):
             if self._investigation_step.is_line_in_search_range(line_content):
                 return line_offset + len(line_content) + 1
 
-    def _find_offset(self, opened_file, primary_key_value, super_parser):
+    def _find_left(self, opened_file, value, super_parser):
+        return ReadUtils.binary_search_left(
+            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser
+        )
+
+    def _find_right(self, opened_file, value, super_parser):
+        return ReadUtils.binary_search_right(
+            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser
+        )
+
+    def _find_offsets_range(self, opened_file, search_range, super_parser):
         """
-        returns offset of the line with the specified time
+        returns a pair of offsets between whose the investigation
+        in file should be provided
         """
-        pass  # TODO: implement bisect offset finding
+        # TODO: run function _find_left on left bound from search_range
+        # TODO: and run functions _find_right on right bound from search_range
+        pass
 
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
