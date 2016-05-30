@@ -25,15 +25,11 @@ class TooManyConstraintsToNegate(VerificationError):
         return "Whylog does not know how to provide investigation when more than 1 constraint are negated"
 
 
-class WrongConstraintClassSetup(VerificationError):
-    def __init__(self, constraint_type):
-        self._constraint_type = constraint_type
-
-    def __str__(self):
-        return "Constraint object '%s' was incorrectly constructed" % self._constraint_type
+class ConstructorError(ConstraintError):
+    pass
 
 
-class ConstructorParamsError(ConstraintError):
+class ConstructorParamsError(ConstructorError):
     def __init__(self, constraint_type, correct_param_names, incorrect_param_names):
         self.constraint_type = constraint_type
         self.correct_params_names = correct_param_names
@@ -45,7 +41,7 @@ class ConstructorParamsError(ConstraintError):
         )
 
 
-class ConstructorGroupsCountError(ConstraintError):
+class ConstructorGroupsCountError(ConstructorError):
     def __init__(self, constraint_type, groups_count, minimal_groups_count, maximal_groups_count):
         self.constraint_type = constraint_type
         self.groups_count = groups_count

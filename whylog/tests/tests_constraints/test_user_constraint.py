@@ -18,7 +18,7 @@ class TestIdenticalConstraint(TestCase):
         )
 
     def test_get_param_names(self):
-        assert IdenticalConstraint.get_param_names() == []
+        assert not IdenticalConstraint.get_param_names()
 
     def test_get_group_count(self):
         assert IdenticalConstraint.get_groups_count() == (2, None)
@@ -58,10 +58,8 @@ class TestTimeConstraint(TestCase):
         params = {TimeConstraint.MIN_DELTA: self.min_delta}
         self.assertRaises(ConstructorGroupsCountError, TimeConstraint, insufficient_groups, params)
 
-    def test_constructor_wrong_params(self):
+    def test_constructor_wrong_params_names(self):
         groups = [(0, 1), (2, 1)]
-        no_params = {}
-        self.assertRaises(ConstructorParamsError, TimeConstraint, groups, no_params)
 
         wrong_params = {"sth": 1}
         self.assertRaises(ConstructorParamsError, TimeConstraint, groups, wrong_params)
