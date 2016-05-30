@@ -123,9 +123,8 @@ class TestBasic(TestCase):
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
         log_reader = LogReader(whylog_config)
         effect_line = FrontInput(
-            effect_line_offset, line_content, LineSource(
-                'localhost', os.path.join(path, self._get_starting_file_name(input_path))
-            )
+            effect_line_offset, line_content,
+            LineSource('localhost', os.path.join(path, self._get_starting_file_name(input_path)))
         )
 
         results = log_reader.get_causes(effect_line)
@@ -144,9 +143,8 @@ class TestBasic(TestCase):
         whylog_config = self._prepare_config(path)
         log_reader = LogReader(whylog_config)
         effect_line = FrontInput(
-            effect_line_offset, line_content, LineSource(
-                'localhost', os.path.join(path, self._get_starting_file_name(input_path))
-            )
+            effect_line_offset, line_content,
+            LineSource('localhost', os.path.join(path, self._get_starting_file_name(input_path)))
         )
 
         node1_source = LineSource('localhost', os.path.join(path, 'node_1.log'))

@@ -21,9 +21,7 @@ class LogType(object):
         parsed_files = set()
         for matcher in self.filename_matchers:
             for host, path, super_parser in itertools.chain(
-                self._generate_forced_files(
-                    forced_log_type
-                ), matcher.get_matched_files()
+                self._generate_forced_files(forced_log_type), matcher.get_matched_files()
             ):
                 file_source = (host, path)
                 if file_source not in parsed_files:
@@ -33,9 +31,8 @@ class LogType(object):
     @classmethod
     def _generate_forced_files(cls, forced_log_type):
         return (
-            (
-                line_source.host, line_source.path, DEFAULT_SUPER_REGEX
-            ) for line_source in forced_log_type
+            (line_source.host, line_source.path, DEFAULT_SUPER_REGEX)
+            for line_source in forced_log_type
         )
 
     def __hash__(self):
