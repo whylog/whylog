@@ -209,7 +209,7 @@ class Teacher(object):
             pattern_type, teacher_parser.name, pattern_match.pattern, teacher_parser.log_type,
             pattern_match.primary_key, pattern_match.param_groups,
             teacher_parser.line.line_content, teacher_parser.line.offset,
-            teacher_parser.line.line_source
+            teacher_parser.line.line_source, line_id
         )  # yapf: disable
 
     def get_rule(self):
@@ -220,8 +220,8 @@ class Teacher(object):
             (line_id, self._prepare_user_parser(line_id)) for line_id in six.iterkeys(self._parsers)
         )  # yapf: disable
         user_constraints = [
-            constraint.convert_to_user_constraint_intent()
-            for constraint in six.itervalues(self._constraint_base)
+            constraint.convert_to_user_constraint_intent(constraint_id)
+            for constraint_id, constraint in six.iteritems(self._constraint_base)
         ]
         return UserRuleIntent(self.effect_id, user_parsers, user_constraints)
 
