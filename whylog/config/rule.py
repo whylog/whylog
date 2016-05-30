@@ -138,36 +138,25 @@ class Rule(object):
                 )
                 queue.append(depended_parser_number)
                 used_parsers.add(depended_parser_number)
-        self.create_ranges_for_unused_parsers(effect_clues, group, group_type, parser_ranges)
+        self.create_ranges_for_unconnected_parsers(effect_clues, group, group_type, parser_ranges)
         parser_ranges.pop(self.EFFECT_NUMBER)
         return parser_ranges
 
-    def _aggregate_constraints(self):
-        # Aggregate constraints have to have min_delta and max_delta params
-        # At this moment only TimeConstraint has this property
-        parser_with_constraints = defaultdict(list)
-        for constraint in self._constraints:
-            if constraint['name'] in self.DELTA_CONSTRAINTS:
-                base_parser = constraint['clues_groups'][1][0]
-                parser_with_constraints[base_parser].append(constraint)
-        return parser_with_constraints
-
-    def create_ranges_for_unused_parsers(self, effect_clues, group, group_type, parser_ranges):
-        for i in six.moves.range(len(self._causes)):
-            if (i + 1) not in parser_ranges:
-                converter = CONVERTION_MAPPING[group_type]
-                primary_group_value = \
-                    effect_clues[self.get_effect_name()].regex_parameters[group - 1]
-                parser_ranges[(i + 1)] = {
-                    group_type: {
-                        InvestigationStep.LEFT_BOUND: converter.MIN_VALUE,
-                        InvestigationStep.RIGHT_BOUND: primary_group_value
-                    }
-                }
-
-    def _get_effect_range(self, effect_clues, group, group_type):
+    def _get_effect_range(self, effect_clues, group_number, group_type):
+        """
+        This method basing on effect clues and effect primary key creates effect
+        search range for effect primary key type which in LEFT_BOUND = RIGHT_BOUND and equals
+        primary key value from effect clues.
+        This method is invokes when algorithm with calculate parsers ranges starts. It give
+        set up for this algorithm.
+        Example:
+            clues_groups = {'effect' : Clue((11, 'aaa'), '11 aaa', LineSource('foo', 'bar'))}
+            group_number = 1
+            group_type = 'int'
+            expected returned value : {EFFECT_NUMBER: {'int': {LEFT_BOUND: 11, RIGHT_BOUND: 11}}}
+        """
         # Here assumption that len of primary_keys_groups equals 1
-        primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group - 1]
+        primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group_number - 1]
         return {
             group_type: {
                 InvestigationStep.LEFT_BOUND: primary_group_value,
@@ -175,15 +164,37 @@ class Rule(object):
             }
         }
 
+    def _aggregate_constraints(self):
+        """
+        This method groups delta constraints by equal base parser
+        """
+        parser_with_constraints = defaultdict(list)
+        for constraint in self._constraints:
+            if constraint['name'] in self.DELTA_CONSTRAINTS:
+                base_parser = constraint['clues_groups'][1][0]
+                parser_with_constraints[base_parser].append(constraint)
+        return parser_with_constraints
+
     def _is_primary_key_constraint(self, clues_groups):
+        """
+        This method checks that groups connected by delta constraint belongs to primary key
+        """
         base_parser_number = clues_groups[1][0]
         depended_parser_number = clues_groups[0][0]
         base_parser_group_number = clues_groups[1][1]
         depended_group_number = clues_groups[0][1]
-        return self._is_primary_key_group(base_parser_group_number, base_parser_number) and \
-               self._is_primary_key_group(depended_group_number, depended_parser_number)
+        return self._is_group_primary(base_parser_group_number, base_parser_number) and \
+               self._is_group_primary(depended_group_number, depended_parser_number)
+
+    def _is_group_primary(self, parser_group_number, parser_number):
+        if parser_number == self.EFFECT_NUMBER:
+            return self._effect.is_primary_key(parser_group_number)
+        return self._causes[parser_number - 1].is_primary_key(parser_group_number)
 
     def _calculate_parser_bounds(self, base_parser_number, params, group_type, parser_ranges):
+        """
+        This method calculate depended parser search range basing od base parser search range.
+        """
         max_delta = params.get('max_delta')
         min_delta = params.get('min_delta')
         left_bound, right_bound = self._get_base_bounds(
@@ -201,14 +212,26 @@ class Rule(object):
 
     @classmethod
     def _get_base_bounds(cls, base_parser_number, group_type, parser_ranges):
-        left_bound = parser_ranges[base_parser_number][group_type][InvestigationStep.LEFT_BOUND]
-        right_bound = parser_ranges[base_parser_number][group_type][InvestigationStep.RIGHT_BOUND]
+        base_parser_bounds = parser_ranges[base_parser_number][group_type]
+        left_bound = base_parser_bounds[InvestigationStep.LEFT_BOUND]
+        right_bound = base_parser_bounds[InvestigationStep.RIGHT_BOUND]
         return left_bound, right_bound
 
-    def _is_primary_key_group(self, parser_group_number, parser_number):
-        if parser_number == self.EFFECT_NUMBER:
-            return self._effect.is_primary_key(parser_group_number)
-        return self._causes[parser_number - 1].is_primary_key(parser_group_number)
+    def create_ranges_for_unconnected_parsers(self, effect_clues, group, group_type, parser_ranges):
+        """
+        Create maximal search range for parsers which are unreachable by delta constraints.
+        """
+        for i in six.moves.range(len(self._causes)):
+            if (i + 1) not in parser_ranges:
+                converter = CONVERTION_MAPPING[group_type]
+                primary_group_value = \
+                    effect_clues[self.get_effect_name()].regex_parameters[group - 1]
+                parser_ranges[(i + 1)] = {
+                    group_type: {
+                        InvestigationStep.LEFT_BOUND: converter.MIN_VALUE,
+                        InvestigationStep.RIGHT_BOUND: primary_group_value
+                    }
+                }
 
     def _update_parser_ranges_with_or_linkage(
         self, effect_clues, effect_group, effect_group_type, parser_ranges
