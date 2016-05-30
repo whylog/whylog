@@ -32,7 +32,6 @@ class TestValidationBase(TestRuleBase):
 
     def _initial_validation_check(self):
         validation_result = self.teacher.validate()
-        print(validation_result.rule_problems)
         assert not validation_result.is_acceptable()
 
         assert len(validation_result.parser_problems) == 3
