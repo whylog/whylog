@@ -1,7 +1,7 @@
 from datetime import datetime
 from unittest import TestCase
 
-from whylog.constraints import IdenticalConstraint, TimeConstraint
+from whylog.constraints import DifferentConstraint, IdenticalConstraint, TimeConstraint
 from whylog.constraints.exceptions import ConstructorGroupsCountError, ConstructorParamsError
 
 
@@ -18,7 +18,7 @@ class TestIdenticalConstraint(TestCase):
         )
 
     def test_get_param_names(self):
-        assert IdenticalConstraint.get_param_names() == [IdenticalConstraint.PARAM_VALUE]
+        assert IdenticalConstraint.get_param_names() == []
 
     def test_get_group_count(self):
         assert IdenticalConstraint.get_groups_count() == (2, None)
@@ -31,13 +31,15 @@ class TestIdenticalConstraint(TestCase):
         ic = IdenticalConstraint(params_checking=False)
         assert not ic.verify(['comp1', 'hello', 'comp1'], {})
 
-    def test_verify_with_param_success(self):
-        ic = IdenticalConstraint(params_checking=False)
-        assert ic.verify(['foo', 'foo', 'foo'], {ic.PARAM_VALUE: 'foo'})
 
-    def test_verify_with_param_fail(self):
-        ic = IdenticalConstraint(params_checking=False)
-        assert not ic.verify(['bar', 'bar', 'foo'], {ic.PARAM_VALUE: 'bar'})
+class TestDifferentConstraint(TestCase):
+    def test_verify_success(self):
+        ic = DifferentConstraint(params_checking=False)
+        assert ic.verify(['foo', 'bar', 'juj'], {})
+
+    def test_verify_fail(self):
+        ic = DifferentConstraint(params_checking=False)
+        assert not ic.verify(['comp1', 'comp1', 'foo'], {})
 
 
 class TestTimeConstraint(TestCase):

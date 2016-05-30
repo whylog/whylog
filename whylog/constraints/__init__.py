@@ -194,8 +194,7 @@ class IdenticalConstraint(AbstractConstraint):
 
     TYPE = ConstraintType.IDENTICAL
 
-    PARAM_VALUE = 'value'
-    PARAMS = [PARAM_VALUE]
+    PARAMS = []
 
     def verify(self, group_contents, param_dict):
         """
@@ -203,11 +202,7 @@ class IdenticalConstraint(AbstractConstraint):
         - verify(['comp1', 'comp1', 'comp1'], {}) returns True
         - verify(['comp1', 'hello', 'comp1'], {}) returns False
         """
-        param = param_dict.get(self.PARAM_VALUE)
-        if param:
-            return all(param == group for group in group_contents)
-        else:
-            return all(group_contents[0] == group for group in group_contents)
+        return all(group_contents[0] == group for group in group_contents)
 
 
 class DifferentConstraint(AbstractConstraint):
@@ -218,7 +213,7 @@ class DifferentConstraint(AbstractConstraint):
     TYPE = ConstraintType.DIFFERENT
 
     PARAM_VALUE = "value"
-    PARAMS = []
+    PARAMS = [PARAM_VALUE]
 
     def verify(self, group_contents, param_dict):
         param = param_dict.get(self.PARAM_VALUE)
