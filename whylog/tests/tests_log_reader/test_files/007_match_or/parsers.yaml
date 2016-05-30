@@ -1,7 +1,7 @@
 ---
 name: cause1
 regex_str: ^root cause1$
-log_type: default
+log_type: test_log_type
 convertions: {}
 primary_key_groups: []
 line_content: root cause1
@@ -9,13 +9,13 @@ line_content: root cause1
 name: cause2
 regex_str: ^root cause2$
 primary_key_groups: []
-log_type: default
+log_type: test_log_type
 convertions: {}
 line_content: root cause2
 ---
 name: effect
 regex_str: ^visible effect$
-log_type: default
+log_type: test_log_type
 primary_key_groups: []
 convertions: {}
 line_content: visible effect

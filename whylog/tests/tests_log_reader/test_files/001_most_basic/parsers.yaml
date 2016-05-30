@@ -2,13 +2,13 @@
 name: cause
 regex_str: ^root cause$
 primary_key_groups: []
-log_type: default
+log_type: test_log_type
 convertions: {}
 line_content: root cause
 ---
 name: effect
 regex_str: ^visible effect$
 primary_key_groups: []
-log_type: default
+log_type: test_log_type
 convertions: {}
 line_content: visible effect

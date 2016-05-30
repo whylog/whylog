@@ -1,5 +1,5 @@
 ---
-log_type_name: default
+log_type_name: test_log_type
 matcher_class_name: WildCardFilenameMatcher
 host_pattern: localhost
 path_pattern: whylog/tests/tests_log_reader/test_files/009_match_negation/node_1.log

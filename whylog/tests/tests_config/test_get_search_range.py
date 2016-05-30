@@ -36,8 +36,7 @@ class TestBasic(TestCase):
         cls.effect_time = datetime(2016, 4, 12, 23, 54, 43)
         effect_line = '2016-04-12 23:54:43 effect internal server error Host: apache_host'
         cls.effect_clues = {
-            'effect': Clue(
-                (cls.effect_time, 'apache_host'), effect_line, 40, line_source)
+            'effect': Clue((cls.effect_time, 'apache_host'), effect_line, 40, line_source)
         }
 
         cls.earliest_date = datetime.min
