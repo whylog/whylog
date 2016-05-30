@@ -10,10 +10,10 @@ from whylog.converters.exceptions import ConverterError
 from whylog.teacher.user_intent import UserConstraintIntent
 
 from whylog.constraints.exceptions import (  # isort:skip
-    ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
+    ConstructorGroupsCountError, ConstructorParamsError, NoTimeDeltasError
 )
 from whylog.constraints.validation_problems import (  # isort:skip
-    MinGreaterThatMaxProblem, ParamConversionProblem
+    MinGreaterThatMaxProblem, NoTimeDeltasProblem, ParamConversionProblem
 )
 
 
@@ -71,7 +71,6 @@ class AbstractConstraint(object):
         actual_param_names = set(self.params.keys())
         self._check_useless_params(correct_param_names, actual_param_names)
         self._check_mandatory_params(correct_param_names, actual_param_names)
-        self._check_optional_params(correct_param_names, actual_param_names)
 
     def _check_useless_params(self, correct_param_names, actual_param_names):
         if actual_param_names - correct_param_names:
@@ -80,13 +79,6 @@ class AbstractConstraint(object):
     def _check_mandatory_params(self, correct_param_names, actual_param_names):
         """
         Verifies mandatory params used to construct Constraint
-        Throws exception if params don't meet requirements
-        """
-        pass
-
-    def _check_optional_params(self, correct_param_names, actual_param_names):
-        """
-        Verifies optional params used to construct Constraint
         Throws exception if params don't meet requirements
         """
         pass
@@ -196,11 +188,7 @@ class TimeConstraint(AbstractConstraint):
                 self.verify = self._verify_min
                 self._min_delta = datetime.timedelta(seconds=param_min_delta)
             else:
-                raise WrongConstraintClassSetup(self.TYPE)
-
-    def _check_optional_params(self, correct_param_names, actual_param_names):
-        if self.MIN_DELTA not in actual_param_names and self.MAX_DELTA not in actual_param_names:
-            raise ConstructorParamsError(self.TYPE, correct_param_names, actual_param_names)
+                raise NoTimeDeltasError(self.TYPE, self.MIN_DELTA, self.MAX_DELTA)
 
     def _verify_min(self, group_contents, param_dict):
         earlier_date, later_date = group_contents
@@ -221,6 +209,8 @@ class TimeConstraint(AbstractConstraint):
         problems = super(TimeConstraint, self)._validate_params()
         param_min_delta = self.params.get(self.MIN_DELTA)
         param_max_delta = self.params.get(self.MAX_DELTA)
+        if param_min_delta is None and param_max_delta is None:
+            problems.append(NoTimeDeltasProblem(self.MIN_DELTA, self.MAX_DELTA))
         if param_min_delta is not None and param_max_delta is not None:
             if param_min_delta > param_max_delta:
                 problems.append(MinGreaterThatMaxProblem())

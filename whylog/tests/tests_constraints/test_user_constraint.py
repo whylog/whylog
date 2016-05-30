@@ -53,8 +53,6 @@ class TestTimeConstraint(TestCase):
 
     def test_constructor_wrong_params_names(self):
         groups = [(0, 1), (2, 1)]
-        no_params = {}
-        self.assertRaises(ConstructorParamsError, TimeConstraint, groups, no_params)
 
         wrong_params = {"sth": 1}
         self.assertRaises(ConstructorParamsError, TimeConstraint, groups, wrong_params)
