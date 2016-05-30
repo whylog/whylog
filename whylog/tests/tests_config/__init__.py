@@ -145,8 +145,8 @@ class TestBasic(TestCase):
 
     def test_loading_log_types(self):
         assert len(self.config._log_types) == 2
-        assert sorted(six.iterkeys(self.config._log_types)) == ['apache', 'default']
-        assert len(self.config._log_types['default'].filename_matchers) == 2
+        assert sorted(six.iterkeys(self.config._log_types)) == ['apache', 'test_log_type']
+        assert len(self.config._log_types['test_log_type'].filename_matchers) == 2
         assert len(self.config._log_types['apache'].filename_matchers) == 1
 
     def test_add_new_rule_to_empty_config(self):
