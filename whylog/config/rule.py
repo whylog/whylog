@@ -67,13 +67,21 @@ class Rule(object):
 
     def get_search_ranges(self, effect_clues):
         """
+        parser's search range is a dictionary with search range for its primary key type:
+        Sample parser's search range:
+        {
+            'date': {
+                InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),
+                InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)
+            }
+        }
         This method calculate search ranges for single rule based on its
         constraints and effect clues.
         Algorithm steps:
             1. Check that effect parser has no empty primary key. If is empty
              return NO_RANGE
             2. Calculate search range for every cause parser.
-            3. Join parsers ranges with this same log type
+            3. Join parsers search ranges with this same log type
         """
         group_number, group_type = self._effect.get_primary_key_group()
         if not group_number:
@@ -87,9 +95,9 @@ class Rule(object):
 
     def _calculate_parsers_ranges(self, effect_clues, group, group_type):
         """
-        This method calculate search ranges for every parser in rule.
+        This method calculate search range for every cause parser in rule.
         This algorithm working only on delta constraints these allow reasoning about
-        parser search range.
+        parser's search range.
         Delta constraints analysis:
             Such constraint contains clues_groups list that contains two elements. Each of
             elements is a two element list.
@@ -111,7 +119,7 @@ class Rule(object):
             1. Calculate effect parser search range. Take primary key values from effect_clues.
             2. For every parser in rule find its all delta constraints where is a base parser
                 (_aggregate_constraints method). It is connectivity parsers graph creator.
-            3. Do a BFS order over connectivity parser graph. Start from effect parser which is a root in tree.
+            3. Do a BFS order over connectivity parsers graph. Start from effect parser which is a root in tree.
                 Calculate parser search range for every child parser of actual parser if it is possible.
             4. Set maximal search range for all unreachable parser from effect parser in graph
             5. Pop effect parser search range.
