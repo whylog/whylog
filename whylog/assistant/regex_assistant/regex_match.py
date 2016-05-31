@@ -51,18 +51,17 @@ class RegexMatch(object):
         try:
             verify_regex(new_regex, self.line_text)
         except NotMatchingRegexError:
-            self.regex = new_regex
             self.param_groups = {}
             self.primary_key = []
-            return
-
-        groups = regex_groups(new_regex, self.line_text)
-        default_converter = ConverterType.TO_STRING
-        self.param_groups = dict(
-            (key + 1, ParamGroup(groups[key], default_converter))
-            for key in six.moves.range(len(groups))
-        )
-        self.regex = new_regex
+        else:
+            groups = regex_groups(new_regex, self.line_text)
+            default_converter = ConverterType.TO_STRING
+            self.param_groups = dict(
+                (key + 1, ParamGroup(groups[key], default_converter))
+                for key in six.moves.range(len(groups))
+            )
+        finally:
+            self.regex = new_regex
 
     def update_by_pattern_match(self, pattern_match):
         self.update_by_regex(pattern_match.pattern)

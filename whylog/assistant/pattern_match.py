@@ -11,7 +11,7 @@ class PatternMatch(object):
     def __init__(self, line_text, pattern, param_groups, primary_key=None):
         self.line_text = line_text
         self.pattern = pattern
-        self.param_groups = param_groups  # dict[int, ParamGroup]
+        self.param_groups = param_groups  # dict[group_no, ParamGroup]
         self.primary_key = primary_key
         if primary_key is None:
             if not self.param_groups:
