@@ -37,19 +37,17 @@ class PatternMatch(object):
 
 
 class ParamGroup(object):
-    def __init__(self, content, converter):
+    def __init__(self, content, converter_type):
         self.content = content
-        self.converter = converter
+        self.converter_type = converter_type
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
     def validate_converter(self):
-        group_content = self.content
-        converter_type = self.converter
-        converter = get_converter(converter_type)
+        converter = get_converter(self.converter_type)
         try:
-            converter.safe_convert(group_content)
+            converter.safe_convert(self.content)
         except ConverterError:
-            return [InvalidConverterProblem(group_content, converter_type)]
+            return [InvalidConverterProblem(self.content, self.converter_type)]
         return []

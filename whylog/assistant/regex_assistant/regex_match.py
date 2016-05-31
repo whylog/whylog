@@ -81,7 +81,7 @@ class RegexMatch(object):
         self.guessed_pattern_matches = guessed_dict
 
     def set_converter(self, group_no, converter):
-        self.param_groups[group_no].converter = converter
+        self.param_groups[group_no].converter_type = converter
 
     def set_primary_key(self, primary_key):
         self.primary_key = primary_key

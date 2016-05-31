@@ -8,13 +8,13 @@ class NotMatchingPatternProblem(ParserValidationProblem):
 class InvalidConverterProblem(ParserValidationProblem):
     TEMPLATE = 'Wrong group converter, converter type: %s, group: %s'
 
-    def __init__(self, group, converter):
+    def __init__(self, group, converter_type):
         super(InvalidConverterProblem, self).__init__()
         self.group = group
-        self.converter = converter
+        self.converter_type = converter_type
 
     def __str__(self):
-        return self.TEMPLATE % (self.converter, self.group)
+        return self.TEMPLATE % (self.converter_type, self.group)
 
 
 class InvalidPrimaryKeyProblem(ParserValidationProblem):
