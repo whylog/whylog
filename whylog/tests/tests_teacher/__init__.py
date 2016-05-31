@@ -20,7 +20,7 @@ from whylog.tests.utils import ConfigPathFactory
 path_test_files = ['whylog', 'tests', 'tests_teacher', 'test_files']
 
 
-class TestBase(TestCase):
+class TestRuleBase(TestCase):
     def setUp(self):
         """
         Creates teacher with sample Rule.
@@ -58,10 +58,21 @@ class TestBase(TestCase):
             line_content=r'2015-12-03 12:10:50 Data migration to comp21 failed in test 123',
             line_source=LineSource('sample_host2', 'sample_path2')
         )
-        self._add_test_rule()
 
-    def _add_test_rule(self):
+        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
+        self.date_groups = [(self.effect_id, 1), (self.effect_id, 1)]
+
+        self._add_rule()
+
+    def _add_rule(self):
         self.teacher.add_line(self.effect_id, self.effect_front_input, effect=True)
+        self.teacher.add_line(self.cause1_id, self.cause1_front_input)
+        self.cause1_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$'
+        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
+
+        self.teacher.add_line(self.cause2_id, self.cause2_front_input)
+        cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
+        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
 
     def tearDown(self):
         self._clean_test_files()
@@ -71,22 +82,7 @@ class TestBase(TestCase):
             open(test_file, 'w').close()
 
 
-class TestRuleUpdateBase(TestBase):
-    def _add_test_rule(self):
-        super(TestRuleUpdateBase, self)._add_test_rule()
-
-        self.teacher.add_line(self.cause1_id, self.cause1_front_input)
-        self.cause1_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$'
-        self.teacher.update_pattern(self.cause1_id, self.cause1_pattern)
-
-        self.teacher.add_line(self.cause2_id, self.cause2_front_input)
-        cause2_pattern = r'^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$'
-        self.teacher.update_pattern(self.cause2_id, cause2_pattern)
-
-        self.identical_groups = [(self.cause1_id, 2), (self.cause2_id, 2)]
-
-
-class TestParser(TestRuleUpdateBase):
+class TestParser(TestRuleBase):
     def test_default_user_parser(self):
         user_rule = self.teacher.get_rule()
         effect_parser = user_rule.parsers[self.effect_id]
@@ -105,6 +101,7 @@ class TestParser(TestRuleUpdateBase):
             self.effect_front_input.line_content,
             self.effect_front_input.offset,
             self.effect_front_input.line_source,
+            self.effect_id
         )  # yapf: disable
         assert wanted_effect_parser == effect_parser
 
@@ -158,7 +155,7 @@ class TestParser(TestRuleUpdateBase):
         assert effect_obvious_regex in effect_guessed_regexes
 
 
-class TestConstraints(TestRuleUpdateBase):
+class TestConstraints(TestRuleBase):
     def _register_identical_constraint(self, constraint_id=1):
         constraint = IdenticalConstraint(groups=self.identical_groups)
         self.teacher.register_constraint(constraint_id, constraint)
@@ -182,8 +179,11 @@ class TestConstraints(TestRuleUpdateBase):
         constraint = IdenticalConstraint(groups=self.identical_groups)
         self.teacher.register_constraint(constraint_id, constraint)
         user_rule = self.teacher.get_rule()
-
-        wanted_constraint = UserConstraintIntent(IdenticalConstraint.TYPE, self.identical_groups)
+        wanted_constraint = UserConstraintIntent(
+            IdenticalConstraint.TYPE,
+            self.identical_groups,
+            constraint_id=constraint_id
+        )
         assert wanted_constraint == user_rule.constraints[0]
 
         self._constraints_presence_check()

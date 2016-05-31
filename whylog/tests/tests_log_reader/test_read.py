@@ -17,17 +17,25 @@ class TestLogsReading(TestCase):
         cls.time_delta_s = 1
         cls.number_of_lines = 10000
         cls.line_padding = 42
+        cls.start_date = datetime(year=2000, month=1, day=1)
         cls.opened_file = OperationCountingFileWrapper(
             DataGeneratorLogSource(
-                start_time=datetime(
-                    year=2000,
-                    month=1,
-                    day=1
-                ),
+                start_time=cls.start_date,
                 time_delta=timedelta(seconds=cls.time_delta_s),
                 number_of_lines=cls.number_of_lines,
                 line_padding=cls.line_padding,
                 datetime_format="%c"
+            )
+        )  # yapf: disable
+        cls.repetitions = 6
+        cls.file_with_repeated_lines = OperationCountingFileWrapper(
+            DataGeneratorLogSource(
+                start_time=cls.start_date,
+                time_delta=timedelta(seconds=cls.time_delta_s),
+                number_of_lines=cls.number_of_lines,
+                line_padding=cls.line_padding,
+                datetime_format="%c",
+                repetitions=cls.repetitions
             )
         )  # yapf: disable
 
@@ -73,5 +81,28 @@ class TestLogsReading(TestCase):
         assert offset == (self.number_of_lines - 1) * self.line_padding
         assert self.opened_file._seek_count < 35
 
+    def test_bisect_left_when_lines_are_repeated(self):
+        secs = 3
+        date = datetime(year=2000, month=1, day=1, second=secs)
+
+        backtracker = BacktrackSearcher("", None, None)
+        offset = backtracker._find_left(self.file_with_repeated_lines, date, {})
+
+        line_no = secs * self.repetitions
+        assert offset == line_no * self.line_padding
+        assert self.file_with_repeated_lines._seek_count < 35
+
+    def test_bisect_right_when_lines_are_repeated(self):
+        secs = 3
+        date = datetime(year=2000, month=1, day=1, second=secs)
+
+        backtracker = BacktrackSearcher("", None, None)
+        offset = backtracker._find_right(self.file_with_repeated_lines, date, {})
+
+        line_no = (secs + 1) * self.repetitions - 1
+        assert offset == line_no * self.line_padding
+        assert self.file_with_repeated_lines._seek_count < 35
+
     def tearDown(self):
         self.opened_file.reset_stats()
+        self.file_with_repeated_lines.reset_stats()

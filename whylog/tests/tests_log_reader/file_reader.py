@@ -5,13 +5,22 @@ import six
 
 
 class DataGeneratorLogSource(object):
-    def __init__(self, start_time, time_delta, number_of_lines, line_padding, datetime_format):
+    def __init__(
+        self,
+        start_time,
+        time_delta,
+        number_of_lines,
+        line_padding,
+        datetime_format,
+        repetitions=1
+    ):
         self._start_time = start_time
         self._time_delta = time_delta
         self._number_of_lines = number_of_lines
         self._line_padding = line_padding
         self._datetime_format = datetime_format
         self._position = 0
+        self._repetitions = repetitions
 
     def _deduce_line_no(self, offset):
         return offset // self._line_padding
@@ -20,7 +29,7 @@ class DataGeneratorLogSource(object):
         return offset % self._line_padding
 
     def _get_line(self, line_no):
-        current_line_time = self._start_time + line_no * self._time_delta
+        current_line_time = self._start_time + (line_no // self._repetitions) * self._time_delta
         current_line_time_str = current_line_time.strftime(self._datetime_format) + " "
         current_line = "%s %s\n" % (
             current_line_time.strftime(self._datetime_format),

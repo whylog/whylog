@@ -1,15 +1,20 @@
 import datetime
 import itertools
-
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 import six
 
 from whylog.constraints.const import ConstraintType
-from whylog.constraints.exceptions import (
-    ConstructorGroupsCountError, ConstructorParamsError, WrongConstraintClassSetup
-)
+from whylog.converters import ConverterType, get_converter
+from whylog.converters.exceptions import ConverterError
 from whylog.teacher.user_intent import UserConstraintIntent
+
+from whylog.constraints.exceptions import (  # isort:skip
+    ConstructorGroupsCountError, ConstructorParamsError
+)
+from whylog.constraints.validation_problems import (  # isort:skip
+    MinGreaterThatMaxProblem, NoTimeDeltasProblem, ParamConversionProblem
+)
 
 
 @six.add_metaclass(ABCMeta)
@@ -33,7 +38,7 @@ class AbstractConstraint(object):
     @abstractproperty
     def PARAMS(self):
         """
-        Params names.
+        Params names and converters.
         Constraint construction requires a dict[param name, param value].
         Some of then can be optional.
         """
@@ -51,7 +56,7 @@ class AbstractConstraint(object):
         self.params = param_dict or {}
         if params_checking:
             self._check_constructor_groups()
-            self._check_constructor_params()
+            self._check_constructor_params_occurrence()
 
     def _check_constructor_groups(self):
         groups_count = len(self.groups)
@@ -61,12 +66,11 @@ class AbstractConstraint(object):
                 self.TYPE, len(self.groups), self.MIN_GROUPS_COUNT, self.MAX_GROUPS_COUNT
             )
 
-    def _check_constructor_params(self):
+    def _check_constructor_params_occurrence(self):
         correct_param_names = set(self.get_param_names())
         actual_param_names = set(self.params.keys())
         self._check_useless_params(correct_param_names, actual_param_names)
         self._check_mandatory_params(correct_param_names, actual_param_names)
-        self._check_optional_params(correct_param_names, actual_param_names)
 
     def _check_useless_params(self, correct_param_names, actual_param_names):
         if actual_param_names - correct_param_names:
@@ -79,20 +83,13 @@ class AbstractConstraint(object):
         """
         pass
 
-    def _check_optional_params(self, correct_param_names, actual_param_names):
-        """
-        Verifies optional params used to construct Constraint
-        Throws exception if params don't meet requirements
-        """
-        pass
-
-    def convert_to_user_constraint_intent(self):
+    def convert_to_user_constraint_intent(self, constraint_id=None):
         """
         Converts constraint to UserConstraintIntent object.
 
         For Teacher and Config use while saving constraint into Whylog knowledge base.
         """
-        return UserConstraintIntent(self.TYPE, self.groups, self.params)
+        return UserConstraintIntent(self.TYPE, self.groups, self.params, constraint_id)
 
     @classmethod
     def get_param_names(cls):
@@ -100,7 +97,7 @@ class AbstractConstraint(object):
         Returns names of constraint additional params.
         For Front to display param names to user and then ask user for param contents.
         """
-        return cls.PARAMS
+        return cls.PARAMS.keys()
 
     @classmethod
     def get_groups_count(cls):
@@ -126,12 +123,32 @@ class AbstractConstraint(object):
 
         pass
 
+    def _convert_params_values(self):
+        problems = []
+        for param_name, converter_type in six.iteritems(self.PARAMS):
+            param_val = self.params.get(param_name)
+            if param_val is not None:
+                converter = get_converter(converter_type)
+                try:
+                    converted_val = converter.safe_convert(param_val)
+                except ConverterError:
+                    problems.append(ParamConversionProblem(param_name, param_val, converter_type))
+                else:
+                    self.params[param_name] = converted_val
+        return problems
+
+    def _validate_params(self):
+        return self._convert_params_values()
+
+    def _validate_groups(self):
+        # TODO: implement
+        return []
+
     def validate(self):
         """
         Validates constraint: verifies if it is ready to save
         """
-        # TODO: implement in subclass and test it
-        return {}
+        return self._validate_params() + self._validate_groups()
 
 
 class TimeConstraint(AbstractConstraint):
@@ -153,28 +170,24 @@ class TimeConstraint(AbstractConstraint):
     MIN_DELTA = 'min_delta'
     MAX_DELTA = 'max_delta'
 
-    PARAMS = sorted([MIN_DELTA, MAX_DELTA])
+    PARAMS = {MIN_DELTA: ConverterType.TO_FLOAT, MAX_DELTA: ConverterType.TO_FLOAT}
 
     def __init__(self, groups=None, param_dict=None, params_checking=True):
         super(TimeConstraint, self).__init__(groups, param_dict, params_checking)
-        param_min_delta = self.params.get(self.MIN_DELTA)
-        param_max_delta = self.params.get(self.MAX_DELTA)
-        if param_min_delta is not None and param_max_delta is not None:
-            self.verify = self._verify_both
-            self._min_delta = datetime.timedelta(seconds=param_min_delta)
-            self._max_delta = datetime.timedelta(seconds=param_max_delta)
-        elif param_max_delta is not None:
-            self.verify = self._verify_max
-            self._max_delta = datetime.timedelta(seconds=param_max_delta)
-        elif param_min_delta is not None:
-            self.verify = self._verify_min
-            self._min_delta = datetime.timedelta(seconds=param_min_delta)
-        else:
-            raise WrongConstraintClassSetup(self.TYPE)
-
-    def _check_optional_params(self, correct_param_names, actual_param_names):
-        if self.MIN_DELTA not in actual_param_names and self.MAX_DELTA not in actual_param_names:
-            raise ConstructorParamsError(self.TYPE, correct_param_names, actual_param_names)
+        if not params_checking:
+            param_min_delta = self.params.get(self.MIN_DELTA)
+            param_max_delta = self.params.get(self.MAX_DELTA)
+            assert param_min_delta is not None or param_max_delta is not None
+            if param_min_delta is not None and param_max_delta is not None:
+                self.verify = self._verify_both
+                self._min_delta = datetime.timedelta(seconds=param_min_delta)
+                self._max_delta = datetime.timedelta(seconds=param_max_delta)
+            elif param_max_delta is not None:
+                self.verify = self._verify_max
+                self._max_delta = datetime.timedelta(seconds=param_max_delta)
+            elif param_min_delta is not None:
+                self.verify = self._verify_min
+                self._min_delta = datetime.timedelta(seconds=param_min_delta)
 
     def _verify_min(self, group_contents, param_dict):
         earlier_date, later_date = group_contents
@@ -191,6 +204,17 @@ class TimeConstraint(AbstractConstraint):
     def verify(self, group_contents, param_dict):
         pass
 
+    def _validate_params(self):
+        problems = super(TimeConstraint, self)._validate_params()
+        param_min_delta = self.params.get(self.MIN_DELTA)
+        param_max_delta = self.params.get(self.MAX_DELTA)
+        if param_min_delta is None and param_max_delta is None:
+            problems.append(NoTimeDeltasProblem(self.MIN_DELTA, self.MAX_DELTA))
+        if param_min_delta is not None and param_max_delta is not None:
+            if param_min_delta > param_max_delta:
+                problems.append(MinGreaterThatMaxProblem())
+        return problems
+
 
 class IdenticalConstraint(AbstractConstraint):
     """
@@ -201,15 +225,14 @@ class IdenticalConstraint(AbstractConstraint):
 
     TYPE = ConstraintType.IDENTICAL
 
-    PARAMS = []
+    PARAMS = {}
 
-    def verify(self, group_contents, param_dict=None):
+    def verify(self, group_contents, param_dict):
         """
         I.e:
         - verify(['comp1', 'comp1', 'comp1'], {}) returns True
         - verify(['comp1', 'hello', 'comp1'], {}) returns False
         """
-
         return all(group_contents[0] == group for group in group_contents)
 
 
@@ -219,10 +242,12 @@ class DifferentConstraint(AbstractConstraint):
     """
 
     TYPE = ConstraintType.DIFFERENT
-    PARAMS = []
+
+    PARAM_VALUE = "value"
+    PARAMS = [PARAM_VALUE]
 
     def verify(self, group_contents, param_dict):
-        param = param_dict.get("value")
+        param = param_dict.get(self.PARAM_VALUE)
         if param:
             return len(set(itertools.chain(group_contents, [param]))) == len(group_contents) + 1
         else:
