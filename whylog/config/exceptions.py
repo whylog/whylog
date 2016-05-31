@@ -19,3 +19,19 @@ class UnsupportedConfigType(WhylogConfigError):
 
     def __str__(self):
         return 'This whylog version do not handle %s. Please upgrade Whylog' % self.unsupported_type
+
+
+class NoLogTypeError(WhylogError):
+    def __init__(self, log_type):
+        self.log_type = log_type
+
+    def __str__(self):
+        return 'LogType: %s not found' % self.log_type
+
+
+class RenameLogTypeError(WhylogError):
+    def __init__(self, log_type):
+        self.log_type = log_type
+
+    def __str__(self):
+        return 'LogType: %s already exists' % self.log_type

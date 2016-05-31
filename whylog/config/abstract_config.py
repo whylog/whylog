@@ -5,6 +5,7 @@ from datetime import datetime
 
 import six
 
+from whylog.config.exceptions import NoLogTypeError, RenameLogTypeError
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
 from whylog.config.log_type import LogType
@@ -64,7 +65,21 @@ class AbstractConfig(object):
         self._parser_name_generator = ParserNameGenerator(self._parsers)
 
     def rename_log_type(self, old_name, new_name):
-        pass
+        if old_name == new_name:
+            return
+        if old_name not in self._log_types:
+            raise NoLogTypeError(old_name)
+        if new_name in self._log_types:
+            raise RenameLogTypeError
+        log_type = self._log_types.pop(old_name)
+        log_type.name = new_name
+        for matcher in log_type.filename_matchers:
+            matcher.log_type_name = new_name
+        self._log_types[new_name] = log_type
+        for parser in six.itervalues(self._parsers):
+            if parser.log_type == old_name:
+                parser.log_type = new_name
+        self._parsers_grouped_by_log_type[new_name] = self._parsers_grouped_by_log_type.pop(old_name)
 
     def add_log_type(self, log_type):
         for matcher in log_type.filename_matchers:

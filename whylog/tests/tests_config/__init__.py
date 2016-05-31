@@ -196,7 +196,7 @@ class TestBasic(TestCase):
         assert sorted(log_type.name for log_type in config.get_all_log_types()) == ['default']
 
         config.rename_log_type('default', 'test_log_type')
-        # self._check_log_type_renaming(config,  parsers_name)
+        self._check_log_type_renaming(config,  parsers_name)
 
         config = SettingsFactorySelector.get_settings()['config']
         # self._check_log_type_renaming(config, parsers_name)
@@ -209,13 +209,13 @@ class TestBasic(TestCase):
         assert 'default' not in config._log_types.keys()
         assert 'test_log_type' in config._parsers_grouped_by_log_type.keys()
         assert 'default' not in config._parsers_grouped_by_log_type.keys()
-        assert config.parser['lostdata'].log_type == 'test_log_type'
-        assert config.parser['datamigration'].log_type == 'test_log_type'
-        assert config.parser['connectionerror'].log_type == 'test_log_type'
+        assert config._parsers['lostdata'].log_type == 'test_log_type'
+        assert config._parsers['datamigration'].log_type == 'test_log_type'
+        assert config._parsers['connectionerror'].log_type == 'test_log_type'
         assert sorted(parser.name for parser in config._parsers_grouped_by_log_type['test_log_type']) == \
                parsers_name
         assert sorted(config._parsers.keys()) == parsers_name
-        assert sorted(config.get_all_log_types()) == ['default', 'test_log_type']
+        assert sorted(log_type.name for log_type in config.get_all_log_types()) == ['default', 'test_log_type']
 
     @classmethod
     def tearDownClass(cls):
