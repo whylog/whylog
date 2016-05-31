@@ -60,10 +60,13 @@ class AbstractConfig(object):
         self._rules[created_rule.get_effect_name()].append(created_rule)
         for parser in created_parsers:
             self._parsers[parser.name] = parser
+            self._parsers_grouped_by_log_type[parser.log_type].append(parser)
+        self._parser_name_generator = ParserNameGenerator(self._parsers)
 
     def add_log_type(self, log_type):
         for matcher in log_type.filename_matchers:
             self.add_filename_matcher_to_log_type(matcher)
+        self._log_types[log_type.name] = log_type
 
     def add_filename_matcher_to_log_type(self, matcher):
         self._save_filename_matcher_definition(matcher.serialize())
