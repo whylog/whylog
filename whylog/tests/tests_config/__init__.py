@@ -8,8 +8,11 @@ import yaml
 from whylog.assistant.const import AssistantType
 from whylog.config import SettingsFactorySelector
 from whylog.config.consts import YamlFileNames
-from whylog.config.parsers import RegexParserFactory
-from whylog.config.rule import RegexRuleFactory
+from whylog.config.filename_matchers import WildCardFilenameMatcher
+from whylog.config.log_type import LogType
+from whylog.config.parsers import RegexParserFactory, RegexParser
+from whylog.config.rule import RegexRuleFactory, Rule
+from whylog.config.super_parser import RegexSuperParser
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
@@ -29,6 +32,8 @@ to_int = "int"
 class TestBasic(TestCase):
     @classmethod
     def setUpClass(cls):
+        SettingsFactorySelector.WHYLOG_DIR = TestPaths.WHYLOG_DIR
+
         cls.sample_line1 = "(2016-04-12 23:54:45) Connection error occurred on comp1. Host name: host1"
         cls.sample_line2 = "(2016-04-12 23:54:40) Data migration from comp1 to comp2 failed. Host name: host2"
         cls.sample_line3 = "(2016-04-12 23:54:43) Data is missing at comp2. Loss = (.*) GB. Host name: host2"
@@ -61,7 +66,7 @@ class TestBasic(TestCase):
             regex_type,
             "connectionerror",
             cls.regex1,
-            "hydra",
+            "default",
             [1],
             cls.groups1,
             cls.sample_line1,
@@ -72,7 +77,7 @@ class TestBasic(TestCase):
             regex_type,
             "datamigration",
             cls.regex2,
-            "hydra",
+            "default",
             [1],
             cls.groups2,
             cls.sample_line2,
@@ -83,7 +88,7 @@ class TestBasic(TestCase):
             regex_type,
             "lostdata",
             cls.regex3,
-            "filesystem",
+            "default",
             [1],
             cls.groups3,
             cls.sample_line3,
@@ -129,7 +134,7 @@ class TestBasic(TestCase):
         loaded_parsers = [
             RegexParserFactory.from_dao(dumped_parser)
             for dumped_parser in yaml.load_all(dumped_parsers)
-        ]
+            ]
         dumped_parsers_again = yaml.dump_all(
             [parser.serialize() for parser in loaded_parsers],
             explicit_start=True
@@ -150,7 +155,6 @@ class TestBasic(TestCase):
         assert len(self.config._log_types['apache'].filename_matchers) == 1
 
     def test_add_new_rule_to_empty_config(self):
-        SettingsFactorySelector.WHYLOG_DIR = TestPaths.WHYLOG_DIR
         config = SettingsFactorySelector.get_settings()['config']
         whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
         config.add_rule(self.user_intent)
@@ -170,6 +174,48 @@ class TestBasic(TestCase):
         ordered = [parser.name for parser in added_rule.get_causes_parsers()]
         ordered.sort()
         assert ordered == ["connectionerror", "datamigration"]
+
+    def test_log_type_rename(self):
+        whylog_dir = SettingsFactorySelector._attach_whylog_dir(os.getcwd())
+        config = SettingsFactorySelector.get_settings()['config']
+
+        super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
+        matcher = WildCardFilenameMatcher(
+            'localhost', '/temp/*.log', 'default', super_parser
+        )
+        log_type = LogType('default', [matcher])
+        config.add_log_type(log_type)
+        config.add_rule(self.user_intent)
+
+        parsers_name = ['connectionerror', 'datamigration', 'lostdata']
+        assert 'default' in config._log_types.keys()
+        assert 'default' in config._parsers_grouped_by_log_type.keys()
+        assert sorted(config._parsers.keys()) == parsers_name
+        assert sorted(parser.name for parser in config._parsers_grouped_by_log_type['default']) == \
+               parsers_name
+        assert sorted(log_type.name for log_type in config.get_all_log_types()) == ['default']
+
+        config.rename_log_type('default', 'test_log_type')
+        # self._check_log_type_renaming(config,  parsers_name)
+
+        config = SettingsFactorySelector.get_settings()['config']
+        # self._check_log_type_renaming(config, parsers_name)
+
+        shutil.rmtree(whylog_dir)
+
+    @classmethod
+    def _check_log_type_renaming(cls, config, parsers_name):
+        assert 'test_log_type' in config._log_types.keys()
+        assert 'default' not in config._log_types.keys()
+        assert 'test_log_type' in config._parsers_grouped_by_log_type.keys()
+        assert 'default' not in config._parsers_grouped_by_log_type.keys()
+        assert config.parser['lostdata'].log_type == 'test_log_type'
+        assert config.parser['datamigration'].log_type == 'test_log_type'
+        assert config.parser['connectionerror'].log_type == 'test_log_type'
+        assert sorted(parser.name for parser in config._parsers_grouped_by_log_type['test_log_type']) == \
+               parsers_name
+        assert sorted(config._parsers.keys()) == parsers_name
+        assert sorted(config.get_all_log_types()) == ['default', 'test_log_type']
 
     @classmethod
     def tearDownClass(cls):
