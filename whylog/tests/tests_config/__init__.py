@@ -10,8 +10,8 @@ from whylog.config import SettingsFactorySelector
 from whylog.config.consts import YamlFileNames
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
-from whylog.config.parsers import RegexParserFactory, RegexParser
-from whylog.config.rule import RegexRuleFactory, Rule
+from whylog.config.parsers import RegexParserFactory
+from whylog.config.rule import RegexRuleFactory
 from whylog.config.super_parser import RegexSuperParser
 from whylog.teacher.user_intent import (
     LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
@@ -134,7 +134,7 @@ class TestBasic(TestCase):
         loaded_parsers = [
             RegexParserFactory.from_dao(dumped_parser)
             for dumped_parser in yaml.load_all(dumped_parsers)
-            ]
+        ]
         dumped_parsers_again = yaml.dump_all(
             [parser.serialize() for parser in loaded_parsers],
             explicit_start=True
@@ -180,9 +180,7 @@ class TestBasic(TestCase):
         config = SettingsFactorySelector.get_settings()['config']
 
         super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
-        matcher = WildCardFilenameMatcher(
-            'localhost', '/temp/*.log', 'default', super_parser
-        )
+        matcher = WildCardFilenameMatcher('localhost', '/temp/*.log', 'default', super_parser)
         log_type = LogType('default', [matcher])
         config.add_log_type(log_type)
         config.add_rule(self.user_intent)
@@ -196,7 +194,7 @@ class TestBasic(TestCase):
         assert sorted(log_type.name for log_type in config.get_all_log_types()) == ['default']
 
         config.rename_log_type('default', 'test_log_type')
-        self._check_log_type_renaming(config,  parsers_name)
+        self._check_log_type_renaming(config, parsers_name)
 
         config = SettingsFactorySelector.get_settings()['config']
         self._check_log_type_renaming(config, parsers_name)
@@ -215,7 +213,8 @@ class TestBasic(TestCase):
         assert sorted(parser.name for parser in config._parsers_grouped_by_log_type['test_log_type']) == \
                parsers_name
         assert sorted(config._parsers.keys()) == parsers_name
-        assert sorted(log_type.name for log_type in config.get_all_log_types()) == ['default', 'test_log_type']
+        assert sorted(log_type.name
+                      for log_type in config.get_all_log_types()) == ['default', 'test_log_type']
 
     @classmethod
     def tearDownClass(cls):

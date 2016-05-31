@@ -79,7 +79,8 @@ class AbstractConfig(object):
         for parser in six.itervalues(self._parsers):
             if parser.log_type == old_name:
                 parser.log_type = new_name
-        self._parsers_grouped_by_log_type[new_name] = self._parsers_grouped_by_log_type.pop(old_name)
+        self._parsers_grouped_by_log_type[new_name
+                                         ] = self._parsers_grouped_by_log_type.pop(old_name)
         all_matchers_definition = tuple()
         for log_type in six.itervalues(self._log_types):
             matchers_definitions = (matcher.serialize() for matcher in log_type.filename_matchers)
