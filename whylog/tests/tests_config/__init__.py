@@ -199,7 +199,7 @@ class TestBasic(TestCase):
         self._check_log_type_renaming(config,  parsers_name)
 
         config = SettingsFactorySelector.get_settings()['config']
-        # self._check_log_type_renaming(config, parsers_name)
+        self._check_log_type_renaming(config, parsers_name)
 
         shutil.rmtree(whylog_dir)
 
