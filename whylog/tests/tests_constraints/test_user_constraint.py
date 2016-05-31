@@ -33,6 +33,9 @@ class TestIdenticalConstraint(TestCase):
 
 
 class TestDifferentConstraint(TestCase):
+    def test_get_param_names(self):
+        assert set(DifferentConstraint.get_param_names()) == set([DifferentConstraint.PARAM_VALUE])
+
     def test_verify_success(self):
         ic = DifferentConstraint(params_checking=False)
         assert ic.verify(['foo', 'bar', 'juj'], {})
@@ -69,6 +72,11 @@ class TestTimeConstraint(TestCase):
 
     def test_get_group_count(self):
         assert TimeConstraint.get_groups_count() == (2, 2)
+
+    def test_get_param_names(self):
+        assert set(TimeConstraint.get_param_names()) == set(
+            [TimeConstraint.MIN_DELTA, TimeConstraint.MAX_DELTA]
+        )
 
     def test_verify_success(self):
         tc = TimeConstraint(param_dict=self.params_dict, params_checking=False)
