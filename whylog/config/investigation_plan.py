@@ -148,3 +148,6 @@ class LineSource(object):
         if other is None:
             return False
         return all((self.host == other.host, self.path == other.path))
+
+    def __hash__(self):
+        return hash(self.host + self.path)
