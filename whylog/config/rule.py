@@ -103,7 +103,7 @@ class Rule(object):
             elements is a two element list.
             For example:
                 clues_groups = [[1,1], [0,1]]
-                It means that first group of first parser depend to first group o zero parser.
+                It means that first group of first parser depend to first group of zero parser.
                 If these first groups of these parsers are in primary keys, we can predict
                 first parser search ranges basing on zero parser search range.
                 Assume that:
@@ -111,8 +111,8 @@ class Rule(object):
                 zero parser search ranges = {'int': {LEFT_BOUND: 200, RIGHT_BOUND: 250}
                 then
                 first parser search range = {'int': {LEFT_BOUND: 200 - 100, RIGHT_BOUND: 250 - 10}
-                In code first parser calls depended parser, zero parser calls base parser.
-        Connectivity parsers graph is directed graph were two parsers from rule are connected when
+                In code first parser is called depended parser, zero parser is called base parser.
+        Connectivity parsers graph is directed graph where two parsers from rule are connected when
         are connected by delta constraint. This edge is directed from base to depended parser.
         This implementation assume that connectivity parsers graph is a tree.
         Algorithm steps:
@@ -128,17 +128,16 @@ class Rule(object):
             self.EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
         }
         queue = deque([self.EFFECT_NUMBER])
-        aggregated_constraints = self._aggregate_constraints()
+        aggregated_constraints = self._group_constraints_by_base_parsers()
         used_parsers = set([self.EFFECT_NUMBER])
         while queue:
             parser_number = queue.popleft()
             for constraint in aggregated_constraints[parser_number]:
-                clues_groups = constraint['clues_groups']
-                depended_parser_number = clues_groups[0][0]
-                base_parser_number = clues_groups[1][0]
+                depended_parser_number = self._get_depended_parser_number(constraint)
+                base_parser_number = self._get_base_parser_number(constraint)
                 if depended_parser_number in used_parsers:
                     continue
-                if not self._is_primary_key_constraint(clues_groups):
+                if not self._is_primary_key_constraint(constraint):
                     continue
                 _, group_type = self._causes[depended_parser_number - 1].get_primary_key_group()
                 parser_ranges[depended_parser_number] = self._calculate_parser_bounds(
@@ -150,11 +149,26 @@ class Rule(object):
         parser_ranges.pop(self.EFFECT_NUMBER)
         return parser_ranges
 
+    @classmethod
+    def _get_depended_parser_number(cls, constraint):
+        return constraint['clues_groups'][0][0]
+
+    @classmethod
+    def _get_base_parser_number(cls, constraint):
+        return constraint['clues_groups'][1][0]
+
+    @classmethod
+    def _get_depended_parser_primary_key_group_number(cls, constraint):
+        return constraint['clues_groups'][0][1]
+
+    @classmethod
+    def _get_base_parser_primary_key_group_number(cls, constraint):
+        return constraint['clues_groups'][1][1]
+
     def _get_effect_range(self, effect_clues, group_number, group_type):
         """
-        This method basing on effect clues and effect primary key creates effect
-        search range for effect primary key type which in LEFT_BOUND = RIGHT_BOUND and equals
-        primary key value from effect clues.
+        This method basing on effect_clues and effect parser primary key creates effect parser
+        search range.
         This method is invokes when algorithm with calculate parsers ranges starts. It give
         set up for this algorithm.
         Example:
@@ -172,25 +186,25 @@ class Rule(object):
             }
         }
 
-    def _aggregate_constraints(self):
+    def _group_constraints_by_base_parsers(self):
         """
         This method groups delta constraints by equal base parser
         """
-        parser_with_constraints = defaultdict(list)
+        grouped_constraints = defaultdict(list)
         for constraint in self._constraints:
             if constraint['name'] in self.DELTA_CONSTRAINTS:
-                base_parser = constraint['clues_groups'][1][0]
-                parser_with_constraints[base_parser].append(constraint)
-        return parser_with_constraints
+                base_parser_num = self._get_base_parser_number(constraint)
+                grouped_constraints[base_parser_num].append(constraint)
+        return grouped_constraints
 
-    def _is_primary_key_constraint(self, clues_groups):
+    def _is_primary_key_constraint(self, constraint):
         """
         This method checks that groups connected by delta constraint belongs to primary key
         """
-        base_parser_number = clues_groups[1][0]
-        depended_parser_number = clues_groups[0][0]
-        base_parser_group_number = clues_groups[1][1]
-        depended_group_number = clues_groups[0][1]
+        base_parser_number = self._get_base_parser_number(constraint)
+        depended_parser_number = self._get_depended_parser_number(constraint)
+        base_parser_group_number = self._get_base_parser_primary_key_group_number(constraint)
+        depended_group_number = self._get_depended_parser_primary_key_group_number(constraint)
         return self._is_group_primary(base_parser_group_number, base_parser_number) and \
                self._is_group_primary(depended_group_number, depended_parser_number)
 
@@ -201,7 +215,7 @@ class Rule(object):
 
     def _calculate_parser_bounds(self, base_parser_number, params, group_type, parser_ranges):
         """
-        This method calculate depended parser search range basing od base parser search range.
+        This method calculate depended parser search range basing on base parser search range.
         """
         max_delta = params.get('max_delta')
         min_delta = params.get('min_delta')
@@ -229,7 +243,8 @@ class Rule(object):
         self, effect_clues, effect_primary_group, effect_group_type, parser_ranges
     ):
         """
-        Create maximal search range for parsers which are unreachable by delta constraints.
+        Create maximal search range for parsers which are unreachable in connectivity parsers graph
+        from effect parser.
         """
         effect_primary_group_value = effect_clues[self.get_effect_name(
         )].regex_parameters[effect_primary_group - 1]
@@ -252,7 +267,7 @@ class Rule(object):
     ):
         """
         This method updates parsers ranges, when rule constraints are connected
-        by OR linkage to maximal possibly range. If we find constraint that hasn't delta we can't
+        by OR linkage, to maximal possibly range. If we find constraint that hasn't delta we can't
         limit parser's search ranges for all parser connected by this constraint.
         """
         effect_group_value = \
@@ -260,8 +275,7 @@ class Rule(object):
         for constraint in self._constraints:
             if constraint['name'] in self.DELTA_CONSTRAINTS:
                 continue
-            for clue_group in constraint['clues_groups']:
-                parser_number = clue_group[0]
+            for parser_number, _ in constraint['clues_groups']:
                 if parser_number == self.EFFECT_NUMBER:
                     continue
                 _, primary_group_type = self._causes[parser_number - 1].get_primary_key_group()
