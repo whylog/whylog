@@ -37,15 +37,20 @@ class ConstraintRegistry(object):
 
 class ConstraintManager(object):
     """
-    there should be one such object per rule being verified
+    There should be one such object per rule being verified.
+    ConstraintManager collects constraints objects, one per each constraint.
+    Constraint objects for each constraint type should not be duplicated
+    (because e.g. two time constraints may have different time ranges),
+    so constraints in _actual_constraints has the same numeration
+    as in corresponding rule.
     """
 
     def __init__(self):
         self._actual_constraints = {}
 
-    def __getitem__(self, constraint_data):
-        constraint = self._actual_constraints.get(constraint_data['name'])
+    def get_constraint_object(self, index, constraint_data):
+        constraint = self._actual_constraints.get(index)
         if constraint is None:
             constraint_verifier = ConstraintRegistry.get_constraint(constraint_data)
-            self._actual_constraints[constraint_data['name']] = constraint_verifier
-        return self._actual_constraints[constraint_data['name']]
+            self._actual_constraints[index] = constraint_verifier
+        return self._actual_constraints[index]

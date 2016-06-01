@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import TestCase
 
 from whylog.config.investigation_plan import Clue, LineSource
@@ -278,3 +279,38 @@ class TestBasic(TestCase):
         assert len(causes) == 1
         assert causes[0].constraints_linkage == InvestigationResult.NOT
         assert causes[0].constraints[0] == constraint
+
+    def test_constraints_or_two_time_constraints(self):
+        line_source = LineSource('localhost', 'node_0.log')
+        effect = Clue(
+            ('Foo occurred', datetime(2000, 6, 14, second=15)),
+            'Foo occurred, 2000 06 14 00:00:15',
+            500,
+            line_source
+        )
+        clues_lists = [
+            ([
+                 Clue(('Bar occurred', datetime(2000, 6, 14, second=10)), 'Bar occurred, 2000 06 14 00:00:10', 250, line_source),
+             ], 1)
+        ]  # yapf: disable
+        constraints = [
+            {
+                'clues_groups': [[1, 2], [0, 2]],
+                'name': 'time_delta',
+                'params': {'max_delta': 8.0}
+            }, {
+                'clues_groups': [[1, 2], [0, 2]],
+                'name': 'time_delta',
+                'params': {'max_delta': 3.0}
+            }
+        ]
+        causes = Verifier.constraints_or(clues_lists, effect, constraints, ConstraintManager())
+        assert len(causes) == 1
+
+        assert all(cause.constraints_linkage == InvestigationResult.OR for cause in causes)
+        assert causes[0].lines == [
+            FrontInput.from_clue(Clue(
+                ('Bar occurred', datetime(2000, 6, 14, second=10)), 'Bar occurred, 2000 06 14 00:00:10', 250, line_source))
+        ]  # yapf: disable
+        assert len(causes[0].constraints) == 1
+        assert causes[0].constraints[0] == constraints[0]

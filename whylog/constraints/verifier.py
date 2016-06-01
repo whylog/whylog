@@ -21,13 +21,13 @@ class Verifier(object):
         )
 
     @classmethod
-    def _verify_constraint(cls, combination, effect, constraint, constraint_manager):
+    def _verify_constraint(cls, combination, effect, index, constraint, constraint_manager):
         """
         checks if specified clues (which represents parsers: 1,2,.. for some rule) and
         effect (which represents parser 0 from this rule) satisfy one given constraint.
         returns True if so, or False otherwise
         """
-        constraint_verifier = constraint_manager[constraint]
+        constraint_verifier = constraint_manager.get_constraint_object(index, constraint)
         groups = []
         for group_info in constraint['clues_groups']:
             parser_num, group_num = group_info
@@ -104,8 +104,8 @@ class Verifier(object):
         causes = []
         for combination in cls._clues_combinations(clues_lists):
             if all(
-                cls._verify_constraint(combination, effect, constraint, constraint_manager)
-                for constraint in constraints
+                cls._verify_constraint(combination, effect, idx, constraint, constraint_manager)
+                for idx, constraint in enumerate(constraints)
             ):
                 causes.append(
                     cls._create_investigation_result(
@@ -134,8 +134,8 @@ class Verifier(object):
         for combination in cls._clues_combinations(clues_lists):
             verified_constraints = [
                 constraint
-                for constraint in constraints
-                if cls._verify_constraint(combination, effect, constraint, constraint_manager)
+                for idx, constraint in enumerate(constraints)
+                if cls._verify_constraint(combination, effect, idx, constraint, constraint_manager)
             ]  # yapf: disable
             if verified_constraints:
                 causes.append(
@@ -172,7 +172,8 @@ class Verifier(object):
         """
         clues_lists = cls._construct_proper_clues_lists(clues_lists)
         for combination in cls._clues_combinations(clues_lists):
-            if cls._verify_constraint(combination, effect, constraint, constraint_manager):
+            if cls._verify_constraint(combination, effect, 0, constraint, constraint_manager):
+                # called with constraint index = 0, because this function assumes that there is one constraint
                 return []
         return [cls._create_investigation_result([], [constraint], InvestigationResult.NOT)]
 
