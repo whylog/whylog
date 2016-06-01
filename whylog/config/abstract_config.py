@@ -171,7 +171,7 @@ class AbstractConfig(object):
     @classmethod
     def _get_search_ranges(cls, suspected_rules, effect_clues):
         """
-        search_range is a dictionary with two keys: InvesitgationStep.LEFT_BOUND and
+        old_search_range is a dictionary with two keys: InvesitgationStep.LEFT_BOUND and
         InvesitgationStep.RIGHT_BOUND. Values in this dict are concrete values of type the same as type of some
         primary key. Both values taken together represent some interval.
         Sample search range:
@@ -179,7 +179,7 @@ class AbstractConfig(object):
                 InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),
                 InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)
             }
-        Log type's search ranges in rule context is a dictionary with search_range for every type of primary key of
+        Log type's search ranges in rule context is a dictionary with old_search_range for every type of primary key of
         rule's parsers that belong to this log type.
         Sample log type's search ranges:
             {
@@ -189,22 +189,43 @@ class AbstractConfig(object):
                 }
             }
         Rule's search_ranges is sum of all log type's search ranges, where rule's parsers belong to these log types.
-        Sample rule's search ranges:
-            Sample search_ranges: {
-                'apache': {
-                    'date': {
-                        InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),
-                        InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)
-                    }
-                },
-                'database': {
-                    'date': {
-                        InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),
-                        InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)
-                    }
+        Sample rule's search ranges (1) : {
+            'apache': {
+                'date': {
+                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),
+                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)
                 }
-             }
+            },
+            'database': {
+                'date': {
+                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),
+                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)
+                }
+            }
+         }
+        Sample rule's search ranges (2) : {
+            'apache': {
+                'date': {
+                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),
+                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)
+                }
+            },
+        }
         This method sums all rule's search ranges from every rule in suspected rules.
+        Expected returned value based on (1) and (2): {
+            'apache': {
+                'date': {
+                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),
+                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)
+                }
+            },
+            'database': {
+                'date': {
+                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),
+                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)
+                }
+            }
+         }
         """
         # This implementation assumes that all primary key groups is a one element list
         # TODO implementation for longer primary key groups
@@ -212,25 +233,27 @@ class AbstractConfig(object):
         for rule in suspected_rules:
             rule_search_ranges = rule.get_search_ranges(effect_clues)
             for log_type_name, log_type_ranges in six.iteritems(rule_search_ranges):
-                if log_type_name not in search_ranges:
+                log_type_search_range = search_ranges.get(log_type_name)
+                if log_type_search_range is None:
                     search_ranges[log_type_name] = log_type_ranges
                     continue
-                log_type_search_range = search_ranges[log_type_name]
-                for key_type, type_range in six.iteritems(rule_search_ranges[log_type_name]):
-                    if key_type not in log_type_search_range:
-                        log_type_search_range[key_type] = type_range
+                for type, range in six.iteritems(rule_search_ranges[log_type_name]):
+                    old_search_range = log_type_search_range.get(type)
+                    if old_search_range is None:
+                        log_type_search_range[type] = range
                         continue
-                    left_bound_candidate = type_range[InvestigationStep.LEFT_BOUND]
-                    right_bound_candidate = type_range[InvestigationStep.RIGHT_BOUND]
-                    left_bound = log_type_search_range[key_type][InvestigationStep.LEFT_BOUND]
-                    right_bound = log_type_search_range[key_type][InvestigationStep.RIGHT_BOUND]
-                    log_type_search_range[key_type][InvestigationStep.LEFT_BOUND] = min(
-                        left_bound, left_bound_candidate
-                    )
-                    log_type_search_range[key_type][InvestigationStep.RIGHT_BOUND] = max(
-                        right_bound, right_bound_candidate
-                    )
+                    left_bound, right_bound = cls._calculate_new_bounds(range, old_search_range)
+                    old_search_range[InvestigationStep.LEFT_BOUND] = left_bound
+                    old_search_range[InvestigationStep.RIGHT_BOUND] = right_bound
         return search_ranges
+
+    @classmethod
+    def _calculate_new_bounds(cls, range, old_search_range):
+        left_bound_candidate = range[InvestigationStep.LEFT_BOUND]
+        right_bound_candidate = range[InvestigationStep.RIGHT_BOUND]
+        left_bound = old_search_range[InvestigationStep.LEFT_BOUND]
+        right_bound = old_search_range[InvestigationStep.RIGHT_BOUND]
+        return min(left_bound_candidate, left_bound), max(right_bound_candidate, right_bound)
 
     def is_free_parser_name(self, parser_name, black_list):
         return self._parser_name_generator.is_free_parser_name(parser_name, black_list)
