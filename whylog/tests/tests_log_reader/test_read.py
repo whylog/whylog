@@ -3,6 +3,8 @@ from unittest import TestCase
 
 import six
 
+from whylog.config.investigation_plan import InvestigationStep
+from whylog.config.super_parser import RegexSuperParser
 from whylog.log_reader.read_utils import ReadUtils
 from whylog.log_reader.searchers import BacktrackSearcher
 from whylog.tests.tests_log_reader.constants import AFewLinesLogParams, TestPaths
@@ -38,6 +40,8 @@ class TestLogsReading(TestCase):
                 repetitions=cls.repetitions
             )
         )  # yapf: disable
+        cls.super_parser = RegexSuperParser("(.*) r*", [1], {1: 'date'})
+        cls.dummy_date = datetime(1410, 7, 15)
 
     def test_getting_line_by_offset_huge(self):
         with open(TestPaths.get_file_path(AFewLinesLogParams.FILE_NAME)) as fh:
@@ -61,22 +65,49 @@ class TestLogsReading(TestCase):
         secs = 3
         date = datetime(year=2000, month=1, day=1, second=secs)
 
-        backtracker = BacktrackSearcher("", None, None)
-        offset = backtracker._find_left(self.opened_file, date, {})
+        investigation_step = InvestigationStep(
+            None, {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: date,
+                    InvestigationStep.RIGHT_BOUND: self.dummy_date
+                }
+            }
+        )
+
+        backtracker = BacktrackSearcher("", investigation_step, self.super_parser)
+        offset = backtracker._find_left(self.opened_file)
 
         assert offset == secs * self.line_padding
         assert self.opened_file._seek_count < 35
 
     def test_bisect_first_line_of_file(self):
-        backtracker = BacktrackSearcher("", None, None)
-        offset = backtracker._find_left(self.opened_file, datetime.min, {})
+        investigation_step = InvestigationStep(
+            None, {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: datetime.min,
+                    InvestigationStep.RIGHT_BOUND: self.dummy_date
+                }
+            }
+        )
+
+        backtracker = BacktrackSearcher("", investigation_step, self.super_parser)
+        offset = backtracker._find_left(self.opened_file)
 
         assert offset == 0
         assert self.opened_file._seek_count < 35
 
     def test_bisect_last_line_of_file(self):
-        backtracker = BacktrackSearcher("", None, None)
-        offset = backtracker._find_right(self.opened_file, datetime.max, {})
+        investigation_step = InvestigationStep(
+            None, {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: self.dummy_date,
+                    InvestigationStep.RIGHT_BOUND: datetime.max
+                }
+            }
+        )
+
+        backtracker = BacktrackSearcher("", investigation_step, self.super_parser)
+        offset = backtracker._find_right(self.opened_file)
 
         assert offset == (self.number_of_lines - 1) * self.line_padding
         assert self.opened_file._seek_count < 35
@@ -85,8 +116,17 @@ class TestLogsReading(TestCase):
         secs = 3
         date = datetime(year=2000, month=1, day=1, second=secs)
 
-        backtracker = BacktrackSearcher("", None, None)
-        offset = backtracker._find_left(self.file_with_repeated_lines, date, {})
+        investigation_step = InvestigationStep(
+            None, {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: date,
+                    InvestigationStep.RIGHT_BOUND: self.dummy_date
+                }
+            }
+        )
+
+        backtracker = BacktrackSearcher("", investigation_step, self.super_parser)
+        offset = backtracker._find_left(self.file_with_repeated_lines)
 
         line_no = secs * self.repetitions
         assert offset == line_no * self.line_padding
@@ -96,8 +136,17 @@ class TestLogsReading(TestCase):
         secs = 3
         date = datetime(year=2000, month=1, day=1, second=secs)
 
-        backtracker = BacktrackSearcher("", None, None)
-        offset = backtracker._find_right(self.file_with_repeated_lines, date, {})
+        investigation_step = InvestigationStep(
+            None, {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: self.dummy_date,
+                    InvestigationStep.RIGHT_BOUND: date
+                }
+            }
+        )
+
+        backtracker = BacktrackSearcher("", investigation_step, self.super_parser)
+        offset = backtracker._find_right(self.file_with_repeated_lines)
 
         line_no = (secs + 1) * self.repetitions - 1
         assert offset == line_no * self.line_padding

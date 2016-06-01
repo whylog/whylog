@@ -5,7 +5,8 @@ from os import SEEK_SET
 
 import six
 
-from whylog.config.investigation_plan import LineSource
+from whylog.config.investigation_plan import InvestigationStep, LineSource
+from whylog.config.utils import CompareResult
 from whylog.log_reader.const import BufsizeConsts
 from whylog.log_reader.read_utils import ReadUtils
 
@@ -13,7 +14,7 @@ from whylog.log_reader.read_utils import ReadUtils
 @six.add_metaclass(ABCMeta)
 class AbstractSearcher(object):
     @abstractmethod
-    def search(self, search_data, original_front_input):
+    def search(self, original_front_input):
         """
         transfer investigation to searcher
         """
@@ -21,12 +22,12 @@ class AbstractSearcher(object):
 
 
 class IndexSearcher(AbstractSearcher):
-    def search(self, search_data, original_front_input):
+    def search(self, original_front_input):
         pass
 
 
 class DatabaseSearcher(AbstractSearcher):
-    def search(self, search_data, original_front_input):
+    def search(self, original_front_input):
         pass
 
 
@@ -45,15 +46,49 @@ class BacktrackSearcher(AbstractSearcher):
             if self._investigation_step.is_line_in_search_range(line_content):
                 return line_offset + len(line_content) + 1
 
-    def _find_left(self, opened_file, value, super_parser):
-        return ReadUtils.binary_search_left(
-            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser
-        )
+    def _find_left(self, opened_file):
+        left = 0
+        right = ReadUtils.size_of_opened_file(opened_file)
+        while left + 1 < right:
+            curr = (left + right) // 2
+            line, line_begin, line_end = ReadUtils.get_line_containing_offset(
+                opened_file, curr, ReadUtils.STANDARD_BUFFER_SIZE
+            )
+            groups = self._super_parser.get_ordered_groups(line)
+            assert len(groups) <= 1
+            if self._investigation_step.compare_with_bound(
+                InvestigationStep.LEFT_BOUND, groups
+            ) == CompareResult.LT:
+                # omit actual line and go right
+                left = line_end + 1
+            else:
+                # going left, omit actual line, but maybe it will be returned
+                right = line_begin
+        return right
 
-    def _find_right(self, opened_file, value, super_parser):
-        return ReadUtils.binary_search_right(
-            opened_file, 0, ReadUtils.size_of_opened_file(opened_file), value, super_parser
+    def _find_right(self, opened_file):
+        left = 0
+        right = ReadUtils.size_of_opened_file(opened_file)
+        while left + 1 < right:
+            curr = (left + right) // 2
+            line, line_begin, line_end = ReadUtils.get_line_containing_offset(
+                opened_file, curr, ReadUtils.STANDARD_BUFFER_SIZE
+            )
+            groups = self._super_parser.get_ordered_groups(line)
+            assert len(groups) <= 1
+            if self._investigation_step.compare_with_bound(InvestigationStep.RIGHT_BOUND, groups)\
+                    in [CompareResult.LT, CompareResult.EQ]:
+                # go to the end of current line, maybe it will be returned
+                left = line_end
+            else:
+                # going left, current line is not interesting
+                right = line_begin - 1
+        if right == 0:
+            return 0
+        _, offset, _ = ReadUtils.get_line_containing_offset(
+            opened_file, right - 1, ReadUtils.STANDARD_BUFFER_SIZE
         )
+        return offset
 
     def _find_offsets_range(self, opened_file, search_range, super_parser):
         """
