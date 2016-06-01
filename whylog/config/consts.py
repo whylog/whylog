@@ -1,3 +1,6 @@
+EFFECT_NUMBER = 0
+
+
 class YamlFileNames(object):
     rules = 'rules.yaml'
     parsers = 'parsers.yaml'

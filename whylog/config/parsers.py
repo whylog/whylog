@@ -85,6 +85,7 @@ class RegexParser(AbstractParser):
 
     def get_primary_key_group(self):
         # Here assumption that len of primary_keys_groups equals 1
+        assert len(self.primary_key_groups) <= 1
         if not self.primary_key_groups:
             return None, None
         primary_key_group = self.primary_key_groups[0]

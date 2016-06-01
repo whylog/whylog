@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 import six
 from frozendict import frozendict
 
+from whylog.config.consts import EFFECT_NUMBER
 from whylog.config.investigation_plan import InvestigationStep
 from whylog.config.parsers import RegexParserFactory
 from whylog.constraints.constraint_manager import ConstraintManager
@@ -24,9 +25,8 @@ class Rule(object):
         LINKAGE_NOT: Verifier.constraints_not
     }
 
-    EFFECT_NUMBER = 0
     NO_RANGE = frozendict()
-    DELTA_CONSTRAINTS = set(['time'])
+    DELTA_CONSTRAINTS = frozenset(['time'])
 
     def __init__(self, causes, effect, constraints, linkage):
         self._causes = causes
@@ -125,29 +125,33 @@ class Rule(object):
             5. Pop effect parser search range.
         """
         parser_ranges = {
-            self.EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
+            EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
         }
-        queue = deque([self.EFFECT_NUMBER])
+        queue = deque([EFFECT_NUMBER])
         aggregated_constraints = self._group_constraints_by_base_parsers()
-        used_parsers = set([self.EFFECT_NUMBER])
+        used_parsers = set([EFFECT_NUMBER])
         while queue:
             parser_number = queue.popleft()
             for constraint in aggregated_constraints[parser_number]:
                 depended_parser_number = self._get_depended_parser_number(constraint)
-                base_parser_number = self._get_base_parser_number(constraint)
-                if depended_parser_number in used_parsers:
-                    continue
-                if not self._is_primary_key_constraint(constraint):
-                    continue
-                _, group_type = self._causes[depended_parser_number - 1].get_primary_key_group()
-                parser_ranges[depended_parser_number] = self._calculate_parser_bounds(
-                    base_parser_number, constraint['params'], group_type, parser_ranges
-                )
+                base_parser_num = self._get_base_parser_number(constraint)
+                self._calculate_depended_parsers_search_range(base_parser_num, parser_ranges, constraint, used_parsers)
                 queue.append(depended_parser_number)
                 used_parsers.add(depended_parser_number)
         self.create_ranges_for_unconnected_parsers(effect_clues, group, group_type, parser_ranges)
-        parser_ranges.pop(self.EFFECT_NUMBER)
+        parser_ranges.pop(EFFECT_NUMBER)
         return parser_ranges
+
+    def _calculate_depended_parsers_search_range(self, base_parser_number, parser_ranges, constraint, used_parsers):
+        depended_parser_number = self._get_depended_parser_number(constraint)
+        if depended_parser_number in used_parsers:
+            return
+        if not self._is_primary_key_constraint(constraint):
+            return
+        _, group_type = self._causes[depended_parser_number - 1].get_primary_key_group()
+        parser_ranges[depended_parser_number] = self._calculate_parser_bounds(
+            base_parser_number, constraint['params'], group_type, parser_ranges
+        )
 
     @classmethod
     def _get_depended_parser_number(cls, constraint):
@@ -177,7 +181,6 @@ class Rule(object):
             group_type = 'int'
             expected returned value : {EFFECT_NUMBER: {'int': {LEFT_BOUND: 11, RIGHT_BOUND: 11}}}
         """
-        # Here assumption that len of primary_keys_groups equals 1
         primary_group_value = effect_clues[self.get_effect_name()].regex_parameters[group_number - 1] # yapf: disable
         return {
             group_type: {
@@ -209,7 +212,7 @@ class Rule(object):
                self._is_group_primary(depended_group_number, depended_parser_number)
 
     def _is_group_primary(self, parser_group_number, parser_number):
-        if parser_number == self.EFFECT_NUMBER:
+        if parser_number == EFFECT_NUMBER:
             return self._effect.is_primary_key(parser_group_number)
         return self._causes[parser_number - 1].is_primary_key(parser_group_number)
 
@@ -276,7 +279,7 @@ class Rule(object):
             if constraint['name'] in self.DELTA_CONSTRAINTS:
                 continue
             for parser_number, _ in constraint['clues_groups']:
-                if parser_number == self.EFFECT_NUMBER:
+                if parser_number == EFFECT_NUMBER:
                     continue
                 _, primary_group_type = self._causes[parser_number - 1].get_primary_key_group()
                 converter = CONVERTION_MAPPING[primary_group_type]
