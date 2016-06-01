@@ -10,7 +10,7 @@ from whylog.config.investigation_plan import InvestigationStep
 from whylog.config.parsers import RegexParserFactory
 from whylog.constraints.constraint_manager import ConstraintManager
 from whylog.constraints.verifier import Verifier
-from whylog.converters import CONVERTION_MAPPING
+from whylog.converters import CONVERTION_MAPPING, DeltaConverter
 
 
 class Rule(object):
@@ -124,9 +124,7 @@ class Rule(object):
             4. Set maximal search range for all unreachable parser from effect parser in graph
             5. Pop effect parser search range.
         """
-        parser_ranges = {
-            EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)
-        }
+        parser_ranges = {EFFECT_NUMBER: self._get_effect_range(effect_clues, group, group_type)}
         queue = deque([EFFECT_NUMBER])
         aggregated_constraints = self._group_constraints_by_base_parsers()
         used_parsers = set([EFFECT_NUMBER])
@@ -135,14 +133,18 @@ class Rule(object):
             for constraint in aggregated_constraints[parser_number]:
                 depended_parser_number = self._get_depended_parser_number(constraint)
                 base_parser_num = self._get_base_parser_number(constraint)
-                self._calculate_depended_parsers_search_range(base_parser_num, parser_ranges, constraint, used_parsers)
+                self._calculate_depended_parsers_search_range(
+                    base_parser_num, parser_ranges, constraint, used_parsers
+                )
                 queue.append(depended_parser_number)
                 used_parsers.add(depended_parser_number)
         self.create_ranges_for_unconnected_parsers(effect_clues, group, group_type, parser_ranges)
         parser_ranges.pop(EFFECT_NUMBER)
         return parser_ranges
 
-    def _calculate_depended_parsers_search_range(self, base_parser_number, parser_ranges, constraint, used_parsers):
+    def _calculate_depended_parsers_search_range(
+        self, base_parser_number, parser_ranges, constraint, used_parsers
+    ):
         depended_parser_number = self._get_depended_parser_number(constraint)
         if depended_parser_number in used_parsers:
             return
@@ -171,7 +173,7 @@ class Rule(object):
 
     def _get_effect_range(self, effect_clues, group_number, group_type):
         """
-        This method basing on effect_clues and effect parser primary key creates effect parser
+        This method basing on effect_clues and effect parser's primary key type creates effect parser's
         search range.
         This method is invokes when algorithm with calculate parsers ranges starts. It give
         set up for this algorithm.
@@ -226,8 +228,12 @@ class Rule(object):
             base_parser_number, group_type, parser_ranges
         )
         converter = CONVERTION_MAPPING[group_type]
-        new_left_bound = converter.switch_by_delta(left_bound, max_delta, "max")
-        new_right_bound = converter.switch_by_delta(right_bound, min_delta, "min")
+        new_left_bound = converter.switch_by_delta(
+            left_bound, max_delta, DeltaConverter.MAX_DELTA_TYPE
+        )
+        new_right_bound = converter.switch_by_delta(
+            right_bound, min_delta, DeltaConverter.MIN_DELTA_TYPE
+        )
         return {
             group_type: {
                 InvestigationStep.LEFT_BOUND: new_left_bound,
@@ -299,10 +305,10 @@ class Rule(object):
         Example:
             parsers_ranges = {
                 1: {
-                    'int' : { LEFT_BOUND: 10, RIGHT_BOUND: 20}
+                    'int' : {LEFT_BOUND: 10, RIGHT_BOUND: 20}
                 },
                 2: {
-                    'int' : { LEFT_BOUND: 5, RIGHT_BOUND: 30}
+                    'int' : {LEFT_BOUND: 5, RIGHT_BOUND: 30}
                 },
                 3: {
                     'int' : {LEFT_BOUND: 30, RIGHT_BOUND: 40}

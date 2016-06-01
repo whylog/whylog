@@ -32,7 +32,18 @@ class AbstractConverter(object):
             return converted_val
 
 
-class IntConverter(AbstractConverter):
+@six.add_metaclass(ABCMeta)
+class DeltaConverter(AbstractConverter):
+    MIN_DELTA_TYPE = 0
+    MAX_DELTA_TYPE = 1
+
+    @classmethod
+    @abstractmethod
+    def switch_by_delta(cls, value, delta, delta_type=None):
+        pass
+
+
+class IntConverter(DeltaConverter):
     MIN_VALUE = -2000000000
     MAX_VALUE = 2000000000
 
@@ -45,7 +56,7 @@ class IntConverter(AbstractConverter):
         return int(pattern_group)
 
 
-class FloatConverter(AbstractConverter):
+class FloatConverter(DeltaConverter):
     MIN_VALUE = float('-inf')
     MAX_VALUE = float('inf')
 
@@ -65,14 +76,14 @@ class StringConverter(AbstractConverter):
 
 
 #TODO: Simple date convertion will replace for concreate date format converter in the future
-class DateConverter(AbstractConverter):
+class DateConverter(DeltaConverter):
     MIN_VALUE = datetime.min
     MAX_VALUE = datetime.max
 
     @classmethod
-    def switch_by_delta(cls, date, delta, delta_type):
+    def switch_by_delta(cls, date, delta, delta_type=None):
         if not delta:
-            if delta_type == "max":
+            if delta_type == cls.MAX_DELTA_TYPE:
                 return cls.MIN_VALUE
             else:
                 return date
