@@ -95,7 +95,7 @@ class TestParser(TestRuleBase):
             {
                 1: ParamGroup(
                     content='2015-12-03 12:11:00',
-                    converter=ConverterType.TO_DATE
+                    converter_type=ConverterType.TO_DATE
                 )
             },
             self.effect_front_input.line_content,
@@ -115,11 +115,11 @@ class TestParser(TestRuleBase):
     def test_setting_converter(self):
         parser = self.teacher.get_rule().parsers[self.cause2_id]
         new_converter = ConverterType.TO_FLOAT
-        assert not new_converter == parser.groups[3].converter
+        assert not new_converter == parser.groups[3].converter_type
 
         self.teacher.set_converter(self.cause2_id, 3, new_converter)
         parser = self.teacher.get_rule().parsers[self.cause2_id]
-        assert new_converter == parser.groups[3].converter
+        assert new_converter == parser.groups[3].converter_type
 
     def test_setting_primary_key(self):
         parser = self.teacher.get_rule().parsers[self.cause1_id]

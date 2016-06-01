@@ -1,8 +1,12 @@
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.log_type import LogType
 from whylog.constraints import TimeConstraint
+from whylog.converters import ConverterType
 from whylog.tests.tests_teacher import TestRuleBase
 
+from whylog.assistant.validation_problems import (  # isort:skip
+    InvalidConverterProblem, InvalidPrimaryKeyProblem, NotMatchingPatternProblem
+)
 from whylog.teacher.rule_validation_problems import (  # isort:skip
     NoEffectParserProblem, NotSetLogTypeProblem, NotUniqueParserNameProblem, ParserCountProblem
 )  # yapf: disable
@@ -92,6 +96,34 @@ class TestParserProblems(TestValidationBase):
         self.teacher.set_log_type(self.effect_id, new_log_type)
 
         assert not self._check_if_parser_has_problem(self.effect_id, NotSetLogTypeProblem())
+
+    def test_not_matching_pattern(self):
+        not_matching_pattern = 'not matching pattern'
+        self.teacher.update_pattern(self.effect_id, not_matching_pattern)
+        assert self._check_if_parser_has_problem(self.effect_id, NotMatchingPatternProblem())
+
+    def test_invalid_primary_key(self):
+        unlikely_primary_key = [1500, 100, 900]
+        self.teacher.set_primary_key(self.effect_id, unlikely_primary_key)
+        parser_groups = self.teacher.get_rule().parsers[self.effect_id].groups.keys()
+        assert self._check_if_parser_has_problem(
+            self.effect_id, InvalidPrimaryKeyProblem(unlikely_primary_key, parser_groups)
+        )
+
+    def test_invalid_converter(self):
+        date_group = 1
+        self.teacher.set_converter(self.cause1_id, date_group, ConverterType.TO_FLOAT)
+        group_content = self.teacher.get_rule().parsers[self.cause1_id].groups[date_group].content
+        assert self._check_if_parser_has_problem(
+            self.cause1_id, InvalidConverterProblem(group_content, ConverterType.TO_FLOAT)
+        )
+        machine_group = 2
+        self.teacher.set_converter(self.cause1_id, machine_group, ConverterType.TO_DATE)
+        group_content = self.teacher.get_rule().parsers[self.cause1_id].groups[
+            machine_group].content
+        assert self._check_if_parser_has_problem(
+            self.cause1_id, InvalidConverterProblem(group_content, ConverterType.TO_DATE)
+        )
 
 
 class TestTimeConstraintProblems(TestValidationBase):

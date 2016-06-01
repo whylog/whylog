@@ -11,6 +11,9 @@ class YamlConfig(AbstractFileConfig):
         with open(path, "r") as config_file:
             return list(yaml.load_all(config_file))
 
+    def _massive_dump_to_yaml(self, definition):
+        return yaml.safe_dump_all(definition, explicit_start=True)
+
     def _convert_rule_to_file_form(self, rule_definition):
         return yaml.safe_dump(rule_definition, explicit_start=True)
 

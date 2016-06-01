@@ -4,6 +4,7 @@ from collections import defaultdict
 
 import six
 
+from whylog.config.exceptions import NoLogTypeError, RenameLogTypeError
 from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
 from whylog.config.log_type import LogType
@@ -62,6 +63,30 @@ class AbstractConfig(object):
             self._parsers_grouped_by_log_type[parser.log_type].append(parser)
         self._parser_name_generator = ParserNameGenerator(self._parsers)
 
+    def rename_log_type(self, old_name, new_name):
+        if old_name == new_name:
+            return
+        if old_name not in self._log_types:
+            raise NoLogTypeError(old_name)
+        if new_name in self._log_types:
+            raise RenameLogTypeError
+        log_type = self._log_types.pop(old_name)
+        log_type.name = new_name
+        for matcher in log_type.filename_matchers:
+            matcher.log_type_name = new_name
+        self._log_types[new_name] = log_type
+        for parser in six.itervalues(self._parsers):
+            if parser.log_type == old_name:
+                parser.log_type = new_name
+        self._parsers_grouped_by_log_type[new_name
+                                         ] = self._parsers_grouped_by_log_type.pop(old_name)
+        all_matchers_definition = tuple()
+        for log_type in six.itervalues(self._log_types):
+            matchers_definitions = (matcher.serialize() for matcher in log_type.filename_matchers)
+            all_matchers_definition = itertools.chain(all_matchers_definition, matchers_definitions)
+        self._resave_all_log_types(all_matchers_definition)
+        self._resave_all_parsers(parser.serialize() for parser in six.itervalues(self._parsers))
+
     def add_log_type(self, log_type):
         for matcher in log_type.filename_matchers:
             self.add_filename_matcher_to_log_type(matcher)
@@ -69,6 +94,14 @@ class AbstractConfig(object):
 
     def add_filename_matcher_to_log_type(self, matcher):
         self._save_filename_matcher_definition(matcher.serialize())
+
+    @abstractmethod
+    def _resave_all_log_types(self, matchers_definition):
+        pass
+
+    @abstractmethod
+    def _resave_all_parsers(self, parsers_definition):
+        pass
 
     @abstractmethod
     def _save_rule_definition(self, rule_definition):

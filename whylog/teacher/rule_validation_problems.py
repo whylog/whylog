@@ -73,15 +73,3 @@ class NotUniqueParserNameProblem(ParserValidationProblem):
 
 class NotSetLogTypeProblem(ParserValidationProblem):
     TEMPLATE = 'Log type is not set.'
-
-
-class InvalidPrimaryKeyProblem(ParserValidationProblem):
-    TEMPLATE = 'Primary key %s should be subset of pattern groups %s.'
-
-    def __init__(self, primary_key, group_numbers):
-        super(InvalidPrimaryKeyProblem, self).__init__()
-        self.primary_key = primary_key
-        self.group_numbers = group_numbers
-
-    def __str__(self):
-        return self.TEMPLATE % (self.primary_key, self.group_numbers)

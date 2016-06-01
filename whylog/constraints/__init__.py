@@ -244,7 +244,7 @@ class DifferentConstraint(AbstractConstraint):
     TYPE = ConstraintType.DIFFERENT
 
     PARAM_VALUE = "value"
-    PARAMS = [PARAM_VALUE]
+    PARAMS = {PARAM_VALUE: ConverterType.TO_STRING}
 
     def verify(self, group_contents, param_dict):
         param = param_dict.get(self.PARAM_VALUE)
