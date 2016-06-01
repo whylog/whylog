@@ -48,9 +48,9 @@ class ConstraintManager(object):
     def __init__(self):
         self._actual_constraints = {}
 
-    def get_constraint_object(self, idx, constraint_data):
-        constraint = self._actual_constraints.get(idx)
+    def get_constraint_object(self, index, constraint_data):
+        constraint = self._actual_constraints.get(index)
         if constraint is None:
             constraint_verifier = ConstraintRegistry.get_constraint(constraint_data)
-            self._actual_constraints[idx] = constraint_verifier
-        return self._actual_constraints[idx]
+            self._actual_constraints[index] = constraint_verifier
+        return self._actual_constraints[index]
