@@ -44,8 +44,8 @@ class DeltaConverter(AbstractConverter):
 
 
 class IntConverter(DeltaConverter):
-    MIN_VALUE = -2000000000
-    MAX_VALUE = 2000000000
+    MIN_VALUE = -six.MAXSIZE - 1
+    MAX_VALUE = six.MAXSIZE
 
     @classmethod
     def switch_by_delta(cls, value, delta, delta_type=None):
