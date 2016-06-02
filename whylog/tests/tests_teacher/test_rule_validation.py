@@ -1,5 +1,3 @@
-from whylog.config.filename_matchers import WildCardFilenameMatcher
-from whylog.config.log_type import LogType
 from whylog.constraints import TimeConstraint
 from whylog.tests.tests_teacher import TestRuleBase
 
@@ -85,10 +83,7 @@ class TestParserProblems(TestValidationBase):
     def test_not_set_log_type(self):
         assert self._check_if_parser_has_problem(self.effect_id, NotSetLogTypeProblem())
 
-        sample_filename_matcher = WildCardFilenameMatcher(
-            'localhost', 'sample_path', 'default', None
-        )
-        new_log_type = LogType('localhost', [sample_filename_matcher])
+        new_log_type = 'sample_log_type'
         self.teacher.set_log_type(self.effect_id, new_log_type)
 
         assert not self._check_if_parser_has_problem(self.effect_id, NotSetLogTypeProblem())
