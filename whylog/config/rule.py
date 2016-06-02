@@ -145,6 +145,9 @@ class Rule(object):
     def _calculate_depended_parsers_search_range(
         self, base_parser_number, parser_ranges, constraint, used_parsers
     ):
+        """
+        This method calculates parser's search range for every parser which is depended for base parser.
+        """
         depended_parser_number = self._get_depended_parser_number(constraint)
         if depended_parser_number in used_parsers:
             return

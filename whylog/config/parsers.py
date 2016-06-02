@@ -84,7 +84,6 @@ class RegexParser(AbstractParser):
         return tuple(converted_params)
 
     def get_primary_key_group(self):
-        # Here assumption that len of primary_keys_groups equals 1
         assert len(self.primary_key_groups) <= 1
         if not self.primary_key_groups:
             return None, None
@@ -92,7 +91,7 @@ class RegexParser(AbstractParser):
         return primary_key_group, self.convertions.get(primary_key_group, 'string')
 
     def is_primary_key(self, group_number):
-        # Here assumption that len of primary_keys_groups equals 1
+        assert len(self.primary_key_groups) <= 1
         return group_number == self.primary_key_groups[0]
 
     def __repr__(self):

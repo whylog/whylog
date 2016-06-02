@@ -258,7 +258,7 @@ class AbstractConfig(object):
                     InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)
                 }
             }
-         }
+        }
         """
         # This implementation assumes that all primary key groups is a one element list
         # TODO implementation for longer primary key groups
