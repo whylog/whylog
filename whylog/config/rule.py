@@ -11,7 +11,7 @@ from whylog.config.parsers import RegexParserFactory
 from whylog.constraints.const import ConstraintType
 from whylog.constraints.constraint_manager import ConstraintManager
 from whylog.constraints.verifier import Verifier
-from whylog.converters import CONVERTION_MAPPING, DeltaConverter
+from whylog.converters import DeltaConverter, DeltaConverterFactory
 
 
 class Rule(object):
@@ -231,7 +231,7 @@ class Rule(object):
         left_bound, right_bound = self._get_base_bounds(
             base_parser_number, group_type, parser_ranges
         )
-        converter = CONVERTION_MAPPING[group_type]
+        converter = DeltaConverterFactory.get_converter(group_type)
         new_left_bound = converter.switch_by_delta(
             left_bound, max_delta, DeltaConverter.MAX_DELTA_TYPE
         )
@@ -264,7 +264,7 @@ class Rule(object):
         for i in six.moves.range(len(self._causes)):
             if (i + 1) not in parser_ranges:
                 _, primary_group_type = self._causes[i].get_primary_key_group()
-                converter = CONVERTION_MAPPING[primary_group_type]
+                converter = DeltaConverterFactory.get_converter(primary_group_type)
                 right_bound = converter.MAX_VALUE
                 if primary_group_type == effect_group_type:
                     right_bound = effect_primary_group_value
@@ -292,7 +292,7 @@ class Rule(object):
                 if parser_number == EFFECT_NUMBER:
                     continue
                 _, primary_group_type = self._causes[parser_number - 1].get_primary_key_group()
-                converter = CONVERTION_MAPPING[primary_group_type]
+                converter = DeltaConverterFactory.get_converter(primary_group_type)
                 new_right_bound = converter.MAX_VALUE
                 if primary_group_type == effect_group_type:
                     new_right_bound = effect_group_value

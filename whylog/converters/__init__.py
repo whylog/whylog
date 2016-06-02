@@ -5,6 +5,7 @@ import dateutil.parser
 import six
 from frozendict import frozendict
 
+from whylog.config.exceptions import UnsupportedPrimaryKeyType
 from whylog.converters.exceptions import ConverterError
 
 
@@ -104,10 +105,28 @@ class DateConverter(DeltaConverter):
             return converted_val
 
 
+@six.add_metaclass(ABCMeta)
+class DeltaConverterFactory(object):
+    @classmethod
+    def get_converter(cls, converter_type):
+        converter = DELTA_CONVERTION_MAPPING.get(converter_type)
+        if converter is None:
+            raise UnsupportedPrimaryKeyType(converter_type)
+        return converter
+
+
 STRING = ConverterType.TO_STRING
 CONVERTION_MAPPING = frozendict(
     {
         ConverterType.TO_STRING: StringConverter,
+        ConverterType.TO_DATE: DateConverter,
+        ConverterType.TO_INT: IntConverter,
+        ConverterType.TO_FLOAT: FloatConverter
+    }
+)
+
+DELTA_CONVERTION_MAPPING = frozendict(
+    {
         ConverterType.TO_DATE: DateConverter,
         ConverterType.TO_INT: IntConverter,
         ConverterType.TO_FLOAT: FloatConverter

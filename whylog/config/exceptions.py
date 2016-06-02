@@ -35,3 +35,11 @@ class RenameLogTypeError(WhylogError):
 
     def __str__(self):
         return 'LogType: %s already exists' % self.log_type
+
+
+class UnsupportedPrimaryKeyType(WhylogError):
+    def __init__(self, type_):
+        self.type_ = type_
+
+    def __str__(self):
+        return '%s cannot be type in primary key' % self.type_
