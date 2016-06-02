@@ -13,9 +13,7 @@ from whylog.config.log_type import LogType
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.config.super_parser import RegexSuperParser
-from whylog.teacher.user_intent import (
-    UserConstraintIntent, UserParserIntent, UserRuleIntent
-)
+from whylog.teacher.user_intent import (UserConstraintIntent, UserParserIntent, UserRuleIntent)
 from whylog.assistant.pattern_match import ParamGroup
 from whylog.tests.consts import TestPaths
 
