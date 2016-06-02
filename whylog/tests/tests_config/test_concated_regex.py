@@ -4,10 +4,10 @@ from unittest import TestCase
 import six
 
 from whylog.assistant.const import AssistantType
+from whylog.assistant.pattern_match import ParamGroup
 from whylog.config.parser_subset import ConcatenatedRegexParser
 from whylog.config.parsers import RegexParserFactory
 from whylog.teacher.user_intent import UserParserIntent
-from whylog.assistant.pattern_match import ParamGroup
 
 # convertions
 to_date = "date"

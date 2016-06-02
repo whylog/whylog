@@ -1,6 +1,6 @@
 from whylog.assistant.const import AssistantType
-from whylog.teacher.user_intent import (UserConstraintIntent, UserParserIntent, UserRuleIntent)
 from whylog.assistant.pattern_match import ParamGroup
+from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 
 
 def create_sample_rule():

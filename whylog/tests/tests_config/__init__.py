@@ -6,6 +6,7 @@ import six
 import yaml
 
 from whylog.assistant.const import AssistantType
+from whylog.assistant.pattern_match import ParamGroup
 from whylog.config import SettingsFactorySelector
 from whylog.config.consts import YamlFileNames
 from whylog.config.filename_matchers import WildCardFilenameMatcher
@@ -13,8 +14,7 @@ from whylog.config.log_type import LogType
 from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.config.super_parser import RegexSuperParser
-from whylog.teacher.user_intent import (UserConstraintIntent, UserParserIntent, UserRuleIntent)
-from whylog.assistant.pattern_match import ParamGroup
+from whylog.teacher.user_intent import UserConstraintIntent, UserParserIntent, UserRuleIntent
 from whylog.tests.consts import TestPaths
 
 # Constraint types
