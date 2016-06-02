@@ -83,6 +83,17 @@ class RegexParser(AbstractParser):
             converted_params.append(converter.convert(params[i]))
         return tuple(converted_params)
 
+    def get_primary_key_group(self):
+        assert len(self.primary_key_groups) <= 1
+        if not self.primary_key_groups:
+            return None, None
+        primary_key_group = self.primary_key_groups[0]
+        return primary_key_group, self.convertions.get(primary_key_group, 'string')
+
+    def is_primary_key(self, group_number):
+        assert len(self.primary_key_groups) <= 1
+        return group_number == self.primary_key_groups[0]
+
     def __repr__(self):
         return "(RegexParser: %s, %s, %s, %s, %s, %s)" % (
             self.name, self.regex_str, self.line_content, self.convertions, self.log_type,

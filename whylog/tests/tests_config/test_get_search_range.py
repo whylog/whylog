@@ -3,12 +3,11 @@ import shutil
 from datetime import datetime
 from unittest import TestCase
 
-from nose.plugins.skip import SkipTest
-
 from whylog.config import SettingsFactorySelector
 from whylog.config.investigation_plan import Clue, InvestigationStep, LineSource
 from whylog.config.parsers import RegexParser
 from whylog.config.rule import Rule
+from whylog.constraints.const import ConstraintType
 from whylog.tests.consts import TestPaths
 
 
@@ -41,7 +40,7 @@ class TestBasic(TestCase):
             'effect': Clue((cls.effect_time, 'apache_host'), effect_line, 40, line_source)
         }
 
-        cls.earliest_date = datetime(1, 1, 1, 1, 1, 1)
+        cls.earliest_date = datetime.min
         cls.ten_second_earlier = datetime(2016, 4, 12, 23, 54, 33)
         cls.one_hundred_second_earlier = datetime(2016, 4, 12, 23, 53, 3)
         cls.ten_second_later = datetime(2016, 4, 12, 23, 54, 53)
@@ -57,17 +56,31 @@ class TestBasic(TestCase):
         rule = Rule([self.cause1, self.cause2], self.effect, [], Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
-        raise SkipTest('Not implemented yet')
-        assert calculated_ranges == {}
+        expected_ranges = {
+            'apache': {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: self.earliest_date,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
+                }
+            },
+            'database': {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: self.earliest_date,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
+                }
+            }
+        } # yapf: disable
+
+        assert calculated_ranges == expected_ranges
 
     def test_search_range_single_log_types(self):
         constraints = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule([self.cause2], self.effect, constraints, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -78,26 +91,25 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
-        } # yapf: disable
+        }  # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     def test_search_range_two_log_types(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 10
                 }
             }, {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule([self.cause1, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -114,19 +126,18 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
-        } # yapf: disable
+        }  # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     def test_search_range_lack_of_left_bound(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'min_delta': 10}
             },
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule([self.cause1], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -137,19 +148,18 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.ten_second_earlier
                 }
             },
-        } # yapf: disable
+        }  # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     def test_search_range_lack_of_right_bound(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             },
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule([self.cause1], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -160,22 +170,21 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             },
-        } # yapf: disable
+        }  # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     def test_search_range_delayed_logs(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'min_delta': -10,
                     'max_delta': 100
                 }
             },
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule([self.cause1], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -186,40 +195,39 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.ten_second_later
                 }
             },
-        } # yapf: disable
+        }  # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     def test_search_range_merge_range(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 75,
                     'min_delta': 10
                 }
             }, {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }, {
                 'clues_groups': [[3, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 20
                 }
             }, {
                 'clues_groups': [[4, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 20
                 }
             }
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule(
             [
                 self.cause1, self.cause2, self.cause1, self.cause2
@@ -240,16 +248,15 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
-        } # yapf: disable
+        }  # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     def test_search_range_covering(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 75,
                     'min_delta': 10
@@ -257,10 +264,10 @@ class TestBasic(TestCase):
             },
             {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 100}
             },
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -271,16 +278,15 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.effect_time
                 }
             }
-        } # yapf: disable
+        }  # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     def test_search_range_reasoning_on_not_only_effect(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 75,
                     'min_delta': 10
@@ -288,41 +294,10 @@ class TestBasic(TestCase):
             },
             {
                 'clues_groups': [[2, 1], [1, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 25}
             },
-        ] # yapf: disable
-        rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
-        calculated_ranges = self.calculate_range([rule])
-
-        expected_ranges = {
-            'apache': {
-                'date': {
-                    InvestigationStep.LEFT_BOUND: self.one_hundred_second_earlier,
-                    InvestigationStep.RIGHT_BOUND: self.effect_time
-                }
-            }
-        } # yapf: disable
-
-        raise SkipTest('Not implemented yet')
-        assert calculated_ranges == expected_ranges
-
-    def test_search_range_mixed_constraint_type(self):
-        constraints1 = [
-            {
-                'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
-                'params': {
-                    'max_delta': 100,
-                    'min_delta': 10
-                }
-            },
-            {
-                'clues_groups': [[2, 3], [0, 2]],
-                'name': 'identical',
-                'params': {}
-            },
-        ] # yapf: disable
+        ]  # yapf: disable
         rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
         calculated_ranges = self.calculate_range([rule])
 
@@ -333,16 +308,43 @@ class TestBasic(TestCase):
                     InvestigationStep.RIGHT_BOUND: self.ten_second_earlier
                 }
             }
-        } # yapf: disable
+        }  # yapf: disable
+        assert calculated_ranges == expected_ranges
 
-        raise SkipTest('Not implemented yet')
+    def test_search_range_mixed_constraint_type(self):
+        constraints1 = [
+            {
+                'clues_groups': [[1, 1], [0, 1]],
+                'name': ConstraintType.TIME_DELTA,
+                'params': {
+                    'max_delta': 100,
+                    'min_delta': 10
+                }
+            },
+            {
+                'clues_groups': [[2, 3], [0, 2]],
+                'name': 'identical',
+                'params': {}
+            },
+        ] # yapf: disable
+        rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_AND)
+        calculated_ranges = self.calculate_range([rule])
+
+        expected_ranges = {
+            'apache': {
+                'date': {
+                    InvestigationStep.LEFT_BOUND: self.earliest_date,
+                    InvestigationStep.RIGHT_BOUND: self.effect_time
+                }
+            }
+        } # yapf: disable
         assert calculated_ranges == expected_ranges
 
     def test_search_range_two_constraints_on_one_group(self):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 10
@@ -350,7 +352,7 @@ class TestBasic(TestCase):
             },
             {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                 }
@@ -373,7 +375,6 @@ class TestBasic(TestCase):
             }
         } # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
         rule = Rule([self.cause2, self.cause2], self.effect, constraints1, Rule.LINKAGE_OR)
@@ -394,7 +395,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }
         ] # yapf: disable
@@ -402,14 +403,14 @@ class TestBasic(TestCase):
         constraints2 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 10
                 }
             }, {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 100}
             }
         ] # yapf: disable
@@ -431,7 +432,6 @@ class TestBasic(TestCase):
             }
         } # yapf: disable
 
-        raise SkipTest('Not implemented yet')
         assert calculated_ranges == expected_ranges
 
     @classmethod
