@@ -6,7 +6,8 @@ import six
 from whylog.assistant.const import AssistantType
 from whylog.config.parser_subset import ConcatenatedRegexParser
 from whylog.config.parsers import RegexParserFactory
-from whylog.teacher.user_intent import LineParamGroup, UserParserIntent
+from whylog.teacher.user_intent import UserParserIntent
+from whylog.assistant.pattern_match import ParamGroup
 
 # convertions
 to_date = "date"
@@ -33,9 +34,9 @@ class TestConcatedRegexParser(TestCase):
         regex6 = "^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$"
         regex7 = "^dummy regex"
 
-        date_group = LineParamGroup(None, to_date)
-        string_group = LineParamGroup(None, to_string)
-        float_group = LineParamGroup(None, to_float)
+        date_group = ParamGroup(None, to_date)
+        string_group = ParamGroup(None, to_string)
+        float_group = ParamGroup(None, to_float)
 
         regex_type = AssistantType.REGEX
 

@@ -1,9 +1,3 @@
-class LineParamGroup(object):
-    def __init__(self, param_content, param_converter):
-        self.content = param_content
-        self.converter = param_converter
-
-
 class UserParserIntent(object):
     def __init__(
         self,
@@ -23,7 +17,7 @@ class UserParserIntent(object):
         self.pattern = pattern
         self.log_type_name = log_type_name
         self.primary_key_groups = primary_key_groups
-        self.groups = groups  # {group_id : LineParamGroup}
+        self.groups = groups  # {group_id : ParamGroup}
         self.line_content = line_content
         self.line_offset = line_offset
         self.line_resource_location = line_resource_location

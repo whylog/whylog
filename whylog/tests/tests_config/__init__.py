@@ -14,8 +14,9 @@ from whylog.config.parsers import RegexParserFactory
 from whylog.config.rule import RegexRuleFactory
 from whylog.config.super_parser import RegexSuperParser
 from whylog.teacher.user_intent import (
-    LineParamGroup, UserConstraintIntent, UserParserIntent, UserRuleIntent
+    UserConstraintIntent, UserParserIntent, UserRuleIntent
 )
+from whylog.assistant.pattern_match import ParamGroup
 from whylog.tests.consts import TestPaths
 
 # Constraint types
@@ -46,20 +47,20 @@ class TestBasic(TestCase):
 
         # yapf: disable
         cls.groups1 = {
-            1: LineParamGroup("2016-04-12 23:54:45", to_date),
-            2: LineParamGroup("comp1", to_string),
-            3: LineParamGroup("host1", to_string)
+            1: ParamGroup("2016-04-12 23:54:45", to_date),
+            2: ParamGroup("comp1", to_string),
+            3: ParamGroup("host1", to_string)
         }
         cls.groups2 = {
-            1: LineParamGroup("2016-04-12 23:54:40", to_date),
-            2: LineParamGroup("comp2", to_string),
-            3: LineParamGroup("host2", to_string)
+            1: ParamGroup("2016-04-12 23:54:40", to_date),
+            2: ParamGroup("comp2", to_string),
+            3: ParamGroup("host2", to_string)
         }
         cls.groups3 = {
-            1: LineParamGroup("2016-04-12 23:54:43", to_date),
-            2: LineParamGroup("comp2", to_string),
-            3: LineParamGroup("150", to_int),
-            4: LineParamGroup("host2", to_string)
+            1: ParamGroup("2016-04-12 23:54:43", to_date),
+            2: ParamGroup("comp2", to_string),
+            3: ParamGroup("150", to_int),
+            4: ParamGroup("host2", to_string)
         }
 
         cls.parser_intent1 = UserParserIntent(
