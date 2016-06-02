@@ -84,8 +84,8 @@ class InvestigationStep(object):
 
     def _compare_with_undefined_bound(self, bound):
         if bound == self.LEFT_BOUND:
-            return CompareResult.LT
-        return CompareResult.GT
+            return CompareResult.GT
+        return CompareResult.LT
 
     @classmethod
     def _compare_values(cls, bound_value, group_value):

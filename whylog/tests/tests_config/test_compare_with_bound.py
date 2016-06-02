@@ -34,13 +34,13 @@ class TestBoundCompare(TestCase):
         super_parser_groups = [('int', 1)]
         assert self.investigation_step.compare_with_bound(
             InvestigationStep.LEFT_BOUND, super_parser_groups
-        ) == CompareResult.LT
+        ) == CompareResult.GT
         assert self.investigation_step.compare_with_bound(
             InvestigationStep.RIGHT_BOUND, super_parser_groups
-        ) == CompareResult.GT
+        ) == CompareResult.LT
 
     def test_empty_super_parser_groups(self):
         assert self.investigation_step.compare_with_bound(InvestigationStep.LEFT_BOUND, []
-                                                         ) == CompareResult.LT
-        assert self.investigation_step.compare_with_bound(InvestigationStep.RIGHT_BOUND, []
                                                          ) == CompareResult.GT
+        assert self.investigation_step.compare_with_bound(InvestigationStep.RIGHT_BOUND, []
+                                                         ) == CompareResult.LT

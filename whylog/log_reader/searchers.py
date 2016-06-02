@@ -85,19 +85,24 @@ class BacktrackSearcher(AbstractSearcher):
                 right = line_begin - 1
         if right == 0:
             return 0
-        _, offset, _ = ReadUtils.get_line_containing_offset(
+        _, _, end_offset = ReadUtils.get_line_containing_offset(
             opened_file, right - 1, ReadUtils.STANDARD_BUFFER_SIZE
         )
-        return offset
+        return end_offset + 1
 
-    def _find_offsets_range(self, opened_file, search_range, super_parser):
+    def _find_offsets_range(self, original_front_input):
         """
         returns a pair of offsets between whose the investigation
         in file should be provided
         """
-        # TODO: run function _find_left on left bound from search_range
-        # TODO: and run functions _find_right on right bound from search_range
-        pass
+        with open(self._file_path) as fd:
+            left_bound = self._find_left(fd)
+            if original_front_input.line_source.path == self._file_path:
+                # TODO checking if host is also the same
+                right_bound = original_front_input.offset
+            else:
+                right_bound = self._find_right(fd)
+        return left_bound, right_bound
 
     @classmethod
     def _merge_clues(cls, collector, clues_from_line):
@@ -145,12 +150,10 @@ class BacktrackSearcher(AbstractSearcher):
 
     def search(self, original_front_input):
         clues = defaultdict(list)
-        if original_front_input.line_source.path == self._file_path:
-            # TODO checking if host is also the same
-            offset = original_front_input.offset
-        else:
-            offset = self._deduce_offset()
-        for line, actual_offset in self._reverse_from_offset(offset):
+        left_bound, right_bound = self._find_offsets_range(original_front_input)
+        for line, actual_offset in self._reverse_from_offset(right_bound):
+            if actual_offset < left_bound:
+                return clues
             # TODO: remove mock
             line_source = LineSource('localhost', self._file_path)
             clues_from_line = self._investigation_step.get_clues(line, actual_offset, line_source)

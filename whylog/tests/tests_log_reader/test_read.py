@@ -109,7 +109,7 @@ class TestLogsReading(TestCase):
         backtracker = BacktrackSearcher("", investigation_step, self.super_parser)
         offset = backtracker._find_right(self.opened_file)
 
-        assert offset == (self.number_of_lines - 1) * self.line_padding
+        assert offset == self.number_of_lines * self.line_padding
         assert self.opened_file._seek_count < 35
 
     def test_bisect_left_when_lines_are_repeated(self):
@@ -148,7 +148,7 @@ class TestLogsReading(TestCase):
         backtracker = BacktrackSearcher("", investigation_step, self.super_parser)
         offset = backtracker._find_right(self.file_with_repeated_lines)
 
-        line_no = (secs + 1) * self.repetitions - 1
+        line_no = (secs + 1) * self.repetitions
         assert offset == line_no * self.line_padding
         assert self.file_with_repeated_lines._seek_count < 35
 
