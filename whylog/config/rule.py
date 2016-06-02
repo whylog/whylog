@@ -8,6 +8,7 @@ from frozendict import frozendict
 from whylog.config.consts import EFFECT_NUMBER
 from whylog.config.investigation_plan import InvestigationStep
 from whylog.config.parsers import RegexParserFactory
+from whylog.constraints.const import ConstraintType
 from whylog.constraints.constraint_manager import ConstraintManager
 from whylog.constraints.verifier import Verifier
 from whylog.converters import CONVERTION_MAPPING, DeltaConverter
@@ -26,7 +27,7 @@ class Rule(object):
     }
 
     NO_RANGE = frozendict()
-    DELTA_CONSTRAINTS = frozenset(['time'])
+    DELTA_CONSTRAINTS = frozenset([ConstraintType.TIME_DELTA])
 
     def __init__(self, causes, effect, constraints, linkage):
         self._causes = causes

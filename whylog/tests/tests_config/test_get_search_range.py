@@ -7,6 +7,7 @@ from whylog.config import SettingsFactorySelector
 from whylog.config.investigation_plan import Clue, InvestigationStep, LineSource
 from whylog.config.parsers import RegexParser
 from whylog.config.rule import Rule
+from whylog.constraints.const import ConstraintType
 from whylog.tests.consts import TestPaths
 
 
@@ -76,7 +77,7 @@ class TestBasic(TestCase):
         constraints = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }
         ]  # yapf: disable
@@ -98,14 +99,14 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 10
                 }
             }, {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }
         ]  # yapf: disable
@@ -133,7 +134,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'min_delta': 10}
             },
         ]  # yapf: disable
@@ -155,7 +156,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             },
         ]  # yapf: disable
@@ -177,7 +178,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'min_delta': -10,
                     'max_delta': 100
@@ -202,25 +203,25 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 75,
                     'min_delta': 10
                 }
             }, {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }, {
                 'clues_groups': [[3, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 20
                 }
             }, {
                 'clues_groups': [[4, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 20
@@ -255,7 +256,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 75,
                     'min_delta': 10
@@ -263,7 +264,7 @@ class TestBasic(TestCase):
             },
             {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 100}
             },
         ]  # yapf: disable
@@ -285,7 +286,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 75,
                     'min_delta': 10
@@ -293,7 +294,7 @@ class TestBasic(TestCase):
             },
             {
                 'clues_groups': [[2, 1], [1, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 25}
             },
         ]  # yapf: disable
@@ -314,7 +315,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 10
@@ -343,7 +344,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 10
@@ -351,7 +352,7 @@ class TestBasic(TestCase):
             },
             {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                 }
@@ -394,7 +395,7 @@ class TestBasic(TestCase):
         constraints1 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 10}
             }
         ] # yapf: disable
@@ -402,14 +403,14 @@ class TestBasic(TestCase):
         constraints2 = [
             {
                 'clues_groups': [[1, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {
                     'max_delta': 100,
                     'min_delta': 10
                 }
             }, {
                 'clues_groups': [[2, 1], [0, 1]],
-                'name': 'time',
+                'name': ConstraintType.TIME_DELTA,
                 'params': {'max_delta': 100}
             }
         ] # yapf: disable
