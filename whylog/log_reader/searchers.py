@@ -1,4 +1,3 @@
-import os.path
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from os import SEEK_SET
