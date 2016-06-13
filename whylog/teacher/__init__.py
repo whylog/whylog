@@ -95,7 +95,6 @@ class Teacher(object):
         """
         Loads text pattern proposed by user, verifies if it matches line text.
         Removes constraints related with updating line
-        TODO: Update related constraints rather than remove.
         """
         self.pattern_assistant.update_by_pattern(line_id, pattern)
         self._remove_constraints_by_line(line_id)

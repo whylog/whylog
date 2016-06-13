@@ -12,7 +12,6 @@ from whylog.assistant.spans_finding import find_date_spans
 def guess_pattern_match(text):
     pattern_match_with_dates = guess_pattern_match_with_dates(text)
     obvious_pattern_match = guess_obvious_pattern_match(text)
-    #TODO: following list will be longer if we guess more regexes.
     return [pattern_match_with_dates, obvious_pattern_match]
 
 

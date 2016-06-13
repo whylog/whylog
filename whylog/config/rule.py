@@ -55,7 +55,6 @@ class Rule(object):
     def get_new_parsers(self, parser_name_generator):
         new_parsers = []
         for parser in itertools.chain([self._effect], self._causes):
-            # TODO: Refactor if teachers are mulithreding
             if parser_name_generator.is_free_parser_name(parser.name, self.EMPTY_BLACK_LIST):
                 new_parsers.append(parser)
         return new_parsers
@@ -380,7 +379,6 @@ class AbstractRuleFactory(object):
         )
         constraints = cls._create_constraints_list(parser_ids_mapper, user_rule_intent)
         ordered_causes, modified_constraints = cls._order_causes_list(causes, constraints)
-        # TODO use user_rule_intent instead of Rule.LINKAGE_AND when UserRuleIntent will support rule linkage
         return Rule(ordered_causes, effect, modified_constraints, Rule.LINKAGE_AND)
 
     @classmethod
@@ -432,7 +430,6 @@ class AbstractRuleFactory(object):
 
     @classmethod
     def from_dao(cls, serialized_rule, parsers):
-        # TODO: restore serialized_rule["linkage"] when UserRuleIntent will support rule linkage
         causes = [parsers[cause] for cause in serialized_rule["causes"]]
         return Rule(
             causes, parsers[serialized_rule["effect"]], serialized_rule["constraints"],

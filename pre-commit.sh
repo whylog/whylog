@@ -51,7 +51,7 @@ else
     #  D---E---F---G-------H---J master
     #
 
-    # this doesn't seem to work, so we are going to try something else and see if it works better TODO cleanup
+    # this doesn't seem to work, so we are going to try something else and see if it works better
     #changed_files=`git diff --name-only "${base_commit}..HEAD"`
     changed_files=`git diff --name-only "$(git rev-parse --abbrev-ref HEAD)..${base_remote}/${base_remote_branch}"`
     dirty_files=`git ls-files -m`

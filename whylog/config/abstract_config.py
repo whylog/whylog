@@ -261,7 +261,6 @@ class AbstractConfig(object):
         }
         """
         # This implementation assumes that all primary key groups is a one element list
-        # TODO implementation for longer primary key groups
         search_ranges = {}
         for rule in suspected_rules:
             rule_search_ranges = rule.get_search_ranges(effect_clues)

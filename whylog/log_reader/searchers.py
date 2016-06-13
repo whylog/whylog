@@ -98,7 +98,6 @@ class BacktrackSearcher(AbstractSearcher):
         with open(self._file_path) as fd:
             left_bound = self._find_left(fd)
             if original_front_input.line_source.path == self._file_path:
-                # TODO checking if host is also the same
                 right_bound = original_front_input.offset
             else:
                 right_bound = self._find_right(fd)
@@ -154,7 +153,6 @@ class BacktrackSearcher(AbstractSearcher):
         for line, actual_offset in self._reverse_from_offset(right_bound):
             if actual_offset < left_bound:
                 return clues
-            # TODO: remove mock
             line_source = LineSource('localhost', self._file_path)
             clues_from_line = self._investigation_step.get_clues(line, actual_offset, line_source)
             self._merge_clues(clues, clues_from_line)

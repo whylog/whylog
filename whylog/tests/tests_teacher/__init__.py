@@ -128,7 +128,6 @@ class TestParser(TestRuleBase):
         assert new_primary_key_groups == parser.primary_key_groups
 
     def test_setting_log_type(self):
-        #TODO setting simple RegexSuperParser
         new_log_type = 'sample_log_type'
         self.teacher.set_log_type(self.effect_id, new_log_type)
         parser = self.teacher.get_rule().parsers[self.effect_id]

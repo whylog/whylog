@@ -65,7 +65,6 @@ class InvestigationStep(object):
         This means that InvestigationStep object hasn't information about order in parsed file.
         """
         # This implementation assume that super_parser_groups length equals 1 or 0
-        # TODO implementation for longer super_parser_groups_list
         group_value, bound_value = self._extract_values_to_compare(bound, super_parser_groups)
         if bound_value is None:
             return self._compare_with_undefined_bound(bound)

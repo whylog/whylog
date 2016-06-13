@@ -141,7 +141,6 @@ class AbstractConstraint(object):
         return self._convert_params_values()
 
     def _validate_groups(self):
-        # TODO: implement
         return []
 
     def validate(self):

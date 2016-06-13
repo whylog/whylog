@@ -112,7 +112,6 @@ class TestBasic(TestCase):
         self.creating_concatenated_parsers_parametrized(self.complexed_config)
 
     def test_creatig_effect_clues(self):
-        #TODO: add some line source assert when FrontInput will contains LineSource or something like that
         offset = 42
         front_input = FrontInput(offset, self.lost_data_line, None)
         effect_params = {'lostdata': ("2015-12-03 12:11:00", "alfa21", "567.02", "101")}

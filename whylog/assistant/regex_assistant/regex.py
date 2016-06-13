@@ -13,9 +13,6 @@ group_pattern = re.compile(r"[a-zA-Z]+|[0-9]+|\s+|[\W]+")
 
 def regex_from_group_spans(group_spans, line_text):
     sorted_group_spans = group_spans.sort_by_start_and_end()
-    # TODO:
-    # [(1,5), (2, 3)] -> [(1,5)]
-    # [(1,5), (3, 7)] -> Error somewhere
     greedy_group_spans = SpanList.not_overlapping_spans(sorted_group_spans)
     complement_spans = greedy_group_spans.complementary_spans(
         0, len(line_text), create_obvious_regex

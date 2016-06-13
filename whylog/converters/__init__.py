@@ -76,7 +76,6 @@ class StringConverter(AbstractConverter):
         return str(pattern_group)
 
 
-#TODO: Simple date convertion will replace for concreate date format converter in the future
 class DateConverter(DeltaConverter):
     MIN_VALUE = datetime.min
     MAX_VALUE = datetime.max

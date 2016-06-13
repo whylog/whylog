@@ -38,8 +38,6 @@ def create_sample_rule():
         4: ParamGroup("host2", to_string)
     }
 
-    # resource location is temporary a string, because there is no ResourceLocation class yet.
-    # TODO: Change following resource locations to ResourceLocation objects
     resource_location1 = "serwer1"
     resource_location2 = "serwer2"
     resource_location3 = "serwer3"

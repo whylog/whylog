@@ -9,8 +9,6 @@ from whylog.config.rule import Rule
 from whylog.config.super_parser import RegexSuperParser
 
 
-# mocked investigation plan for 003_match_time_range test
-# TODO: remove mock
 def mocked_investigation_plan():
     super_parser = RegexSuperParser('^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*', [1], {1: 'date'})
     matcher = WildCardFilenameMatcher('localhost', 'node_1.log', 'default', super_parser)
