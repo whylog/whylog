@@ -212,8 +212,7 @@ class TestBasic(TestCase):
         assert sorted(parser.name for parser in config._parsers_grouped_by_log_type['test_log_type']) == \
                parsers_name
         assert sorted(config._parsers.keys()) == parsers_name
-        assert sorted(log_type.name
-                      for log_type in config.get_all_log_types()) == ['default', 'test_log_type']
+        assert sorted(log_type.name for log_type in config.get_all_log_types()) == ['test_log_type']
 
     @classmethod
     def tearDownClass(cls):

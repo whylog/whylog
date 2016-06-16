@@ -4,7 +4,7 @@ from abc import abstractmethod
 import six
 import yaml
 
-from whylog.config.consts import YamlFileNames
+from whylog.config.consts import DEFAULT_MATCHER, YamlFileNames
 
 
 class AbstractSettingsFactory(object):
@@ -52,6 +52,10 @@ class YamlSettingsFactory(AbstractSettingsFactory):
         for key, file_name in six.iteritems(cls.FILES_NAMES):
             path = os.path.join(whylog_dir, file_name)
             cls._create_empty_file(path)
+            if file_name == YamlFileNames.default_log_types:
+                with open(path, 'w') as log_types_file:
+                    default_matcher_def = DEFAULT_MATCHER.serialize()
+                    log_types_file.write(yaml.safe_dump(default_matcher_def, explicit_start=True))
             settings[key] = path
         settings['pattern_assistant'] = cls.DEFAULT_PATTERN_ASSISTANT
         settings['config_type'] = 'yaml'

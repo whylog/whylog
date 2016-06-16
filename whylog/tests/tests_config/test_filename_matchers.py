@@ -42,7 +42,7 @@ class TestBasic(TestCase):
         config.add_log_type(default_log_type)
 
         config = SettingsFactorySelector.get_settings()['config']
-        assert len(config._log_types) == 1
+        assert len(config._log_types) == 2
         log_type = config._log_types['test_log_type']
         assert log_type.name == 'test_log_type'
         assert len(log_type.filename_matchers) == 1
