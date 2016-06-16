@@ -6,7 +6,7 @@ import yaml
 from generator import generate, generator
 
 from whylog.config import YamlConfig
-from whylog.config.abstract_config import AbstractConfig
+from whylog.config.consts import DEFAULT_LOG_TYPE
 from whylog.config.investigation_plan import LineSource
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.constraints.verifier import InvestigationResult
@@ -150,15 +150,11 @@ class TestBasic(TestCase):
         node1_source = LineSource('localhost', os.path.join(path, 'node_1.log'))
         node2_source = LineSource('localhost', os.path.join(path, 'node_2.log'))
         node3_source = LineSource('localhost', os.path.join(path, 'node_3.log'))
-        temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source]}
+        temp_assign = {DEFAULT_LOG_TYPE: [node1_source]}
         if test_name == "010_multiple_files":
-            temp_assign = {AbstractConfig.DEFAULT_LOG_TYPE: [node1_source, node2_source]}
+            temp_assign = {DEFAULT_LOG_TYPE: [node1_source, node2_source]}
         if test_name == "011_different_entry":
-            temp_assign = {
-                AbstractConfig.DEFAULT_LOG_TYPE: [
-                    node1_source, node2_source, node3_source
-                ]
-            }
+            temp_assign = {DEFAULT_LOG_TYPE: [node1_source, node2_source, node3_source]}
 
         results = log_reader.get_causes(effect_line, temp_assign)
         expected_results = self._investigation_results_from_yaml(results_yaml_file, result_log_file)
@@ -168,7 +164,7 @@ class TestBasic(TestCase):
     def _prepare_config(cls, path):
         # preparing Whylog structures special for temporary assign file to log type test
         whylog_config = YamlConfig(*ConfigPathFactory.get_path_to_config_files(path))
-        whylog_config._log_types = {"default": AbstractConfig.DEFAULT_LOG_TYPE}
+        whylog_config._log_types = {"default": DEFAULT_LOG_TYPE}
         for parser in six.itervalues(whylog_config._parsers):
             parser.log_type = "default"
         whylog_config._parser_name_generator = ParserNameGenerator(whylog_config._parsers)

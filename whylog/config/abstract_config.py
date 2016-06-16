@@ -5,24 +5,15 @@ from collections import defaultdict
 import six
 
 from whylog.config.exceptions import NoLogTypeError, RenameLogTypeError
-from whylog.config.filename_matchers import WildCardFilenameMatcher
 from whylog.config.investigation_plan import Clue, InvestigationPlan, InvestigationStep
-from whylog.config.log_type import LogType
 from whylog.config.parser_name_generator import ParserNameGenerator
 from whylog.config.parser_subset import ConcatenatedRegexParser
 from whylog.config.rule import RegexRuleFactory
-from whylog.config.super_parser import RegexSuperParser
 
 
 @six.add_metaclass(ABCMeta)
 class AbstractConfig(object):
     words_count_in_name = 4
-    DEFAULT_NAME = "default"
-    DEFAULT_LOG_TYPE = LogType(
-        DEFAULT_NAME, [
-            WildCardFilenameMatcher("localhost", "", DEFAULT_NAME, RegexSuperParser("", [], {}))
-        ]
-    ) # yapf: disable
 
     def __init__(self):
         self._parsers = self._load_parsers()
@@ -116,9 +107,7 @@ class AbstractConfig(object):
         pass
 
     def get_all_log_types(self):
-        if self.DEFAULT_NAME in self._log_types:
-            return six.itervalues(self._log_types)
-        return itertools.chain([self.DEFAULT_LOG_TYPE], six.itervalues(self._log_types))
+        return six.itervalues(self._log_types)
 
     def get_log_type(self, line_source):
         for log_type in six.itervalues(self._log_types):
