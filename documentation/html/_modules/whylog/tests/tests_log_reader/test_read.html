@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_log_reader.test_read &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../../index.html" />
+    <link rel="up" title="whylog.tests.tests_log_reader" href="../tests_log_reader.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../tests_log_reader.html" accesskey="U">whylog.tests.tests_log_reader</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.tests.tests_log_reader.test_read</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.config.investigation_plan</span> <span class="kn">import</span> <span class="n">InvestigationStep</span>
+<span class="kn">from</span> <span class="nn">whylog.config.super_parser</span> <span class="kn">import</span> <span class="n">RegexSuperParser</span>
+<span class="kn">from</span> <span class="nn">whylog.log_reader.read_utils</span> <span class="kn">import</span> <span class="n">ReadUtils</span>
+<span class="kn">from</span> <span class="nn">whylog.log_reader.searchers</span> <span class="kn">import</span> <span class="n">BacktrackSearcher</span>
+<span class="kn">from</span> <span class="nn">whylog.tests.tests_log_reader.constants</span> <span class="kn">import</span> <span class="n">AFewLinesLogParams</span><span class="p">,</span> <span class="n">TestPaths</span>
+<span class="kn">from</span> <span class="nn">whylog.tests.tests_log_reader.file_reader</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataGeneratorLogSource</span><span class="p">,</span> <span class="n">OperationCountingFileWrapper</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="TestLogsReading"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading">[docs]</a><span class="k">class</span> <span class="nc">TestLogsReading</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TestLogsReading.setUpClass"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.setUpClass">[docs]</a>    <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">time_delta_s</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">number_of_lines</span> <span class="o">=</span> <span class="mi">10000</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">line_padding</span> <span class="o">=</span> <span class="mi">42</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">opened_file</span> <span class="o">=</span> <span class="n">OperationCountingFileWrapper</span><span class="p">(</span>
+            <span class="n">DataGeneratorLogSource</span><span class="p">(</span>
+                <span class="n">start_time</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">start_date</span><span class="p">,</span>
+                <span class="n">time_delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">time_delta_s</span><span class="p">),</span>
+                <span class="n">number_of_lines</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">number_of_lines</span><span class="p">,</span>
+                <span class="n">line_padding</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">line_padding</span><span class="p">,</span>
+                <span class="n">datetime_format</span><span class="o">=</span><span class="s">&quot;</span><span class="si">%c</span><span class="s">&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>  <span class="c"># yapf: disable</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">repetitions</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">file_with_repeated_lines</span> <span class="o">=</span> <span class="n">OperationCountingFileWrapper</span><span class="p">(</span>
+            <span class="n">DataGeneratorLogSource</span><span class="p">(</span>
+                <span class="n">start_time</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">start_date</span><span class="p">,</span>
+                <span class="n">time_delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">time_delta_s</span><span class="p">),</span>
+                <span class="n">number_of_lines</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">number_of_lines</span><span class="p">,</span>
+                <span class="n">line_padding</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">line_padding</span><span class="p">,</span>
+                <span class="n">datetime_format</span><span class="o">=</span><span class="s">&quot;</span><span class="si">%c</span><span class="s">&quot;</span><span class="p">,</span>
+                <span class="n">repetitions</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">repetitions</span>
+            <span class="p">)</span>
+        <span class="p">)</span>  <span class="c"># yapf: disable</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">super_parser</span> <span class="o">=</span> <span class="n">RegexSuperParser</span><span class="p">(</span><span class="s">&quot;(.*) r*&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s">&#39;date&#39;</span><span class="p">})</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">dummy_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1410</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.test_getting_line_by_offset_huge"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_getting_line_by_offset_huge">[docs]</a>    <span class="k">def</span> <span class="nf">test_getting_line_by_offset_huge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">TestPaths</span><span class="o">.</span><span class="n">get_file_path</span><span class="p">(</span><span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">FILE_NAME</span><span class="p">))</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+                    <span class="k">assert</span> <span class="n">ReadUtils</span><span class="o">.</span><span class="n">get_line_containing_offset</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">==</span> \
+                           <span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">get_line_with_borders</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.test_getting_line_by_offset_basic"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_getting_line_by_offset_basic">[docs]</a>    <span class="k">def</span> <span class="nf">test_getting_line_by_offset_basic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">TestPaths</span><span class="o">.</span><span class="n">get_file_path</span><span class="p">(</span><span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">FILE_NAME</span><span class="p">))</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">read_line</span> <span class="o">=</span> <span class="n">ReadUtils</span><span class="o">.</span><span class="n">_read_entire_line</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">read_line</span> <span class="o">==</span> <span class="p">(</span><span class="s">&#39;aaa-0-bbb&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+            <span class="n">read_line</span> <span class="o">=</span> <span class="n">ReadUtils</span><span class="o">.</span><span class="n">_read_entire_line</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">read_line</span> <span class="o">==</span> <span class="p">(</span><span class="s">&#39;aaa-0-bbb&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+            <span class="n">read_line</span> <span class="o">=</span> <span class="n">ReadUtils</span><span class="o">.</span><span class="n">_read_entire_line</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">read_line</span> <span class="o">==</span> <span class="p">(</span><span class="s">&#39;aaa-4-bbb&#39;</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">49</span><span class="p">)</span>
+            <span class="n">read_line</span> <span class="o">=</span> <span class="n">ReadUtils</span><span class="o">.</span><span class="n">_read_entire_line</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">read_line</span> <span class="o">==</span> <span class="p">(</span><span class="s">&#39;aaa-9-bbb&#39;</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.test_bisect_line_finding"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_line_finding">[docs]</a>    <span class="k">def</span> <span class="nf">test_bisect_line_finding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="n">secs</span><span class="p">)</span>
+
+        <span class="n">investigation_step</span> <span class="o">=</span> <span class="n">InvestigationStep</span><span class="p">(</span>
+            <span class="bp">None</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_date</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">backtracker</span> <span class="o">=</span> <span class="n">BacktrackSearcher</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">investigation_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">super_parser</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">backtracker</span><span class="o">.</span><span class="n">_find_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">offset</span> <span class="o">==</span> <span class="n">secs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_padding</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="o">.</span><span class="n">_seek_count</span> <span class="o">&lt;</span> <span class="mi">35</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.test_bisect_first_line_of_file"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_first_line_of_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_bisect_first_line_of_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">investigation_step</span> <span class="o">=</span> <span class="n">InvestigationStep</span><span class="p">(</span>
+            <span class="bp">None</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_date</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">backtracker</span> <span class="o">=</span> <span class="n">BacktrackSearcher</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">investigation_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">super_parser</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">backtracker</span><span class="o">.</span><span class="n">_find_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">offset</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="o">.</span><span class="n">_seek_count</span> <span class="o">&lt;</span> <span class="mi">35</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.test_bisect_last_line_of_file"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_last_line_of_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_bisect_last_line_of_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">investigation_step</span> <span class="o">=</span> <span class="n">InvestigationStep</span><span class="p">(</span>
+            <span class="bp">None</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_date</span><span class="p">,</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">max</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">backtracker</span> <span class="o">=</span> <span class="n">BacktrackSearcher</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">investigation_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">super_parser</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">backtracker</span><span class="o">.</span><span class="n">_find_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">offset</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_lines</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_padding</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="o">.</span><span class="n">_seek_count</span> <span class="o">&lt;</span> <span class="mi">35</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.test_bisect_left_when_lines_are_repeated"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_left_when_lines_are_repeated">[docs]</a>    <span class="k">def</span> <span class="nf">test_bisect_left_when_lines_are_repeated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="n">secs</span><span class="p">)</span>
+
+        <span class="n">investigation_step</span> <span class="o">=</span> <span class="n">InvestigationStep</span><span class="p">(</span>
+            <span class="bp">None</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_date</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">backtracker</span> <span class="o">=</span> <span class="n">BacktrackSearcher</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">investigation_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">super_parser</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">backtracker</span><span class="o">.</span><span class="n">_find_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_with_repeated_lines</span><span class="p">)</span>
+
+        <span class="n">line_no</span> <span class="o">=</span> <span class="n">secs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">repetitions</span>
+        <span class="k">assert</span> <span class="n">offset</span> <span class="o">==</span> <span class="n">line_no</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_padding</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_with_repeated_lines</span><span class="o">.</span><span class="n">_seek_count</span> <span class="o">&lt;</span> <span class="mi">35</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.test_bisect_right_when_lines_are_repeated"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_right_when_lines_are_repeated">[docs]</a>    <span class="k">def</span> <span class="nf">test_bisect_right_when_lines_are_repeated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="n">secs</span><span class="p">)</span>
+
+        <span class="n">investigation_step</span> <span class="o">=</span> <span class="n">InvestigationStep</span><span class="p">(</span>
+            <span class="bp">None</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_date</span><span class="p">,</span>
+                    <span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">:</span> <span class="n">date</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">backtracker</span> <span class="o">=</span> <span class="n">BacktrackSearcher</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">investigation_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">super_parser</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">backtracker</span><span class="o">.</span><span class="n">_find_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_with_repeated_lines</span><span class="p">)</span>
+
+        <span class="n">line_no</span> <span class="o">=</span> <span class="p">(</span><span class="n">secs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">repetitions</span>
+        <span class="k">assert</span> <span class="n">offset</span> <span class="o">==</span> <span class="n">line_no</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_padding</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_with_repeated_lines</span><span class="o">.</span><span class="n">_seek_count</span> <span class="o">&lt;</span> <span class="mi">35</span>
+</div>
+<div class="viewcode-block" id="TestLogsReading.tearDown"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_read.TestLogsReading.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="o">.</span><span class="n">reset_stats</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_with_repeated_lines</span><span class="o">.</span><span class="n">reset_stats</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

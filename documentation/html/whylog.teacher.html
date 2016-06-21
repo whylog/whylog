@@ -1,0 +1,439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.teacher package &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Whylog 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="whylog-teacher-package">
+<h1>whylog.teacher package<a class="headerlink" href="#whylog-teacher-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-whylog.teacher.constraint_links_base">
+<span id="whylog-teacher-constraint-links-base-module"></span><h2>whylog.teacher.constraint_links_base module<a class="headerlink" href="#module-whylog.teacher.constraint_links_base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLink">
+<em class="property">class </em><code class="descclassname">whylog.teacher.constraint_links_base.</code><code class="descname">ConstraintLink</code><span class="sig-paren">(</span><em>line_id</em>, <em>group_no</em>, <em>constraint_id</em><span class="sig-paren">)</span><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLink.constraint_id">
+<code class="descname">constraint_id</code><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLink.constraint_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLink.group_no">
+<code class="descname">group_no</code><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLink.group_no" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLink.line_id">
+<code class="descname">line_id</code><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLink.line_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLinksBase">
+<em class="property">class </em><code class="descclassname">whylog.teacher.constraint_links_base.</code><code class="descname">ConstraintLinksBase</code><span class="sig-paren">(</span><em>links=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/constraint_links_base.html#ConstraintLinksBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLinksBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Container for links between group and constraint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>links</strong> (<em>list[ConstraintLink]</em>) &#8211; list of links between group and constraint</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLinksBase.add_links">
+<code class="descname">add_links</code><span class="sig-paren">(</span><em>links</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/constraint_links_base.html#ConstraintLinksBase.add_links"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLinksBase.add_links" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLinksBase.distinct_constraint_ids">
+<code class="descname">distinct_constraint_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/constraint_links_base.html#ConstraintLinksBase.distinct_constraint_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLinksBase.distinct_constraint_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLinksBase.get_links">
+<code class="descname">get_links</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/constraint_links_base.html#ConstraintLinksBase.get_links"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLinksBase.get_links" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLinksBase.remove_links_by_constraint">
+<code class="descname">remove_links_by_constraint</code><span class="sig-paren">(</span><em>constraint_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/constraint_links_base.html#ConstraintLinksBase.remove_links_by_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLinksBase.remove_links_by_constraint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLinksBase.remove_links_by_group">
+<code class="descname">remove_links_by_group</code><span class="sig-paren">(</span><em>line_id</em>, <em>group_no</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/constraint_links_base.html#ConstraintLinksBase.remove_links_by_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLinksBase.remove_links_by_group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.constraint_links_base.ConstraintLinksBase.remove_links_by_line">
+<code class="descname">remove_links_by_line</code><span class="sig-paren">(</span><em>line_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/constraint_links_base.html#ConstraintLinksBase.remove_links_by_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.constraint_links_base.ConstraintLinksBase.remove_links_by_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.teacher.mock_outputs">
+<span id="whylog-teacher-mock-outputs-module"></span><h2>whylog.teacher.mock_outputs module<a class="headerlink" href="#module-whylog.teacher.mock_outputs" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="whylog.teacher.mock_outputs.create_sample_rule">
+<code class="descclassname">whylog.teacher.mock_outputs.</code><code class="descname">create_sample_rule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/mock_outputs.html#create_sample_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.mock_outputs.create_sample_rule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-whylog.teacher.rule_validation_problems">
+<span id="whylog-teacher-rule-validation-problems-module"></span><h2>whylog.teacher.rule_validation_problems module<a class="headerlink" href="#module-whylog.teacher.rule_validation_problems" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.ConstraintValidationProblem">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">ConstraintValidationProblem</code><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#ConstraintValidationProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.ConstraintValidationProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.teacher.rule_validation_problems.RuleValidationProblem" title="whylog.teacher.rule_validation_problems.RuleValidationProblem"><code class="xref py py-class docutils literal"><span class="pre">whylog.teacher.rule_validation_problems.RuleValidationProblem</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.NoEffectParserProblem">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">NoEffectParserProblem</code><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#NoEffectParserProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.NoEffectParserProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.teacher.rule_validation_problems.RuleValidationProblem" title="whylog.teacher.rule_validation_problems.RuleValidationProblem"><code class="xref py py-class docutils literal"><span class="pre">whylog.teacher.rule_validation_problems.RuleValidationProblem</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.teacher.rule_validation_problems.NoEffectParserProblem.TEMPLATE">
+<code class="descname">TEMPLATE</code><em class="property"> = 'No effect parser'</em><a class="headerlink" href="#whylog.teacher.rule_validation_problems.NoEffectParserProblem.TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.NotSetLogTypeProblem">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">NotSetLogTypeProblem</code><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#NotSetLogTypeProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.NotSetLogTypeProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.teacher.rule_validation_problems.ParserValidationProblem" title="whylog.teacher.rule_validation_problems.ParserValidationProblem"><code class="xref py py-class docutils literal"><span class="pre">whylog.teacher.rule_validation_problems.ParserValidationProblem</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.teacher.rule_validation_problems.NotSetLogTypeProblem.TEMPLATE">
+<code class="descname">TEMPLATE</code><em class="property"> = 'Log type is not set.'</em><a class="headerlink" href="#whylog.teacher.rule_validation_problems.NotSetLogTypeProblem.TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.NotUniqueParserNameProblem">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">NotUniqueParserNameProblem</code><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#NotUniqueParserNameProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.NotUniqueParserNameProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.teacher.rule_validation_problems.ParserValidationProblem" title="whylog.teacher.rule_validation_problems.ParserValidationProblem"><code class="xref py py-class docutils literal"><span class="pre">whylog.teacher.rule_validation_problems.ParserValidationProblem</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.teacher.rule_validation_problems.NotUniqueParserNameProblem.TEMPLATE">
+<code class="descname">TEMPLATE</code><em class="property"> = 'Parser name is not unique.'</em><a class="headerlink" href="#whylog.teacher.rule_validation_problems.NotUniqueParserNameProblem.TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.ParserCountProblem">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">ParserCountProblem</code><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#ParserCountProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.ParserCountProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.teacher.rule_validation_problems.RuleValidationProblem" title="whylog.teacher.rule_validation_problems.RuleValidationProblem"><code class="xref py py-class docutils literal"><span class="pre">whylog.teacher.rule_validation_problems.RuleValidationProblem</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.teacher.rule_validation_problems.ParserCountProblem.TEMPLATE">
+<code class="descname">TEMPLATE</code><em class="property"> = 'Rule should consist of at least 2 parsers.'</em><a class="headerlink" href="#whylog.teacher.rule_validation_problems.ParserCountProblem.TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.ParserValidationProblem">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">ParserValidationProblem</code><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#ParserValidationProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.ParserValidationProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.teacher.rule_validation_problems.RuleValidationProblem" title="whylog.teacher.rule_validation_problems.RuleValidationProblem"><code class="xref py py-class docutils literal"><span class="pre">whylog.teacher.rule_validation_problems.RuleValidationProblem</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.RuleValidationProblem">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">RuleValidationProblem</code><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#RuleValidationProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.RuleValidationProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="whylog.teacher.rule_validation_problems.RuleValidationProblem.IS_FATAL">
+<code class="descname">IS_FATAL</code><em class="property"> = True</em><a class="headerlink" href="#whylog.teacher.rule_validation_problems.RuleValidationProblem.IS_FATAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.teacher.rule_validation_problems.RuleValidationProblem.TEMPLATE">
+<code class="descname">TEMPLATE</code><a class="headerlink" href="#whylog.teacher.rule_validation_problems.RuleValidationProblem.TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Text that explains problem</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.rule_validation_problems.ValidationResult">
+<em class="property">class </em><code class="descclassname">whylog.teacher.rule_validation_problems.</code><code class="descname">ValidationResult</code><span class="sig-paren">(</span><em>rule_problems</em>, <em>parser_problems</em>, <em>constraint_problems</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#ValidationResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.ValidationResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.teacher.rule_validation_problems.ValidationResult.is_acceptable">
+<code class="descname">is_acceptable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/rule_validation_problems.html#ValidationResult.is_acceptable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.rule_validation_problems.ValidationResult.is_acceptable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.teacher.user_intent">
+<span id="whylog-teacher-user-intent-module"></span><h2>whylog.teacher.user_intent module<a class="headerlink" href="#module-whylog.teacher.user_intent" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.teacher.user_intent.UserConstraintIntent">
+<em class="property">class </em><code class="descclassname">whylog.teacher.user_intent.</code><code class="descname">UserConstraintIntent</code><span class="sig-paren">(</span><em>constr_type</em>, <em>groups</em>, <em>params=None</em>, <em>constraint_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/user_intent.html#UserConstraintIntent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.user_intent.UserConstraintIntent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.user_intent.UserParserIntent">
+<em class="property">class </em><code class="descclassname">whylog.teacher.user_intent.</code><code class="descname">UserParserIntent</code><span class="sig-paren">(</span><em>pattern_type</em>, <em>pattern_name</em>, <em>pattern</em>, <em>log_type_name</em>, <em>primary_key_groups</em>, <em>groups</em>, <em>line_content</em>, <em>line_offset</em>, <em>line_resource_location</em>, <em>parser_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/user_intent.html#UserParserIntent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.user_intent.UserParserIntent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.user_intent.UserRuleIntent">
+<em class="property">class </em><code class="descclassname">whylog.teacher.user_intent.</code><code class="descname">UserRuleIntent</code><span class="sig-paren">(</span><em>effect_id</em>, <em>parsers=None</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher/user_intent.html#UserRuleIntent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.user_intent.UserRuleIntent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.teacher">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-whylog.teacher" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.teacher.Teacher">
+<em class="property">class </em><code class="descclassname">whylog.teacher.</code><code class="descname">Teacher</code><span class="sig-paren">(</span><em>config</em>, <em>pattern_assistant</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Enable teaching new rule. One Teacher per one entering rule.
+:type pattern_assistant: AbstractAssistant
+:type _parsers: dict[int, TeacherParser]
+:type _constraint_base: dict[int, AbstractConstraint]
+:param _constraint_links: Keeps links between constraints and groups.</p>
+<blockquote>
+<div>Link between constraint C and group G exists
+if C describes relation between G and other groups.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+</tbody>
+</table>
+<dl class="method">
+<dt id="whylog.teacher.Teacher.add_line">
+<code class="descname">add_line</code><span class="sig-paren">(</span><em>line_id</em>, <em>line_object</em>, <em>effect=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.add_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.add_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds new line to rule.
+If line_id already exists, old line is overwritten by new line
+and all constraints related to old line are removed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.choose_guessed_pattern">
+<code class="descname">choose_guessed_pattern</code><span class="sig-paren">(</span><em>line_id</em>, <em>pattern_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.choose_guessed_pattern"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.choose_guessed_pattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.get_rule">
+<code class="descname">get_rule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.get_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.get_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates rule for Front that will be shown to user</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.guess_patterns">
+<code class="descname">guess_patterns</code><span class="sig-paren">(</span><em>line_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.guess_patterns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.guess_patterns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of guessed patterns for a line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.register_constraint">
+<code class="descname">register_constraint</code><span class="sig-paren">(</span><em>constraint_id</em>, <em>constraint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.register_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.register_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds new constraint to rule.
+If constraint_id already exists, constraint with this constraint_id
+is overwritten by new constraint</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.remove_constraint">
+<code class="descname">remove_constraint</code><span class="sig-paren">(</span><em>constraint_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.remove_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.remove_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes constraint from rule.
+Assumption: Constraint already exists in rule.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.remove_line">
+<code class="descname">remove_line</code><span class="sig-paren">(</span><em>line_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.remove_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.remove_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes line from rule.
+Assumption: line with line_id exists in rule.
+Removes also all constraints related to this line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies text patterns and constraints. If they meet all requirements, saves Rule.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.set_causes_relation">
+<code class="descname">set_causes_relation</code><span class="sig-paren">(</span><em>relation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.set_causes_relation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.set_causes_relation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines which combinations of causes can cause effect.
+:param relation: kind of sentence made of AND, OR, brackets and cause symbols.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.set_converter">
+<code class="descname">set_converter</code><span class="sig-paren">(</span><em>line_id</em>, <em>group_no</em>, <em>converter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.set_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.set_converter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.set_log_type">
+<code class="descname">set_log_type</code><span class="sig-paren">(</span><em>line_id</em>, <em>log_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.set_log_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.set_log_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.set_pattern_name">
+<code class="descname">set_pattern_name</code><span class="sig-paren">(</span><em>line_id</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.set_pattern_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.set_pattern_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.set_primary_key">
+<code class="descname">set_primary_key</code><span class="sig-paren">(</span><em>line_id</em>, <em>group_numbers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.set_primary_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.set_primary_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.update_pattern">
+<code class="descname">update_pattern</code><span class="sig-paren">(</span><em>line_id</em>, <em>pattern</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.update_pattern"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.update_pattern" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads text pattern proposed by user, verifies if it matches line text.
+Removes constraints related with updating line
+TODO: Update related constraints rather than remove.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.Teacher.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#Teacher.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.Teacher.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies if Rule is ready to save.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.teacher.TeacherParser">
+<em class="property">class </em><code class="descclassname">whylog.teacher.</code><code class="descname">TeacherParser</code><span class="sig-paren">(</span><em>line_object</em>, <em>name</em>, <em>log_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#TeacherParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.TeacherParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.teacher.TeacherParser.validate_log_type">
+<code class="descname">validate_log_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#TeacherParser.validate_log_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.TeacherParser.validate_log_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.teacher.TeacherParser.validate_name">
+<code class="descname">validate_name</code><span class="sig-paren">(</span><em>config</em>, <em>names_blacklist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/teacher.html#TeacherParser.validate_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.teacher.TeacherParser.validate_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">whylog.teacher package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-whylog.teacher.constraint_links_base">whylog.teacher.constraint_links_base module</a></li>
+<li><a class="reference internal" href="#module-whylog.teacher.mock_outputs">whylog.teacher.mock_outputs module</a></li>
+<li><a class="reference internal" href="#module-whylog.teacher.rule_validation_problems">whylog.teacher.rule_validation_problems module</a></li>
+<li><a class="reference internal" href="#module-whylog.teacher.user_intent">whylog.teacher.user_intent module</a></li>
+<li><a class="reference internal" href="#module-whylog.teacher">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/whylog.teacher.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/whylog.teacher.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

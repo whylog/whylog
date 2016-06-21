@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_config.test_concated_regex &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../../index.html" />
+    <link rel="up" title="whylog.tests.tests_config" href="../tests_config.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../tests_config.html" accesskey="U">whylog.tests.tests_config</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.tests.tests_config.test_concated_regex</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.assistant.const</span> <span class="kn">import</span> <span class="n">AssistantType</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.pattern_match</span> <span class="kn">import</span> <span class="n">ParamGroup</span>
+<span class="kn">from</span> <span class="nn">whylog.config.parser_subset</span> <span class="kn">import</span> <span class="n">ConcatenatedRegexParser</span>
+<span class="kn">from</span> <span class="nn">whylog.config.parsers</span> <span class="kn">import</span> <span class="n">RegexParserFactory</span>
+<span class="kn">from</span> <span class="nn">whylog.teacher.user_intent</span> <span class="kn">import</span> <span class="n">UserParserIntent</span>
+
+<span class="c"># convertions</span>
+<span class="n">to_date</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span>
+<span class="n">to_string</span> <span class="o">=</span> <span class="s">&quot;string&quot;</span>
+<span class="n">to_float</span> <span class="o">=</span> <span class="s">&quot;float&quot;</span>
+
+
+<div class="viewcode-block" id="TestConcatedRegexParser"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser">[docs]</a><span class="k">class</span> <span class="nc">TestConcatedRegexParser</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TestConcatedRegexParser.setUpClass"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.setUpClass">[docs]</a>    <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">connection_error_line</span> <span class="o">=</span> <span class="s">&quot;2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">data_migration_line</span> <span class="o">=</span> <span class="s">&quot;2015-12-03 12:10:10 Data migration from alfa36 to alfa21 failed. Host name: 2&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">lost_data_line</span> <span class="o">=</span> <span class="s">&quot;2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">root_cause_line</span> <span class="o">=</span> <span class="s">&quot;root cause&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">data_missing_line</span> <span class="o">=</span> <span class="s">&quot;2015-12-03 12:11:00 Data is missing&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">data_missing_at_line</span> <span class="o">=</span> <span class="s">&quot;2015-12-03 12:11:00 Data is missing at alfa21&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">dummy_line</span> <span class="o">=</span> <span class="s">&quot;dummy regex&quot;</span>
+
+        <span class="n">regex1</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$&quot;</span>
+        <span class="n">regex2</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$&quot;</span>
+        <span class="n">regex3</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$&quot;</span>
+        <span class="n">regex4</span> <span class="o">=</span> <span class="s">&quot;^root cause$&quot;</span>
+        <span class="n">regex5</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing&quot;</span>
+        <span class="n">regex6</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)$&quot;</span>
+        <span class="n">regex7</span> <span class="o">=</span> <span class="s">&quot;^dummy regex&quot;</span>
+
+        <span class="n">date_group</span> <span class="o">=</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">to_date</span><span class="p">)</span>
+        <span class="n">string_group</span> <span class="o">=</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">to_string</span><span class="p">)</span>
+        <span class="n">float_group</span> <span class="o">=</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">to_float</span><span class="p">)</span>
+
+        <span class="n">regex_type</span> <span class="o">=</span> <span class="n">AssistantType</span><span class="o">.</span><span class="n">REGEX</span>
+
+        <span class="c"># yapf: disable</span>
+        <span class="n">parser_intent1</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;connectionerror&quot;</span><span class="p">,</span> <span class="n">regex1</span><span class="p">,</span> <span class="s">&quot;hydra&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="n">date_group</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="n">string_group</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="n">string_group</span>
+            <span class="p">},</span> <span class="n">cls</span><span class="o">.</span><span class="n">connection_error_line</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;serwer1&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser_intent2</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;datamigration&quot;</span><span class="p">,</span> <span class="n">regex2</span><span class="p">,</span> <span class="s">&quot;hydra&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="n">date_group</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="n">string_group</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="n">string_group</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="n">string_group</span>
+            <span class="p">},</span> <span class="n">cls</span><span class="o">.</span><span class="n">data_migration_line</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;serwer2&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser_intent3</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;lostdata&quot;</span><span class="p">,</span> <span class="n">regex3</span><span class="p">,</span> <span class="s">&quot;filesystem&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="n">date_group</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="n">string_group</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="n">float_group</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="n">string_group</span>
+            <span class="p">},</span> <span class="n">cls</span><span class="o">.</span><span class="n">lost_data_line</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&quot;serwer3&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser_intent4</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;rootcause&quot;</span><span class="p">,</span> <span class="n">regex4</span><span class="p">,</span> <span class="s">&quot;filesystem&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{},</span> <span class="n">cls</span><span class="o">.</span><span class="n">root_cause_line</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s">&quot;serwer4&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser_intent5</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;date&quot;</span><span class="p">,</span> <span class="n">regex5</span><span class="p">,</span> <span class="s">&quot;filesystem&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">date_group</span><span class="p">},</span> <span class="n">cls</span><span class="o">.</span><span class="n">data_missing_line</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">,</span> <span class="s">&quot;serwer5&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser_intent6</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;onlymissdata&quot;</span><span class="p">,</span> <span class="n">regex6</span><span class="p">,</span> <span class="s">&quot;filesystem&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="n">date_group</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="n">string_group</span>
+            <span class="p">},</span> <span class="n">cls</span><span class="o">.</span><span class="n">data_missing_at_line</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s">&quot;serwer6&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser_intent7</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;dummy&quot;</span><span class="p">,</span> <span class="n">regex7</span><span class="p">,</span> <span class="s">&quot;filesystem&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{},</span> <span class="n">cls</span><span class="o">.</span><span class="n">dummy_line</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="s">&quot;serwer7&quot;</span>
+        <span class="p">)</span>
+        <span class="c"># yapf: enable</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">connection_error</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">parser_intent1</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">data_migration</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">parser_intent2</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">lost_data</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">parser_intent3</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">root_cause</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">parser_intent4</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">lost_data_date</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">parser_intent5</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">lost_data_suffix</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">parser_intent6</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">dummy_parser</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">parser_intent7</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">no_lost_data_parser_list</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_no_lost_data_parser_list</span><span class="p">()</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TestConcatedRegexParser.get_no_lost_data_parser_list"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.get_no_lost_data_parser_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_no_lost_data_parser_list</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">base_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">parser</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">connection_error</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parser</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">data_migration</span>
+            <span class="n">base_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">base_list</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.is_three_lost_data_parsers_matched"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.is_three_lost_data_parsers_matched">[docs]</a>    <span class="k">def</span> <span class="nf">is_three_lost_data_parsers_matched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concatenated</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data_line</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="s">&quot;2015-12-03 12:11:00&quot;</span><span class="p">,</span> <span class="s">&quot;alfa21&quot;</span><span class="p">,</span> <span class="s">&quot;567.02&quot;</span><span class="p">,</span> <span class="s">&quot;101&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_date</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="s">&quot;2015-12-03 12:11:00&quot;</span><span class="p">,),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="p">(</span><span class="s">&quot;2015-12-03 12:11:00&quot;</span><span class="p">,</span> <span class="s">&quot;alfa21. Loss = 567.02 GB. Host name: 101&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.is_two_lost_data_parsers_matched"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.is_two_lost_data_parsers_matched">[docs]</a>    <span class="k">def</span> <span class="nf">is_two_lost_data_parsers_matched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concatenated</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data_line</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="s">&quot;2015-12-03 12:11:00&quot;</span><span class="p">,</span> <span class="s">&quot;alfa21&quot;</span><span class="p">,</span> <span class="s">&quot;567.02&quot;</span><span class="p">,</span> <span class="s">&quot;101&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="p">(</span><span class="s">&quot;2015-12-03 12:11:00&quot;</span><span class="p">,</span> <span class="s">&quot;alfa21. Loss = 567.02 GB. Host name: 101&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_common_cases"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_common_cases">[docs]</a>    <span class="k">def</span> <span class="nf">test_common_cases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection_error</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_migration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_cause</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_date</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="s">&quot;aaaaa&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{}</span>
+
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_error_line</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection_error</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="s">&quot;2015-12-03 12:08:09&quot;</span><span class="p">,</span> <span class="s">&quot;alfa36&quot;</span><span class="p">,</span> <span class="s">&quot;2&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_migration_line</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_migration</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="s">&quot;2015-12-03 12:10:10&quot;</span><span class="p">,</span> <span class="s">&quot;alfa36&quot;</span><span class="p">,</span> <span class="s">&quot;alfa21&quot;</span><span class="p">,</span> <span class="s">&quot;2&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_three_lost_data_parsers_matched</span><span class="p">(</span><span class="n">concatenated</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_cause_line</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root_cause</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">()</span>
+        <span class="p">}</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_all_subregexes_matches"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_all_subregexes_matches">[docs]</a>    <span class="k">def</span> <span class="nf">test_all_subregexes_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_date</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_three_lost_data_parsers_matched</span><span class="p">(</span><span class="n">concatenated</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_matches_first_and_last_and_one_in_middle"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_matches_first_and_last_and_one_in_middle">[docs]</a>    <span class="k">def</span> <span class="nf">test_matches_first_and_last_and_one_in_middle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_parser</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_parser</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dummy_parser</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_parser</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_date</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_three_lost_data_parsers_matched</span><span class="p">(</span><span class="n">concatenated</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_two_parsers_matches_permutations"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_two_parsers_matches_permutations">[docs]</a>    <span class="k">def</span> <span class="nf">test_two_parsers_matches_permutations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">parser_list</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_migration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_error</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">],</span> <span class="mi">4</span>
+        <span class="p">):</span>
+            <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span><span class="n">parser_list</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_two_lost_data_parsers_matched</span><span class="p">(</span><span class="n">concatenated</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_single_subregex"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_single_subregex">[docs]</a>    <span class="k">def</span> <span class="nf">test_single_subregex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">])</span>
+
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data_line</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="s">&quot;2015-12-03 12:11:00&quot;</span><span class="p">,</span> <span class="s">&quot;alfa21&quot;</span><span class="p">,</span> <span class="s">&quot;567.02&quot;</span><span class="p">,</span> <span class="s">&quot;101&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="p">])</span>
+
+        <span class="k">assert</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data_line</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="p">(</span><span class="s">&quot;2015-12-03 12:11:00&quot;</span><span class="p">,</span> <span class="s">&quot;alfa21. Loss = 567.02 GB. Host name: 101&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_large_matches_first_and_second"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_large_matches_first_and_second">[docs]</a>    <span class="k">def</span> <span class="nf">test_large_matches_first_and_second</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_lost_data_parser_list</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_two_lost_data_parsers_matched</span><span class="p">(</span><span class="n">concatenated</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_large_matches_first_second_and_last"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_large_matches_first_second_and_last">[docs]</a>    <span class="k">def</span> <span class="nf">test_large_matches_first_second_and_last</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_lost_data_parser_list</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data_date</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_three_lost_data_parsers_matched</span><span class="p">(</span><span class="n">concatenated</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestConcatedRegexParser.test_large_matches_first_and_last_two"><a class="viewcode-back" href="../../../../whylog.tests.tests_config.html#whylog.tests.tests_config.test_concated_regex.TestConcatedRegexParser.test_large_matches_first_and_last_two">[docs]</a>    <span class="k">def</span> <span class="nf">test_large_matches_first_and_last_two</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lost_data_suffix</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_lost_data_parser_list</span> <span class="o">+</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lost_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost_data_date</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_three_lost_data_parsers_matched</span><span class="p">(</span><span class="n">concatenated</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

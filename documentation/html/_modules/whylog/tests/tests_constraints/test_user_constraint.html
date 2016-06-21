@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_constraints.test_user_constraint &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../../index.html" />
+    <link rel="up" title="whylog.tests.tests_constraints" href="../tests_constraints.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../tests_constraints.html" accesskey="U">whylog.tests.tests_constraints</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.tests.tests_constraints.test_user_constraint</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">from</span> <span class="nn">whylog.constraints</span> <span class="kn">import</span> <span class="n">DifferentConstraint</span><span class="p">,</span> <span class="n">IdenticalConstraint</span><span class="p">,</span> <span class="n">TimeConstraint</span>
+<span class="kn">from</span> <span class="nn">whylog.constraints.exceptions</span> <span class="kn">import</span> <span class="n">ConstructorGroupsCountError</span><span class="p">,</span> <span class="n">ConstructorParamsError</span>
+
+
+<div class="viewcode-block" id="TestIdenticalConstraint"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestIdenticalConstraint">[docs]</a><span class="k">class</span> <span class="nc">TestIdenticalConstraint</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIdenticalConstraint.test_constructor_insufficient_groups"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestIdenticalConstraint.test_constructor_insufficient_groups">[docs]</a>    <span class="k">def</span> <span class="nf">test_constructor_insufficient_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">insufficient_groups</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">ConstructorGroupsCountError</span><span class="p">,</span> <span class="n">IdenticalConstraint</span><span class="p">,</span> <span class="n">insufficient_groups</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestIdenticalConstraint.test_constructor_not_empty_params"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestIdenticalConstraint.test_constructor_not_empty_params">[docs]</a>    <span class="k">def</span> <span class="nf">test_constructor_not_empty_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span>
+            <span class="n">ConstructorParamsError</span><span class="p">,</span> <span class="n">IdenticalConstraint</span><span class="p">,</span> <span class="p">[</span>
+                <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">],</span> <span class="p">{</span><span class="s">&#39;sth&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">}</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestIdenticalConstraint.test_get_param_names"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestIdenticalConstraint.test_get_param_names">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_param_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">IdenticalConstraint</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="TestIdenticalConstraint.test_get_group_count"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestIdenticalConstraint.test_get_group_count">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_group_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">IdenticalConstraint</span><span class="o">.</span><span class="n">get_groups_count</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestIdenticalConstraint.test_verify_success"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestIdenticalConstraint.test_verify_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_verify_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ic</span> <span class="o">=</span> <span class="n">IdenticalConstraint</span><span class="p">(</span><span class="n">params_checking</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">ic</span><span class="o">.</span><span class="n">verify</span><span class="p">([</span><span class="s">&#39;comp1&#39;</span><span class="p">,</span> <span class="s">&#39;comp1&#39;</span><span class="p">,</span> <span class="s">&#39;comp1&#39;</span><span class="p">],</span> <span class="p">{})</span>
+</div>
+<div class="viewcode-block" id="TestIdenticalConstraint.test_verify_fail"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestIdenticalConstraint.test_verify_fail">[docs]</a>    <span class="k">def</span> <span class="nf">test_verify_fail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ic</span> <span class="o">=</span> <span class="n">IdenticalConstraint</span><span class="p">(</span><span class="n">params_checking</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">ic</span><span class="o">.</span><span class="n">verify</span><span class="p">([</span><span class="s">&#39;comp1&#39;</span><span class="p">,</span> <span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="s">&#39;comp1&#39;</span><span class="p">],</span> <span class="p">{})</span>
+
+</div></div>
+<div class="viewcode-block" id="TestDifferentConstraint"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestDifferentConstraint">[docs]</a><span class="k">class</span> <span class="nc">TestDifferentConstraint</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDifferentConstraint.test_get_param_names"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestDifferentConstraint.test_get_param_names">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_param_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">DifferentConstraint</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">([</span><span class="n">DifferentConstraint</span><span class="o">.</span><span class="n">PARAM_VALUE</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="TestDifferentConstraint.test_verify_success"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestDifferentConstraint.test_verify_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_verify_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ic</span> <span class="o">=</span> <span class="n">DifferentConstraint</span><span class="p">(</span><span class="n">params_checking</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">ic</span><span class="o">.</span><span class="n">verify</span><span class="p">([</span><span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="s">&#39;juj&#39;</span><span class="p">],</span> <span class="p">{})</span>
+</div>
+<div class="viewcode-block" id="TestDifferentConstraint.test_verify_fail"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestDifferentConstraint.test_verify_fail">[docs]</a>    <span class="k">def</span> <span class="nf">test_verify_fail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ic</span> <span class="o">=</span> <span class="n">DifferentConstraint</span><span class="p">(</span><span class="n">params_checking</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">ic</span><span class="o">.</span><span class="n">verify</span><span class="p">([</span><span class="s">&#39;comp1&#39;</span><span class="p">,</span> <span class="s">&#39;comp1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">],</span> <span class="p">{})</span>
+
+</div></div>
+<div class="viewcode-block" id="TestTimeConstraint"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestTimeConstraint">[docs]</a><span class="k">class</span> <span class="nc">TestTimeConstraint</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestTimeConstraint.setUp"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestTimeConstraint.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_delta</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lower_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">greater_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span><span class="p">,</span>
+            <span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MAX_DELTA</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_delta</span>
+        <span class="p">}</span>
+</div>
+<div class="viewcode-block" id="TestTimeConstraint.test_constructor_insufficient_groups"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestTimeConstraint.test_constructor_insufficient_groups">[docs]</a>    <span class="k">def</span> <span class="nf">test_constructor_insufficient_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">insufficient_groups</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">ConstructorGroupsCountError</span><span class="p">,</span> <span class="n">TimeConstraint</span><span class="p">,</span> <span class="n">insufficient_groups</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestTimeConstraint.test_constructor_wrong_params_names"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestTimeConstraint.test_constructor_wrong_params_names">[docs]</a>    <span class="k">def</span> <span class="nf">test_constructor_wrong_params_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+
+        <span class="n">wrong_params</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;sth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">ConstructorParamsError</span><span class="p">,</span> <span class="n">TimeConstraint</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">wrong_params</span><span class="p">)</span>
+
+        <span class="n">mixed_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">:</span> <span class="mi">33</span><span class="p">,</span> <span class="s">&quot;sth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">ConstructorParamsError</span><span class="p">,</span> <span class="n">TimeConstraint</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">mixed_params</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestTimeConstraint.test_get_group_count"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestTimeConstraint.test_get_group_count">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_group_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">TimeConstraint</span><span class="o">.</span><span class="n">get_groups_count</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestTimeConstraint.test_get_param_names"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestTimeConstraint.test_get_param_names">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_param_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">TimeConstraint</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">,</span> <span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MAX_DELTA</span><span class="p">]</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestTimeConstraint.test_verify_success"><a class="viewcode-back" href="../../../../whylog.tests.tests_constraints.html#whylog.tests.tests_constraints.test_user_constraint.TestTimeConstraint.test_verify_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_verify_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tc</span> <span class="o">=</span> <span class="n">TimeConstraint</span><span class="p">(</span><span class="n">param_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params_dict</span><span class="p">,</span> <span class="n">params_checking</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">tc</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lower_date</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">greater_date</span><span class="p">],</span> <span class="p">{</span>
+                <span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span><span class="p">,</span>
+                <span class="n">TimeConstraint</span><span class="o">.</span><span class="n">MAX_DELTA</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_delta</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

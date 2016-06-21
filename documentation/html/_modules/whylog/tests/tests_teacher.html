@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_teacher &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.tests.tests_teacher</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.assistant.pattern_match</span> <span class="kn">import</span> <span class="n">ParamGroup</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.regex_assistant</span> <span class="kn">import</span> <span class="n">RegexAssistant</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.regex_assistant.regex</span> <span class="kn">import</span> <span class="n">create_obvious_regex</span>
+<span class="kn">from</span> <span class="nn">whylog.config</span> <span class="kn">import</span> <span class="n">YamlConfig</span>
+<span class="kn">from</span> <span class="nn">whylog.config.investigation_plan</span> <span class="kn">import</span> <span class="n">LineSource</span>
+<span class="kn">from</span> <span class="nn">whylog.constraints</span> <span class="kn">import</span> <span class="n">IdenticalConstraint</span>
+<span class="kn">from</span> <span class="nn">whylog.converters</span> <span class="kn">import</span> <span class="n">ConverterType</span>
+<span class="kn">from</span> <span class="nn">whylog.front.utils</span> <span class="kn">import</span> <span class="n">FrontInput</span>
+<span class="kn">from</span> <span class="nn">whylog.teacher</span> <span class="kn">import</span> <span class="n">Teacher</span>
+<span class="kn">from</span> <span class="nn">whylog.teacher.user_intent</span> <span class="kn">import</span> <span class="n">UserConstraintIntent</span><span class="p">,</span> <span class="n">UserParserIntent</span>
+<span class="kn">from</span> <span class="nn">whylog.tests.utils</span> <span class="kn">import</span> <span class="n">ConfigPathFactory</span>
+
+<span class="n">path_test_files</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;whylog&#39;</span><span class="p">,</span> <span class="s">&#39;tests&#39;</span><span class="p">,</span> <span class="s">&#39;tests_teacher&#39;</span><span class="p">,</span> <span class="s">&#39;test_files&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="TestRuleBase"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestRuleBase">[docs]</a><span class="k">class</span> <span class="nc">TestRuleBase</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRuleBase.setUp"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestRuleBase.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates teacher with sample Rule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">test_files_dir</span> <span class="o">=</span> <span class="s">&#39;empty_config_files&#39;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">path_test_files</span> <span class="o">+</span> <span class="p">[</span><span class="n">test_files_dir</span><span class="p">])</span>
+        <span class="n">parsers_path</span><span class="p">,</span> <span class="n">rules_path</span><span class="p">,</span> <span class="n">log_types_path</span> <span class="o">=</span> <span class="n">ConfigPathFactory</span><span class="o">.</span><span class="n">get_path_to_config_files</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span> <span class="bp">False</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">parsers_path</span><span class="p">,</span> <span class="n">rules_path</span><span class="p">,</span> <span class="n">log_types_path</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_test_files</span><span class="p">()</span>
+
+        <span class="n">yaml_config</span> <span class="o">=</span> <span class="n">YamlConfig</span><span class="p">(</span><span class="n">parsers_path</span><span class="p">,</span> <span class="n">rules_path</span><span class="p">,</span> <span class="n">log_types_path</span><span class="p">)</span>
+        <span class="n">regex_assistant</span> <span class="o">=</span> <span class="n">RegexAssistant</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span> <span class="o">=</span> <span class="n">Teacher</span><span class="p">(</span><span class="n">yaml_config</span><span class="p">,</span> <span class="n">regex_assistant</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect_front_input</span> <span class="o">=</span> <span class="n">FrontInput</span><span class="p">(</span>
+            <span class="n">offset</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+            <span class="n">line_content</span><span class="o">=</span><span class="s">r&#39;2015-12-03 12:11:00 Error occurred in reading test&#39;</span><span class="p">,</span>
+            <span class="n">line_source</span><span class="o">=</span><span class="n">LineSource</span><span class="p">(</span><span class="s">&#39;sample_host&#39;</span><span class="p">,</span> <span class="s">&#39;sample_path&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cause1_front_input</span> <span class="o">=</span> <span class="n">FrontInput</span><span class="p">(</span>
+            <span class="n">offset</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+            <span class="n">line_content</span><span class="o">=</span><span class="s">r&#39;2015-12-03 12:10:55 Data is missing on comp21&#39;</span><span class="p">,</span>
+            <span class="n">line_source</span><span class="o">=</span><span class="n">LineSource</span><span class="p">(</span><span class="s">&#39;sample_host1&#39;</span><span class="p">,</span> <span class="s">&#39;sample_path1&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cause2_id</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cause2_front_input</span> <span class="o">=</span> <span class="n">FrontInput</span><span class="p">(</span>
+            <span class="n">offset</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
+            <span class="n">line_content</span><span class="o">=</span><span class="s">r&#39;2015-12-03 12:10:50 Data migration to comp21 failed in test 123&#39;</span><span class="p">,</span>
+            <span class="n">line_source</span><span class="o">=</span><span class="n">LineSource</span><span class="p">(</span><span class="s">&#39;sample_host2&#39;</span><span class="p">,</span> <span class="s">&#39;sample_path2&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">identical_groups</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause2_id</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date_groups</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_rule</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">_add_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect_front_input</span><span class="p">,</span> <span class="n">effect</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cause1_front_input</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cause1_pattern</span> <span class="o">=</span> <span class="s">r&#39;^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data is missing on (.*)$&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">update_pattern</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cause1_pattern</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause2_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cause2_front_input</span><span class="p">)</span>
+        <span class="n">cause2_pattern</span> <span class="o">=</span> <span class="s">r&#39;^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Data migration to (.*) failed in test (.*)$&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">update_pattern</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause2_id</span><span class="p">,</span> <span class="n">cause2_pattern</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestRuleBase.tearDown"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestRuleBase.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_test_files</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">_clean_test_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">test_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_files</span><span class="p">:</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">test_file</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="TestParser"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser">[docs]</a><span class="k">class</span> <span class="nc">TestParser</span><span class="p">(</span><span class="n">TestRuleBase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestParser.test_default_user_parser"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser.test_default_user_parser">[docs]</a>    <span class="k">def</span> <span class="nf">test_default_user_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span>
+        <span class="n">effect_parser</span> <span class="o">=</span> <span class="n">user_rule</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">]</span>
+        <span class="n">wanted_effect_parser</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="s">&#39;regex_assistant&#39;</span><span class="p">,</span>
+            <span class="s">&#39;error_occurred_in_reading&#39;</span><span class="p">,</span>
+            <span class="s">r&#39;([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in reading test$&#39;</span><span class="p">,</span>
+            <span class="bp">None</span><span class="p">,</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="p">{</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span>
+                    <span class="n">content</span><span class="o">=</span><span class="s">&#39;2015-12-03 12:11:00&#39;</span><span class="p">,</span>
+                    <span class="n">converter_type</span><span class="o">=</span><span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_DATE</span>
+                <span class="p">)</span>
+            <span class="p">},</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">effect_front_input</span><span class="o">.</span><span class="n">line_content</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">effect_front_input</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">effect_front_input</span><span class="o">.</span><span class="n">line_source</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span>
+        <span class="p">)</span>  <span class="c"># yapf: disable</span>
+        <span class="k">assert</span> <span class="n">wanted_effect_parser</span> <span class="o">==</span> <span class="n">effect_parser</span>
+</div>
+<div class="viewcode-block" id="TestParser.test_setting_parser_name"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser.test_setting_parser_name">[docs]</a>    <span class="k">def</span> <span class="nf">test_setting_parser_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">effect_parser_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">]</span><span class="o">.</span><span class="n">pattern_name</span>
+        <span class="n">new_name</span> <span class="o">=</span> <span class="n">effect_parser_name</span> <span class="o">+</span> <span class="s">&#39;_hello&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">set_pattern_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+        <span class="n">rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">new_name</span> <span class="o">==</span> <span class="n">rule</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">]</span><span class="o">.</span><span class="n">pattern_name</span>
+</div>
+<div class="viewcode-block" id="TestParser.test_setting_converter"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser.test_setting_converter">[docs]</a>    <span class="k">def</span> <span class="nf">test_setting_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cause2_id</span><span class="p">]</span>
+        <span class="n">new_converter</span> <span class="o">=</span> <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_FLOAT</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">new_converter</span> <span class="o">==</span> <span class="n">parser</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">converter_type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">set_converter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause2_id</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">new_converter</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cause2_id</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">new_converter</span> <span class="o">==</span> <span class="n">parser</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">converter_type</span>
+</div>
+<div class="viewcode-block" id="TestParser.test_setting_primary_key"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser.test_setting_primary_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_setting_primary_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">]</span>
+        <span class="n">new_primary_key_groups</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">new_primary_key_groups</span> <span class="o">==</span> <span class="n">parser</span><span class="o">.</span><span class="n">primary_key_groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">set_primary_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">,</span> <span class="n">new_primary_key_groups</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">new_primary_key_groups</span> <span class="o">==</span> <span class="n">parser</span><span class="o">.</span><span class="n">primary_key_groups</span>
+</div>
+<div class="viewcode-block" id="TestParser.test_setting_log_type"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser.test_setting_log_type">[docs]</a>    <span class="k">def</span> <span class="nf">test_setting_log_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#TODO setting simple RegexSuperParser</span>
+        <span class="n">new_log_type</span> <span class="o">=</span> <span class="s">&#39;sample_log_type&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">set_log_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">,</span> <span class="n">new_log_type</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">new_log_type</span> <span class="o">==</span> <span class="n">parser</span><span class="o">.</span><span class="n">log_type_name</span>
+</div>
+<div class="viewcode-block" id="TestParser.test_update_pattern"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser.test_update_pattern">[docs]</a>    <span class="k">def</span> <span class="nf">test_update_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new_effect_pattern</span> <span class="o">=</span> <span class="s">r&#39;^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}) Error occurred in (.*) test$&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">update_pattern</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">,</span> <span class="n">new_effect_pattern</span><span class="p">)</span>
+        <span class="n">updated_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span><span class="o">.</span><span class="n">parsers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">]</span><span class="o">.</span><span class="n">pattern</span>
+        <span class="k">assert</span> <span class="n">new_effect_pattern</span> <span class="o">==</span> <span class="n">updated_pattern</span>
+</div>
+<div class="viewcode-block" id="TestParser.test_guess_patterns"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestParser.test_guess_patterns">[docs]</a>    <span class="k">def</span> <span class="nf">test_guess_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">effect_guessed_patterns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">guess_patterns</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">effect_guessed_patterns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="n">effect_guessed_regexes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">pattern_match</span><span class="o">.</span><span class="n">pattern</span> <span class="k">for</span> <span class="n">pattern_match</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="n">effect_guessed_patterns</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">effect_obvious_regex</span> <span class="o">=</span> <span class="n">create_obvious_regex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect_front_input</span><span class="o">.</span><span class="n">line_content</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">effect_obvious_regex</span> <span class="ow">in</span> <span class="n">effect_guessed_regexes</span>
+
+</div></div>
+<div class="viewcode-block" id="TestConstraints"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestConstraints">[docs]</a><span class="k">class</span> <span class="nc">TestConstraints</span><span class="p">(</span><span class="n">TestRuleBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_register_identical_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint_id</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">constraint</span> <span class="o">=</span> <span class="n">IdenticalConstraint</span><span class="p">(</span><span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identical_groups</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">register_constraint</span><span class="p">(</span><span class="n">constraint_id</span><span class="p">,</span> <span class="n">constraint</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_constraints_absence_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">user_rule</span><span class="o">.</span><span class="n">constraints</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">_constraint_base</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">_constraint_links</span><span class="o">.</span><span class="n">get_links</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_constraints_presence_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">user_rule</span><span class="o">.</span><span class="n">constraints</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">_constraint_base</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">_constraint_links</span><span class="o">.</span><span class="n">get_links</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TestConstraints.test_register_and_remove_constraint"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestConstraints.test_register_and_remove_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">test_register_and_remove_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints_absence_check</span><span class="p">()</span>
+
+        <span class="n">constraint_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">constraint</span> <span class="o">=</span> <span class="n">IdenticalConstraint</span><span class="p">(</span><span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identical_groups</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">register_constraint</span><span class="p">(</span><span class="n">constraint_id</span><span class="p">,</span> <span class="n">constraint</span><span class="p">)</span>
+        <span class="n">user_rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">get_rule</span><span class="p">()</span>
+        <span class="n">wanted_constraint</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span>
+            <span class="n">IdenticalConstraint</span><span class="o">.</span><span class="n">TYPE</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identical_groups</span><span class="p">,</span>
+            <span class="n">constraint_id</span><span class="o">=</span><span class="n">constraint_id</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">wanted_constraint</span> <span class="o">==</span> <span class="n">user_rule</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints_presence_check</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">remove_constraint</span><span class="p">(</span><span class="n">constraint_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints_absence_check</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="TestConstraints.test_remove_line"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestConstraints.test_remove_line">[docs]</a>    <span class="k">def</span> <span class="nf">test_remove_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removing line should indicate removal of related constraints.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_identical_constraint</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints_presence_check</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">remove_line</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints_absence_check</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="TestConstraints.test_update_pattern"><a class="viewcode-back" href="../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.TestConstraints.test_update_pattern">[docs]</a>    <span class="k">def</span> <span class="nf">test_update_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updating pattern of line should indicate removal of related constraints.</span>
+<span class="sd">        (even if new pattern is the same as old or has the same groups)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_identical_constraint</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints_presence_check</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">update_pattern</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause1_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cause1_pattern</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constraints_absence_check</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

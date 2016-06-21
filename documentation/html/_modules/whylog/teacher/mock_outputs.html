@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.teacher.mock_outputs &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.teacher" href="../teacher.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../teacher.html" accesskey="U">whylog.teacher</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.teacher.mock_outputs</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">whylog.assistant.const</span> <span class="kn">import</span> <span class="n">AssistantType</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.pattern_match</span> <span class="kn">import</span> <span class="n">ParamGroup</span>
+<span class="kn">from</span> <span class="nn">whylog.teacher.user_intent</span> <span class="kn">import</span> <span class="n">UserConstraintIntent</span><span class="p">,</span> <span class="n">UserParserIntent</span><span class="p">,</span> <span class="n">UserRuleIntent</span>
+
+
+<div class="viewcode-block" id="create_sample_rule"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.mock_outputs.create_sample_rule">[docs]</a><span class="k">def</span> <span class="nf">create_sample_rule</span><span class="p">():</span>
+    <span class="n">identical_constr</span> <span class="o">=</span> <span class="s">&quot;identical&quot;</span>
+    <span class="n">different_constr</span> <span class="o">=</span> <span class="s">&quot;different&quot;</span>
+    <span class="n">hetero_constr</span> <span class="o">=</span> <span class="s">&quot;hetero&quot;</span>
+
+    <span class="n">to_date</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span>
+    <span class="n">to_string</span> <span class="o">=</span> <span class="s">&quot;string&quot;</span>
+    <span class="n">to_int</span> <span class="o">=</span> <span class="s">&quot;int&quot;</span>
+
+    <span class="n">sample_line1</span> <span class="o">=</span> <span class="s">&quot;2016-04-12 23:54:45 Connection error occurred on comp1. Host name: host1&quot;</span>
+    <span class="n">sample_line2</span> <span class="o">=</span> <span class="s">&quot;2016-04-12 23:54:40 Data migration from comp1 to comp2 failed. Host name: host2&quot;</span>
+    <span class="n">sample_line3</span> <span class="o">=</span> <span class="s">&quot;2016-04-12 23:54:43 Data is missing at comp2. Loss = 150 GB. Host name: host2&quot;</span>
+
+    <span class="n">regex1</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$&quot;</span>
+    <span class="n">regex2</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$&quot;</span>
+    <span class="n">regex3</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$&quot;</span>
+
+    <span class="c"># yapf: disable</span>
+    <span class="n">groups1</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;2016-04-12 23:54:45&quot;</span><span class="p">,</span> <span class="n">to_date</span><span class="p">),</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;comp1&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">),</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;host1&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">groups2</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;2016-04-12 23:54:40&quot;</span><span class="p">,</span> <span class="n">to_date</span><span class="p">),</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;comp2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">),</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;host2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">groups3</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;2016-04-12 23:54:43&quot;</span><span class="p">,</span> <span class="n">to_date</span><span class="p">),</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;comp2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">),</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;150&quot;</span><span class="p">,</span> <span class="n">to_int</span><span class="p">),</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;host2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="c"># resource location is temporary a string, because there is no ResourceLocation class yet.</span>
+    <span class="c"># TODO: Change following resource locations to ResourceLocation objects</span>
+    <span class="n">resource_location1</span> <span class="o">=</span> <span class="s">&quot;serwer1&quot;</span>
+    <span class="n">resource_location2</span> <span class="o">=</span> <span class="s">&quot;serwer2&quot;</span>
+    <span class="n">resource_location3</span> <span class="o">=</span> <span class="s">&quot;serwer3&quot;</span>
+
+    <span class="n">regex_type</span> <span class="o">=</span> <span class="n">AssistantType</span><span class="o">.</span><span class="n">REGEX</span>
+
+    <span class="n">parser_intent1</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+        <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;connectionerror&quot;</span><span class="p">,</span> <span class="n">regex1</span><span class="p">,</span> <span class="s">&quot;hydra&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">groups1</span><span class="p">,</span> <span class="n">sample_line1</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span>
+        <span class="n">resource_location1</span>
+    <span class="p">)</span>
+    <span class="n">parser_intent2</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+        <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;datamigration&quot;</span><span class="p">,</span> <span class="n">regex2</span><span class="p">,</span> <span class="s">&quot;hydra&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">groups2</span><span class="p">,</span> <span class="n">sample_line2</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="n">resource_location2</span>
+    <span class="p">)</span>
+    <span class="n">parser_intent3</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+        <span class="n">regex_type</span><span class="p">,</span> <span class="s">&quot;lostdata&quot;</span><span class="p">,</span> <span class="n">regex3</span><span class="p">,</span> <span class="s">&quot;filesystem&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">groups3</span><span class="p">,</span> <span class="n">sample_line3</span><span class="p">,</span> <span class="mi">1994</span><span class="p">,</span>
+        <span class="n">resource_location3</span>
+    <span class="p">)</span>
+    <span class="c"># yapf: enable</span>
+
+    <span class="n">parsers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">parser_intent1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="n">parser_intent2</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="n">parser_intent3</span><span class="p">}</span>
+    <span class="n">effect_id</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">constraint1</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="n">identical_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+    <span class="n">constraint2</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="n">identical_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+    <span class="n">constraint3</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="n">different_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+    <span class="n">constraint4</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="n">hetero_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span> <span class="p">{</span><span class="s">&quot;different&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">constraint1</span><span class="p">,</span> <span class="n">constraint2</span><span class="p">,</span> <span class="n">constraint3</span><span class="p">,</span> <span class="n">constraint4</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">UserRuleIntent</span><span class="p">(</span><span class="n">effect_id</span><span class="p">,</span> <span class="n">parsers</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

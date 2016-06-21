@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.constraints &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.constraints</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.constraints.const</span> <span class="kn">import</span> <span class="n">ConstraintType</span>
+<span class="kn">from</span> <span class="nn">whylog.converters</span> <span class="kn">import</span> <span class="n">ConverterType</span><span class="p">,</span> <span class="n">get_converter</span>
+<span class="kn">from</span> <span class="nn">whylog.converters.exceptions</span> <span class="kn">import</span> <span class="n">ConverterError</span>
+<span class="kn">from</span> <span class="nn">whylog.teacher.user_intent</span> <span class="kn">import</span> <span class="n">UserConstraintIntent</span>
+
+<span class="kn">from</span> <span class="nn">whylog.constraints.exceptions</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c"># isort:skip</span>
+    <span class="n">ConstructorGroupsCountError</span><span class="p">,</span> <span class="n">ConstructorParamsError</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">whylog.constraints.validation_problems</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c"># isort:skip</span>
+    <span class="n">MinGreaterThatMaxProblem</span><span class="p">,</span> <span class="n">NoTimeDeltasProblem</span><span class="p">,</span> <span class="n">ParamConversionProblem</span>
+<span class="p">)</span>
+
+
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractConstraint"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.AbstractConstraint">[docs]</a><span class="k">class</span> <span class="nc">AbstractConstraint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param MIN_GROUPS_COUNT: minimal groups count needed to create constraint</span>
+<span class="sd">    :param MAX_GROUPS_COUNT: maximal groups count needed to create constraint</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">TYPE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constraint type name. Must be unique for each constraint.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="n">MIN_GROUPS_COUNT</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">MAX_GROUPS_COUNT</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">PARAMS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Params names and converters.</span>
+<span class="sd">        Constraint construction requires a dict[param name, param value].</span>
+<span class="sd">        Some of then can be optional.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">param_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">params_checking</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For Teacher and Front use while creating user rule.</span>
+<span class="sd">        :param param_dict: dict of additional params of constraint</span>
+<span class="sd">        :param groups: all groups that are linked by constraint,</span>
+<span class="sd">                       represented by list of tuples (line_id, group_no),</span>
+<span class="sd">                       where line_id and group_no is inner numeration between Front and Teacher</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">param_dict</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">params_checking</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_constructor_groups</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_constructor_params_occurrence</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_check_constructor_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">groups_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_GROUPS_COUNT</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">groups_count</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_GROUPS_COUNT</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_GROUPS_COUNT</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">groups_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_GROUPS_COUNT</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConstructorGroupsCountError</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TYPE</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_GROUPS_COUNT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_GROUPS_COUNT</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_constructor_params_occurrence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">correct_param_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">())</span>
+        <span class="n">actual_param_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_useless_params</span><span class="p">(</span><span class="n">correct_param_names</span><span class="p">,</span> <span class="n">actual_param_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_mandatory_params</span><span class="p">(</span><span class="n">correct_param_names</span><span class="p">,</span> <span class="n">actual_param_names</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_useless_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correct_param_names</span><span class="p">,</span> <span class="n">actual_param_names</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">actual_param_names</span> <span class="o">-</span> <span class="n">correct_param_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConstructorParamsError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TYPE</span><span class="p">,</span> <span class="n">correct_param_names</span><span class="p">,</span> <span class="n">actual_param_names</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_mandatory_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correct_param_names</span><span class="p">,</span> <span class="n">actual_param_names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies mandatory params used to construct Constraint</span>
+<span class="sd">        Throws exception if params don&#39;t meet requirements</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="AbstractConstraint.convert_to_user_constraint_intent"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.AbstractConstraint.convert_to_user_constraint_intent">[docs]</a>    <span class="k">def</span> <span class="nf">convert_to_user_constraint_intent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts constraint to UserConstraintIntent object.</span>
+
+<span class="sd">        For Teacher and Config use while saving constraint into Whylog knowledge base.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TYPE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">constraint_id</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractConstraint.get_param_names"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.AbstractConstraint.get_param_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_param_names</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns names of constraint additional params.</span>
+<span class="sd">        For Front to display param names to user and then ask user for param contents.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">PARAMS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractConstraint.get_groups_count"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.AbstractConstraint.get_groups_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_groups_count</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns minimal and maximal count of groups needed to create constraint.</span>
+<span class="sd">        For Front to ask user for proper count of groups.</span>
+<span class="sd">        2, None - at least 2 groups</span>
+<span class="sd">        2, 2 - exactly 2 groups</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">MIN_GROUPS_COUNT</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">MAX_GROUPS_COUNT</span>
+</div>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractConstraint.verify"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.AbstractConstraint.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_contents</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies constraint for given params in param_dict and groups contents.</span>
+
+<span class="sd">        :param param_dict: dict of additional params of constraint</span>
+<span class="sd">        :param groups: list of groups contents,</span>
+
+<span class="sd">        For LogReader and Teacher verification.</span>
+<span class="sd">        It must be optimized as well as possible (for LogReader).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">pass</span>
+</div>
+    <span class="k">def</span> <span class="nf">_convert_params_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">problems</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">converter_type</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PARAMS</span><span class="p">):</span>
+            <span class="n">param_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">param_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">converter</span> <span class="o">=</span> <span class="n">get_converter</span><span class="p">(</span><span class="n">converter_type</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">converted_val</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">safe_convert</span><span class="p">(</span><span class="n">param_val</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">ConverterError</span><span class="p">:</span>
+                    <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ParamConversionProblem</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">param_val</span><span class="p">,</span> <span class="n">converter_type</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">converted_val</span>
+        <span class="k">return</span> <span class="n">problems</span>
+
+    <span class="k">def</span> <span class="nf">_validate_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_params_values</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_validate_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># TODO: implement</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="AbstractConstraint.validate"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.AbstractConstraint.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates constraint: verifies if it is ready to save</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_params</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_groups</span><span class="p">()</span>
+
+</div></div>
+<div class="viewcode-block" id="TimeConstraint"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.TimeConstraint">[docs]</a><span class="k">class</span> <span class="nc">TimeConstraint</span><span class="p">(</span><span class="n">AbstractConstraint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Time delta between two dates must be greater or equal to &#39;min_delta&#39;</span>
+<span class="sd">    and lower or equal to &#39;max_delta&#39;</span>
+<span class="sd">    I.e:</span>
+<span class="sd">    TimeConstraint(</span>
+<span class="sd">        [(0, 1), (2, 1)]</span>
+<span class="sd">        {&#39;min_delta&#39;: datetime.timedelta(seconds=1), &#39;max_delta&#39;: datetime.timedelta(seconds=10)},</span>
+<span class="sd">    )</span>
+<span class="sd">    :param groups: First element of groups is a group with earlier date.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TYPE</span> <span class="o">=</span> <span class="n">ConstraintType</span><span class="o">.</span><span class="n">TIME_DELTA</span>
+
+    <span class="n">MAX_GROUPS_COUNT</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">MIN_DELTA</span> <span class="o">=</span> <span class="s">&#39;min_delta&#39;</span>
+    <span class="n">MAX_DELTA</span> <span class="o">=</span> <span class="s">&#39;max_delta&#39;</span>
+
+    <span class="n">PARAMS</span> <span class="o">=</span> <span class="p">{</span><span class="n">MIN_DELTA</span><span class="p">:</span> <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_FLOAT</span><span class="p">,</span> <span class="n">MAX_DELTA</span><span class="p">:</span> <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_FLOAT</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">param_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">params_checking</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimeConstraint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">,</span> <span class="n">params_checking</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">params_checking</span><span class="p">:</span>
+            <span class="n">param_min_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">)</span>
+            <span class="n">param_max_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_DELTA</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">param_min_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">param_max_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="n">param_min_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">param_max_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_both</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_min_delta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">param_min_delta</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_max_delta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">param_max_delta</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">param_max_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_max</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_max_delta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">param_max_delta</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">param_min_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_min</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_min_delta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">param_min_delta</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_verify_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_contents</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="n">earlier_date</span><span class="p">,</span> <span class="n">later_date</span> <span class="o">=</span> <span class="n">group_contents</span>
+        <span class="k">return</span> <span class="n">later_date</span> <span class="o">-</span> <span class="n">earlier_date</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_delta</span>
+
+    <span class="k">def</span> <span class="nf">_verify_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_contents</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="n">earlier_date</span><span class="p">,</span> <span class="n">later_date</span> <span class="o">=</span> <span class="n">group_contents</span>
+        <span class="k">return</span> <span class="n">later_date</span> <span class="o">-</span> <span class="n">earlier_date</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_delta</span>
+
+    <span class="k">def</span> <span class="nf">_verify_both</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_contents</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="n">earlier_date</span><span class="p">,</span> <span class="n">later_date</span> <span class="o">=</span> <span class="n">group_contents</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_delta</span> <span class="o">&gt;=</span> <span class="n">later_date</span> <span class="o">-</span> <span class="n">earlier_date</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_delta</span>
+
+<div class="viewcode-block" id="TimeConstraint.verify"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.TimeConstraint.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_contents</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+    <span class="k">def</span> <span class="nf">_validate_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">problems</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TimeConstraint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_validate_params</span><span class="p">()</span>
+        <span class="n">param_min_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">)</span>
+        <span class="n">param_max_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_DELTA</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">param_min_delta</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">param_max_delta</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NoTimeDeltasProblem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_DELTA</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_DELTA</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">param_min_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">param_max_delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">param_min_delta</span> <span class="o">&gt;</span> <span class="n">param_max_delta</span><span class="p">:</span>
+                <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MinGreaterThatMaxProblem</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">problems</span>
+
+</div>
+<div class="viewcode-block" id="IdenticalConstraint"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.IdenticalConstraint">[docs]</a><span class="k">class</span> <span class="nc">IdenticalConstraint</span><span class="p">(</span><span class="n">AbstractConstraint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of groups must be identical.</span>
+<span class="sd">    I.e:</span>
+<span class="sd">    IdenticalConstraint([(1, 2), (2, 4)])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TYPE</span> <span class="o">=</span> <span class="n">ConstraintType</span><span class="o">.</span><span class="n">IDENTICAL</span>
+
+    <span class="n">PARAMS</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="IdenticalConstraint.verify"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.IdenticalConstraint.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_contents</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        I.e:</span>
+<span class="sd">        - verify([&#39;comp1&#39;, &#39;comp1&#39;, &#39;comp1&#39;], {}) returns True</span>
+<span class="sd">        - verify([&#39;comp1&#39;, &#39;hello&#39;, &#39;comp1&#39;], {}) returns False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">group_contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">group_contents</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="DifferentConstraint"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.DifferentConstraint">[docs]</a><span class="k">class</span> <span class="nc">DifferentConstraint</span><span class="p">(</span><span class="n">AbstractConstraint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contents of groups must be different.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TYPE</span> <span class="o">=</span> <span class="n">ConstraintType</span><span class="o">.</span><span class="n">DIFFERENT</span>
+
+    <span class="n">PARAM_VALUE</span> <span class="o">=</span> <span class="s">&quot;value&quot;</span>
+    <span class="n">PARAMS</span> <span class="o">=</span> <span class="p">{</span><span class="n">PARAM_VALUE</span><span class="p">:</span> <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_STRING</span><span class="p">}</span>
+
+<div class="viewcode-block" id="DifferentConstraint.verify"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.DifferentConstraint.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_contents</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PARAM_VALUE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">param</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">group_contents</span><span class="p">,</span> <span class="p">[</span><span class="n">param</span><span class="p">])))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_contents</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">group_contents</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_contents</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="ValueDeltaConstraint"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.ValueDeltaConstraint">[docs]</a><span class="k">class</span> <span class="nc">ValueDeltaConstraint</span><span class="p">(</span><span class="n">AbstractConstraint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Value delta between values must be greater than &#39;min_delta&#39; and lower than &#39;max_delta&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+</div>
+<div class="viewcode-block" id="HeteroConstraint"><a class="viewcode-back" href="../../whylog.constraints.html#whylog.constraints.HeteroConstraint">[docs]</a><span class="k">class</span> <span class="nc">HeteroConstraint</span><span class="p">(</span><span class="n">AbstractConstraint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A number of groups must be identical, the rest must be different.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

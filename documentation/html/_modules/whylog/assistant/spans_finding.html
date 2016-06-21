@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.assistant.spans_finding &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.assistant" href="../assistant.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../assistant.html" accesskey="U">whylog.assistant</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.assistant.spans_finding</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Methods responsible for finding spans (potential params) for given text.</span>
+<span class="sd">Some heuristic included.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">from</span> <span class="nn">dateutil.parser</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">date_parse</span>
+
+<span class="kn">from</span> <span class="nn">whylog.assistant.const</span> <span class="kn">import</span> <span class="n">DateParams</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.regex_assistant.regex</span> <span class="kn">import</span> <span class="n">create_date_regex</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.span</span> <span class="kn">import</span> <span class="n">Span</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.span_list</span> <span class="kn">import</span> <span class="n">SpanList</span>
+<span class="kn">from</span> <span class="nn">whylog.converters</span> <span class="kn">import</span> <span class="n">ConverterType</span>
+
+<span class="n">possible_span_start_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;(?&lt;=[^\w])[\w]|^[\w]&quot;</span><span class="p">)</span>
+<span class="n">possible_span_end_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;\w(?=[^\w])|\w$&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="find_date_spans"><a class="viewcode-back" href="../../../whylog.assistant.html#whylog.assistant.spans_finding.find_date_spans">[docs]</a><span class="k">def</span> <span class="nf">find_date_spans</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">regexes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">regexes</span> <span class="o">=</span> <span class="n">regexes</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="n">forced_date_spans</span> <span class="o">=</span> <span class="n">_find_date_spans_by_force</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">regex_date_spans</span> <span class="o">=</span> <span class="n">_find_date_spans_by_regex</span><span class="p">(</span><span class="n">regexes</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+    <span class="n">unique_spans</span> <span class="o">=</span> <span class="n">forced_date_spans</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">regex_date_spans</span><span class="p">)</span>
+
+    <span class="n">ordered_date_spans</span> <span class="o">=</span> <span class="n">SpanList</span><span class="p">(</span><span class="n">unique_spans</span><span class="p">)</span><span class="o">.</span><span class="n">sort_reversed_by_length</span><span class="p">()</span>
+
+    <span class="n">best_spans</span> <span class="o">=</span> <span class="n">SpanList</span><span class="o">.</span><span class="n">not_overlapping_spans</span><span class="p">(</span><span class="n">ordered_date_spans</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">best_spans</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_find_date_spans_by_regex</span><span class="p">(</span><span class="n">regexes</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">find_spans_by_regex</span><span class="p">(</span>
+        <span class="n">regexes</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">pattern_creator</span><span class="o">=</span><span class="n">create_date_regex</span><span class="p">,</span>
+        <span class="n">converter</span><span class="o">=</span><span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_DATE</span>
+    <span class="p">)</span>  <span class="c"># yapf: disable</span>
+
+
+<span class="k">def</span> <span class="nf">_find_date_spans_by_force</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">date_spans</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="n">proper_starts</span><span class="p">,</span> <span class="n">proper_ends</span> <span class="o">=</span> <span class="n">_possible_span_starts_and_ends</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">proper_ends</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+    <span class="n">date_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">not_overlapping_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">proper_starts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">not_overlapping_start</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">proper_ends</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="o">&lt;</span> <span class="n">start</span> <span class="o">+</span> <span class="n">DateParams</span><span class="o">.</span><span class="n">MIN_DATE_LENGTH</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">date_text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                <span class="n">date</span> <span class="o">=</span> <span class="n">date_parse</span><span class="p">(</span><span class="n">date_text</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">date</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="n">date_now</span><span class="o">.</span><span class="n">year</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">new_span</span> <span class="o">=</span> <span class="n">Span</span><span class="p">(</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">pattern_creator</span><span class="o">=</span><span class="n">create_date_regex</span><span class="p">,</span> <span class="n">converter</span><span class="o">=</span><span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_DATE</span>
+            <span class="p">)</span>  <span class="c"># yapf: disable</span>
+            <span class="n">date_spans</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_span</span><span class="p">)</span>
+            <span class="n">not_overlapping_start</span> <span class="o">=</span> <span class="n">end</span>
+            <span class="c"># break, because we don&#39;t care about shorter date groups</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">date_spans</span>
+
+
+<div class="viewcode-block" id="find_spans_by_regex"><a class="viewcode-back" href="../../../whylog.assistant.html#whylog.assistant.spans_finding.find_spans_by_regex">[docs]</a><span class="k">def</span> <span class="nf">find_spans_by_regex</span><span class="p">(</span><span class="n">regexes</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">pattern_creator</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">converter</span><span class="o">=</span><span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_STRING</span><span class="p">):</span>
+    <span class="n">spans</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">compiled_regex</span><span class="p">,</span> <span class="n">regex</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">regexes</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">compiled_regex</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+            <span class="n">new_span</span> <span class="o">=</span> <span class="n">Span</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">regex</span><span class="p">,</span> <span class="n">pattern_creator</span><span class="p">,</span> <span class="n">converter</span><span class="p">)</span>
+            <span class="n">spans</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_span</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spans</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_possible_span_starts_and_ends</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    for given text finds possible starts and ends of potential spans.</span>
+
+<span class="sd">    Based on observation that group does not start/end in the middle of alphanumerical sequence</span>
+<span class="sd">    or whitespace sequence and is not position of punctuation mark</span>
+
+<span class="sd">    I.e For given text: &quot;[18/Sep/2007] Reboot failed&quot;,</span>
+<span class="sd">    possible starts are: &#39;1&#39;, &#39;S&#39;, &#39;2&#39;, &#39;R&#39;, &#39;f&#39;,</span>
+<span class="sd">    possible ends are: &#39;8&#39;, &#39;p&#39;, &#39;7&#39;, &#39;t&#39;, &#39;d&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">starts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">matcher</span> <span class="ow">in</span> <span class="n">possible_span_start_pattern</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">starts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">ends</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">matcher</span> <span class="ow">in</span> <span class="n">possible_span_end_pattern</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">ends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matcher</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

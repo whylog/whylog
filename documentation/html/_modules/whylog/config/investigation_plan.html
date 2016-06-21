@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.config.investigation_plan &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.config" href="../config.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../config.html" accesskey="U">whylog.config</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.config.investigation_plan</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.config.utils</span> <span class="kn">import</span> <span class="n">CompareResult</span>
+
+
+<div class="viewcode-block" id="InvestigationPlan"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.investigation_plan.InvestigationPlan">[docs]</a><span class="k">class</span> <span class="nc">InvestigationPlan</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents all rules that can be fulfilled in single investigation.</span>
+<span class="sd">    Also contains all investigation metadata, what means all pairs</span>
+<span class="sd">    (investigationstep, logtype) neccesary for investigation</span>
+<span class="sd">    For single log type we have single investigation step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suspected_rules</span><span class="p">,</span> <span class="n">investigation_metadata</span><span class="p">,</span> <span class="n">effect_clues</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_suspected_rules</span> <span class="o">=</span> <span class="n">suspected_rules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_investigation_metadata</span> <span class="o">=</span> <span class="n">investigation_metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_effect_clues</span> <span class="o">=</span> <span class="n">effect_clues</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">investigation_steps_with_log_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_investigation_metadata</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">suspected_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_suspected_rules</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">effect_clues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effect_clues</span>
+
+</div>
+<div class="viewcode-block" id="InvestigationStep"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.investigation_plan.InvestigationStep">[docs]</a><span class="k">class</span> <span class="nc">InvestigationStep</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains all parsers for single log type that can be matched in actual investigation.</span>
+<span class="sd">    This class is responsible for finding all possible Clues from parsed logs.</span>
+<span class="sd">    Also controls searched time range in logs file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LEFT_BOUND</span><span class="p">,</span> <span class="n">RIGHT_BOUND</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser_subset</span><span class="p">,</span> <span class="n">search_ranges</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parser_subset</span> <span class="o">=</span> <span class="n">parser_subset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_search_ranges</span> <span class="o">=</span> <span class="n">search_ranges</span>
+
+<div class="viewcode-block" id="InvestigationStep.is_line_in_search_range"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.investigation_plan.InvestigationStep.is_line_in_search_range">[docs]</a>    <span class="k">def</span> <span class="nf">is_line_in_search_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">super_parser_groups</span><span class="p">):</span>
+        <span class="c">#TODO: delete this deprecated method</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="InvestigationStep.compare_with_bound"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.investigation_plan.InvestigationStep.compare_with_bound">[docs]</a>    <span class="k">def</span> <span class="nf">compare_with_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">super_parser_groups</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Basing on super_parser_groups extracted from line, returns information</span>
+<span class="sd">        how relative to choosed bound (LEFT_BOUND or RIGHT_BOUND) this line is.</span>
+<span class="sd">        Example:</span>
+<span class="sd">            bound = InvestigationStep.LEFT_BOUND (only other possible value of this parameter is</span>
+<span class="sd">                    InvestigationStep.RIGHT_BOUND)</span>
+<span class="sd">            super_parser_groups = [(&#39;date&#39;, datetime(2015, 12, 3, 12, 8, 9))]</span>
+<span class="sd">            self._search_ranges = {</span>
+<span class="sd">                &#39;date&#39;: {</span>
+<span class="sd">                    &#39;left_bound&#39;: datetime(2015, 12, 3, 12, 8, 0),</span>
+<span class="sd">                    &#39;right_bound&#39;: datetime(2015, 12, 3, 12, 8, 11)</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">            returned value: CompareResult.GT</span>
+<span class="sd">        When self._search_ranges hasn&#39;t defined bounds for given primary key type this method</span>
+<span class="sd">        return GT/LT when compare with RIGHT_BOUND/LEFT_BOUND.</span>
+<span class="sd">        This means that InvestigationStep object hasn&#39;t information about order in parsed file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># This implementation assume that super_parser_groups length equals 1 or 0</span>
+        <span class="c"># TODO implementation for longer super_parser_groups_list</span>
+        <span class="n">group_value</span><span class="p">,</span> <span class="n">bound_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_values_to_compare</span><span class="p">(</span><span class="n">bound</span><span class="p">,</span> <span class="n">super_parser_groups</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bound_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compare_with_undefined_bound</span><span class="p">(</span><span class="n">bound</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compare_values</span><span class="p">(</span><span class="n">bound_value</span><span class="p">,</span> <span class="n">group_value</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_extract_values_to_compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">super_parser_groups</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">super_parser_groups</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="n">group_type</span><span class="p">,</span> <span class="n">group_value</span> <span class="o">=</span> <span class="n">super_parser_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c"># type_bound is a dictionary, that contains bounds (LEFT and RIGHT bound)</span>
+        <span class="c"># values for concrete primary key type</span>
+        <span class="n">type_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_ranges</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_bounds</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="n">group_value</span><span class="p">,</span> <span class="n">type_bounds</span><span class="p">[</span><span class="n">bound</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_compare_with_undefined_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bound</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bound</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CompareResult</span><span class="o">.</span><span class="n">GT</span>
+        <span class="k">return</span> <span class="n">CompareResult</span><span class="o">.</span><span class="n">LT</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_compare_values</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">bound_value</span><span class="p">,</span> <span class="n">group_value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">group_value</span> <span class="o">&lt;</span> <span class="n">bound_value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CompareResult</span><span class="o">.</span><span class="n">LT</span>
+        <span class="k">elif</span> <span class="n">group_value</span> <span class="o">&gt;</span> <span class="n">bound_value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CompareResult</span><span class="o">.</span><span class="n">GT</span>
+        <span class="k">return</span> <span class="n">CompareResult</span><span class="o">.</span><span class="n">EQ</span>
+
+<div class="viewcode-block" id="InvestigationStep.get_clues"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.investigation_plan.InvestigationStep.get_clues">[docs]</a>    <span class="k">def</span> <span class="nf">get_clues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">line_source</span><span class="p">):</span>
+        <span class="n">converted_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser_subset</span><span class="o">.</span><span class="n">convert_parsers_groups_from_matched_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">parser_name</span><span class="p">,</span> <span class="n">Clue</span><span class="p">(</span><span class="n">converted_groups</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">line_source</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">parser_name</span><span class="p">,</span> <span class="n">converted_groups</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">converted_params</span><span class="p">)</span>
+        <span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="Clue"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.investigation_plan.Clue">[docs]</a><span class="k">class</span> <span class="nc">Clue</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collects all the data that parser subset can extract from single log line.</span>
+<span class="sd">    Also, contains parsed line and its source.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_parameters</span><span class="p">,</span> <span class="n">line_prefix_content</span><span class="p">,</span> <span class="n">line_offset</span><span class="p">,</span> <span class="n">line_source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_parameters</span> <span class="o">=</span> <span class="n">regex_parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_prefix_content</span> <span class="o">=</span> <span class="n">line_prefix_content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span> <span class="o">=</span> <span class="n">line_offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_source</span> <span class="o">=</span> <span class="n">line_source</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">elem</span> <span class="ow">is</span> <span class="bp">None</span>
+            <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">regex_parameters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_prefix_content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_source</span>
+            <span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s">&quot;(Clue: UNMATCHED)&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;(Clue: </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regex_parameters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_prefix_content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_source</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">((</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regex_parameters</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">regex_parameters</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">line_prefix_content</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">line_prefix_content</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">line_offset</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">line_source</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">line_source</span>
+        <span class="p">))</span>  <span class="c"># yapf: disable</span>
+
+</div>
+<div class="viewcode-block" id="LineSource"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.investigation_plan.LineSource">[docs]</a><span class="k">class</span> <span class="nc">LineSource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;(LineSource: </span><span class="si">%s</span><span class="s">:</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

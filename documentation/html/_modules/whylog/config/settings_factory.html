@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.config.settings_factory &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.config" href="../config.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../config.html" accesskey="U">whylog.config</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.config.settings_factory</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">from</span> <span class="nn">whylog.config.consts</span> <span class="kn">import</span> <span class="n">YamlFileNames</span>
+
+
+<div class="viewcode-block" id="AbstractSettingsFactory"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.settings_factory.AbstractSettingsFactory">[docs]</a><span class="k">class</span> <span class="nc">AbstractSettingsFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Note: This class use yaml format. Here is assumption that in every .whylog dir we have a</span>
+<span class="sd">    settings settings.yaml file. Which has all data that enable creating subclass AbstractConfig object and</span>
+<span class="sd">    subclass AbstractAssistant. No matter what kind of config was saved in settings.yaml.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DEFAULT_PATTERN_ASSISTANT</span> <span class="o">=</span> <span class="s">&#39;regex&#39;</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractSettingsFactory.create_new_settings_dir"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.settings_factory.AbstractSettingsFactory.create_new_settings_dir">[docs]</a>    <span class="k">def</span> <span class="nf">create_new_settings_dir</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">base_path</span><span class="p">,</span> <span class="n">whylog_dir</span><span class="p">,</span> <span class="n">settings_file</span><span class="p">):</span>
+        <span class="n">whylog_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">whylog_dir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">whylog_dir</span><span class="p">,</span> <span class="mi">0</span><span class="n">o755</span><span class="p">)</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_create_settings_dict</span><span class="p">(</span><span class="n">whylog_dir</span><span class="p">)</span>
+        <span class="n">path_to_settings</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">whylog_dir</span><span class="p">,</span> <span class="n">settings_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_create_settings_file</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">path_to_settings</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_empty_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_settings_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">config_paths</span><span class="p">,</span> <span class="n">path_to_config</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_to_config</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+            <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="n">config_paths</span><span class="p">,</span> <span class="n">explicit_start</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">path_to_config</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_create_settings_dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">whylog_dir</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="YamlSettingsFactory"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.settings_factory.YamlSettingsFactory">[docs]</a><span class="k">class</span> <span class="nc">YamlSettingsFactory</span><span class="p">(</span><span class="n">AbstractSettingsFactory</span><span class="p">):</span>
+    <span class="n">FILES_NAMES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;parsers_path&#39;</span><span class="p">:</span> <span class="n">YamlFileNames</span><span class="o">.</span><span class="n">parsers</span><span class="p">,</span>
+        <span class="s">&#39;rules_path&#39;</span><span class="p">:</span> <span class="n">YamlFileNames</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span>
+        <span class="s">&#39;log_types_path&#39;</span><span class="p">:</span> <span class="n">YamlFileNames</span><span class="o">.</span><span class="n">default_log_types</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_settings_dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">whylog_dir</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">FILES_NAMES</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">whylog_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">_create_empty_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">settings</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s">&#39;pattern_assistant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">DEFAULT_PATTERN_ASSISTANT</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s">&#39;config_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;yaml&#39;</span>
+        <span class="k">return</span> <span class="n">settings</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

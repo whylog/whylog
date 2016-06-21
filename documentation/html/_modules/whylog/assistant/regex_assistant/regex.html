@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.assistant.regex_assistant.regex &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../../index.html" />
+    <link rel="up" title="whylog.assistant.regex_assistant" href="../regex_assistant.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../../assistant.html" >whylog.assistant</a> &raquo;</li>
+          <li class="nav-item nav-item-3"><a href="../regex_assistant.html" accesskey="U">whylog.assistant.regex_assistant</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.assistant.regex_assistant.regex</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Regex verification and creating (but not finding groups in regex)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">whylog.assistant.regex_assistant.exceptions</span> <span class="kn">import</span> <span class="n">NotMatchingRegexError</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.span_list</span> <span class="kn">import</span> <span class="n">SpanList</span>
+
+<span class="n">special_characters</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="s">&#39;.^$*+{}?[]|()]&#39;</span><span class="p">)</span>
+<span class="n">group_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;[a-zA-Z]+|[0-9]+|\s+|[\W]+&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="regex_from_group_spans"><a class="viewcode-back" href="../../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.regex.regex_from_group_spans">[docs]</a><span class="k">def</span> <span class="nf">regex_from_group_spans</span><span class="p">(</span><span class="n">group_spans</span><span class="p">,</span> <span class="n">line_text</span><span class="p">):</span>
+    <span class="n">sorted_group_spans</span> <span class="o">=</span> <span class="n">group_spans</span><span class="o">.</span><span class="n">sort_by_start_and_end</span><span class="p">()</span>
+    <span class="c"># TODO:</span>
+    <span class="c"># [(1,5), (2, 3)] -&gt; [(1,5)]</span>
+    <span class="c"># [(1,5), (3, 7)] -&gt; Error somewhere</span>
+    <span class="n">greedy_group_spans</span> <span class="o">=</span> <span class="n">SpanList</span><span class="o">.</span><span class="n">not_overlapping_spans</span><span class="p">(</span><span class="n">sorted_group_spans</span><span class="p">)</span>
+    <span class="n">complement_spans</span> <span class="o">=</span> <span class="n">greedy_group_spans</span><span class="o">.</span><span class="n">complementary_spans</span><span class="p">(</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">line_text</span><span class="p">),</span> <span class="n">create_obvious_regex</span>
+    <span class="p">)</span>
+    <span class="n">line_spans</span> <span class="o">=</span> <span class="p">(</span><span class="n">complement_spans</span> <span class="o">+</span> <span class="n">greedy_group_spans</span><span class="p">)</span><span class="o">.</span><span class="n">sort_by_start_and_end</span><span class="p">()</span>
+
+    <span class="n">regex</span> <span class="o">=</span> <span class="s">r&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">line_spans</span><span class="p">:</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">update_pattern</span><span class="p">(</span><span class="n">line_text</span><span class="p">)</span>
+        <span class="n">span_pattern</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">pattern</span>
+        <span class="k">if</span> <span class="n">span</span><span class="o">.</span><span class="n">is_param</span><span class="p">:</span>
+            <span class="n">span_pattern</span> <span class="o">=</span> <span class="s">&quot;(&quot;</span> <span class="o">+</span> <span class="n">span_pattern</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span>
+        <span class="n">regex</span> <span class="o">+=</span> <span class="n">span_pattern</span>
+    <span class="k">return</span> <span class="n">regex</span>
+
+</div>
+<div class="viewcode-block" id="verify_regex"><a class="viewcode-back" href="../../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.regex.verify_regex">[docs]</a><span class="k">def</span> <span class="nf">verify_regex</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verifies regex properties such as:</span>
+<span class="sd">    - matching a whole text</span>
+<span class="sd">    If properties are not met, exception is raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># regex must match a whole text from its beginning to end.</span>
+    <span class="n">matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">$&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">regex</span><span class="p">,),</span> <span class="n">text</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">matcher</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NotMatchingRegexError</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">regex</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="regex_groups"><a class="viewcode-back" href="../../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.regex.regex_groups">[docs]</a><span class="k">def</span> <span class="nf">regex_groups</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="n">matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">$&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">regex</span><span class="p">,),</span> <span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">matcher</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NotMatchingRegexError</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">regex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">matcher</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="create_obvious_regex"><a class="viewcode-back" href="../../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.regex.create_obvious_regex">[docs]</a><span class="k">def</span> <span class="nf">create_obvious_regex</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates regex form text by simple transformation:</span>
+<span class="sd">    - backslash before backslash</span>
+<span class="sd">    - backslash before special character</span>
+<span class="sd">    :param text: must be a raw string</span>
+<span class="sd">    :return: obvious regex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">double_backslashed_text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\\\\</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">regex</span> <span class="o">=</span> <span class="s">r&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">double_backslashed_text</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">special_characters</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">&quot;</span>
+        <span class="n">regex</span> <span class="o">+=</span> <span class="n">char</span>
+    <span class="k">return</span> <span class="n">regex</span>
+
+</div>
+<div class="viewcode-block" id="create_date_regex"><a class="viewcode-back" href="../../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.regex.create_date_regex">[docs]</a><span class="k">def</span> <span class="nf">create_date_regex</span><span class="p">(</span><span class="n">date_text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates date regex based on observation that numbers in date</span>
+<span class="sd">    are represented as 1, 2 or 4 -digit numbers</span>
+<span class="sd">    i.e guess_date_regex(&quot;23/March/2016&quot;) = [0-9]{1,2}/[a-zA-Z]+/[0-9]{4}</span>
+<span class="sd">    :param date_text: must be a raw string</span>
+<span class="sd">    :return: date regex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># We divide date_text into groups consisting of:</span>
+    <span class="c"># only alpha or only num or only non-alphanumerical marks</span>
+    <span class="n">date_regex</span> <span class="o">=</span> <span class="s">r&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">matcher</span> <span class="ow">in</span> <span class="n">group_pattern</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">date_text</span><span class="p">):</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="n">date_text</span><span class="p">[</span><span class="n">start</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
+            <span class="n">date_regex</span> <span class="o">+=</span> <span class="s">&quot;[a-zA-Z]+&quot;</span>
+        <span class="k">elif</span> <span class="n">char</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">matcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">repetition_count</span> <span class="o">=</span> <span class="s">&quot;+&quot;</span>
+            <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">repetition_count</span> <span class="o">=</span> <span class="s">&quot;{1,2}&quot;</span>
+            <span class="k">elif</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">repetition_count</span> <span class="o">=</span> <span class="s">&quot;{4}&quot;</span>
+            <span class="n">date_regex</span> <span class="o">+=</span> <span class="s">&quot;[0-9]&quot;</span> <span class="o">+</span> <span class="n">repetition_count</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_regex</span> <span class="o">+=</span> <span class="n">create_obvious_regex</span><span class="p">(</span><span class="n">matcher</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">date_regex</span>
+
+</div>
+<div class="viewcode-block" id="create_matching_everything_regex"><a class="viewcode-back" href="../../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.regex.create_matching_everything_regex">[docs]</a><span class="k">def</span> <span class="nf">create_matching_everything_regex</span><span class="p">(</span><span class="n">date_text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">r&quot;.*&quot;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

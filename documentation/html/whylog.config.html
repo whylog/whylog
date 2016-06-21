@@ -1,0 +1,960 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.config package &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Whylog 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="whylog-config-package">
+<h1>whylog.config package<a class="headerlink" href="#whylog-config-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-whylog.config.abstract_config">
+<span id="whylog-config-abstract-config-module"></span><h2>whylog.config.abstract_config module<a class="headerlink" href="#module-whylog.config.abstract_config" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.abstract_config.AbstractConfig">
+<em class="property">class </em><code class="descclassname">whylog.config.abstract_config.</code><code class="descname">AbstractConfig</code><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="whylog.config.abstract_config.AbstractConfig.DEFAULT_LOG_TYPE">
+<code class="descname">DEFAULT_LOG_TYPE</code><em class="property"> = (LogType: default [(WildCardFilenameMatcher: default, , localhost)])</em><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.DEFAULT_LOG_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.abstract_config.AbstractConfig.DEFAULT_NAME">
+<code class="descname">DEFAULT_NAME</code><em class="property"> = 'default'</em><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.DEFAULT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.add_filename_matcher_to_log_type">
+<code class="descname">add_filename_matcher_to_log_type</code><span class="sig-paren">(</span><em>matcher</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.add_filename_matcher_to_log_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.add_filename_matcher_to_log_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.add_log_type">
+<code class="descname">add_log_type</code><span class="sig-paren">(</span><em>log_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.add_log_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.add_log_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.add_rule">
+<code class="descname">add_rule</code><span class="sig-paren">(</span><em>user_rule_intent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.add_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.add_rule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.create_investigation_plan">
+<code class="descname">create_investigation_plan</code><span class="sig-paren">(</span><em>front_input</em>, <em>log_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.create_investigation_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.create_investigation_plan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.get_all_log_types">
+<code class="descname">get_all_log_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.get_all_log_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.get_all_log_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.get_log_type">
+<code class="descname">get_log_type</code><span class="sig-paren">(</span><em>line_source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.get_log_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.get_log_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.is_free_parser_name">
+<code class="descname">is_free_parser_name</code><span class="sig-paren">(</span><em>parser_name</em>, <em>black_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.is_free_parser_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.is_free_parser_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.propose_parser_name">
+<code class="descname">propose_parser_name</code><span class="sig-paren">(</span><em>line</em>, <em>regex_str</em>, <em>black_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.propose_parser_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.propose_parser_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.abstract_config.AbstractConfig.rename_log_type">
+<code class="descname">rename_log_type</code><span class="sig-paren">(</span><em>old_name</em>, <em>new_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_config.html#AbstractConfig.rename_log_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.rename_log_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.abstract_config.AbstractConfig.words_count_in_name">
+<code class="descname">words_count_in_name</code><em class="property"> = 4</em><a class="headerlink" href="#whylog.config.abstract_config.AbstractConfig.words_count_in_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.abstract_file_config">
+<span id="whylog-config-abstract-file-config-module"></span><h2>whylog.config.abstract_file_config module<a class="headerlink" href="#module-whylog.config.abstract_file_config" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.abstract_file_config.AbstractFileConfig">
+<em class="property">class </em><code class="descclassname">whylog.config.abstract_file_config.</code><code class="descname">AbstractFileConfig</code><span class="sig-paren">(</span><em>parsers_path</em>, <em>rules_path</em>, <em>log_type_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/abstract_file_config.html#AbstractFileConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.abstract_file_config.AbstractFileConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.abstract_config.AbstractConfig" title="whylog.config.abstract_config.AbstractConfig"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.abstract_config.AbstractConfig</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.consts">
+<span id="whylog-config-consts-module"></span><h2>whylog.config.consts module<a class="headerlink" href="#module-whylog.config.consts" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.consts.YamlFileNames">
+<em class="property">class </em><code class="descclassname">whylog.config.consts.</code><code class="descname">YamlFileNames</code><a class="reference internal" href="_modules/whylog/config/consts.html#YamlFileNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.consts.YamlFileNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="whylog.config.consts.YamlFileNames.default_log_types">
+<code class="descname">default_log_types</code><em class="property"> = 'log_types.yaml'</em><a class="headerlink" href="#whylog.config.consts.YamlFileNames.default_log_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.consts.YamlFileNames.parsers">
+<code class="descname">parsers</code><em class="property"> = 'parsers.yaml'</em><a class="headerlink" href="#whylog.config.consts.YamlFileNames.parsers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.consts.YamlFileNames.rules">
+<code class="descname">rules</code><em class="property"> = 'rules.yaml'</em><a class="headerlink" href="#whylog.config.consts.YamlFileNames.rules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.consts.YamlFileNames.settings">
+<code class="descname">settings</code><em class="property"> = 'settings.yaml'</em><a class="headerlink" href="#whylog.config.consts.YamlFileNames.settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.consts.YamlFileNames.unix_log_types">
+<code class="descname">unix_log_types</code><em class="property"> = 'unix_log_types.yaml'</em><a class="headerlink" href="#whylog.config.consts.YamlFileNames.unix_log_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.consts.YamlFileNames.windows_log_types">
+<code class="descname">windows_log_types</code><em class="property"> = 'windows_log_types.yaml'</em><a class="headerlink" href="#whylog.config.consts.YamlFileNames.windows_log_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.exceptions">
+<span id="whylog-config-exceptions-module"></span><h2>whylog.config.exceptions module<a class="headerlink" href="#module-whylog.config.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="whylog.config.exceptions.NoLogTypeError">
+<em class="property">exception </em><code class="descclassname">whylog.config.exceptions.</code><code class="descname">NoLogTypeError</code><span class="sig-paren">(</span><em>log_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/exceptions.html#NoLogTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.exceptions.NoLogTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="whylog.html#whylog.exceptions.WhylogError" title="whylog.exceptions.WhylogError"><code class="xref py py-class docutils literal"><span class="pre">whylog.exceptions.WhylogError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="whylog.config.exceptions.RenameLogTypeError">
+<em class="property">exception </em><code class="descclassname">whylog.config.exceptions.</code><code class="descname">RenameLogTypeError</code><span class="sig-paren">(</span><em>log_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/exceptions.html#RenameLogTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.exceptions.RenameLogTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="whylog.html#whylog.exceptions.WhylogError" title="whylog.exceptions.WhylogError"><code class="xref py py-class docutils literal"><span class="pre">whylog.exceptions.WhylogError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="whylog.config.exceptions.UnsupportedConfigType">
+<em class="property">exception </em><code class="descclassname">whylog.config.exceptions.</code><code class="descname">UnsupportedConfigType</code><span class="sig-paren">(</span><em>unsupported_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/exceptions.html#UnsupportedConfigType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.exceptions.UnsupportedConfigType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.exceptions.WhylogConfigError" title="whylog.config.exceptions.WhylogConfigError"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.exceptions.WhylogConfigError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="whylog.config.exceptions.UnsupportedFilenameMatcher">
+<em class="property">exception </em><code class="descclassname">whylog.config.exceptions.</code><code class="descname">UnsupportedFilenameMatcher</code><span class="sig-paren">(</span><em>matcher_class_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/exceptions.html#UnsupportedFilenameMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.exceptions.UnsupportedFilenameMatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.exceptions.WhylogConfigError" title="whylog.config.exceptions.WhylogConfigError"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.exceptions.WhylogConfigError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="whylog.config.exceptions.UnsupportedPrimaryKeyType">
+<em class="property">exception </em><code class="descclassname">whylog.config.exceptions.</code><code class="descname">UnsupportedPrimaryKeyType</code><span class="sig-paren">(</span><em>type_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/exceptions.html#UnsupportedPrimaryKeyType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.exceptions.UnsupportedPrimaryKeyType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="whylog.html#whylog.exceptions.WhylogError" title="whylog.exceptions.WhylogError"><code class="xref py py-class docutils literal"><span class="pre">whylog.exceptions.WhylogError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="whylog.config.exceptions.WhylogConfigError">
+<em class="property">exception </em><code class="descclassname">whylog.config.exceptions.</code><code class="descname">WhylogConfigError</code><a class="reference internal" href="_modules/whylog/config/exceptions.html#WhylogConfigError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.exceptions.WhylogConfigError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="whylog.html#whylog.exceptions.WhylogError" title="whylog.exceptions.WhylogError"><code class="xref py py-class docutils literal"><span class="pre">whylog.exceptions.WhylogError</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.filename_matchers">
+<span id="whylog-config-filename-matchers-module"></span><h2>whylog.config.filename_matchers module<a class="headerlink" href="#module-whylog.config.filename_matchers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.filename_matchers.AbstractFilenameMatcher">
+<em class="property">class </em><code class="descclassname">whylog.config.filename_matchers.</code><code class="descname">AbstractFilenameMatcher</code><a class="reference internal" href="_modules/whylog/config/filename_matchers.html#AbstractFilenameMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.filename_matchers.AbstractFilenameMatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.config.filename_matchers.AbstractFilenameMatcher.get_matched_files">
+<code class="descname">get_matched_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/filename_matchers.html#AbstractFilenameMatcher.get_matched_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.filename_matchers.AbstractFilenameMatcher.get_matched_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.filename_matchers.WildCardFilenameMatcher">
+<em class="property">class </em><code class="descclassname">whylog.config.filename_matchers.</code><code class="descname">WildCardFilenameMatcher</code><span class="sig-paren">(</span><em>host_pattern</em>, <em>path_pattern</em>, <em>log_type_name</em>, <em>super_parser</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/filename_matchers.html#WildCardFilenameMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.filename_matchers.WildCardFilenameMatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.filename_matchers.AbstractFilenameMatcher" title="whylog.config.filename_matchers.AbstractFilenameMatcher"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.filename_matchers.AbstractFilenameMatcher</span></code></a></p>
+<dl class="method">
+<dt id="whylog.config.filename_matchers.WildCardFilenameMatcher.get_matched_files">
+<code class="descname">get_matched_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/filename_matchers.html#WildCardFilenameMatcher.get_matched_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.filename_matchers.WildCardFilenameMatcher.get_matched_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.filename_matchers.WildCardFilenameMatcher.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/filename_matchers.html#WildCardFilenameMatcher.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.filename_matchers.WildCardFilenameMatcher.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.filename_matchers.WildCardFilenameMatcherFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.filename_matchers.</code><code class="descname">WildCardFilenameMatcherFactory</code><a class="reference internal" href="_modules/whylog/config/filename_matchers.html#WildCardFilenameMatcherFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.filename_matchers.WildCardFilenameMatcherFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.config.filename_matchers.WildCardFilenameMatcherFactory.from_dao">
+<em class="property">classmethod </em><code class="descname">from_dao</code><span class="sig-paren">(</span><em>serialized</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/filename_matchers.html#WildCardFilenameMatcherFactory.from_dao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.filename_matchers.WildCardFilenameMatcherFactory.from_dao" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.investigation_plan">
+<span id="whylog-config-investigation-plan-module"></span><h2>whylog.config.investigation_plan module<a class="headerlink" href="#module-whylog.config.investigation_plan" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.investigation_plan.Clue">
+<em class="property">class </em><code class="descclassname">whylog.config.investigation_plan.</code><code class="descname">Clue</code><span class="sig-paren">(</span><em>regex_parameters</em>, <em>line_prefix_content</em>, <em>line_offset</em>, <em>line_source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/investigation_plan.html#Clue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.investigation_plan.Clue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Collects all the data that parser subset can extract from single log line.
+Also, contains parsed line and its source.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.investigation_plan.InvestigationPlan">
+<em class="property">class </em><code class="descclassname">whylog.config.investigation_plan.</code><code class="descname">InvestigationPlan</code><span class="sig-paren">(</span><em>suspected_rules</em>, <em>investigation_metadata</em>, <em>effect_clues</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/investigation_plan.html#InvestigationPlan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationPlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents all rules that can be fulfilled in single investigation.
+Also contains all investigation metadata, what means all pairs
+(investigationstep, logtype) neccesary for investigation
+For single log type we have single investigation step.</p>
+<dl class="attribute">
+<dt id="whylog.config.investigation_plan.InvestigationPlan.effect_clues">
+<code class="descname">effect_clues</code><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationPlan.effect_clues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.investigation_plan.InvestigationPlan.investigation_steps_with_log_types">
+<code class="descname">investigation_steps_with_log_types</code><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationPlan.investigation_steps_with_log_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.investigation_plan.InvestigationPlan.suspected_rules">
+<code class="descname">suspected_rules</code><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationPlan.suspected_rules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.investigation_plan.InvestigationStep">
+<em class="property">class </em><code class="descclassname">whylog.config.investigation_plan.</code><code class="descname">InvestigationStep</code><span class="sig-paren">(</span><em>parser_subset</em>, <em>search_ranges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/investigation_plan.html#InvestigationStep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Contains all parsers for single log type that can be matched in actual investigation.
+This class is responsible for finding all possible Clues from parsed logs.
+Also controls searched time range in logs file.</p>
+<dl class="attribute">
+<dt id="whylog.config.investigation_plan.InvestigationStep.LEFT_BOUND">
+<code class="descname">LEFT_BOUND</code><em class="property"> = 0</em><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationStep.LEFT_BOUND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.investigation_plan.InvestigationStep.RIGHT_BOUND">
+<code class="descname">RIGHT_BOUND</code><em class="property"> = 1</em><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationStep.RIGHT_BOUND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.investigation_plan.InvestigationStep.compare_with_bound">
+<code class="descname">compare_with_bound</code><span class="sig-paren">(</span><em>bound</em>, <em>super_parser_groups</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/investigation_plan.html#InvestigationStep.compare_with_bound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationStep.compare_with_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basing on super_parser_groups extracted from line, returns information
+how relative to choosed bound (LEFT_BOUND or RIGHT_BOUND) this line is.
+Example:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>bound = InvestigationStep.LEFT_BOUND (only other possible value of this parameter is</dt>
+<dd>InvestigationStep.RIGHT_BOUND)</dd>
+</dl>
+<p>super_parser_groups = [(&#8216;date&#8217;, datetime(2015, 12, 3, 12, 8, 9))]
+self._search_ranges = {</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8216;date&#8217;: {</dt>
+<dd>&#8216;left_bound&#8217;: datetime(2015, 12, 3, 12, 8, 0),
+&#8216;right_bound&#8217;: datetime(2015, 12, 3, 12, 8, 11)</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>}
+returned value: CompareResult.GT</p>
+</div></blockquote>
+<p>When self._search_ranges hasn&#8217;t defined bounds for given primary key type this method
+return GT/LT when compare with RIGHT_BOUND/LEFT_BOUND.
+This means that InvestigationStep object hasn&#8217;t information about order in parsed file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.investigation_plan.InvestigationStep.get_clues">
+<code class="descname">get_clues</code><span class="sig-paren">(</span><em>line</em>, <em>offset</em>, <em>line_source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/investigation_plan.html#InvestigationStep.get_clues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationStep.get_clues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.investigation_plan.InvestigationStep.is_line_in_search_range">
+<code class="descname">is_line_in_search_range</code><span class="sig-paren">(</span><em>super_parser_groups</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/investigation_plan.html#InvestigationStep.is_line_in_search_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.investigation_plan.InvestigationStep.is_line_in_search_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.investigation_plan.LineSource">
+<em class="property">class </em><code class="descclassname">whylog.config.investigation_plan.</code><code class="descname">LineSource</code><span class="sig-paren">(</span><em>host</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/investigation_plan.html#LineSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.investigation_plan.LineSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.log_type">
+<span id="whylog-config-log-type-module"></span><h2>whylog.config.log_type module<a class="headerlink" href="#module-whylog.config.log_type" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.log_type.LogType">
+<em class="property">class </em><code class="descclassname">whylog.config.log_type.</code><code class="descname">LogType</code><span class="sig-paren">(</span><em>name</em>, <em>filename_matchers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/log_type.html#LogType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.log_type.LogType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.config.log_type.LogType.files_to_parse">
+<code class="descname">files_to_parse</code><span class="sig-paren">(</span><em>forced_log_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/log_type.html#LogType.files_to_parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.log_type.LogType.files_to_parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all possible distinct tuples (host, file_name, super_parser) belonging to single log type
+It&#8217;s information which files should be parsed by LogReader. Super parser has a information about
+inner log file structure</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.mocked_investigation_plan">
+<span id="whylog-config-mocked-investigation-plan-module"></span><h2>whylog.config.mocked_investigation_plan module<a class="headerlink" href="#module-whylog.config.mocked_investigation_plan" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="whylog.config.mocked_investigation_plan.mocked_investigation_plan">
+<code class="descclassname">whylog.config.mocked_investigation_plan.</code><code class="descname">mocked_investigation_plan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/mocked_investigation_plan.html#mocked_investigation_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.mocked_investigation_plan.mocked_investigation_plan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.parser_name_generator">
+<span id="whylog-config-parser-name-generator-module"></span><h2>whylog.config.parser_name_generator module<a class="headerlink" href="#module-whylog.config.parser_name_generator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.parser_name_generator.ParserNameGenerator">
+<em class="property">class </em><code class="descclassname">whylog.config.parser_name_generator.</code><code class="descname">ParserNameGenerator</code><span class="sig-paren">(</span><em>parsers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parser_name_generator.html#ParserNameGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_name_generator.ParserNameGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.config.parser_name_generator.ParserNameGenerator.is_free_parser_name">
+<code class="descname">is_free_parser_name</code><span class="sig-paren">(</span><em>parser_name</em>, <em>black_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parser_name_generator.html#ParserNameGenerator.is_free_parser_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_name_generator.ParserNameGenerator.is_free_parser_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.parser_name_generator.ParserNameGenerator.propose_parser_name">
+<code class="descname">propose_parser_name</code><span class="sig-paren">(</span><em>line</em>, <em>regex_str</em>, <em>black_list</em>, <em>words_count_in_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parser_name_generator.html#ParserNameGenerator.propose_parser_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_name_generator.ParserNameGenerator.propose_parser_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.parser_subset">
+<span id="whylog-config-parser-subset-module"></span><h2>whylog.config.parser_subset module<a class="headerlink" href="#module-whylog.config.parser_subset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.parser_subset.AbstractParserSubset">
+<em class="property">class </em><code class="descclassname">whylog.config.parser_subset.</code><code class="descname">AbstractParserSubset</code><a class="reference internal" href="_modules/whylog/config/parser_subset.html#AbstractParserSubset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_subset.AbstractParserSubset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.config.parser_subset.AbstractParserSubset.get_extracted_parsers_params">
+<code class="descname">get_extracted_parsers_params</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parser_subset.html#AbstractParserSubset.get_extracted_parsers_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_subset.AbstractParserSubset.get_extracted_parsers_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.parser_subset.ConcatenatedRegexParser">
+<em class="property">class </em><code class="descclassname">whylog.config.parser_subset.</code><code class="descname">ConcatenatedRegexParser</code><span class="sig-paren">(</span><em>parser_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parser_subset.html#ConcatenatedRegexParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_subset.ConcatenatedRegexParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.parser_subset.AbstractParserSubset" title="whylog.config.parser_subset.AbstractParserSubset"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.parser_subset.AbstractParserSubset</span></code></a></p>
+<p>Represents concatenated created from many regex parsers.
+Allows to check which parsers matches to given line faster
+than brute match by many regex parsers
+Sample forward concatenated regex : (a)|(b)|(c)|(d)|(e)
+Sample backward concatenated regex: (e)|(d)|(c)|(b)|(a)
+where a, b, c, d, e are subregexes. Subregexes can have own groups
+We need to backward concatenated regex to check that only subregex matches with given line</p>
+<dl class="attribute">
+<dt id="whylog.config.parser_subset.ConcatenatedRegexParser.NO_MATCH">
+<code class="descname">NO_MATCH</code><em class="property"> = &lt;frozendict {}&gt;</em><a class="headerlink" href="#whylog.config.parser_subset.ConcatenatedRegexParser.NO_MATCH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.parser_subset.ConcatenatedRegexParser.convert_parsers_groups_from_matched_line">
+<code class="descname">convert_parsers_groups_from_matched_line</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parser_subset.html#ConcatenatedRegexParser.convert_parsers_groups_from_matched_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_subset.ConcatenatedRegexParser.convert_parsers_groups_from_matched_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts extracted parsers groups dict, where groups are strings to dict where groups
+was converted to proper type, which is defined in parser object.
+Params come from only one line from logs.
+Sample convertion:</p>
+<blockquote>
+<div><p>line: &#8220;2015-12-03 12:10:10 Commited transaction number 2100. Host name: postgres_db&#8221;
+params_dict : {</p>
+<blockquote>
+<div>&#8216;commited_transaction&#8217; : (&#8216;2015-12-03 12:10:10&#8217;, &#8216;2100&#8217;, &#8216;postgres_db&#8217;)</div></blockquote>
+<p>}
+return: {</p>
+<blockquote>
+<div>&#8216;commited_transaction&#8217;: (datetime(2015, 12, 3, 12, 10, 10), 2100, &#8216;postgres_db&#8217;)</div></blockquote>
+<p>}
+commited_transaction is sample parser name which matches with line</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.parser_subset.ConcatenatedRegexParser.get_extracted_parsers_params">
+<code class="descname">get_extracted_parsers_params</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parser_subset.html#ConcatenatedRegexParser.get_extracted_parsers_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parser_subset.ConcatenatedRegexParser.get_extracted_parsers_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts groups from subregexes that matched with given line
+:param line: line from parsed file
+:returns: dict of regexname to tuple of extracted regex params which match with line
+Example of line = &#8220;2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101&#8221;
+Example of returned data: {</p>
+<blockquote>
+<div>&#8220;lost_data&#8221;: (&#8220;2015-12-03 12:11:00&#8221;, &#8220;alfa21&#8221;, &#8220;567.02&#8221;, &#8220;101&#8221;),
+&#8220;lost_data_date&#8221;: (&#8220;2015-12-03 12:11:00&#8221;,),
+&#8220;lost_data_suffix&#8221;: (&#8220;2015-12-03 12:11:00&#8221;, &#8220;alfa21. Loss = 567.02 GB. Host name: 101&#8221;),</div></blockquote>
+<p>}</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.parsers">
+<span id="whylog-config-parsers-module"></span><h2>whylog.config.parsers module<a class="headerlink" href="#module-whylog.config.parsers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.parsers.AbstractParser">
+<em class="property">class </em><code class="descclassname">whylog.config.parsers.</code><code class="descname">AbstractParser</code><a class="reference internal" href="_modules/whylog/config/parsers.html#AbstractParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.AbstractParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.config.parsers.AbstractParser.get_regex_params">
+<code class="descname">get_regex_params</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#AbstractParser.get_regex_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.AbstractParser.get_regex_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.parsers.AbstractParserFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.parsers.</code><code class="descname">AbstractParserFactory</code><a class="reference internal" href="_modules/whylog/config/parsers.html#AbstractParserFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.AbstractParserFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.config.parsers.AbstractParserFactory.create_from_intent">
+<em class="property">classmethod </em><code class="descname">create_from_intent</code><span class="sig-paren">(</span><em>parser_intent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#AbstractParserFactory.create_from_intent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.AbstractParserFactory.create_from_intent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.config.parsers.AbstractParserFactory.from_dao">
+<em class="property">classmethod </em><code class="descname">from_dao</code><span class="sig-paren">(</span><em>serialized_parser</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#AbstractParserFactory.from_dao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.AbstractParserFactory.from_dao" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.parsers.RegexParser">
+<em class="property">class </em><code class="descclassname">whylog.config.parsers.</code><code class="descname">RegexParser</code><span class="sig-paren">(</span><em>name</em>, <em>line_content</em>, <em>regex_str</em>, <em>primary_key_groups</em>, <em>log_type</em>, <em>convertions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.parsers.AbstractParser" title="whylog.config.parsers.AbstractParser"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.parsers.AbstractParser</span></code></a></p>
+<p>Represents regular expression used for searching some data in log file.
+RegexParser has an unique name. Some groups of regex can be signed as primary.
+It means that log file which has line matched with this regex is order by values
+of this group. Every regex belongs for single log type. Convertions in regex has a
+knowledge about casting regex groups content. At last line content is a sample line
+which matches with regex. It&#8217;s used to show how concrete regex works. For example
+which segments of line are catch by its groups.</p>
+<dl class="method">
+<dt id="whylog.config.parsers.RegexParser.convert_params">
+<code class="descname">convert_params</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParser.convert_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParser.convert_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts single parser tuple groups to tuple with converted elems
+Sample convertion:</p>
+<blockquote>
+<div>params: (&#8216;2015-12-03 12:10:10&#8217;, &#8216;2100&#8217;, &#8216;postgres_db&#8217;)
+return: (datetime(2015, 12, 3, 12, 10, 10), 2100, &#8216;postgres_db&#8217;)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.parsers.RegexParser.get_primary_key_group">
+<code class="descname">get_primary_key_group</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParser.get_primary_key_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParser.get_primary_key_group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.parsers.RegexParser.get_regex_params">
+<code class="descname">get_regex_params</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParser.get_regex_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParser.get_regex_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.parsers.RegexParser.is_primary_key">
+<code class="descname">is_primary_key</code><span class="sig-paren">(</span><em>group_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParser.is_primary_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParser.is_primary_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.parsers.RegexParser.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParser.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParser.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.parsers.RegexParserFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.parsers.</code><code class="descname">RegexParserFactory</code><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParserFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParserFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.config.parsers.RegexParserFactory.create_from_intent">
+<em class="property">classmethod </em><code class="descname">create_from_intent</code><span class="sig-paren">(</span><em>parser_intent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParserFactory.create_from_intent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParserFactory.create_from_intent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.config.parsers.RegexParserFactory.from_dao">
+<em class="property">classmethod </em><code class="descname">from_dao</code><span class="sig-paren">(</span><em>serialized_parser</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/parsers.html#RegexParserFactory.from_dao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.parsers.RegexParserFactory.from_dao" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.rule">
+<span id="whylog-config-rule-module"></span><h2>whylog.config.rule module<a class="headerlink" href="#module-whylog.config.rule" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.rule.AbstractRuleFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.rule.</code><code class="descname">AbstractRuleFactory</code><a class="reference internal" href="_modules/whylog/config/rule.html#AbstractRuleFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.AbstractRuleFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.config.rule.AbstractRuleFactory.create_from_intent">
+<em class="property">classmethod </em><code class="descname">create_from_intent</code><span class="sig-paren">(</span><em>user_rule_intent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#AbstractRuleFactory.create_from_intent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.AbstractRuleFactory.create_from_intent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.config.rule.AbstractRuleFactory.from_dao">
+<em class="property">classmethod </em><code class="descname">from_dao</code><span class="sig-paren">(</span><em>serialized_rule</em>, <em>parsers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#AbstractRuleFactory.from_dao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.AbstractRuleFactory.from_dao" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.rule.RegexRuleFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.rule.</code><code class="descname">RegexRuleFactory</code><a class="reference internal" href="_modules/whylog/config/rule.html#RegexRuleFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.RegexRuleFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.rule.AbstractRuleFactory" title="whylog.config.rule.AbstractRuleFactory"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.rule.AbstractRuleFactory</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.rule.Rule">
+<em class="property">class </em><code class="descclassname">whylog.config.rule.</code><code class="descname">Rule</code><span class="sig-paren">(</span><em>causes</em>, <em>effect</em>, <em>constraints</em>, <em>linkage</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="whylog.config.rule.Rule.DELTA_CONSTRAINTS">
+<code class="descname">DELTA_CONSTRAINTS</code><em class="property"> = frozenset(['time_delta'])</em><a class="headerlink" href="#whylog.config.rule.Rule.DELTA_CONSTRAINTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.rule.Rule.EMPTY_BLACK_LIST">
+<code class="descname">EMPTY_BLACK_LIST</code><em class="property"> = frozenset([])</em><a class="headerlink" href="#whylog.config.rule.Rule.EMPTY_BLACK_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.rule.Rule.LINKAGE_AND">
+<code class="descname">LINKAGE_AND</code><em class="property"> = 'AND'</em><a class="headerlink" href="#whylog.config.rule.Rule.LINKAGE_AND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.rule.Rule.LINKAGE_NOT">
+<code class="descname">LINKAGE_NOT</code><em class="property"> = 'NOT'</em><a class="headerlink" href="#whylog.config.rule.Rule.LINKAGE_NOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.rule.Rule.LINKAGE_OR">
+<code class="descname">LINKAGE_OR</code><em class="property"> = 'OR'</em><a class="headerlink" href="#whylog.config.rule.Rule.LINKAGE_OR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.rule.Rule.LINKAGE_SELECTOR">
+<code class="descname">LINKAGE_SELECTOR</code><em class="property"> = {'AND': &lt;bound method type.constraints_and of &lt;class 'whylog.constraints.verifier.Verifier'&gt;&gt;, 'NOT': &lt;bound method type.constraints_not of &lt;class 'whylog.constraints.verifier.Verifier'&gt;&gt;, 'OR': &lt;bound method type.constraints_or of &lt;class 'whylog.constraints.verifier.Verifier'&gt;&gt;}</em><a class="headerlink" href="#whylog.config.rule.Rule.LINKAGE_SELECTOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.rule.Rule.NO_RANGE">
+<code class="descname">NO_RANGE</code><em class="property"> = &lt;frozendict {}&gt;</em><a class="headerlink" href="#whylog.config.rule.Rule.NO_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.rule.Rule.constraints_check">
+<code class="descname">constraints_check</code><span class="sig-paren">(</span><em>clues</em>, <em>effect_clues_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule.constraints_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule.constraints_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if given clues satisfy rule
+basing on its causes, effect and constraints.
+returns list of InvestigationResult objects</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.rule.Rule.create_ranges_for_unconnected_parsers">
+<code class="descname">create_ranges_for_unconnected_parsers</code><span class="sig-paren">(</span><em>effect_clues</em>, <em>effect_primary_group</em>, <em>effect_group_type</em>, <em>parser_ranges</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule.create_ranges_for_unconnected_parsers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule.create_ranges_for_unconnected_parsers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create maximal search range for parsers which are unreachable in connectivity parsers graph
+from effect parser.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.rule.Rule.get_causes_parsers">
+<code class="descname">get_causes_parsers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule.get_causes_parsers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule.get_causes_parsers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.rule.Rule.get_effect_name">
+<code class="descname">get_effect_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule.get_effect_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule.get_effect_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.rule.Rule.get_new_parsers">
+<code class="descname">get_new_parsers</code><span class="sig-paren">(</span><em>parser_name_generator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule.get_new_parsers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule.get_new_parsers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.rule.Rule.get_search_ranges">
+<code class="descname">get_search_ranges</code><span class="sig-paren">(</span><em>effect_clues</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule.get_search_ranges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule.get_search_ranges" title="Permalink to this definition">¶</a></dt>
+<dd><p>parser&#8217;s search range is a dictionary with search range for its primary key type:
+Sample parser&#8217;s search range:
+{</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8216;date&#8217;: {</dt>
+<dd>InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),
+InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>}
+This method calculate search ranges for single rule based on its
+constraints and effect clues.
+Algorithm steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Check that effect parser has no empty primary key. If is empty</li>
+</ol>
+<blockquote>
+<div>return NO_RANGE</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>Calculate search range for every cause parser.</li>
+<li>Join parsers search ranges with this same log type</li>
+</ol>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.rule.Rule.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/rule.html#Rule.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.rule.Rule.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.settings_factory">
+<span id="whylog-config-settings-factory-module"></span><h2>whylog.config.settings_factory module<a class="headerlink" href="#module-whylog.config.settings_factory" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.settings_factory.AbstractSettingsFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.settings_factory.</code><code class="descname">AbstractSettingsFactory</code><a class="reference internal" href="_modules/whylog/config/settings_factory.html#AbstractSettingsFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.settings_factory.AbstractSettingsFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Note: This class use yaml format. Here is assumption that in every .whylog dir we have a
+settings settings.yaml file. Which has all data that enable creating subclass AbstractConfig object and
+subclass AbstractAssistant. No matter what kind of config was saved in settings.yaml.</p>
+<dl class="attribute">
+<dt id="whylog.config.settings_factory.AbstractSettingsFactory.DEFAULT_PATTERN_ASSISTANT">
+<code class="descname">DEFAULT_PATTERN_ASSISTANT</code><em class="property"> = 'regex'</em><a class="headerlink" href="#whylog.config.settings_factory.AbstractSettingsFactory.DEFAULT_PATTERN_ASSISTANT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.config.settings_factory.AbstractSettingsFactory.create_new_settings_dir">
+<em class="property">classmethod </em><code class="descname">create_new_settings_dir</code><span class="sig-paren">(</span><em>base_path</em>, <em>whylog_dir</em>, <em>settings_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/settings_factory.html#AbstractSettingsFactory.create_new_settings_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.settings_factory.AbstractSettingsFactory.create_new_settings_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.settings_factory.YamlSettingsFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.settings_factory.</code><code class="descname">YamlSettingsFactory</code><a class="reference internal" href="_modules/whylog/config/settings_factory.html#YamlSettingsFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.settings_factory.YamlSettingsFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.settings_factory.AbstractSettingsFactory" title="whylog.config.settings_factory.AbstractSettingsFactory"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.settings_factory.AbstractSettingsFactory</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.config.settings_factory.YamlSettingsFactory.FILES_NAMES">
+<code class="descname">FILES_NAMES</code><em class="property"> = {'log_types_path': 'log_types.yaml', 'parsers_path': 'parsers.yaml', 'rules_path': 'rules.yaml'}</em><a class="headerlink" href="#whylog.config.settings_factory.YamlSettingsFactory.FILES_NAMES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.super_parser">
+<span id="whylog-config-super-parser-module"></span><h2>whylog.config.super_parser module<a class="headerlink" href="#module-whylog.config.super_parser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.super_parser.AbstractSuperParser">
+<em class="property">class </em><code class="descclassname">whylog.config.super_parser.</code><code class="descname">AbstractSuperParser</code><a class="reference internal" href="_modules/whylog/config/super_parser.html#AbstractSuperParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.AbstractSuperParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.config.super_parser.AbstractSuperParser.get_ordered_groups">
+<code class="descname">get_ordered_groups</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/super_parser.html#AbstractSuperParser.get_ordered_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.AbstractSuperParser.get_ordered_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method basing on line, returns list of pairs (converted super parser
+group content, type of this group convertion) in super parser primary key groups order</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.super_parser.AbstractSuperParserFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.super_parser.</code><code class="descname">AbstractSuperParserFactory</code><a class="reference internal" href="_modules/whylog/config/super_parser.html#AbstractSuperParserFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.AbstractSuperParserFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.config.super_parser.AbstractSuperParserFactory.from_dao">
+<em class="property">classmethod </em><code class="descname">from_dao</code><span class="sig-paren">(</span><em>serialized</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/super_parser.html#AbstractSuperParserFactory.from_dao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.AbstractSuperParserFactory.from_dao" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.super_parser.RegexSuperParser">
+<em class="property">class </em><code class="descclassname">whylog.config.super_parser.</code><code class="descname">RegexSuperParser</code><span class="sig-paren">(</span><em>regex_str</em>, <em>group_order</em>, <em>convertions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/super_parser.html#RegexSuperParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.RegexSuperParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.super_parser.AbstractSuperParser" title="whylog.config.super_parser.AbstractSuperParser"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.super_parser.AbstractSuperParser</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.config.super_parser.RegexSuperParser.NO_PRIMARY_KEY">
+<code class="descname">NO_PRIMARY_KEY</code><em class="property"> = ()</em><a class="headerlink" href="#whylog.config.super_parser.RegexSuperParser.NO_PRIMARY_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.super_parser.RegexSuperParser.get_ordered_groups">
+<code class="descname">get_ordered_groups</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/super_parser.html#RegexSuperParser.get_ordered_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.RegexSuperParser.get_ordered_groups" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Example:</dt>
+<dd><dl class="first docutils">
+<dt>super_parser = RegexSuperParser(</dt>
+<dd><dl class="first docutils">
+<dt>&#8216;^(dddd-dd-dd dd:dd:dd).* Host name: (d+)&#8217;, [2, 1], {</dt>
+<dd>1: &#8216;date&#8217;,
+2: &#8216;int&#8217;</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+<p class="last">)
+line = &#8216;2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2&#8217;
+super_parser.get_ordered_groups(line) returns:
+[(&#8216;int&#8217;, 2), (&#8216;date&#8217;, datetime(2015, 12, 3, 12, 8, 9))]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="whylog.config.super_parser.RegexSuperParser.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/super_parser.html#RegexSuperParser.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.RegexSuperParser.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.config.super_parser.RegexSuperParserFactory">
+<em class="property">class </em><code class="descclassname">whylog.config.super_parser.</code><code class="descname">RegexSuperParserFactory</code><a class="reference internal" href="_modules/whylog/config/super_parser.html#RegexSuperParserFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.RegexSuperParserFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.super_parser.AbstractSuperParserFactory" title="whylog.config.super_parser.AbstractSuperParserFactory"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.super_parser.AbstractSuperParserFactory</span></code></a></p>
+<dl class="classmethod">
+<dt id="whylog.config.super_parser.RegexSuperParserFactory.from_dao">
+<em class="property">classmethod </em><code class="descname">from_dao</code><span class="sig-paren">(</span><em>serialized</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/super_parser.html#RegexSuperParserFactory.from_dao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.super_parser.RegexSuperParserFactory.from_dao" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.utils">
+<span id="whylog-config-utils-module"></span><h2>whylog.config.utils module<a class="headerlink" href="#module-whylog.config.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.utils.CompareResult">
+<em class="property">class </em><code class="descclassname">whylog.config.utils.</code><code class="descname">CompareResult</code><a class="reference internal" href="_modules/whylog/config/utils.html#CompareResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.utils.CompareResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="whylog.config.utils.CompareResult.EQ">
+<code class="descname">EQ</code><em class="property"> = 0</em><a class="headerlink" href="#whylog.config.utils.CompareResult.EQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.utils.CompareResult.GT">
+<code class="descname">GT</code><em class="property"> = 1</em><a class="headerlink" href="#whylog.config.utils.CompareResult.GT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.utils.CompareResult.LT">
+<code class="descname">LT</code><em class="property"> = -1</em><a class="headerlink" href="#whylog.config.utils.CompareResult.LT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config.yaml_config">
+<span id="whylog-config-yaml-config-module"></span><h2>whylog.config.yaml_config module<a class="headerlink" href="#module-whylog.config.yaml_config" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.yaml_config.YamlConfig">
+<em class="property">class </em><code class="descclassname">whylog.config.yaml_config.</code><code class="descname">YamlConfig</code><span class="sig-paren">(</span><em>parsers_path</em>, <em>rules_path</em>, <em>log_types_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config/yaml_config.html#YamlConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.yaml_config.YamlConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.config.abstract_file_config.AbstractFileConfig" title="whylog.config.abstract_file_config.AbstractFileConfig"><code class="xref py py-class docutils literal"><span class="pre">whylog.config.abstract_file_config.AbstractFileConfig</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.config">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-whylog.config" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.config.SettingsFactorySelector">
+<em class="property">class </em><code class="descclassname">whylog.config.</code><code class="descname">SettingsFactorySelector</code><a class="reference internal" href="_modules/whylog/config.html#SettingsFactorySelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.SettingsFactorySelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>This class is responsible for finding .whylog directory (whylog settings directory) and basing on
+found content directory creating settings. If not found then it creates minimal
+.whylog version in current directory.</p>
+<dl class="attribute">
+<dt id="whylog.config.SettingsFactorySelector.ASSISTANTS_DICT">
+<code class="descname">ASSISTANTS_DICT</code><em class="property"> = {'regex': &lt;class 'whylog.assistant.regex_assistant.RegexAssistant'&gt;}</em><a class="headerlink" href="#whylog.config.SettingsFactorySelector.ASSISTANTS_DICT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.SettingsFactorySelector.DEFAULT_SETTINGS_FACTORY_TYPE">
+<code class="descname">DEFAULT_SETTINGS_FACTORY_TYPE</code><a class="headerlink" href="#whylog.config.SettingsFactorySelector.DEFAULT_SETTINGS_FACTORY_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">YamlSettingsFactory</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.SettingsFactorySelector.ETC_DIR">
+<code class="descname">ETC_DIR</code><em class="property"> = '/etc'</em><a class="headerlink" href="#whylog.config.SettingsFactorySelector.ETC_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.SettingsFactorySelector.HOME_DIR">
+<code class="descname">HOME_DIR</code><em class="property"> = '/home/ewa'</em><a class="headerlink" href="#whylog.config.SettingsFactorySelector.HOME_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.SettingsFactorySelector.SETTINGS_FILE">
+<code class="descname">SETTINGS_FILE</code><em class="property"> = 'settings.yaml'</em><a class="headerlink" href="#whylog.config.SettingsFactorySelector.SETTINGS_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.SettingsFactorySelector.SUPPORTED_TYPES">
+<code class="descname">SUPPORTED_TYPES</code><em class="property"> = {'yaml': &lt;class 'whylog.config.yaml_config.YamlConfig'&gt;}</em><a class="headerlink" href="#whylog.config.SettingsFactorySelector.SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.config.SettingsFactorySelector.WHYLOG_DIR">
+<code class="descname">WHYLOG_DIR</code><em class="property"> = '.whylog'</em><a class="headerlink" href="#whylog.config.SettingsFactorySelector.WHYLOG_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.config.SettingsFactorySelector.get_settings">
+<em class="property">classmethod </em><code class="descname">get_settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config.html#SettingsFactorySelector.get_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.SettingsFactorySelector.get_settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.config.SettingsFactorySelector.load_settings">
+<em class="property">classmethod </em><code class="descname">load_settings</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/config.html#SettingsFactorySelector.load_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.config.SettingsFactorySelector.load_settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">whylog.config package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-whylog.config.abstract_config">whylog.config.abstract_config module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.abstract_file_config">whylog.config.abstract_file_config module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.consts">whylog.config.consts module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.exceptions">whylog.config.exceptions module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.filename_matchers">whylog.config.filename_matchers module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.investigation_plan">whylog.config.investigation_plan module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.log_type">whylog.config.log_type module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.mocked_investigation_plan">whylog.config.mocked_investigation_plan module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.parser_name_generator">whylog.config.parser_name_generator module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.parser_subset">whylog.config.parser_subset module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.parsers">whylog.config.parsers module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.rule">whylog.config.rule module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.settings_factory">whylog.config.settings_factory module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.super_parser">whylog.config.super_parser module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.utils">whylog.config.utils module</a></li>
+<li><a class="reference internal" href="#module-whylog.config.yaml_config">whylog.config.yaml_config module</a></li>
+<li><a class="reference internal" href="#module-whylog.config">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/whylog.config.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/whylog.config.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

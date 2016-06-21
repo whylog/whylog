@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.config.super_parser &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.config" href="../config.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../config.html" accesskey="U">whylog.config</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.config.super_parser</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.converters</span> <span class="kn">import</span> <span class="n">CONVERTION_MAPPING</span><span class="p">,</span> <span class="n">STRING</span>
+
+
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractSuperParser"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.AbstractSuperParser">[docs]</a><span class="k">class</span> <span class="nc">AbstractSuperParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractSuperParser.get_ordered_groups"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.AbstractSuperParser.get_ordered_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_ordered_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method basing on line, returns list of pairs (converted super parser</span>
+<span class="sd">        group content, type of this group convertion) in super parser primary key groups order</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+</div></div>
+<div class="viewcode-block" id="RegexSuperParser"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.RegexSuperParser">[docs]</a><span class="k">class</span> <span class="nc">RegexSuperParser</span><span class="p">(</span><span class="n">AbstractSuperParser</span><span class="p">):</span>
+    <span class="n">NO_PRIMARY_KEY</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_str</span><span class="p">,</span> <span class="n">group_order</span><span class="p">,</span> <span class="n">convertions</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex_str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_order</span> <span class="o">=</span> <span class="n">group_order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convertions</span> <span class="o">=</span> <span class="n">convertions</span>
+
+<div class="viewcode-block" id="RegexSuperParser.serialize"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.RegexSuperParser.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">&#39;regex_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span>
+            <span class="s">&#39;group_order&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_order</span><span class="p">,</span>
+            <span class="s">&#39;convertions&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convertions</span>
+        <span class="p">}</span>
+</div>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RegexSuperParser.get_ordered_groups"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.RegexSuperParser.get_ordered_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_ordered_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Example:</span>
+<span class="sd">            super_parser = RegexSuperParser(</span>
+<span class="sd">                &#39;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).* Host name: (\d+)&#39;, [2, 1], {</span>
+<span class="sd">                    1: &#39;date&#39;,</span>
+<span class="sd">                    2: &#39;int&#39;</span>
+<span class="sd">                }</span>
+<span class="sd">            )</span>
+<span class="sd">            line = &#39;2015-12-03 12:08:09 Connection error occurred on alfa36. Host name: 2&#39;</span>
+<span class="sd">            super_parser.get_ordered_groups(line) returns:</span>
+<span class="sd">            [(&#39;int&#39;, 2), (&#39;date&#39;, datetime(2015, 12, 3, 12, 8, 9))]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">NO_PRIMARY_KEY</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">group_nr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_order</span><span class="p">:</span>
+            <span class="n">convertion_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convertions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group_nr</span><span class="p">)</span>
+            <span class="n">group_to_convert</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="n">group_nr</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">convertion_type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">STRING</span><span class="p">,</span> <span class="n">group_to_convert</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="n">converter</span> <span class="o">=</span> <span class="n">CONVERTION_MAPPING</span><span class="p">[</span><span class="n">convertion_type</span><span class="p">]</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">convertion_type</span><span class="p">,</span> <span class="n">converter</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">group_to_convert</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">NO_PRIMARY_KEY</span>
+
+</div></div>
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractSuperParserFactory"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.AbstractSuperParserFactory">[docs]</a><span class="k">class</span> <span class="nc">AbstractSuperParserFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractSuperParserFactory.from_dao"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.AbstractSuperParserFactory.from_dao">[docs]</a>    <span class="k">def</span> <span class="nf">from_dao</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">serialized</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</div></div>
+<div class="viewcode-block" id="RegexSuperParserFactory"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.RegexSuperParserFactory">[docs]</a><span class="k">class</span> <span class="nc">RegexSuperParserFactory</span><span class="p">(</span><span class="n">AbstractSuperParserFactory</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RegexSuperParserFactory.from_dao"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.super_parser.RegexSuperParserFactory.from_dao">[docs]</a>    <span class="k">def</span> <span class="nf">from_dao</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">serialized</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">RegexSuperParser</span><span class="p">(</span><span class="o">**</span><span class="n">serialized</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

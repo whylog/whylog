@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.config.abstract_file_config &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.config" href="../config.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../config.html" accesskey="U">whylog.config</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.config.abstract_file_config</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.config.abstract_config</span> <span class="kn">import</span> <span class="n">AbstractConfig</span>
+<span class="kn">from</span> <span class="nn">whylog.config.exceptions</span> <span class="kn">import</span> <span class="n">UnsupportedFilenameMatcher</span>
+<span class="kn">from</span> <span class="nn">whylog.config.filename_matchers</span> <span class="kn">import</span> <span class="n">WildCardFilenameMatcherFactory</span>
+<span class="kn">from</span> <span class="nn">whylog.config.log_type</span> <span class="kn">import</span> <span class="n">LogType</span>
+<span class="kn">from</span> <span class="nn">whylog.config.parsers</span> <span class="kn">import</span> <span class="n">RegexParserFactory</span>
+<span class="kn">from</span> <span class="nn">whylog.config.rule</span> <span class="kn">import</span> <span class="n">RegexRuleFactory</span>
+
+
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractFileConfig"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_file_config.AbstractFileConfig">[docs]</a><span class="k">class</span> <span class="nc">AbstractFileConfig</span><span class="p">(</span><span class="n">AbstractConfig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers_path</span><span class="p">,</span> <span class="n">rules_path</span><span class="p">,</span> <span class="n">log_type_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_path</span> <span class="o">=</span> <span class="n">parsers_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rules_path</span> <span class="o">=</span> <span class="n">rules_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_type_path</span> <span class="o">=</span> <span class="n">log_type_path</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractFileConfig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_load_parsers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">parser_definition</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">],</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">from_dao</span><span class="p">(</span><span class="n">parser_definition</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">parser_definition</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file_with_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers_path</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">loaded_rules</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">serialized_rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file_with_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rules_path</span><span class="p">):</span>
+            <span class="n">rule</span> <span class="o">=</span> <span class="n">RegexRuleFactory</span><span class="o">.</span><span class="n">from_dao</span><span class="p">(</span><span class="n">serialized_rule</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+            <span class="n">loaded_rules</span><span class="p">[</span><span class="n">serialized_rule</span><span class="p">[</span><span class="s">&quot;effect&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loaded_rules</span>
+
+    <span class="k">def</span> <span class="nf">_load_log_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">matchers</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">matcher_definitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file_with_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_type_path</span><span class="p">)</span>
+        <span class="n">matchers_factory_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;WildCardFilenameMatcher&#39;</span><span class="p">:</span> <span class="n">WildCardFilenameMatcherFactory</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">definition</span> <span class="ow">in</span> <span class="n">matcher_definitions</span><span class="p">:</span>
+            <span class="n">matcher_class_name</span> <span class="o">=</span> <span class="n">definition</span><span class="p">[</span><span class="s">&#39;matcher_class_name&#39;</span><span class="p">]</span>
+            <span class="n">factory_class</span> <span class="o">=</span> <span class="n">matchers_factory_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">matcher_class_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">factory_class</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnsupportedFilenameMatcher</span><span class="p">(</span><span class="n">matcher_class_name</span><span class="p">)</span>
+            <span class="n">matcher</span> <span class="o">=</span> <span class="n">factory_class</span><span class="o">.</span><span class="n">from_dao</span><span class="p">(</span><span class="n">definition</span><span class="p">)</span>
+            <span class="n">matchers</span><span class="p">[</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;log_type_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matcher</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">log_type_name</span><span class="p">,</span> <span class="n">LogType</span><span class="p">(</span><span class="n">log_type_name</span><span class="p">,</span> <span class="n">log_type_matchers</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">log_type_name</span><span class="p">,</span> <span class="n">log_type_matchers</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">matchers</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_load_file_with_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_save_rule_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_definition</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rules_path</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rules_file</span><span class="p">:</span>
+            <span class="n">rules_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convert_rule_to_file_form</span><span class="p">(</span><span class="n">rule_definition</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_save_parsers_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser_definitions</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers_path</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">parsers_file</span><span class="p">:</span>
+            <span class="n">parsers_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convert_parsers_to_file_form</span><span class="p">(</span><span class="n">parser_definitions</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_save_filename_matcher_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matcher_definition</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_type_path</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">parsers_file</span><span class="p">:</span>
+            <span class="n">parsers_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convert_matcher_to_file_form</span><span class="p">(</span><span class="n">matcher_definition</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_resave_all_log_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchers_definition</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_type_path</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">parsers_file</span><span class="p">:</span>
+            <span class="n">parsers_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_massive_dump_to_yaml</span><span class="p">(</span><span class="n">matchers_definition</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_resave_all_parsers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers_definition</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers_path</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">parsers_file</span><span class="p">:</span>
+            <span class="n">parsers_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_massive_dump_to_yaml</span><span class="p">(</span><span class="n">parsers_definition</span><span class="p">))</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_massive_dump_to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_convert_rule_to_file_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_definition</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_convert_parsers_to_file_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_definition</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_convert_matcher_to_file_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_definition</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.config.abstract_config &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.config" href="../config.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../config.html" accesskey="U">whylog.config</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.config.abstract_config</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.config.exceptions</span> <span class="kn">import</span> <span class="n">NoLogTypeError</span><span class="p">,</span> <span class="n">RenameLogTypeError</span>
+<span class="kn">from</span> <span class="nn">whylog.config.filename_matchers</span> <span class="kn">import</span> <span class="n">WildCardFilenameMatcher</span>
+<span class="kn">from</span> <span class="nn">whylog.config.investigation_plan</span> <span class="kn">import</span> <span class="n">Clue</span><span class="p">,</span> <span class="n">InvestigationPlan</span><span class="p">,</span> <span class="n">InvestigationStep</span>
+<span class="kn">from</span> <span class="nn">whylog.config.log_type</span> <span class="kn">import</span> <span class="n">LogType</span>
+<span class="kn">from</span> <span class="nn">whylog.config.parser_name_generator</span> <span class="kn">import</span> <span class="n">ParserNameGenerator</span>
+<span class="kn">from</span> <span class="nn">whylog.config.parser_subset</span> <span class="kn">import</span> <span class="n">ConcatenatedRegexParser</span>
+<span class="kn">from</span> <span class="nn">whylog.config.rule</span> <span class="kn">import</span> <span class="n">RegexRuleFactory</span>
+<span class="kn">from</span> <span class="nn">whylog.config.super_parser</span> <span class="kn">import</span> <span class="n">RegexSuperParser</span>
+
+
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractConfig"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig">[docs]</a><span class="k">class</span> <span class="nc">AbstractConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">words_count_in_name</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">DEFAULT_NAME</span> <span class="o">=</span> <span class="s">&quot;default&quot;</span>
+    <span class="n">DEFAULT_LOG_TYPE</span> <span class="o">=</span> <span class="n">LogType</span><span class="p">(</span>
+        <span class="n">DEFAULT_NAME</span><span class="p">,</span> <span class="p">[</span>
+            <span class="n">WildCardFilenameMatcher</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">DEFAULT_NAME</span><span class="p">,</span> <span class="n">RegexSuperParser</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}))</span>
+        <span class="p">]</span>
+    <span class="p">)</span> <span class="c"># yapf: disable</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_parsers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_parsers_by_log_type</span><span class="p">(</span>
+            <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parser_name_generator</span> <span class="o">=</span> <span class="n">ParserNameGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_rules</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_log_types</span><span class="p">()</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_load_parsers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_load_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_load_log_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_index_parsers_by_log_type</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">parsers</span><span class="p">):</span>
+        <span class="n">grouped_parsers</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">parsers</span><span class="p">:</span>
+            <span class="n">grouped_parsers</span><span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">log_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">grouped_parsers</span>
+
+<div class="viewcode-block" id="AbstractConfig.add_rule"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.add_rule">[docs]</a>    <span class="k">def</span> <span class="nf">add_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_rule_intent</span><span class="p">):</span>
+        <span class="n">created_rule</span> <span class="o">=</span> <span class="n">RegexRuleFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="n">user_rule_intent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_rule_definition</span><span class="p">(</span><span class="n">created_rule</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
+        <span class="n">created_parsers</span> <span class="o">=</span> <span class="n">created_rule</span><span class="o">.</span><span class="n">get_new_parsers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parser_name_generator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_parsers_definition</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">created_parsers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rules</span><span class="p">[</span><span class="n">created_rule</span><span class="o">.</span><span class="n">get_effect_name</span><span class="p">()]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">created_rule</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">created_parsers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">log_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parser_name_generator</span> <span class="o">=</span> <span class="n">ParserNameGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AbstractConfig.rename_log_type"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.rename_log_type">[docs]</a>    <span class="k">def</span> <span class="nf">rename_log_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">old_name</span> <span class="o">==</span> <span class="n">new_name</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">old_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoLogTypeError</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RenameLogTypeError</span>
+        <span class="n">log_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
+        <span class="n">log_type</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_name</span>
+        <span class="k">for</span> <span class="n">matcher</span> <span class="ow">in</span> <span class="n">log_type</span><span class="o">.</span><span class="n">filename_matchers</span><span class="p">:</span>
+            <span class="n">matcher</span><span class="o">.</span><span class="n">log_type_name</span> <span class="o">=</span> <span class="n">new_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_type</span>
+        <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parser</span><span class="o">.</span><span class="n">log_type</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
+                <span class="n">parser</span><span class="o">.</span><span class="n">log_type</span> <span class="o">=</span> <span class="n">new_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="p">[</span><span class="n">new_name</span>
+                                         <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
+        <span class="n">all_matchers_definition</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">log_type</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">):</span>
+            <span class="n">matchers_definitions</span> <span class="o">=</span> <span class="p">(</span><span class="n">matcher</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">matcher</span> <span class="ow">in</span> <span class="n">log_type</span><span class="o">.</span><span class="n">filename_matchers</span><span class="p">)</span>
+            <span class="n">all_matchers_definition</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">all_matchers_definition</span><span class="p">,</span> <span class="n">matchers_definitions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resave_all_log_types</span><span class="p">(</span><span class="n">all_matchers_definition</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resave_all_parsers</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="AbstractConfig.add_log_type"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.add_log_type">[docs]</a>    <span class="k">def</span> <span class="nf">add_log_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_type</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">matcher</span> <span class="ow">in</span> <span class="n">log_type</span><span class="o">.</span><span class="n">filename_matchers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_filename_matcher_to_log_type</span><span class="p">(</span><span class="n">matcher</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">[</span><span class="n">log_type</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_type</span>
+</div>
+<div class="viewcode-block" id="AbstractConfig.add_filename_matcher_to_log_type"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.add_filename_matcher_to_log_type">[docs]</a>    <span class="k">def</span> <span class="nf">add_filename_matcher_to_log_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matcher</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename_matcher_definition</span><span class="p">(</span><span class="n">matcher</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
+</div>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_resave_all_log_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchers_definition</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_resave_all_parsers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers_definition</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_save_rule_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_definition</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_save_parsers_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser_definitions</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_save_filename_matcher_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matcher_definition</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="AbstractConfig.get_all_log_types"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.get_all_log_types">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_log_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_NAME</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_LOG_TYPE</span><span class="p">],</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="AbstractConfig.get_log_type"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.get_log_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_log_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_source</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">log_type</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line_source</span> <span class="ow">in</span> <span class="n">log_type</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">log_type</span>
+</div>
+<div class="viewcode-block" id="AbstractConfig.create_investigation_plan"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.create_investigation_plan">[docs]</a>    <span class="k">def</span> <span class="nf">create_investigation_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">front_input</span><span class="p">,</span> <span class="n">log_type</span><span class="p">):</span>
+        <span class="n">matching_parsers</span><span class="p">,</span> <span class="n">effect_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_matching_parsers</span><span class="p">(</span>
+            <span class="n">front_input</span><span class="o">.</span><span class="n">line_content</span><span class="p">,</span> <span class="n">log_type</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+        <span class="n">suspected_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_rule_set</span><span class="p">(</span><span class="n">matching_parsers</span><span class="p">)</span>
+        <span class="n">concatenated_parsers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_concatenated_parsers_for_investigation</span><span class="p">(</span><span class="n">suspected_rules</span><span class="p">)</span>
+        <span class="n">effect_clues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_effect_clues</span><span class="p">(</span><span class="n">effect_params</span><span class="p">,</span> <span class="n">front_input</span><span class="p">)</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_steps_in_investigation</span><span class="p">(</span>
+            <span class="n">concatenated_parsers</span><span class="p">,</span> <span class="n">suspected_rules</span><span class="p">,</span> <span class="n">effect_clues</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">InvestigationPlan</span><span class="p">(</span><span class="n">suspected_rules</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">effect_clues</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_create_effect_clues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_params</span><span class="p">,</span> <span class="n">front_input</span><span class="p">):</span>
+        <span class="n">effect_clues</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">parser_name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">effect_params</span><span class="p">):</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="n">parser_name</span><span class="p">]</span>
+            <span class="n">clue</span> <span class="o">=</span> <span class="n">Clue</span><span class="p">(</span>
+                <span class="n">parser</span><span class="o">.</span><span class="n">convert_params</span><span class="p">(</span>
+                    <span class="n">params</span>
+                <span class="p">),</span> <span class="n">front_input</span><span class="o">.</span><span class="n">line_content</span><span class="p">,</span> <span class="n">front_input</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">front_input</span><span class="o">.</span><span class="n">line_source</span>
+            <span class="p">)</span>  <span class="c"># yapf: disable</span>
+            <span class="n">effect_clues</span><span class="p">[</span><span class="n">parser_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">clue</span>
+        <span class="k">return</span> <span class="n">effect_clues</span>
+
+    <span class="k">def</span> <span class="nf">_find_matching_parsers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_line_content</span><span class="p">,</span> <span class="n">log_type_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method finding all parsers from Config base which matching with effect_line_content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matching_parsers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">extracted_params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="p">[</span><span class="n">log_type_name</span><span class="p">]:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_regex_params</span><span class="p">(</span><span class="n">effect_line_content</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">extracted_params</span><span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+                <span class="n">matching_parsers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">matching_parsers</span><span class="p">,</span> <span class="n">extracted_params</span>
+
+    <span class="k">def</span> <span class="nf">_filter_rule_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method finding all rules from Config base which can be fulfilled in</span>
+<span class="sd">        single investigation base on parsers_list found by _find_matching_parsers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">suspected_rules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">parsers_list</span><span class="p">:</span>
+            <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rules</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">suspected_rules</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">suspected_rules</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_concatenated_parsers_for_investigation</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">rules</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create concatenated parser for all log types which participate in given investigation based</span>
+<span class="sd">        on suspected rules found by _filter_rule_set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grouped_parsers</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">inserted_parsers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">suspected_rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">suspected_rule</span><span class="o">.</span><span class="n">get_causes_parsers</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">parser</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inserted_parsers</span><span class="p">:</span>
+                    <span class="n">grouped_parsers</span><span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">log_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+                    <span class="n">inserted_parsers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">log_type_name</span><span class="p">,</span> <span class="n">ConcatenatedRegexParser</span><span class="p">(</span><span class="n">parsers</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">log_type_name</span><span class="p">,</span> <span class="n">parsers</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">grouped_parsers</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_steps_in_investigation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concatenated_parsers</span><span class="p">,</span> <span class="n">suspected_rules</span><span class="p">,</span> <span class="n">effect_clues</span><span class="p">):</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">search_ranges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_search_ranges</span><span class="p">(</span><span class="n">suspected_rules</span><span class="p">,</span> <span class="n">effect_clues</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">log_type_name</span><span class="p">,</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">concatenated_parsers</span><span class="p">):</span>
+            <span class="n">log_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_types</span><span class="p">[</span><span class="n">log_type_name</span><span class="p">]</span>
+            <span class="n">investigation_step</span> <span class="o">=</span> <span class="n">InvestigationStep</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">search_ranges</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">log_type_name</span><span class="p">,</span> <span class="p">{}))</span>
+            <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">investigation_step</span><span class="p">,</span> <span class="n">log_type</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">steps</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_search_ranges</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">suspected_rules</span><span class="p">,</span> <span class="n">effect_clues</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        old_search_range is a dictionary with two keys: InvesitgationStep.LEFT_BOUND and</span>
+<span class="sd">        InvesitgationStep.RIGHT_BOUND. Values in this dict are concrete values of type_ the same as type_ of some</span>
+<span class="sd">        primary key. Both values taken together represent some interval.</span>
+<span class="sd">        Sample search range_:</span>
+<span class="sd">            {</span>
+<span class="sd">                InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),</span>
+<span class="sd">                InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)</span>
+<span class="sd">            }</span>
+<span class="sd">        Log type_&#39;s search ranges in rule context is a dictionary with old_search_range for every type_ of primary key of</span>
+<span class="sd">        rule&#39;s parsers that belong to this log type_.</span>
+<span class="sd">        Sample log type_&#39;s search ranges:</span>
+<span class="sd">            {</span>
+<span class="sd">                &#39;date&#39;: {</span>
+<span class="sd">                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),</span>
+<span class="sd">                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">        Rule&#39;s search_ranges is sum of all log type_&#39;s search ranges, where rule&#39;s parsers belong to these log types.</span>
+<span class="sd">        Sample rule&#39;s search ranges (1) : {</span>
+<span class="sd">            &#39;apache&#39;: {</span>
+<span class="sd">                &#39;date&#39;: {</span>
+<span class="sd">                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 33, 0),</span>
+<span class="sd">                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)</span>
+<span class="sd">                }</span>
+<span class="sd">            },</span>
+<span class="sd">            &#39;database&#39;: {</span>
+<span class="sd">                &#39;date&#39;: {</span>
+<span class="sd">                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),</span>
+<span class="sd">                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">         }</span>
+<span class="sd">        Sample rule&#39;s search ranges (2) : {</span>
+<span class="sd">            &#39;apache&#39;: {</span>
+<span class="sd">                &#39;date&#39;: {</span>
+<span class="sd">                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),</span>
+<span class="sd">                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)</span>
+<span class="sd">                }</span>
+<span class="sd">            },</span>
+<span class="sd">        }</span>
+<span class="sd">        This method sums all rule&#39;s search ranges from every rule in suspected rules.</span>
+<span class="sd">        Expected returned value based on (1) and (2): {</span>
+<span class="sd">            &#39;apache&#39;: {</span>
+<span class="sd">                &#39;date&#39;: {</span>
+<span class="sd">                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),</span>
+<span class="sd">                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 30)</span>
+<span class="sd">                }</span>
+<span class="sd">            },</span>
+<span class="sd">            &#39;database&#39;: {</span>
+<span class="sd">                &#39;date&#39;: {</span>
+<span class="sd">                    InvesitgationStep.LEFT_BOUND: datetime(2016, 5, 29, 12, 32, 0),</span>
+<span class="sd">                    InvesitgationStep.RIGHT_BOUND: datetime(2016, 5, 29, 12, 33, 20)</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># This implementation assumes that all primary key groups is a one element list</span>
+        <span class="c"># TODO implementation for longer primary key groups</span>
+        <span class="n">search_ranges</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">suspected_rules</span><span class="p">:</span>
+            <span class="n">rule_search_ranges</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get_search_ranges</span><span class="p">(</span><span class="n">effect_clues</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">log_type_name</span><span class="p">,</span> <span class="n">log_type_ranges</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">rule_search_ranges</span><span class="p">):</span>
+                <span class="n">log_type_search_range</span> <span class="o">=</span> <span class="n">search_ranges</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">log_type_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">log_type_search_range</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">search_ranges</span><span class="p">[</span><span class="n">log_type_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_type_ranges</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">type_</span><span class="p">,</span> <span class="n">range_</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">rule_search_ranges</span><span class="p">[</span><span class="n">log_type_name</span><span class="p">]):</span>
+                    <span class="n">old_search_range</span> <span class="o">=</span> <span class="n">log_type_search_range</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">old_search_range</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">log_type_search_range</span><span class="p">[</span><span class="n">type_</span><span class="p">]</span> <span class="o">=</span> <span class="n">range_</span>
+                        <span class="k">continue</span>
+                    <span class="n">left_bound</span><span class="p">,</span> <span class="n">right_bound</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_calculate_new_bounds</span><span class="p">(</span><span class="n">range_</span><span class="p">,</span> <span class="n">old_search_range</span><span class="p">)</span>
+                    <span class="n">old_search_range</span><span class="p">[</span><span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">]</span> <span class="o">=</span> <span class="n">left_bound</span>
+                    <span class="n">old_search_range</span><span class="p">[</span><span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">]</span> <span class="o">=</span> <span class="n">right_bound</span>
+        <span class="k">return</span> <span class="n">search_ranges</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_new_bounds</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">range_</span><span class="p">,</span> <span class="n">old_search_range</span><span class="p">):</span>
+        <span class="n">left_bound_candidate</span> <span class="o">=</span> <span class="n">range_</span><span class="p">[</span><span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">]</span>
+        <span class="n">right_bound_candidate</span> <span class="o">=</span> <span class="n">range_</span><span class="p">[</span><span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">]</span>
+        <span class="n">left_bound</span> <span class="o">=</span> <span class="n">old_search_range</span><span class="p">[</span><span class="n">InvestigationStep</span><span class="o">.</span><span class="n">LEFT_BOUND</span><span class="p">]</span>
+        <span class="n">right_bound</span> <span class="o">=</span> <span class="n">old_search_range</span><span class="p">[</span><span class="n">InvestigationStep</span><span class="o">.</span><span class="n">RIGHT_BOUND</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">left_bound_candidate</span><span class="p">,</span> <span class="n">left_bound</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">right_bound_candidate</span><span class="p">,</span> <span class="n">right_bound</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AbstractConfig.is_free_parser_name"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.is_free_parser_name">[docs]</a>    <span class="k">def</span> <span class="nf">is_free_parser_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser_name</span><span class="p">,</span> <span class="n">black_list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser_name_generator</span><span class="o">.</span><span class="n">is_free_parser_name</span><span class="p">(</span><span class="n">parser_name</span><span class="p">,</span> <span class="n">black_list</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AbstractConfig.propose_parser_name"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.abstract_config.AbstractConfig.propose_parser_name">[docs]</a>    <span class="k">def</span> <span class="nf">propose_parser_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">regex_str</span><span class="p">,</span> <span class="n">black_list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser_name_generator</span><span class="o">.</span><span class="n">propose_parser_name</span><span class="p">(</span>
+            <span class="n">line</span><span class="p">,</span> <span class="n">regex_str</span><span class="p">,</span> <span class="n">black_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">words_count_in_name</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.config.parser_subset &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.config" href="../config.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../config.html" accesskey="U">whylog.config</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.config.parser_subset</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
+
+<span class="n">IMPORTED_RE</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">regex</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">re</span> <span class="kn">as</span> <span class="nn">regex</span>
+
+    <span class="n">IMPORTED_RE</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This handling of import regex error does not really mean that</span>
+<span class="sd">we are able to work without regex being installed. It means that</span>
+<span class="sd">whylog can work with these python versions, which don&#39;t handle</span>
+<span class="sd">regex module(like pypy, pypy3). So if you use cpython 2.5-3.5</span>
+<span class="sd">please install regex module. That will improve whylog performance.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractParserSubset"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.parser_subset.AbstractParserSubset">[docs]</a><span class="k">class</span> <span class="nc">AbstractParserSubset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractParserSubset.get_extracted_parsers_params"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.parser_subset.AbstractParserSubset.get_extracted_parsers_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</div></div>
+<div class="viewcode-block" id="ConcatenatedRegexParser"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.parser_subset.ConcatenatedRegexParser">[docs]</a><span class="k">class</span> <span class="nc">ConcatenatedRegexParser</span><span class="p">(</span><span class="n">AbstractParserSubset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents concatenated created from many regex parsers.</span>
+<span class="sd">    Allows to check which parsers matches to given line faster</span>
+<span class="sd">    than brute match by many regex parsers</span>
+<span class="sd">    Sample forward concatenated regex : (a)|(b)|(c)|(d)|(e)</span>
+<span class="sd">    Sample backward concatenated regex: (e)|(d)|(c)|(b)|(a)</span>
+<span class="sd">    where a, b, c, d, e are subregexes. Subregexes can have own groups</span>
+<span class="sd">    We need to backward concatenated regex to check that only subregex matches with given line</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NO_MATCH</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser_list</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span> <span class="o">=</span> <span class="n">parser_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">parser</span><span class="p">)</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">IMPORTED_RE</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">forward</span><span class="p">,</span> <span class="n">backward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_concatenated_regexes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_forward_regex</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">forward</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backward_regex</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">backward</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_forward_parsers_indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indexes_of_groups_for_parsers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backward_parsers_indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indexes_of_groups_for_parsers</span><span class="p">(</span>
+            <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numbers_in_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_in_list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_forward_group_index_to_regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_group_index_to_regex_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_forward_parsers_indexes</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backward_group_index_to_regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_group_index_to_regex_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backward_parsers_indexes</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_concatenated_regexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">forward_regex</span> <span class="o">=</span> <span class="s">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;(&quot;</span> <span class="o">+</span> <span class="n">parser</span><span class="o">.</span><span class="n">regex_str</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="n">backward_regex</span> <span class="o">=</span> <span class="s">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s">&quot;(&quot;</span> <span class="o">+</span> <span class="n">parser</span><span class="o">.</span><span class="n">regex_str</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">forward_regex</span><span class="p">,</span> <span class="n">backward_regex</span>
+
+    <span class="k">def</span> <span class="nf">_get_indexes_of_groups_for_parsers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser_list</span><span class="p">):</span>
+        <span class="n">indexes_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">free_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">parser_list</span><span class="p">:</span>
+            <span class="n">amount_of_group</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">regex_str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;(&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">parser</span><span class="o">.</span><span class="n">regex_str</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;\(&#39;</span><span class="p">)</span>
+            <span class="n">indexes_dict</span><span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">free_index</span><span class="p">,</span> <span class="n">amount_of_group</span><span class="p">)</span>
+            <span class="n">free_index</span> <span class="o">+=</span> <span class="n">amount_of_group</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">indexes_dict</span>
+
+    <span class="k">def</span> <span class="nf">_number_in_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">regex_numbers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">:</span>
+            <span class="n">regex_numbers</span><span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">number</span>
+            <span class="n">number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">regex_numbers</span>
+
+    <span class="k">def</span> <span class="nf">_create_group_index_to_regex_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers_indexes</span><span class="p">):</span>
+        <span class="n">index_to_regex</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">indexes</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">parsers_indexes</span><span class="p">):</span>
+            <span class="n">index_to_regex</span><span class="p">[</span><span class="n">indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="n">index_to_regex</span>
+
+<div class="viewcode-block" id="ConcatenatedRegexParser.convert_parsers_groups_from_matched_line"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.parser_subset.ConcatenatedRegexParser.convert_parsers_groups_from_matched_line">[docs]</a>    <span class="k">def</span> <span class="nf">convert_parsers_groups_from_matched_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts extracted parsers groups dict, where groups are strings to dict where groups</span>
+<span class="sd">        was converted to proper type, which is defined in parser object.</span>
+<span class="sd">        Params come from only one line from logs.</span>
+<span class="sd">        Sample convertion:</span>
+<span class="sd">            line: &quot;2015-12-03 12:10:10 Commited transaction number 2100. Host name: postgres_db&quot;</span>
+<span class="sd">            params_dict : {</span>
+<span class="sd">                &#39;commited_transaction&#39; : (&#39;2015-12-03 12:10:10&#39;, &#39;2100&#39;, &#39;postgres_db&#39;)</span>
+<span class="sd">            }</span>
+<span class="sd">            return: {</span>
+<span class="sd">                &#39;commited_transaction&#39;: (datetime(2015, 12, 3, 12, 10, 10), 2100, &#39;postgres_db&#39;)</span>
+<span class="sd">            }</span>
+<span class="sd">            commited_transaction is sample parser name which matches with line</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extracted_parsers_params</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">converted_params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">parser_name</span><span class="p">,</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">params_dict</span><span class="p">):</span>
+            <span class="n">converted_params</span><span class="p">[</span><span class="n">parser_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers_dict</span><span class="p">[</span><span class="n">parser_name</span><span class="p">]</span><span class="o">.</span><span class="n">convert_params</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">converted_params</span>
+</div>
+<div class="viewcode-block" id="ConcatenatedRegexParser.get_extracted_parsers_params"><a class="viewcode-back" href="../../../whylog.config.html#whylog.config.parser_subset.ConcatenatedRegexParser.get_extracted_parsers_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_extracted_parsers_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts groups from subregexes that matched with given line</span>
+<span class="sd">        :param line: line from parsed file</span>
+<span class="sd">        :returns: dict of regexname to tuple of extracted regex params which match with line</span>
+<span class="sd">        Example of line = &quot;2015-12-03 12:11:00 Data is missing at alfa21. Loss = 567.02 GB. Host name: 101&quot;</span>
+<span class="sd">        Example of returned data: {</span>
+<span class="sd">            &quot;lost_data&quot;: (&quot;2015-12-03 12:11:00&quot;, &quot;alfa21&quot;, &quot;567.02&quot;, &quot;101&quot;),</span>
+<span class="sd">            &quot;lost_data_date&quot;: (&quot;2015-12-03 12:11:00&quot;,),</span>
+<span class="sd">            &quot;lost_data_suffix&quot;: (&quot;2015-12-03 12:11:00&quot;, &quot;alfa21. Loss = 567.02 GB. Host name: 101&quot;),</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Handle case when regex module is not installed by matching many regexes</span>
+        <span class="k">if</span> <span class="n">IMPORTED_RE</span><span class="p">:</span>
+            <span class="n">extracted_regex_params</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_brute_subregexes_matching</span><span class="p">(</span><span class="n">extracted_regex_params</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">extracted_regex_params</span>
+        <span class="n">forward_matched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">forward_matched</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ConcatenatedRegexParser</span><span class="o">.</span><span class="n">NO_MATCH</span>
+        <span class="n">forward_groups</span> <span class="o">=</span> <span class="n">forward_matched</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_last_group_matched</span><span class="p">(</span><span class="n">forward_groups</span><span class="p">):</span>
+            <span class="c"># If it was last subregex it&#39;s true that only one subregex matches</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_params_from_last_regex</span><span class="p">(</span><span class="n">forward_groups</span><span class="p">)</span>
+        <span class="c"># Now we must use backward concatenated regex to check if only one subregex matched</span>
+        <span class="n">backward_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backward_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="n">forward_matched_regex_name</span><span class="p">,</span> <span class="n">only_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_that_only_one_regex_matched</span><span class="p">(</span>
+            <span class="n">forward_groups</span><span class="p">,</span> <span class="n">backward_groups</span>
+        <span class="p">)</span>
+        <span class="n">regex_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_regex_params_by_regex_name</span><span class="p">(</span>
+            <span class="n">forward_groups</span><span class="p">,</span> <span class="n">forward_matched_regex_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_parsers_indexes</span>
+        <span class="p">)</span>
+        <span class="n">extracted_regex_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">forward_matched_regex_name</span><span class="p">:</span> <span class="n">regex_params</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">only_one</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">extracted_regex_params</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_params_from_many_matched_regexes</span><span class="p">(</span>
+            <span class="n">backward_groups</span><span class="p">,</span> <span class="n">extracted_regex_params</span><span class="p">,</span> <span class="n">forward_matched_regex_name</span><span class="p">,</span> <span class="n">line</span>
+        <span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_extract_params_from_many_matched_regexes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">backward_groups</span><span class="p">,</span> <span class="n">extracted_regex_params</span><span class="p">,</span> <span class="n">forward_matched_regex_name</span><span class="p">,</span> <span class="n">line</span>
+    <span class="p">):</span>
+        <span class="c"># Now we know more than one subregex matched.</span>
+        <span class="c"># Check which subregex was matched by backward regex.</span>
+        <span class="n">backward_matched_regex_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_first_matched_parser_name</span><span class="p">(</span>
+            <span class="n">backward_groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backward_group_index_to_regex</span>
+        <span class="p">)</span>
+        <span class="n">regex_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_regex_params_by_regex_name</span><span class="p">(</span>
+            <span class="n">backward_groups</span><span class="p">,</span> <span class="n">backward_matched_regex_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backward_parsers_indexes</span>
+        <span class="p">)</span>
+        <span class="n">extracted_regex_params</span><span class="p">[</span><span class="n">backward_matched_regex_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">regex_params</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numbers_in_list</span><span class="p">[</span><span class="n">forward_matched_regex_name</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numbers_in_list</span><span class="p">[</span><span class="n">backward_matched_regex_name</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c"># Now we must check if other subregexes matched with line.</span>
+        <span class="c"># We only have to check the ones that are beetween subregexes found forward and backward</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_brute_subregexes_matching</span><span class="p">(</span><span class="n">extracted_regex_params</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">extracted_regex_params</span>
+
+    <span class="k">def</span> <span class="nf">_extract_regex_params_by_regex_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">matched_regex_name</span><span class="p">,</span> <span class="n">parsers_indexes</span><span class="p">):</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">parsers_indexes</span><span class="p">[</span><span class="n">matched_regex_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">number_of_groups</span> <span class="o">=</span> <span class="n">parsers_indexes</span><span class="p">[</span><span class="n">matched_regex_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">regex_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_regex_params</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">number_of_groups</span><span class="p">,</span> <span class="n">start_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">regex_params</span>
+
+    <span class="k">def</span> <span class="nf">_get_first_matched_parser_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">group_index_to_parser_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">first_matched</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">group_index_to_parser_name</span><span class="p">[</span><span class="n">first_matched</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_check_that_only_one_regex_matched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward_groups</span><span class="p">,</span> <span class="n">backward_groups</span><span class="p">):</span>
+        <span class="n">regex_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_first_matched_parser_name</span><span class="p">(</span>
+            <span class="n">forward_groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_group_index_to_regex</span>
+        <span class="p">)</span>
+        <span class="n">matched_regex_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backward_parsers_indexes</span><span class="p">[</span><span class="n">regex_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">is_matched_one_regex</span> <span class="o">=</span> <span class="n">backward_groups</span><span class="p">[</span><span class="n">matched_regex_index</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="n">regex_name</span><span class="p">,</span> <span class="n">is_matched_one_regex</span>
+
+    <span class="k">def</span> <span class="nf">_extract_params_from_last_regex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward_groups</span><span class="p">):</span>
+        <span class="n">last_regex_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">last_regex_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_regex_params_by_regex_name</span><span class="p">(</span>
+            <span class="n">forward_groups</span><span class="p">,</span> <span class="n">last_regex_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_parsers_indexes</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">last_regex_name</span><span class="p">:</span> <span class="n">last_regex_params</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_is_last_group_matched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">groups</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">_extract_regex_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">regex_group_number</span><span class="p">,</span> <span class="n">regex_index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">regex_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">regex_index</span> <span class="o">+</span> <span class="n">regex_group_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_brute_subregexes_matching</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extracted_regex_params</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_regex_params</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">extracted_regex_params</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

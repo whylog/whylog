@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.assistant.regex_assistant &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.assistant" href="../assistant.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../assistant.html" accesskey="U">whylog.assistant</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.assistant.regex_assistant</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">whylog.assistant</span> <span class="kn">import</span> <span class="n">AbstractAssistant</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.const</span> <span class="kn">import</span> <span class="n">AssistantType</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.regex_assistant.regex_match</span> <span class="kn">import</span> <span class="n">RegexMatch</span>
+
+
+<div class="viewcode-block" id="RegexAssistant"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant">[docs]</a><span class="k">class</span> <span class="nc">RegexAssistant</span><span class="p">(</span><span class="n">AbstractAssistant</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Responsible for creating regex for each line of Rule.</span>
+<span class="sd">    RegexAssistant helps user to write regex, it can also propose regex.</span>
+<span class="sd">    One RegexAssistant per one entering Rule.</span>
+
+<span class="sd">    :type regex_matches: dict[int, RegexMatch]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TYPE</span> <span class="o">=</span> <span class="n">AssistantType</span><span class="o">.</span><span class="n">REGEX</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="RegexAssistant.add_line"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.add_line">[docs]</a>    <span class="k">def</span> <span class="nf">add_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">,</span> <span class="n">line_object</span><span class="p">):</span>
+        <span class="n">regex_match</span> <span class="o">=</span> <span class="n">RegexMatch</span><span class="p">(</span><span class="n">line_object</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">regex_match</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.remove_line"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.remove_line">[docs]</a>    <span class="k">def</span> <span class="nf">remove_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.get_pattern_match"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.get_pattern_match">[docs]</a>    <span class="k">def</span> <span class="nf">get_pattern_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">):</span>
+        <span class="n">regex_match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">regex_match</span><span class="o">.</span><span class="n">convert_to_pattern_match</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.update_by_pattern"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.update_by_pattern">[docs]</a>    <span class="k">def</span> <span class="nf">update_by_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span><span class="o">.</span><span class="n">update_by_regex</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.update_by_guessed_pattern_match"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.update_by_guessed_pattern_match">[docs]</a>    <span class="k">def</span> <span class="nf">update_by_guessed_pattern_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">,</span> <span class="n">regex_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span><span class="o">.</span><span class="n">update_by_guessed_regex</span><span class="p">(</span><span class="n">regex_id</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.guess_pattern_matches"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.guess_pattern_matches">[docs]</a>    <span class="k">def</span> <span class="nf">guess_pattern_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">):</span>
+        <span class="n">regex_match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">regex_match</span><span class="o">.</span><span class="n">guessed_pattern_matches</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.set_converter"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.set_converter">[docs]</a>    <span class="k">def</span> <span class="nf">set_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">,</span> <span class="n">group_no</span><span class="p">,</span> <span class="n">converter</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span><span class="o">.</span><span class="n">set_converter</span><span class="p">(</span><span class="n">group_no</span><span class="p">,</span> <span class="n">converter</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.set_primary_key"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.set_primary_key">[docs]</a>    <span class="k">def</span> <span class="nf">set_primary_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">,</span> <span class="n">primary_key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span><span class="o">.</span><span class="n">set_primary_key</span><span class="p">(</span><span class="n">primary_key</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RegexAssistant.validate"><a class="viewcode-back" href="../../../whylog.assistant.regex_assistant.html#whylog.assistant.regex_assistant.RegexAssistant.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex_matches</span><span class="p">[</span><span class="n">line_id</span><span class="p">]</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

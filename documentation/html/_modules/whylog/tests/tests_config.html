@@ -1,0 +1,314 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_config &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.tests.tests_config</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">from</span> <span class="nn">whylog.assistant.const</span> <span class="kn">import</span> <span class="n">AssistantType</span>
+<span class="kn">from</span> <span class="nn">whylog.assistant.pattern_match</span> <span class="kn">import</span> <span class="n">ParamGroup</span>
+<span class="kn">from</span> <span class="nn">whylog.config</span> <span class="kn">import</span> <span class="n">SettingsFactorySelector</span>
+<span class="kn">from</span> <span class="nn">whylog.config.consts</span> <span class="kn">import</span> <span class="n">YamlFileNames</span>
+<span class="kn">from</span> <span class="nn">whylog.config.filename_matchers</span> <span class="kn">import</span> <span class="n">WildCardFilenameMatcher</span>
+<span class="kn">from</span> <span class="nn">whylog.config.log_type</span> <span class="kn">import</span> <span class="n">LogType</span>
+<span class="kn">from</span> <span class="nn">whylog.config.parsers</span> <span class="kn">import</span> <span class="n">RegexParserFactory</span>
+<span class="kn">from</span> <span class="nn">whylog.config.rule</span> <span class="kn">import</span> <span class="n">RegexRuleFactory</span>
+<span class="kn">from</span> <span class="nn">whylog.config.super_parser</span> <span class="kn">import</span> <span class="n">RegexSuperParser</span>
+<span class="kn">from</span> <span class="nn">whylog.teacher.user_intent</span> <span class="kn">import</span> <span class="n">UserConstraintIntent</span><span class="p">,</span> <span class="n">UserParserIntent</span><span class="p">,</span> <span class="n">UserRuleIntent</span>
+<span class="kn">from</span> <span class="nn">whylog.tests.consts</span> <span class="kn">import</span> <span class="n">TestPaths</span>
+
+<span class="c"># Constraint types</span>
+<span class="n">identical_constr</span> <span class="o">=</span> <span class="s">&quot;identical&quot;</span>
+<span class="n">different_constr</span> <span class="o">=</span> <span class="s">&quot;different&quot;</span>
+<span class="n">hetero_constr</span> <span class="o">=</span> <span class="s">&quot;hetero&quot;</span>
+
+<span class="c"># convertions</span>
+<span class="n">to_date</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span>
+<span class="n">to_string</span> <span class="o">=</span> <span class="s">&quot;string&quot;</span>
+<span class="n">to_int</span> <span class="o">=</span> <span class="s">&quot;int&quot;</span>
+
+
+<div class="viewcode-block" id="TestBasic"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic">[docs]</a><span class="k">class</span> <span class="nc">TestBasic</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TestBasic.setUpClass"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.setUpClass">[docs]</a>    <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">WHYLOG_DIR</span> <span class="o">=</span> <span class="n">TestPaths</span><span class="o">.</span><span class="n">WHYLOG_DIR</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">sample_line1</span> <span class="o">=</span> <span class="s">&quot;(2016-04-12 23:54:45) Connection error occurred on comp1. Host name: host1&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">sample_line2</span> <span class="o">=</span> <span class="s">&quot;(2016-04-12 23:54:40) Data migration from comp1 to comp2 failed. Host name: host2&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">sample_line3</span> <span class="o">=</span> <span class="s">&quot;(2016-04-12 23:54:43) Data is missing at comp2. Loss = (.*) GB. Host name: host2&quot;</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">regex1</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Connection error occurred on (.*)\. Host name: (.*)$&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">regex2</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data migration from (.*) to (.*) failed\. Host name: (.*)$&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">regex3</span> <span class="o">=</span> <span class="s">&quot;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d) Data is missing at (.*)\. Loss = (.*) GB\. Host name: (.*)$&quot;</span>
+
+        <span class="n">regex_type</span> <span class="o">=</span> <span class="n">AssistantType</span><span class="o">.</span><span class="n">REGEX</span>
+
+        <span class="c"># yapf: disable</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">groups1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;2016-04-12 23:54:45&quot;</span><span class="p">,</span> <span class="n">to_date</span><span class="p">),</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;comp1&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">),</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;host1&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">groups2</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;2016-04-12 23:54:40&quot;</span><span class="p">,</span> <span class="n">to_date</span><span class="p">),</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;comp2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">),</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;host2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">groups3</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;2016-04-12 23:54:43&quot;</span><span class="p">,</span> <span class="n">to_date</span><span class="p">),</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;comp2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">),</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;150&quot;</span><span class="p">,</span> <span class="n">to_int</span><span class="p">),</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="n">ParamGroup</span><span class="p">(</span><span class="s">&quot;host2&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">parser_intent1</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span>
+            <span class="s">&quot;connectionerror&quot;</span><span class="p">,</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">regex1</span><span class="p">,</span>
+            <span class="s">&quot;default&quot;</span><span class="p">,</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">groups1</span><span class="p">,</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">sample_line1</span><span class="p">,</span>
+            <span class="n">line_offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">line_resource_location</span><span class="o">=</span><span class="bp">None</span>
+        <span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">parser_intent2</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span>
+            <span class="s">&quot;datamigration&quot;</span><span class="p">,</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">regex2</span><span class="p">,</span>
+            <span class="s">&quot;default&quot;</span><span class="p">,</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">groups2</span><span class="p">,</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">sample_line2</span><span class="p">,</span>
+            <span class="n">line_offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">line_resource_location</span><span class="o">=</span><span class="bp">None</span>
+        <span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">parser_intent3</span> <span class="o">=</span> <span class="n">UserParserIntent</span><span class="p">(</span>
+            <span class="n">regex_type</span><span class="p">,</span>
+            <span class="s">&quot;lostdata&quot;</span><span class="p">,</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">regex3</span><span class="p">,</span>
+            <span class="s">&quot;default&quot;</span><span class="p">,</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">groups3</span><span class="p">,</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">sample_line3</span><span class="p">,</span>
+            <span class="n">line_offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">line_resource_location</span><span class="o">=</span><span class="bp">None</span>
+        <span class="p">)</span>
+
+        <span class="n">parsers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">cls</span><span class="o">.</span><span class="n">parser_intent1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="n">cls</span><span class="o">.</span><span class="n">parser_intent2</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="n">cls</span><span class="o">.</span><span class="n">parser_intent3</span><span class="p">}</span>
+        <span class="n">effect_id</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="n">constraint1</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="n">identical_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+        <span class="n">constraint2</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="n">identical_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+        <span class="n">constraint3</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span><span class="n">different_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+        <span class="n">constraint4</span> <span class="o">=</span> <span class="n">UserConstraintIntent</span><span class="p">(</span>
+            <span class="n">hetero_constr</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span> <span class="p">{</span>
+                <span class="s">&quot;different&quot;</span><span class="p">:</span> <span class="mi">1</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="c">#  yapf: enable</span>
+
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">constraint1</span><span class="p">,</span> <span class="n">constraint2</span><span class="p">,</span> <span class="n">constraint3</span><span class="p">,</span> <span class="n">constraint4</span><span class="p">]</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">user_intent</span> <span class="o">=</span> <span class="n">UserRuleIntent</span><span class="p">(</span><span class="n">effect_id</span><span class="p">,</span> <span class="n">parsers</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+
+        <span class="n">path_config</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;whylog&#39;</span><span class="p">,</span> <span class="s">&#39;tests&#39;</span><span class="p">,</span> <span class="s">&#39;tests_config&#39;</span><span class="p">,</span> <span class="s">&#39;test_files&#39;</span><span class="p">,</span> <span class="s">&#39;.whylog&#39;</span><span class="p">,</span> <span class="s">&#39;config.yaml&#39;</span><span class="p">]</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">path_config</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">load_settings</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="s">&#39;config&#39;</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_simple_transform"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.test_simple_transform">[docs]</a>    <span class="k">def</span> <span class="nf">test_simple_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rule</span> <span class="o">=</span> <span class="n">RegexRuleFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_intent</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">rule</span><span class="o">.</span><span class="n">_effect</span><span class="o">.</span><span class="n">regex_str</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex3</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cause</span><span class="o">.</span><span class="n">regex_str</span> <span class="k">for</span> <span class="n">cause</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">_causes</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">regex1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex2</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_parser_serialization"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.test_parser_serialization">[docs]</a>    <span class="k">def</span> <span class="nf">test_parser_serialization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser1</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parser_intent1</span><span class="p">)</span>
+        <span class="n">parser2</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parser_intent2</span><span class="p">)</span>
+        <span class="n">parser3</span> <span class="o">=</span> <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">create_from_intent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parser_intent3</span><span class="p">)</span>
+        <span class="n">parsers_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">parser1</span><span class="p">,</span> <span class="n">parser2</span><span class="p">,</span> <span class="n">parser3</span><span class="p">]</span>
+
+        <span class="n">parsers_dao_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">parsers_list</span><span class="p">]</span>
+        <span class="n">dumped_parsers</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump_all</span><span class="p">(</span><span class="n">parsers_dao_list</span><span class="p">,</span> <span class="n">explicit_start</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">loaded_parsers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">RegexParserFactory</span><span class="o">.</span><span class="n">from_dao</span><span class="p">(</span><span class="n">dumped_parser</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dumped_parser</span> <span class="ow">in</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load_all</span><span class="p">(</span><span class="n">dumped_parsers</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">dumped_parsers_again</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump_all</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">loaded_parsers</span><span class="p">],</span>
+            <span class="n">explicit_start</span><span class="o">=</span><span class="bp">True</span>
+        <span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">dumped_parsers_again</span> <span class="o">==</span> <span class="n">dumped_parsers</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_loading_single_rule_its_parsers"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.test_loading_single_rule_its_parsers">[docs]</a>    <span class="k">def</span> <span class="nf">test_loading_single_rule_its_parsers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_rules</span><span class="p">[</span><span class="s">&#39;lostdata&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">cause</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">cause</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">_causes</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">rule</span><span class="o">.</span><span class="n">_effect</span><span class="o">.</span><span class="n">name</span><span class="p">])</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_parsers</span><span class="p">)</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_loading_log_types"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.test_loading_log_types">[docs]</a>    <span class="k">def</span> <span class="nf">test_loading_log_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_log_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_log_types</span><span class="p">))</span> <span class="o">==</span> <span class="p">[</span><span class="s">&#39;apache&#39;</span><span class="p">,</span> <span class="s">&#39;test_log_type&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_log_types</span><span class="p">[</span><span class="s">&#39;test_log_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filename_matchers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_log_types</span><span class="p">[</span><span class="s">&#39;apache&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filename_matchers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_add_new_rule_to_empty_config"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.test_add_new_rule_to_empty_config">[docs]</a>    <span class="k">def</span> <span class="nf">test_add_new_rule_to_empty_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()[</span><span class="s">&#39;config&#39;</span><span class="p">]</span>
+        <span class="n">whylog_dir</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">_attach_whylog_dir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">add_rule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_intent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_loaded_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">whylog_dir</span><span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()[</span><span class="s">&#39;config&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_loaded_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">whylog_dir</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">whylog_dir</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TestBasic.check_loaded_config"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.check_loaded_config">[docs]</a>    <span class="k">def</span> <span class="nf">check_loaded_config</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">whylog_dir</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers_path</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">whylog_dir</span><span class="p">,</span> <span class="n">YamlFileNames</span><span class="o">.</span><span class="n">parsers</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_rules</span><span class="p">[</span><span class="s">&#39;lostdata&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">added_rule</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">_rules</span><span class="p">[</span><span class="s">&#39;lostdata&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">added_rule</span><span class="o">.</span><span class="n">get_effect_name</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;lostdata&#39;</span>
+        <span class="n">ordered</span> <span class="o">=</span> <span class="p">[</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">added_rule</span><span class="o">.</span><span class="n">get_causes_parsers</span><span class="p">()]</span>
+        <span class="n">ordered</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">ordered</span> <span class="o">==</span> <span class="p">[</span><span class="s">&quot;connectionerror&quot;</span><span class="p">,</span> <span class="s">&quot;datamigration&quot;</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_log_type_rename"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.test_log_type_rename">[docs]</a>    <span class="k">def</span> <span class="nf">test_log_type_rename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">whylog_dir</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">_attach_whylog_dir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()[</span><span class="s">&#39;config&#39;</span><span class="p">]</span>
+
+        <span class="n">super_parser</span> <span class="o">=</span> <span class="n">RegexSuperParser</span><span class="p">(</span><span class="s">&#39;^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d).*&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s">&#39;date&#39;</span><span class="p">})</span>
+        <span class="n">matcher</span> <span class="o">=</span> <span class="n">WildCardFilenameMatcher</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="s">&#39;/temp/*.log&#39;</span><span class="p">,</span> <span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">super_parser</span><span class="p">)</span>
+        <span class="n">log_type</span> <span class="o">=</span> <span class="n">LogType</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">matcher</span><span class="p">])</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">add_log_type</span><span class="p">(</span><span class="n">log_type</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">add_rule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_intent</span><span class="p">)</span>
+
+        <span class="n">parsers_name</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;connectionerror&#39;</span><span class="p">,</span> <span class="s">&#39;datamigration&#39;</span><span class="p">,</span> <span class="s">&#39;lostdata&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="s">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_log_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="s">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_parsers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="n">parsers_name</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">])</span> <span class="o">==</span> \
+               <span class="n">parsers_name</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">log_type</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">log_type</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get_all_log_types</span><span class="p">())</span> <span class="o">==</span> <span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">]</span>
+
+        <span class="n">config</span><span class="o">.</span><span class="n">rename_log_type</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="s">&#39;test_log_type&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_log_type_renaming</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">parsers_name</span><span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()[</span><span class="s">&#39;config&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_log_type_renaming</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">parsers_name</span><span class="p">)</span>
+
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">whylog_dir</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_check_log_type_renaming</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">parsers_name</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="s">&#39;test_log_type&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_log_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="s">&#39;default&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_log_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="s">&#39;test_log_type&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="s">&#39;default&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="s">&#39;lostdata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">log_type</span> <span class="o">==</span> <span class="s">&#39;test_log_type&#39;</span>
+        <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="s">&#39;datamigration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">log_type</span> <span class="o">==</span> <span class="s">&#39;test_log_type&#39;</span>
+        <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers</span><span class="p">[</span><span class="s">&#39;connectionerror&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">log_type</span> <span class="o">==</span> <span class="s">&#39;test_log_type&#39;</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">parser</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_parsers_grouped_by_log_type</span><span class="p">[</span><span class="s">&#39;test_log_type&#39;</span><span class="p">])</span> <span class="o">==</span> \
+               <span class="n">parsers_name</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_parsers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="n">parsers_name</span>
+        <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">log_type</span><span class="o">.</span><span class="n">name</span>
+                      <span class="k">for</span> <span class="n">log_type</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get_all_log_types</span><span class="p">())</span> <span class="o">==</span> <span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="s">&#39;test_log_type&#39;</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TestBasic.tearDownClass"><a class="viewcode-back" href="../../../whylog.tests.tests_config.html#whylog.tests.tests_config.TestBasic.tearDownClass">[docs]</a>    <span class="k">def</span> <span class="nf">tearDownClass</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="c"># remove .test_directory if test test_add_new_rule_to_empty_config failed</span>
+        <span class="n">test_whylog_dir</span> <span class="o">=</span> <span class="n">SettingsFactorySelector</span><span class="o">.</span><span class="n">_attach_whylog_dir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">test_whylog_dir</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">test_whylog_dir</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

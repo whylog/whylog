@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.teacher.user_intent &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.teacher" href="../teacher.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../teacher.html" accesskey="U">whylog.teacher</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.teacher.user_intent</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="UserParserIntent"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.user_intent.UserParserIntent">[docs]</a><span class="k">class</span> <span class="nc">UserParserIntent</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pattern_type</span><span class="p">,</span>
+        <span class="n">pattern_name</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="p">,</span>
+        <span class="n">log_type_name</span><span class="p">,</span>
+        <span class="n">primary_key_groups</span><span class="p">,</span>
+        <span class="n">groups</span><span class="p">,</span>
+        <span class="n">line_content</span><span class="p">,</span>
+        <span class="n">line_offset</span><span class="p">,</span>
+        <span class="n">line_resource_location</span><span class="p">,</span>
+        <span class="n">parser_id</span><span class="o">=</span><span class="bp">None</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern_type</span> <span class="o">=</span> <span class="n">pattern_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern_name</span> <span class="o">=</span> <span class="n">pattern_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_type_name</span> <span class="o">=</span> <span class="n">log_type_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primary_key_groups</span> <span class="o">=</span> <span class="n">primary_key_groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span>  <span class="c"># {group_id : ParamGroup}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_content</span> <span class="o">=</span> <span class="n">line_content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span> <span class="o">=</span> <span class="n">line_offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_resource_location</span> <span class="o">=</span> <span class="n">line_resource_location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_</span> <span class="o">=</span> <span class="n">parser_id</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__dict__</span>
+
+</div>
+<div class="viewcode-block" id="UserConstraintIntent"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.user_intent.UserConstraintIntent">[docs]</a><span class="k">class</span> <span class="nc">UserConstraintIntent</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constr_type</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">constraint_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">constr_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_</span> <span class="o">=</span> <span class="n">constraint_id</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__dict__</span>
+
+</div>
+<div class="viewcode-block" id="UserRuleIntent"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.user_intent.UserRuleIntent">[docs]</a><span class="k">class</span> <span class="nc">UserRuleIntent</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_id</span><span class="p">,</span> <span class="n">parsers</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect_id</span> <span class="o">=</span> <span class="n">effect_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parsers</span> <span class="o">=</span> <span class="n">parsers</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">constraints</span> <span class="ow">or</span> <span class="p">[]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

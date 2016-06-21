@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.constraints.constraint_manager &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.constraints" href="../constraints.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../constraints.html" accesskey="U">whylog.constraints</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.constraints.constraint_manager</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.constraints</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DifferentConstraint</span><span class="p">,</span> <span class="n">HeteroConstraint</span><span class="p">,</span> <span class="n">IdenticalConstraint</span><span class="p">,</span> <span class="n">TimeConstraint</span><span class="p">,</span> <span class="n">ValueDeltaConstraint</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">whylog.constraints.const</span> <span class="kn">import</span> <span class="n">ConstraintType</span>
+<span class="kn">from</span> <span class="nn">whylog.constraints.exceptions</span> <span class="kn">import</span> <span class="n">UnsupportedConstraintTypeError</span>
+
+
+<div class="viewcode-block" id="ConstraintRegistry"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.constraint_manager.ConstraintRegistry">[docs]</a><span class="k">class</span> <span class="nc">ConstraintRegistry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">CONSTRAINTS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ConstraintType</span><span class="o">.</span><span class="n">DIFFERENT</span><span class="p">:</span> <span class="n">DifferentConstraint</span><span class="p">,</span>
+        <span class="n">ConstraintType</span><span class="o">.</span><span class="n">IDENTICAL</span><span class="p">:</span> <span class="n">IdenticalConstraint</span><span class="p">,</span>
+        <span class="n">ConstraintType</span><span class="o">.</span><span class="n">TIME_DELTA</span><span class="p">:</span> <span class="n">TimeConstraint</span><span class="p">,</span>
+        <span class="n">ConstraintType</span><span class="o">.</span><span class="n">VALUE_DELTA</span><span class="p">:</span> <span class="n">ValueDeltaConstraint</span><span class="p">,</span>
+        <span class="n">ConstraintType</span><span class="o">.</span><span class="n">HETERO</span><span class="p">:</span> <span class="n">HeteroConstraint</span><span class="p">,</span>
+        <span class="c"># register your constraint here</span>
+    <span class="p">}</span>  <span class="c"># yapf: disable</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ConstraintRegistry.get_constraint"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.constraint_manager.ConstraintRegistry.get_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">get_constraint</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">constraint_data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">constraint_data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">CONSTRAINTS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">CONSTRAINTS</span><span class="p">[</span><span class="n">constraint_data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]](</span>
+                <span class="n">param_dict</span><span class="o">=</span><span class="n">constraint_data</span><span class="p">[</span><span class="s">&#39;params&#39;</span><span class="p">],</span>
+                <span class="n">params_checking</span><span class="o">=</span><span class="bp">False</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">UnsupportedConstraintTypeError</span><span class="p">(</span><span class="n">constraint_data</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ConstraintRegistry.constraint_from_name"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.constraint_manager.ConstraintRegistry.constraint_from_name">[docs]</a>    <span class="k">def</span> <span class="nf">constraint_from_name</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">constraint_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">CONSTRAINTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">constraint_name</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ConstraintRegistry.get_types"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.constraint_manager.ConstraintRegistry.get_types">[docs]</a>    <span class="k">def</span> <span class="nf">get_types</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">six</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">CONSTRAINTS</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="ConstraintManager"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.constraint_manager.ConstraintManager">[docs]</a><span class="k">class</span> <span class="nc">ConstraintManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    There should be one such object per rule being verified.</span>
+<span class="sd">    ConstraintManager collects constraints objects, one per each constraint.</span>
+<span class="sd">    Constraint objects for each constraint type should not be duplicated</span>
+<span class="sd">    (because e.g. two time constraints may have different time ranges),</span>
+<span class="sd">    so constraints in _actual_constraints has the same numeration</span>
+<span class="sd">    as in corresponding rule.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_actual_constraints</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="ConstraintManager.get_constraint_object"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.constraint_manager.ConstraintManager.get_constraint_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_constraint_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">constraint_data</span><span class="p">):</span>
+        <span class="n">constraint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actual_constraints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">constraint</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">constraint_verifier</span> <span class="o">=</span> <span class="n">ConstraintRegistry</span><span class="o">.</span><span class="n">get_constraint</span><span class="p">(</span><span class="n">constraint_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_actual_constraints</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">constraint_verifier</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actual_constraints</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

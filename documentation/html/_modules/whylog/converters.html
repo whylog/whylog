@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.converters &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.converters</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="kn">import</span> <span class="nn">dateutil.parser</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
+
+<span class="kn">from</span> <span class="nn">whylog.config.exceptions</span> <span class="kn">import</span> <span class="n">UnsupportedPrimaryKeyType</span>
+<span class="kn">from</span> <span class="nn">whylog.converters.exceptions</span> <span class="kn">import</span> <span class="n">ConverterError</span>
+
+
+<div class="viewcode-block" id="ConverterType"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.ConverterType">[docs]</a><span class="k">class</span> <span class="nc">ConverterType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">TO_DATE</span> <span class="o">=</span> <span class="s">&#39;date&#39;</span>
+    <span class="n">TO_FLOAT</span> <span class="o">=</span> <span class="s">&#39;float&#39;</span>
+    <span class="n">TO_INT</span> <span class="o">=</span> <span class="s">&#39;int&#39;</span>
+    <span class="n">TO_STRING</span> <span class="o">=</span> <span class="s">&#39;string&#39;</span>
+
+</div>
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractConverter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.AbstractConverter">[docs]</a><span class="k">class</span> <span class="nc">AbstractConverter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractConverter.convert"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.AbstractConverter.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">pattern_group</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractConverter.safe_convert"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.AbstractConverter.safe_convert">[docs]</a>    <span class="k">def</span> <span class="nf">safe_convert</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">pattern_group</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">converted_val</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConverterError</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">converted_val</span>
+
+</div></div>
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="DeltaConverter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DeltaConverter">[docs]</a><span class="k">class</span> <span class="nc">DeltaConverter</span><span class="p">(</span><span class="n">AbstractConverter</span><span class="p">):</span>
+    <span class="n">MIN_DELTA_TYPE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">MAX_DELTA_TYPE</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="DeltaConverter.switch_by_delta"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DeltaConverter.switch_by_delta">[docs]</a>    <span class="k">def</span> <span class="nf">switch_by_delta</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">delta_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</div></div>
+<div class="viewcode-block" id="IntConverter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.IntConverter">[docs]</a><span class="k">class</span> <span class="nc">IntConverter</span><span class="p">(</span><span class="n">DeltaConverter</span><span class="p">):</span>
+    <span class="n">MIN_VALUE</span> <span class="o">=</span> <span class="o">-</span><span class="n">six</span><span class="o">.</span><span class="n">MAXSIZE</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">MAX_VALUE</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">MAXSIZE</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="IntConverter.switch_by_delta"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.IntConverter.switch_by_delta">[docs]</a>    <span class="k">def</span> <span class="nf">switch_by_delta</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">delta_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="o">-</span> <span class="n">delta</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="IntConverter.convert"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.IntConverter.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">pattern_group</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="FloatConverter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.FloatConverter">[docs]</a><span class="k">class</span> <span class="nc">FloatConverter</span><span class="p">(</span><span class="n">DeltaConverter</span><span class="p">):</span>
+    <span class="n">MIN_VALUE</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s">&#39;-inf&#39;</span><span class="p">)</span>
+    <span class="n">MAX_VALUE</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s">&#39;inf&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FloatConverter.switch_by_delta"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.FloatConverter.switch_by_delta">[docs]</a>    <span class="k">def</span> <span class="nf">switch_by_delta</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">delta_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="o">-</span> <span class="n">delta</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FloatConverter.convert"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.FloatConverter.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">pattern_group</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="StringConverter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.StringConverter">[docs]</a><span class="k">class</span> <span class="nc">StringConverter</span><span class="p">(</span><span class="n">AbstractConverter</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="StringConverter.convert"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.StringConverter.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">pattern_group</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+
+
+<span class="c">#TODO: Simple date convertion will replace for concreate date format converter in the future</span></div></div>
+<div class="viewcode-block" id="DateConverter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DateConverter">[docs]</a><span class="k">class</span> <span class="nc">DateConverter</span><span class="p">(</span><span class="n">DeltaConverter</span><span class="p">):</span>
+    <span class="n">MIN_VALUE</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span>
+    <span class="n">MAX_VALUE</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">max</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="DateConverter.switch_by_delta"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DateConverter.switch_by_delta">[docs]</a>    <span class="k">def</span> <span class="nf">switch_by_delta</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">delta_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">delta</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">delta_type</span> <span class="o">==</span> <span class="n">cls</span><span class="o">.</span><span class="n">MAX_DELTA_TYPE</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">MIN_VALUE</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">date</span>
+        <span class="n">converted_delta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">date</span> <span class="o">-</span> <span class="n">converted_delta</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="DateConverter.convert"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DateConverter.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">pattern_group</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="DateConverter.safe_convert"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DateConverter.safe_convert">[docs]</a>    <span class="k">def</span> <span class="nf">safe_convert</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">pattern_group</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">converted_val</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConverterError</span><span class="p">(</span><span class="n">pattern_group</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">converted_val</span>
+
+</div></div>
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="DeltaConverterFactory"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DeltaConverterFactory">[docs]</a><span class="k">class</span> <span class="nc">DeltaConverterFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="DeltaConverterFactory.get_converter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.DeltaConverterFactory.get_converter">[docs]</a>    <span class="k">def</span> <span class="nf">get_converter</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">converter_type</span><span class="p">):</span>
+        <span class="n">converter</span> <span class="o">=</span> <span class="n">DELTA_CONVERTION_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">converter_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">converter</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnsupportedPrimaryKeyType</span><span class="p">(</span><span class="n">converter_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">converter</span>
+
+</div></div>
+<span class="n">STRING</span> <span class="o">=</span> <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_STRING</span>
+<span class="n">CONVERTION_MAPPING</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_STRING</span><span class="p">:</span> <span class="n">StringConverter</span><span class="p">,</span>
+        <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_DATE</span><span class="p">:</span> <span class="n">DateConverter</span><span class="p">,</span>
+        <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_INT</span><span class="p">:</span> <span class="n">IntConverter</span><span class="p">,</span>
+        <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_FLOAT</span><span class="p">:</span> <span class="n">FloatConverter</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">DELTA_CONVERTION_MAPPING</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_DATE</span><span class="p">:</span> <span class="n">DateConverter</span><span class="p">,</span>
+        <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_INT</span><span class="p">:</span> <span class="n">IntConverter</span><span class="p">,</span>
+        <span class="n">ConverterType</span><span class="o">.</span><span class="n">TO_FLOAT</span><span class="p">:</span> <span class="n">FloatConverter</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_converter"><a class="viewcode-back" href="../../whylog.converters.html#whylog.converters.get_converter">[docs]</a><span class="k">def</span> <span class="nf">get_converter</span><span class="p">(</span><span class="n">converter_type</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">CONVERTION_MAPPING</span><span class="p">[</span><span class="n">converter_type</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_teacher.test_constraint_links_base &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../../index.html" />
+    <link rel="up" title="whylog.tests.tests_teacher" href="../tests_teacher.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../tests_teacher.html" accesskey="U">whylog.tests.tests_teacher</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.tests.tests_teacher.test_constraint_links_base</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">from</span> <span class="nn">whylog.teacher.constraint_links_base</span> <span class="kn">import</span> <span class="n">ConstraintLinksBase</span>
+
+
+<div class="viewcode-block" id="TestBasic"><a class="viewcode-back" href="../../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.test_constraint_links_base.TestBasic">[docs]</a><span class="k">class</span> <span class="nc">TestBasic</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestBasic.setUp"><a class="viewcode-back" href="../../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.test_constraint_links_base.TestBasic.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span> <span class="o">=</span> <span class="n">ConstraintLinksBase</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_distinct_constraint_ids"><a class="viewcode-back" href="../../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.test_constraint_links_base.TestBasic.test_distinct_constraint_ids">[docs]</a>    <span class="k">def</span> <span class="nf">test_distinct_constraint_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">distinct_constraint_ids</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_add_links"><a class="viewcode-back" href="../../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.test_constraint_links_base.TestBasic.test_add_links">[docs]</a>    <span class="k">def</span> <span class="nf">test_add_links</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new_links</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">300</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">add_links</span><span class="p">(</span><span class="n">new_links</span><span class="p">)</span>
+        <span class="n">constr_links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">get_links</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">constr_links</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">constr_links</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_remove_by_line"><a class="viewcode-back" href="../../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.test_constraint_links_base.TestBasic.test_remove_by_line">[docs]</a>    <span class="k">def</span> <span class="nf">test_remove_by_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">remove_links_by_line</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">get_links</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_remove_by_group"><a class="viewcode-back" href="../../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.test_constraint_links_base.TestBasic.test_remove_by_group">[docs]</a>    <span class="k">def</span> <span class="nf">test_remove_by_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">remove_links_by_group</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">get_links</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestBasic.test_remove_by_constraint"><a class="viewcode-back" href="../../../../whylog.tests.tests_teacher.html#whylog.tests.tests_teacher.test_constraint_links_base.TestBasic.test_remove_by_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">test_remove_by_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">remove_links_by_constraint</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraint_links</span><span class="o">.</span><span class="n">get_links</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

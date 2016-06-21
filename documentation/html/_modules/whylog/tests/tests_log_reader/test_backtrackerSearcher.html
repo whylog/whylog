@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_log_reader.test_backtrackerSearcher &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../../index.html" />
+    <link rel="up" title="whylog.tests.tests_log_reader" href="../tests_log_reader.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../tests_log_reader.html" accesskey="U">whylog.tests.tests_log_reader</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.tests.tests_log_reader.test_backtrackerSearcher</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">whylog.log_reader</span> <span class="kn">import</span> <span class="n">searchers</span>
+<span class="kn">from</span> <span class="nn">whylog.tests.tests_log_reader.constants</span> <span class="kn">import</span> <span class="n">AFewLinesLogParams</span><span class="p">,</span> <span class="n">TestPaths</span>
+
+
+<div class="viewcode-block" id="TestBacktrackSearcher"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher">[docs]</a><span class="k">class</span> <span class="nc">TestBacktrackSearcher</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_count_lines_in_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_get_sample_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the correct offset of line &#39;line_num&#39;</span>
+<span class="sd">        referring to the file a_few_lines.log construction.</span>
+<span class="sd">        Be careful when modifying a_few_lines.log.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">line_num</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_lines_in_file</span><span class="p">(</span>
+            <span class="n">TestPaths</span><span class="o">.</span><span class="n">get_file_path</span><span class="p">(</span><span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">FILE_NAME</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">line_num</span> <span class="o">*</span> <span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">SINGLE_LINE_LENGTH</span>
+
+    <span class="k">def</span> <span class="nf">_read_all_lines_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_read_last_n_lines_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">how_many_lines</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="n">how_many_lines</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_verify_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines_normally</span><span class="p">,</span> <span class="n">lines_reversed</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines_reversed</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines_normally</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lines_reversed</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">lines_normally</span><span class="p">)):</span>
+            <span class="k">assert</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span>
+
+    <span class="k">def</span> <span class="nf">_run_reverse_and_check_results</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">log_file_path</span><span class="p">,</span>
+        <span class="n">reverse_from_offset_params</span><span class="p">,</span>
+        <span class="n">how_many_last_lines</span><span class="p">,</span>
+        <span class="n">final_offset_should_be_zero</span><span class="o">=</span><span class="bp">True</span>
+    <span class="p">):</span>
+        <span class="c"># for testing _reverse_from_offset investigation_step and super_parser are unnecessary</span>
+        <span class="n">backtracker</span> <span class="o">=</span> <span class="n">searchers</span><span class="o">.</span><span class="n">BacktrackSearcher</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_last_n_lines_from_file</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">how_many_last_lines</span><span class="p">)</span>
+        <span class="n">lines_reversed</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">backtracker</span><span class="o">.</span><span class="n">_reverse_from_offset</span><span class="p">(</span><span class="o">*</span><span class="n">reverse_from_offset_params</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">data_reversed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">backtracker</span><span class="o">.</span><span class="n">_reverse_from_offset</span><span class="p">(</span><span class="o">*</span><span class="n">reverse_from_offset_params</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">how_many_last_lines</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">final_offset_should_be_zero</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">data_reversed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">lines_reversed</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verify_lines</span><span class="p">(</span><span class="n">lines_reversed</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_sample_call_with_specified_bufsize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bufsize</span><span class="p">):</span>
+        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">TestPaths</span><span class="o">.</span><span class="n">get_file_path</span><span class="p">(</span><span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">FILE_NAME</span><span class="p">)</span>
+        <span class="n">how_many_lines</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sample_offset</span><span class="p">(</span><span class="n">how_many_lines</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_reverse_and_check_results</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="p">[</span><span class="n">offset</span><span class="p">,</span> <span class="n">bufsize</span><span class="p">],</span> <span class="n">how_many_lines</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestBacktrackSearcher.test_very_small_bufsize"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_very_small_bufsize">[docs]</a>    <span class="k">def</span> <span class="nf">test_very_small_bufsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_call_with_specified_bufsize</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestBacktrackSearcher.test_file_size_as_offset"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_file_size_as_offset">[docs]</a>    <span class="k">def</span> <span class="nf">test_file_size_as_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">TestPaths</span><span class="o">.</span><span class="n">get_file_path</span><span class="p">(</span><span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">FILE_NAME</span><span class="p">)</span>
+        <span class="n">file_size_as_offset</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_reverse_and_check_results</span><span class="p">(</span>
+            <span class="n">log_file_path</span><span class="p">,</span> <span class="p">[</span><span class="n">file_size_as_offset</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_lines_in_file</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">)</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestBacktrackSearcher.test_yield_nothing_when_offset_is_zero"><a class="viewcode-back" href="../../../../whylog.tests.tests_log_reader.html#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_yield_nothing_when_offset_is_zero">[docs]</a>    <span class="k">def</span> <span class="nf">test_yield_nothing_when_offset_is_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">TestPaths</span><span class="o">.</span><span class="n">get_file_path</span><span class="p">(</span><span class="n">AFewLinesLogParams</span><span class="o">.</span><span class="n">FILE_NAME</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_reverse_and_check_results</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="p">[</span><span class="n">offset</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

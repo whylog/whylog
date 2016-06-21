@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.constraints.verifier &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.constraints" href="../constraints.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../constraints.html" accesskey="U">whylog.constraints</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.constraints.verifier</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">whylog.config.investigation_plan</span> <span class="kn">import</span> <span class="n">Clue</span>
+<span class="kn">from</span> <span class="nn">whylog.constraints.exceptions</span> <span class="kn">import</span> <span class="n">TooManyConstraintsToNegate</span>
+<span class="kn">from</span> <span class="nn">whylog.front.utils</span> <span class="kn">import</span> <span class="n">FrontInput</span>
+
+
+<div class="viewcode-block" id="Verifier"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.verifier.Verifier">[docs]</a><span class="k">class</span> <span class="nc">Verifier</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">UNMATCHED</span> <span class="o">=</span> <span class="n">Clue</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_investigation_result</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clues_combination</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">linkage</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        basing on clues combination and constraints,</span>
+<span class="sd">        returns appropriate InvestigationResult object</span>
+<span class="sd">        which collects information about lines</span>
+<span class="sd">        (FrontInput objects) instead of Clues</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">InvestigationResult</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">FrontInput</span><span class="o">.</span><span class="n">from_clue</span><span class="p">(</span><span class="n">clue</span><span class="p">)</span> <span class="k">for</span> <span class="n">clue</span> <span class="ow">in</span> <span class="n">clues_combination</span><span class="p">],</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">linkage</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_verify_constraint</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">combination</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        checks if specified clues (which represents parsers: 1,2,.. for some rule) and</span>
+<span class="sd">        effect (which represents parser 0 from this rule) satisfy one given constraint.</span>
+<span class="sd">        returns True if so, or False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">constraint_verifier</span> <span class="o">=</span> <span class="n">constraint_manager</span><span class="o">.</span><span class="n">get_constraint_object</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">constraint</span><span class="p">)</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">group_info</span> <span class="ow">in</span> <span class="n">constraint</span><span class="p">[</span><span class="s">&#39;clues_groups&#39;</span><span class="p">]:</span>
+            <span class="n">parser_num</span><span class="p">,</span> <span class="n">group_num</span> <span class="o">=</span> <span class="n">group_info</span>
+            <span class="k">if</span> <span class="n">parser_num</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">regex_parameters</span><span class="p">[</span><span class="n">group_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">combination</span><span class="p">[</span><span class="n">parser_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">Verifier</span><span class="o">.</span><span class="n">UNMATCHED</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">False</span>
+                <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">combination</span><span class="p">[</span><span class="n">parser_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">regex_parameters</span><span class="p">[</span><span class="n">group_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">constraint_verifier</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">constraint</span><span class="p">[</span><span class="s">&#39;params&#39;</span><span class="p">])</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_clues_combinations</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clues_tuples</span><span class="p">,</span> <span class="n">collected_subset</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        recursive generator that returns all permutations according to schema:</span>
+<span class="sd">        from first pair (list, number) of clues_tuples,</span>
+<span class="sd">        produces permutations with size &#39;number&#39; from &#39;list&#39;s elements</span>
+<span class="sd">        and concatenates it with _clues_combinations invoked on the rest of clues_tuples.</span>
+<span class="sd">        example:</span>
+<span class="sd">        &gt;&gt;&gt; xs = [([1, 2, 3], 2), ([4, 5], 1)]</span>
+<span class="sd">        &gt;&gt;&gt; for l in Verifier._clues_combinations(xs):</span>
+<span class="sd">        &gt;&gt;&gt;     print l</span>
+<span class="sd">        [1, 2, 4]</span>
+<span class="sd">        [1, 2, 5]</span>
+<span class="sd">        [1, 3, 4]</span>
+<span class="sd">        [1, 3, 5]</span>
+<span class="sd">        [2, 1, 4]</span>
+<span class="sd">        [2, 1, 5]</span>
+<span class="sd">        [2, 3, 4]</span>
+<span class="sd">        [2, 3, 5]</span>
+<span class="sd">        [3, 1, 4]</span>
+<span class="sd">        [3, 1, 5]</span>
+<span class="sd">        [3, 2, 4]</span>
+<span class="sd">        [3, 2, 5]</span>
+<span class="sd">        it always should be called with empty accumulator,</span>
+<span class="sd">        that is collected_subset=[]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clues_tuples</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">first_list</span><span class="p">,</span> <span class="n">repetitions_number</span> <span class="o">=</span> <span class="n">clues_tuples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">clues</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">first_list</span><span class="p">,</span> <span class="n">repetitions_number</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_clues_combinations</span><span class="p">(</span>
+                    <span class="n">clues_tuples</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">collected_subset</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">clues</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">subset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">collected_subset</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_construct_proper_clues_lists</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">original_clues_lists</span><span class="p">):</span>
+        <span class="n">clues_lists</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">clues</span><span class="p">,</span> <span class="n">occurrences</span> <span class="ow">in</span> <span class="n">original_clues_lists</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">clues</span><span class="p">:</span>
+                <span class="n">clues_lists</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">clues</span><span class="p">,</span> <span class="n">occurrences</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clues_lists</span><span class="o">.</span><span class="n">append</span><span class="p">(([</span><span class="n">Verifier</span><span class="o">.</span><span class="n">UNMATCHED</span><span class="p">],</span> <span class="n">occurrences</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">clues_lists</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_pack_results_for_constraint_or</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">combination</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_create_investigation_result</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">clue</span> <span class="k">for</span> <span class="n">clue</span> <span class="ow">in</span> <span class="n">combination</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">clue</span> <span class="o">==</span> <span class="n">Verifier</span><span class="o">.</span><span class="n">UNMATCHED</span><span class="p">),</span> <span class="n">constraints</span><span class="p">,</span>
+            <span class="n">InvestigationResult</span><span class="o">.</span><span class="n">OR</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Verifier.constraints_and"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.verifier.Verifier.constraints_and">[docs]</a>    <span class="k">def</span> <span class="nf">constraints_and</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clues_lists</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        for each combination of clues (they are generated by _clues_combinations)</span>
+<span class="sd">        checks if for all given constraints their requirements are satisfied</span>
+<span class="sd">        and for each such combination produces InvestigationResult object.</span>
+<span class="sd">        returns list of all produced InvestigationResults</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">clues_lists</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_construct_proper_clues_lists</span><span class="p">(</span><span class="n">clues_lists</span><span class="p">)</span>
+        <span class="n">causes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">combination</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_clues_combinations</span><span class="p">(</span><span class="n">clues_lists</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="n">cls</span><span class="o">.</span><span class="n">_verify_constraint</span><span class="p">(</span><span class="n">combination</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">causes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">cls</span><span class="o">.</span><span class="n">_create_investigation_result</span><span class="p">(</span>
+                        <span class="n">combination</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">InvestigationResult</span><span class="o">.</span><span class="n">AND</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">causes</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Verifier.constraints_or"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.verifier.Verifier.constraints_or">[docs]</a>    <span class="k">def</span> <span class="nf">constraints_or</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clues_lists</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        for each combination of clues (they are generated by _clues_combinations)</span>
+<span class="sd">        checks if for any of given constraints their requirements are satisfied</span>
+<span class="sd">        and for each such combination produces InvestigationResult object.</span>
+<span class="sd">        returns list of all produced InvestigationResults</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">constraints</span><span class="p">:</span>
+            <span class="c"># when there is lack of constraints, but there are existing clues combinations,</span>
+            <span class="c"># each of them should be returned</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="n">cls</span><span class="o">.</span><span class="n">_pack_results_for_constraint_or</span><span class="p">(</span><span class="n">combination</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">combination</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_clues_combinations</span><span class="p">(</span><span class="n">clues_lists</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="n">causes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">clues_lists</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_construct_proper_clues_lists</span><span class="p">(</span><span class="n">clues_lists</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">combination</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_clues_combinations</span><span class="p">(</span><span class="n">clues_lists</span><span class="p">):</span>
+            <span class="n">verified_constraints</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">constraint</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">_verify_constraint</span><span class="p">(</span><span class="n">combination</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">)</span>
+            <span class="p">]</span>  <span class="c"># yapf: disable</span>
+            <span class="k">if</span> <span class="n">verified_constraints</span><span class="p">:</span>
+                <span class="n">causes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">cls</span><span class="o">.</span><span class="n">_pack_results_for_constraint_or</span><span class="p">(</span><span class="n">combination</span><span class="p">,</span> <span class="n">verified_constraints</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">causes</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Verifier.constraints_not"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.verifier.Verifier.constraints_not">[docs]</a>    <span class="k">def</span> <span class="nf">constraints_not</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clues_lists</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        provide investigation if there is zero or one constraint,</span>
+<span class="sd">        because only in such cases NOT linkage has sense</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TooManyConstraintsToNegate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">constraints</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">clues_lists</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">single_constraint_not</span><span class="p">(</span>
+                    <span class="n">clues_lists</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">constraint_manager</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">clues_lists</span><span class="p">:</span>
+                <span class="c"># if all parsers found their matched logs, the NOT requirement isn&#39;t satisfied</span>
+                <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">_create_investigation_result</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">InvestigationResult</span><span class="o">.</span><span class="n">NOT</span><span class="p">)]</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Verifier.single_constraint_not"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.verifier.Verifier.single_constraint_not">[docs]</a>    <span class="k">def</span> <span class="nf">single_constraint_not</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">clues_lists</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        for each combination of clues (they are generated by _clues_combinations)</span>
+<span class="sd">        checks for given constraint if its requirements are not satisfied</span>
+<span class="sd">        and if they are not, it produces InvestigationResult object.</span>
+<span class="sd">        returns list of all produced InvestigationResults</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">clues_lists</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_construct_proper_clues_lists</span><span class="p">(</span><span class="n">clues_lists</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">combination</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_clues_combinations</span><span class="p">(</span><span class="n">clues_lists</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">_verify_constraint</span><span class="p">(</span><span class="n">combination</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">constraint_manager</span><span class="p">):</span>
+                <span class="c"># called with constraint index = 0, because this function assumes that there is one constraint</span>
+                <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">_create_investigation_result</span><span class="p">([],</span> <span class="p">[</span><span class="n">constraint</span><span class="p">],</span> <span class="n">InvestigationResult</span><span class="o">.</span><span class="n">NOT</span><span class="p">)]</span>
+
+</div></div>
+<div class="viewcode-block" id="InvestigationResult"><a class="viewcode-back" href="../../../whylog.constraints.html#whylog.constraints.verifier.InvestigationResult">[docs]</a><span class="k">class</span> <span class="nc">InvestigationResult</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">AND</span> <span class="o">=</span> <span class="s">&quot;AND&quot;</span>
+    <span class="n">OR</span> <span class="o">=</span> <span class="s">&quot;OR&quot;</span>
+    <span class="n">NOT</span> <span class="o">=</span> <span class="s">&quot;NOT&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">cons_linkage</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints_linkage</span> <span class="o">=</span> <span class="n">cons_linkage</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints_linkage</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">AND</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">OR</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">(</span><span class="se">\n</span><span class="s">    result lines: </span><span class="si">%s</span><span class="s">;</span><span class="se">\n</span><span class="s">    due to &#39;</span><span class="si">%s</span><span class="s">&#39; constraints: </span><span class="si">%s</span><span class="se">\n</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints_linkage</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">(</span><span class="se">\n</span><span class="s">    no result lines due to NOT;</span><span class="se">\n</span><span class="s">    constraints: </span><span class="si">%s</span><span class="se">\n</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">((</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">constraints</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints_linkage</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">constraints_linkage</span>
+        <span class="p">))</span>  <span class="c"># yapf: disable</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

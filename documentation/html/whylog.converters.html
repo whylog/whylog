@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.converters package &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Whylog 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="whylog-converters-package">
+<h1>whylog.converters package<a class="headerlink" href="#whylog-converters-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-whylog.converters.exceptions">
+<span id="whylog-converters-exceptions-module"></span><h2>whylog.converters.exceptions module<a class="headerlink" href="#module-whylog.converters.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="whylog.converters.exceptions.ConverterError">
+<em class="property">exception </em><code class="descclassname">whylog.converters.exceptions.</code><code class="descname">ConverterError</code><span class="sig-paren">(</span><em>converting_param</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters/exceptions.html#ConverterError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.exceptions.ConverterError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="whylog.html#whylog.exceptions.WhylogError" title="whylog.exceptions.WhylogError"><code class="xref py py-class docutils literal"><span class="pre">whylog.exceptions.WhylogError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="whylog.converters.exceptions.UnsupportedConverterError">
+<em class="property">exception </em><code class="descclassname">whylog.converters.exceptions.</code><code class="descname">UnsupportedConverterError</code><span class="sig-paren">(</span><em>converter_class_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters/exceptions.html#UnsupportedConverterError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.exceptions.UnsupportedConverterError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="whylog.html#whylog.exceptions.WhylogError" title="whylog.exceptions.WhylogError"><code class="xref py py-class docutils literal"><span class="pre">whylog.exceptions.WhylogError</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.converters">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-whylog.converters" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.converters.AbstractConverter">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">AbstractConverter</code><a class="reference internal" href="_modules/whylog/converters.html#AbstractConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.AbstractConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.converters.AbstractConverter.convert">
+<em class="property">classmethod </em><code class="descname">convert</code><span class="sig-paren">(</span><em>pattern_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#AbstractConverter.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.AbstractConverter.convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.AbstractConverter.safe_convert">
+<em class="property">classmethod </em><code class="descname">safe_convert</code><span class="sig-paren">(</span><em>pattern_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#AbstractConverter.safe_convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.AbstractConverter.safe_convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.converters.ConverterType">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">ConverterType</code><a class="reference internal" href="_modules/whylog/converters.html#ConverterType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.ConverterType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="whylog.converters.ConverterType.TO_DATE">
+<code class="descname">TO_DATE</code><em class="property"> = 'date'</em><a class="headerlink" href="#whylog.converters.ConverterType.TO_DATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.converters.ConverterType.TO_FLOAT">
+<code class="descname">TO_FLOAT</code><em class="property"> = 'float'</em><a class="headerlink" href="#whylog.converters.ConverterType.TO_FLOAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.converters.ConverterType.TO_INT">
+<code class="descname">TO_INT</code><em class="property"> = 'int'</em><a class="headerlink" href="#whylog.converters.ConverterType.TO_INT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.converters.ConverterType.TO_STRING">
+<code class="descname">TO_STRING</code><em class="property"> = 'string'</em><a class="headerlink" href="#whylog.converters.ConverterType.TO_STRING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.converters.DateConverter">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">DateConverter</code><a class="reference internal" href="_modules/whylog/converters.html#DateConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DateConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.converters.DeltaConverter" title="whylog.converters.DeltaConverter"><code class="xref py py-class docutils literal"><span class="pre">whylog.converters.DeltaConverter</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.converters.DateConverter.MAX_VALUE">
+<code class="descname">MAX_VALUE</code><em class="property"> = datetime.datetime(9999, 12, 31, 23, 59, 59, 999999)</em><a class="headerlink" href="#whylog.converters.DateConverter.MAX_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.converters.DateConverter.MIN_VALUE">
+<code class="descname">MIN_VALUE</code><em class="property"> = datetime.datetime(1, 1, 1, 0, 0)</em><a class="headerlink" href="#whylog.converters.DateConverter.MIN_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.DateConverter.convert">
+<em class="property">classmethod </em><code class="descname">convert</code><span class="sig-paren">(</span><em>pattern_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#DateConverter.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DateConverter.convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.DateConverter.safe_convert">
+<em class="property">classmethod </em><code class="descname">safe_convert</code><span class="sig-paren">(</span><em>pattern_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#DateConverter.safe_convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DateConverter.safe_convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.DateConverter.switch_by_delta">
+<em class="property">classmethod </em><code class="descname">switch_by_delta</code><span class="sig-paren">(</span><em>date</em>, <em>delta</em>, <em>delta_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#DateConverter.switch_by_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DateConverter.switch_by_delta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.converters.DeltaConverter">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">DeltaConverter</code><a class="reference internal" href="_modules/whylog/converters.html#DeltaConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DeltaConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.converters.AbstractConverter" title="whylog.converters.AbstractConverter"><code class="xref py py-class docutils literal"><span class="pre">whylog.converters.AbstractConverter</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.converters.DeltaConverter.MAX_DELTA_TYPE">
+<code class="descname">MAX_DELTA_TYPE</code><em class="property"> = 1</em><a class="headerlink" href="#whylog.converters.DeltaConverter.MAX_DELTA_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.converters.DeltaConverter.MIN_DELTA_TYPE">
+<code class="descname">MIN_DELTA_TYPE</code><em class="property"> = 0</em><a class="headerlink" href="#whylog.converters.DeltaConverter.MIN_DELTA_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.DeltaConverter.switch_by_delta">
+<em class="property">classmethod </em><code class="descname">switch_by_delta</code><span class="sig-paren">(</span><em>value</em>, <em>delta</em>, <em>delta_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#DeltaConverter.switch_by_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DeltaConverter.switch_by_delta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.converters.DeltaConverterFactory">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">DeltaConverterFactory</code><a class="reference internal" href="_modules/whylog/converters.html#DeltaConverterFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DeltaConverterFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.converters.DeltaConverterFactory.get_converter">
+<em class="property">classmethod </em><code class="descname">get_converter</code><span class="sig-paren">(</span><em>converter_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#DeltaConverterFactory.get_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.DeltaConverterFactory.get_converter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.converters.FloatConverter">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">FloatConverter</code><a class="reference internal" href="_modules/whylog/converters.html#FloatConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.FloatConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.converters.DeltaConverter" title="whylog.converters.DeltaConverter"><code class="xref py py-class docutils literal"><span class="pre">whylog.converters.DeltaConverter</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.converters.FloatConverter.MAX_VALUE">
+<code class="descname">MAX_VALUE</code><em class="property"> = inf</em><a class="headerlink" href="#whylog.converters.FloatConverter.MAX_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.converters.FloatConverter.MIN_VALUE">
+<code class="descname">MIN_VALUE</code><em class="property"> = -inf</em><a class="headerlink" href="#whylog.converters.FloatConverter.MIN_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.FloatConverter.convert">
+<em class="property">classmethod </em><code class="descname">convert</code><span class="sig-paren">(</span><em>pattern_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#FloatConverter.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.FloatConverter.convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.FloatConverter.switch_by_delta">
+<em class="property">classmethod </em><code class="descname">switch_by_delta</code><span class="sig-paren">(</span><em>value</em>, <em>delta</em>, <em>delta_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#FloatConverter.switch_by_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.FloatConverter.switch_by_delta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.converters.IntConverter">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">IntConverter</code><a class="reference internal" href="_modules/whylog/converters.html#IntConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.IntConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.converters.DeltaConverter" title="whylog.converters.DeltaConverter"><code class="xref py py-class docutils literal"><span class="pre">whylog.converters.DeltaConverter</span></code></a></p>
+<dl class="attribute">
+<dt id="whylog.converters.IntConverter.MAX_VALUE">
+<code class="descname">MAX_VALUE</code><em class="property"> = 9223372036854775807</em><a class="headerlink" href="#whylog.converters.IntConverter.MAX_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.converters.IntConverter.MIN_VALUE">
+<code class="descname">MIN_VALUE</code><em class="property"> = -9223372036854775808</em><a class="headerlink" href="#whylog.converters.IntConverter.MIN_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.IntConverter.convert">
+<em class="property">classmethod </em><code class="descname">convert</code><span class="sig-paren">(</span><em>pattern_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#IntConverter.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.IntConverter.convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.converters.IntConverter.switch_by_delta">
+<em class="property">classmethod </em><code class="descname">switch_by_delta</code><span class="sig-paren">(</span><em>value</em>, <em>delta</em>, <em>delta_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#IntConverter.switch_by_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.IntConverter.switch_by_delta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.converters.StringConverter">
+<em class="property">class </em><code class="descclassname">whylog.converters.</code><code class="descname">StringConverter</code><a class="reference internal" href="_modules/whylog/converters.html#StringConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.StringConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#whylog.converters.AbstractConverter" title="whylog.converters.AbstractConverter"><code class="xref py py-class docutils literal"><span class="pre">whylog.converters.AbstractConverter</span></code></a></p>
+<dl class="classmethod">
+<dt id="whylog.converters.StringConverter.convert">
+<em class="property">classmethod </em><code class="descname">convert</code><span class="sig-paren">(</span><em>pattern_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#StringConverter.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.StringConverter.convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="whylog.converters.get_converter">
+<code class="descclassname">whylog.converters.</code><code class="descname">get_converter</code><span class="sig-paren">(</span><em>converter_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/converters.html#get_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.converters.get_converter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">whylog.converters package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-whylog.converters.exceptions">whylog.converters.exceptions module</a></li>
+<li><a class="reference internal" href="#module-whylog.converters">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/whylog.converters.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/whylog.converters.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

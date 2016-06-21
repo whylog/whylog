@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.teacher.rule_validation_problems &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="../../../index.html" />
+    <link rel="up" title="whylog.teacher" href="../teacher.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Whylog 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../teacher.html" accesskey="U">whylog.teacher</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for whylog.teacher.rule_validation_problems</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractproperty</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+
+<div class="viewcode-block" id="ValidationResult"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.ValidationResult">[docs]</a><span class="k">class</span> <span class="nc">ValidationResult</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_problems</span><span class="p">,</span> <span class="n">parser_problems</span><span class="p">,</span> <span class="n">constraint_problems</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param rule_problems: Problems related to whole rule</span>
+<span class="sd">        :param parser_problems: Problems related to parsers, dict[parser id, problem]</span>
+<span class="sd">        :param constraint_problems: Problems related to constraints, dict[constraint id, problem]</span>
+<span class="sd">        :type rule_problems: list[RuleValidationProblem]</span>
+<span class="sd">        :type parser_problems: dict[int, ParserValidationProblem]</span>
+<span class="sd">        :type constraint_problems: dict[int, ConstraintValidationProblem]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rule_problems</span> <span class="o">=</span> <span class="n">rule_problems</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser_problems</span> <span class="o">=</span> <span class="n">parser_problems</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_problems</span> <span class="o">=</span> <span class="n">constraint_problems</span>
+
+<div class="viewcode-block" id="ValidationResult.is_acceptable"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.ValidationResult.is_acceptable">[docs]</a>    <span class="k">def</span> <span class="nf">is_acceptable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser_problems_list</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parser_problems</span><span class="p">))</span>
+        <span class="n">constraint_problems_list</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+            <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraint_problems</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">all_problems</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rule_problems</span><span class="p">,</span> <span class="n">parser_problems_list</span><span class="p">,</span> <span class="n">constraint_problems_list</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="n">problem</span><span class="o">.</span><span class="n">IS_FATAL</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">all_problems</span><span class="p">)</span>
+
+</div></div>
+<span class="nd">@six.add_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="RuleValidationProblem"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.RuleValidationProblem">[docs]</a><span class="k">class</span> <span class="nc">RuleValidationProblem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">TEMPLATE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Text that explains problem</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="n">IS_FATAL</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE</span>
+
+</div>
+<div class="viewcode-block" id="ConstraintValidationProblem"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.ConstraintValidationProblem">[docs]</a><span class="k">class</span> <span class="nc">ConstraintValidationProblem</span><span class="p">(</span><span class="n">RuleValidationProblem</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="ParserValidationProblem"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.ParserValidationProblem">[docs]</a><span class="k">class</span> <span class="nc">ParserValidationProblem</span><span class="p">(</span><span class="n">RuleValidationProblem</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="NoEffectParserProblem"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.NoEffectParserProblem">[docs]</a><span class="k">class</span> <span class="nc">NoEffectParserProblem</span><span class="p">(</span><span class="n">RuleValidationProblem</span><span class="p">):</span>
+    <span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s">&#39;No effect parser&#39;</span>
+
+</div>
+<div class="viewcode-block" id="ParserCountProblem"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.ParserCountProblem">[docs]</a><span class="k">class</span> <span class="nc">ParserCountProblem</span><span class="p">(</span><span class="n">RuleValidationProblem</span><span class="p">):</span>
+    <span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s">&#39;Rule should consist of at least 2 parsers.&#39;</span>
+
+</div>
+<div class="viewcode-block" id="NotUniqueParserNameProblem"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.NotUniqueParserNameProblem">[docs]</a><span class="k">class</span> <span class="nc">NotUniqueParserNameProblem</span><span class="p">(</span><span class="n">ParserValidationProblem</span><span class="p">):</span>
+    <span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s">&#39;Parser name is not unique.&#39;</span>
+
+</div>
+<div class="viewcode-block" id="NotSetLogTypeProblem"><a class="viewcode-back" href="../../../whylog.teacher.html#whylog.teacher.rule_validation_problems.NotSetLogTypeProblem">[docs]</a><span class="k">class</span> <span class="nc">NotSetLogTypeProblem</span><span class="p">(</span><span class="n">ParserValidationProblem</span><span class="p">):</span>
+    <span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s">&#39;Log type is not set.&#39;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

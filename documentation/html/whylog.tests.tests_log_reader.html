@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>whylog.tests.tests_log_reader package &mdash; Whylog 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Whylog 1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Whylog 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="whylog-tests-tests-log-reader-package">
+<h1>whylog.tests.tests_log_reader package<a class="headerlink" href="#whylog-tests-tests-log-reader-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-whylog.tests.tests_log_reader.constants">
+<span id="whylog-tests-tests-log-reader-constants-module"></span><h2>whylog.tests.tests_log_reader.constants module<a class="headerlink" href="#module-whylog.tests.tests_log_reader.constants" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.tests.tests_log_reader.constants.AFewLinesLogParams">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.constants.</code><code class="descname">AFewLinesLogParams</code><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/constants.html#AFewLinesLogParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.AFewLinesLogParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="whylog.tests.tests_log_reader.constants.AFewLinesLogParams.FILE_NAME">
+<code class="descname">FILE_NAME</code><em class="property"> = 'a_few_lines.log'</em><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.AFewLinesLogParams.FILE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.tests.tests_log_reader.constants.AFewLinesLogParams.NUMBER_OF_LINES">
+<code class="descname">NUMBER_OF_LINES</code><em class="property"> = 10</em><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.AFewLinesLogParams.NUMBER_OF_LINES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.tests.tests_log_reader.constants.AFewLinesLogParams.SINGLE_LINE_LENGTH">
+<code class="descname">SINGLE_LINE_LENGTH</code><em class="property"> = 10</em><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.AFewLinesLogParams.SINGLE_LINE_LENGTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="whylog.tests.tests_log_reader.constants.AFewLinesLogParams.get_line_with_borders">
+<em class="property">classmethod </em><code class="descname">get_line_with_borders</code><span class="sig-paren">(</span><em>offset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/constants.html#AFewLinesLogParams.get_line_with_borders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.AFewLinesLogParams.get_line_with_borders" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns: line content, beginning offset, ending offset</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.tests.tests_log_reader.constants.TestPaths">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.constants.</code><code class="descname">TestPaths</code><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/constants.html#TestPaths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.TestPaths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.tests.tests_log_reader.constants.TestPaths.get_file_path">
+<em class="property">classmethod </em><code class="descname">get_file_path</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/constants.html#TestPaths.get_file_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.TestPaths.get_file_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="whylog.tests.tests_log_reader.constants.TestPaths.path_test_files">
+<code class="descname">path_test_files</code><em class="property"> = ['whylog', 'tests', 'tests_log_reader', 'test_files']</em><a class="headerlink" href="#whylog.tests.tests_log_reader.constants.TestPaths.path_test_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.tests.tests_log_reader.file_reader">
+<span id="whylog-tests-tests-log-reader-file-reader-module"></span><h2>whylog.tests.tests_log_reader.file_reader module<a class="headerlink" href="#module-whylog.tests.tests_log_reader.file_reader" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.file_reader.</code><code class="descname">DataGeneratorLogSource</code><span class="sig-paren">(</span><em>start_time</em>, <em>time_delta</em>, <em>number_of_lines</em>, <em>line_padding</em>, <em>datetime_format</em>, <em>repetitions=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#DataGeneratorLogSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#DataGeneratorLogSource.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.readline">
+<code class="descname">readline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#DataGeneratorLogSource.readline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.readline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.seek">
+<code class="descname">seek</code><span class="sig-paren">(</span><em>offset</em>, <em>whence=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#DataGeneratorLogSource.seek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.seek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.tell">
+<code class="descname">tell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#DataGeneratorLogSource.tell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.DataGeneratorLogSource.tell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.file_reader.</code><code class="descname">OperationCountingFileWrapper</code><span class="sig-paren">(</span><em>file_object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#OperationCountingFileWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#OperationCountingFileWrapper.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.readline">
+<code class="descname">readline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#OperationCountingFileWrapper.readline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.readline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.reset_stats">
+<code class="descname">reset_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#OperationCountingFileWrapper.reset_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.reset_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.seek">
+<code class="descname">seek</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#OperationCountingFileWrapper.seek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.seek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.tell">
+<code class="descname">tell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/file_reader.html#OperationCountingFileWrapper.tell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.file_reader.OperationCountingFileWrapper.tell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.tests.tests_log_reader.test_backtrackerSearcher">
+<span id="whylog-tests-tests-log-reader-test-backtrackersearcher-module"></span><h2>whylog.tests.tests_log_reader.test_backtrackerSearcher module<a class="headerlink" href="#module-whylog.tests.tests_log_reader.test_backtrackerSearcher" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.test_backtrackerSearcher.</code><code class="descname">TestBacktrackSearcher</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_backtrackerSearcher.html#TestBacktrackSearcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_file_size_as_offset">
+<code class="descname">test_file_size_as_offset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_backtrackerSearcher.html#TestBacktrackSearcher.test_file_size_as_offset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_file_size_as_offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_very_small_bufsize">
+<code class="descname">test_very_small_bufsize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_backtrackerSearcher.html#TestBacktrackSearcher.test_very_small_bufsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_very_small_bufsize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_yield_nothing_when_offset_is_zero">
+<code class="descname">test_yield_nothing_when_offset_is_zero</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_backtrackerSearcher.html#TestBacktrackSearcher.test_yield_nothing_when_offset_is_zero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_backtrackerSearcher.TestBacktrackSearcher.test_yield_nothing_when_offset_is_zero" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.tests.tests_log_reader.test_read">
+<span id="whylog-tests-tests-log-reader-test-read-module"></span><h2>whylog.tests.tests_log_reader.test_read module<a class="headerlink" href="#module-whylog.tests.tests_log_reader.test_read" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.test_read.</code><code class="descname">TestLogsReading</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="classmethod">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.setUpClass">
+<em class="property">classmethod </em><code class="descname">setUpClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.setUpClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_first_line_of_file">
+<code class="descname">test_bisect_first_line_of_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.test_bisect_first_line_of_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_first_line_of_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_last_line_of_file">
+<code class="descname">test_bisect_last_line_of_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.test_bisect_last_line_of_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_last_line_of_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_left_when_lines_are_repeated">
+<code class="descname">test_bisect_left_when_lines_are_repeated</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.test_bisect_left_when_lines_are_repeated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_left_when_lines_are_repeated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_line_finding">
+<code class="descname">test_bisect_line_finding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.test_bisect_line_finding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_line_finding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_right_when_lines_are_repeated">
+<code class="descname">test_bisect_right_when_lines_are_repeated</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.test_bisect_right_when_lines_are_repeated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_bisect_right_when_lines_are_repeated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.test_getting_line_by_offset_basic">
+<code class="descname">test_getting_line_by_offset_basic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.test_getting_line_by_offset_basic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_getting_line_by_offset_basic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_read.TestLogsReading.test_getting_line_by_offset_huge">
+<code class="descname">test_getting_line_by_offset_huge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_read.html#TestLogsReading.test_getting_line_by_offset_huge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_read.TestLogsReading.test_getting_line_by_offset_huge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-whylog.tests.tests_log_reader.test_search_manager">
+<span id="whylog-tests-tests-log-reader-test-search-manager-module"></span><h2>whylog.tests.tests_log_reader.test_search_manager module<a class="headerlink" href="#module-whylog.tests.tests_log_reader.test_search_manager" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="whylog.tests.tests_log_reader.test_search_manager.TestBasic">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.test_search_manager.</code><code class="descname">TestBasic</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_search_manager.html#TestBasic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_search_manager.TestBasic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="whylog.tests.tests_log_reader.test_search_manager.TestBasic.test_search_manager_creation">
+<code class="descname">test_search_manager_creation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader/test_search_manager.html#TestBasic.test_search_manager_creation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.test_search_manager.TestBasic.test_search_manager_creation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-whylog.tests.tests_log_reader"></span><dl class="class">
+<dt id="whylog.tests.tests_log_reader.TestBasic">
+<em class="property">class </em><code class="descclassname">whylog.tests.tests_log_reader.</code><code class="descname">TestBasic</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/whylog/tests/tests_log_reader.html#TestBasic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#whylog.tests.tests_log_reader.TestBasic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">whylog.tests.tests_log_reader package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-whylog.tests.tests_log_reader.constants">whylog.tests.tests_log_reader.constants module</a></li>
+<li><a class="reference internal" href="#module-whylog.tests.tests_log_reader.file_reader">whylog.tests.tests_log_reader.file_reader module</a></li>
+<li><a class="reference internal" href="#module-whylog.tests.tests_log_reader.test_backtrackerSearcher">whylog.tests.tests_log_reader.test_backtrackerSearcher module</a></li>
+<li><a class="reference internal" href="#module-whylog.tests.tests_log_reader.test_read">whylog.tests.tests_log_reader.test_read module</a></li>
+<li><a class="reference internal" href="#module-whylog.tests.tests_log_reader.test_search_manager">whylog.tests.tests_log_reader.test_search_manager module</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/whylog.tests.tests_log_reader.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ewa Pawłowska, Andrzej Górski, Krzysztof Gromadzki, Grzegorz Konefał.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/whylog.tests.tests_log_reader.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>
