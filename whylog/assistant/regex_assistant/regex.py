@@ -83,7 +83,7 @@ def create_date_regex(date_text):
     # only alpha or only num or only non-alphanumerical marks
     date_regex = r""
     for matcher in group_pattern.finditer(date_text):
-        start, end = matcher.span(0)
+        start, _ = matcher.span(0)
         char = date_text[start]
         if char.isalpha():
             date_regex += "[a-zA-Z]+"

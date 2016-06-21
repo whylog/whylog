@@ -34,7 +34,7 @@ class TestBasic(TestRemovingSettings):
         path = os.getcwd()
         self.find_config_in_parent_dir(path)
         shutil.rmtree(SettingsFactorySelector._attach_whylog_dir(path))
-        for i in six.moves.range(2):
+        for _ in six.moves.range(2):
             path, _ = os.path.split(path)
             self.find_config_in_parent_dir(path)
             shutil.rmtree(SettingsFactorySelector._attach_whylog_dir(path))
