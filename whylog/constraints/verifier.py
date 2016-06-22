@@ -47,21 +47,21 @@ class Verifier(object):
         produces permutations with size 'number' from 'list's elements
         and concatenates it with _clues_combinations invoked on the rest of clues_tuples.
         example:
-        >>> xs = [([1, 2, 3], 2), ([4, 5], 1)]
+        >>> xs = [([1, 2], 1), ('abc', 2)]
         >>> for l in Verifier._clues_combinations(xs):
         >>>     print l
-        [1, 2, 4]
-        [1, 2, 5]
-        [1, 3, 4]
-        [1, 3, 5]
-        [2, 1, 4]
-        [2, 1, 5]
-        [2, 3, 4]
-        [2, 3, 5]
-        [3, 1, 4]
-        [3, 1, 5]
-        [3, 2, 4]
-        [3, 2, 5]
+        [1, 'a', 'b']
+        [1, 'a', 'c']
+        [1, 'b', 'a']
+        [1, 'b', 'c']
+        [1, 'c', 'a']
+        [1, 'c', 'b']
+        [2, 'a', 'b']
+        [2, 'a', 'c']
+        [2, 'b', 'a']
+        [2, 'b', 'c']
+        [2, 'c', 'a']
+        [2, 'c', 'b']
         it always should be called with empty accumulator,
         that is collected_subset=[]
         """
