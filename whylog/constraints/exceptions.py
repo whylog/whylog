@@ -11,6 +11,7 @@ class VerificationError(ConstraintError):
 
 class UnsupportedConstraintTypeError(VerificationError):
     def __init__(self, constraint_data):
+        super(UnsupportedConstraintTypeError, self).__init__()
         self._constraint_data = constraint_data
 
     def __str__(self):
@@ -18,9 +19,6 @@ class UnsupportedConstraintTypeError(VerificationError):
 
 
 class TooManyConstraintsToNegate(VerificationError):
-    def __init__(self):
-        pass
-
     def __str__(self):
         return "Whylog does not know how to provide investigation when more than 1 constraint are negated"
 
@@ -31,6 +29,7 @@ class ConstructorError(ConstraintError):
 
 class ConstructorParamsError(ConstructorError):
     def __init__(self, constraint_type, correct_param_names, incorrect_param_names):
+        super(ConstructorParamsError, self).__init__()
         self.constraint_type = constraint_type
         self.correct_params_names = correct_param_names
         self.incorrect_params_names = incorrect_param_names
@@ -43,6 +42,7 @@ class ConstructorParamsError(ConstructorError):
 
 class ConstructorGroupsCountError(ConstructorError):
     def __init__(self, constraint_type, groups_count, minimal_groups_count, maximal_groups_count):
+        super(ConstructorGroupsCountError, self).__init__()
         self.constraint_type = constraint_type
         self.groups_count = groups_count
         self.minimal_groups_count = minimal_groups_count

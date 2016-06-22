@@ -11,6 +11,7 @@ class NotMatchingPatternError(WhylogAssistantError):
 
 class DateFromFutureError(WhylogAssistantError):
     def __init__(self, parsed_date, date_text):
+        super(DateFromFutureError, self).__init__()
         self.date_text = date_text
         self.parsed_date = parsed_date
 
@@ -22,6 +23,7 @@ class DateFromFutureError(WhylogAssistantError):
 
 class NoDateGroupError(WhylogAssistantError):
     def __init__(self, line_content, regex, line_index):
+        super(NoDateGroupError, self).__init__()
         self.line_content = line_content
         self.regex = regex
         self.line_index = line_index
@@ -34,6 +36,7 @@ class NoDateGroupError(WhylogAssistantError):
 
 class UnsupportedAssistantError(WhylogAssistantError):
     def __init__(self, assistant_class_name):
+        super(UnsupportedAssistantError, self).__init__()
         self.assistant_class_name = assistant_class_name
 
     def __str__(self):
