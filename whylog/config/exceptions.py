@@ -7,6 +7,7 @@ class WhylogConfigError(WhylogError):
 
 class UnsupportedFilenameMatcher(WhylogConfigError):
     def __init__(self, matcher_class_name):
+        super(UnsupportedFilenameMatcher, self).__init__()
         self.matcher_class_name = matcher_class_name
 
     def __str__(self):
@@ -15,6 +16,7 @@ class UnsupportedFilenameMatcher(WhylogConfigError):
 
 class UnsupportedConfigType(WhylogConfigError):
     def __init__(self, unsupported_type):
+        super(UnsupportedConfigType, self).__init__()
         self.unsupported_type = unsupported_type
 
     def __str__(self):
@@ -23,6 +25,7 @@ class UnsupportedConfigType(WhylogConfigError):
 
 class NoLogTypeError(WhylogError):
     def __init__(self, log_type):
+        super(NoLogTypeError, self).__init__()
         self.log_type = log_type
 
     def __str__(self):
@@ -31,6 +34,7 @@ class NoLogTypeError(WhylogError):
 
 class RenameLogTypeError(WhylogError):
     def __init__(self, log_type):
+        super(RenameLogTypeError, self).__init__()
         self.log_type = log_type
 
     def __str__(self):
@@ -39,6 +43,7 @@ class RenameLogTypeError(WhylogError):
 
 class UnsupportedPrimaryKeyType(WhylogError):
     def __init__(self, type_):
+        super(UnsupportedPrimaryKeyType, self).__init__()
         self.type_ = type_
 
     def __str__(self):

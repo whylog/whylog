@@ -51,7 +51,7 @@ class TestRemovingSettings(TestCase):
     def remove_settings_dirs(cls):
         current_path = os.getcwd()
         cls.remove_one_settings_dir(current_path)
-        for i in range(2):
+        for _ in range(2):
             current_path, _ = os.path.split(current_path)
             cls.remove_one_settings_dir(current_path)
         cls.remove_one_settings_dir(SettingsFactorySelector.HOME_DIR)

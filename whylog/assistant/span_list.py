@@ -7,6 +7,7 @@ from whylog.exceptions import WhylogError
 
 class OverlappingSpansError(WhylogError):
     def __init__(self, span1, span2):
+        super(OverlappingSpansError, self).__init__()
         self.span1 = span1
         self.span2 = span2
 

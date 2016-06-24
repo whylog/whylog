@@ -24,12 +24,10 @@ class ParserNameGenerator(object):
 
     @classmethod
     def _get_building_words(cls, line, pattern_str):
-        pattern = re.compile(pattern_str)
-        matcher = pattern.match(line)
+        matcher = re.match(pattern_str, line)
         if matcher is not None:
-            groups = matcher.groups()
-            for i in six.moves.range(len(groups)):
-                line = line.replace(groups[i], ' ')
+            for group in matcher.groups():
+                line = line.replace(group, ' ')
         return [re.sub(NON_ALPHA_NUMERIC_REGEX, ' ', word.lower()) for word in line.split()]
 
     def _find_free_by_number_appending(self, proposed_name, black_list):
