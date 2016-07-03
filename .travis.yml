@@ -14,65 +14,146 @@ python:
   - pypy
   - pypy3
 
+branches:
+  # https://github.com/travis-ci/travis-ci/issues/1147#issuecomment-160820262
+  # this reduces workload on Travis if there are many pushes in a short time.
+  # It does not have a drawback if:
+  # - pull requests are used for review
+  # - branches that we care about (not work-in-progress) are listed below
+  only:
+    - master
+
 matrix:
   include:
+    # jython
     - python: 2.7
       env: JYTHON=true
+
+    # Source Code Analysis is slow.  We just run it once on
+    # Python 2 and once on Python 3.
     - python: 2.7
       env: SCA=true
     - python: 3.5
       env: SCA=true
+
+    # Travis CI doesn't support OSX python builds officially,
+    # but that won't stop us
+    - python: 2.7
+      os: osx
+      language: generic
+      env: OS_X_PYTHON_VERSION=python
     - python: 3.5
       os: osx
       language: generic
+      env: OS_X_PYTHON_VERSION=python3
+
 
 cache:
   - pip
   - directories:
+    - $HOME/.eggs
     - $HOME/jython-pip
     - $HOME/jython
     - $HOME/.virtualenv/jython
-    - $HOME/.virtualenv/python3-osx
+    - $HOME/.virtualenv/osx-python
+    - $HOME/.virtualenv/osx-python3
 
 before_install:
   - uname -a
   - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then lsb_release -a; fi
-  # get jython
-  - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/bin/activate" ]; then wget http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.1b3/jython-installer-2.7.1b3.jar -O jython-installer-2.7.1b3.jar; else echo skip; fi
-  - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/bin/activate" ]; then java -jar jython-installer-2.7.1b3.jar --silent --directory "$HOME/jython"; else echo skip; fi
-  # install a custom version of pip, as standard pip doesn't work on jython (https://github.com/jythontools/pip/commits/develop)
-  - if [ -n "$JYTHON" -a ! -d "$HOME/jython-pip" ]; then mkdir ~/jython-pip; else echo skip; fi
-  - if [ -n "$JYTHON" -a ! -f ~/jython-pip/pip-7.1.2-py2.py3-none-any.whl ]; then wget https://pypi.python.org/packages/py2.py3/p/pip/pip-7.1.2-py2.py3-none-any.whl -O ~/jython-pip/pip-7.1.2-py2.py3-none-any.whl; else echo skip; fi
-  # create jython virtualenv
-  - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/bin/activate" ]; then virtualenv --system-site-packages --extra-search-dir="$HOME/jython-pip" -p "$HOME/jython/bin/jython" "$HOME/.virtualenv/jython"; else echo skip; fi
-  - if [ -n "$JYTHON" ]; then source "$HOME/.virtualenv/jython/bin/activate"; fi
-  # install python3 on OS X
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv -p python3 "$HOME/.virtualenv/python3-osx"; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source "$HOME/.virtualenv/python3-osx/bin/activate"; fi
+  - |
+        # install python on OS X
+        if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+            brew update
+            brew install "$OS_X_PYTHON_VERSION"
+            if [ ! -e "$HOME/.virtualenv/osx-$OS_X_PYTHON_VERSION/bin/activate" ]; then
+                virtualenv -p "$OS_X_PYTHON_VERSION" "$HOME/.virtualenv/osx-$OS_X_PYTHON_VERSION"
+            fi
+            source "$HOME/.virtualenv/osx-$OS_X_PYTHON_VERSION/bin/activate"
+        else
+            echo skip
+        fi
+  - |
+        # get jython
+        if [ -n "$JYTHON" ]; then
+            if [ ! -f "$HOME/.virtualenv/jython/bin/activate" ]; then
+                wget http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.1b3/jython-installer-2.7.1b3.jar -O jython-installer-2.7.1b3.jar
+                java -jar jython-installer-2.7.1b3.jar --silent --directory "$HOME/jython"
+            else
+                echo skip
+            fi
+            # install a custom version of pip, as standard pip doesn't work on jython (https://github.com/jythontools/pip/commits/develop)
+            if [ ! -d "$HOME/jython-pip" ]; then
+                mkdir ~/jython-pip
+            else
+                echo skip
+            fi
+            if [ ! -f ~/jython-pip/pip-7.1.2-py2.py3-none-any.whl ]; then
+                wget https://pypi.python.org/packages/py2.py3/p/pip/pip-7.1.2-py2.py3-none-any.whl -O ~/jython-pip/pip-7.1.2-py2.py3-none-any.whl
+            else
+                echo skip
+            fi
+            # create jython virtualenv
+            if [ ! -f "$HOME/.virtualenv/jython/bin/activate" ]; then
+                virtualenv --system-site-packages --extra-search-dir="$HOME/jython-pip" -p "$HOME/jython/bin/jython" "$HOME/.virtualenv/jython"
+            else
+                echo skip
+            fi
+            source "$HOME/.virtualenv/jython/bin/activate"
+        else
+            echo skip
+        fi
   - virtualenv --version
+  - python --version
 
 install:
-  # install PyYAML on Jython manually before pip tries to do it and fails
-  - if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/Lib/site-packages/PyYAML-3.11-py2.7.egg-info" ]; then wget https://pypi.python.org/packages/source/P/PyYAML/PyYAML-3.11.tar.gz; tar -zxf PyYAML-3.11.tar.gz; cd PyYAML-3.11/; wget http://pyyaml.org/raw-attachment/ticket/163/jython-setup.patch; patch < jython-setup.patch; python setup.py install; cd -; fi
-  # `pip install -r requirements.txt` does not work on jython 2.7.1b2
+  - |
+        # install PyYAML on Jython manually before pip tries to do it and fails
+        if [ -n "$JYTHON" -a ! -f "$HOME/.virtualenv/jython/Lib/site-packages/PyYAML-3.11-py2.7.egg-info" ]; then
+            wget https://pypi.python.org/packages/source/P/PyYAML/PyYAML-3.11.tar.gz
+            tar -zxf PyYAML-3.11.tar.gz
+            cd PyYAML-3.11/
+            wget http://pyyaml.org/raw-attachment/ticket/163/jython-setup.patch
+            patch < jython-setup.patch
+            python setup.py install
+            cd -
+        fi
+
   # installing regex on jython fails (jython can't compile the native extension), this awk filter prevents it
   - cat requirements*.txt | awk \"${JYTHON:-False}'" == "True" && /^regex/ || ! /^regex/' | xargs pip install
+
+  # custom things specific to whylog
   - if [ -z "$SCA" ]; then python setup.py develop; else echo skip; fi
 
+
 before_script:
+  - pip freeze
   # Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
   - if [ -n "$JYTHON" ]; then python -c "print ''"; else echo skip; fi
 
 script:
-  - if [ -n "$SCA" -a -n "$TRAVIS_COMMIT_RANGE" ]; then git diff --name-only "$TRAVIS_COMMIT_RANGE" | grep '\.py$' | xargs yapf --diff setup.py || exit; else echo skip; fi
-  - if [ -n "$SCA" -a -z "$TRAVIS_COMMIT_RANGE" ]; then yapf --diff --recursive . || exit; else echo skip; fi
+  # nosetests
+  - if [ -z "$SCA" ]; then python setup.py nosetests; else echo skip; fi
+
+  # SCA
+  - |
+        if [ -n "$SCA" ]; then
+            if [ -n "$TRAVIS_COMMIT_RANGE" ]; then
+                echo "using commit range: $TRAVIS_COMMIT_RANGE"
+                git diff --name-only "$TRAVIS_COMMIT_RANGE" | grep '\.py$' | xargs yapf --diff setup.py || exit
+            else
+                yapf --diff --recursive . || exit
+            fi
+        else
+            echo skip
+        fi
   - if [ -n "$SCA" ]; then pyflakes . || exit; else echo skip; fi
-  - if [ -n "$SCA" ]; then isort --order-by-type --recursive --line-width 100 --diff --verbose --check-only || exit; else echo skip; fi
-  - if [ -n "$SCA" ]; then grep -r '\_\_metaclass\_\_' whylog/ && exit 1 || true; else echo skip; fi
-  - if [ -n "$SCA" ]; then grep -r --extended-regex '^ *class [^\(]+(\(\))?:' whylog/ && exit 1 || true; else echo skip; fi
-  - if [ -n "$SCA" ]; then grep -r 'isinstance(' whylog/ && exit 1 || true; else echo skip; fi
-  - if [ -n "$SCA" ]; then grep -r --extended-regex '\b(all|any)\(\[' whylog/ && exit 1 || true; else echo skip; fi
-  - if [ -n "$SCA" ]; then exit; else echo skip; fi
-  - python setup.py nosetests
+
+  # isort doesn't get along with yapf. Hopefully we'll figure it out and re-enable in the future.
+  # - if [ -n "$SCA" ]; then isort --order-by-type --recursive --line-width 100 --diff --verbose --check-only || exit; else echo skip; fi
+
+  # home-made bad code detectors
+  - if [ -n "$SCA" ]; then grep -r --extended-regex '^ *class [^\(]+(\(\))?:' whylog/ && exit 1 || true; else echo skip; fi  # old-style class detector
+  - if [ -n "$SCA" ]; then grep -r 'isinstance\(' . && exit 1 || true; else echo skip; fi  # very non-pythonic
+  - if [ -n "$SCA" ]; then grep -r --extended-regex '\b(all|any)\(\[' whylog/ && exit 1 || true; else echo skip; fi  # a list is unnecesarily allocated where a generator expression could have been used
+  - if [ -n "$SCA" ]; then grep -r '\_\_metaclass\_\_' . && exit 1 || true; else echo skip; fi  # bad metaclass declaration: use six
