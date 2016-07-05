@@ -152,10 +152,6 @@ install:
   # installing regex on jython fails (jython can't compile the native extension), this awk filter prevents it
   - cat requirements*.txt | awk \"${JYTHON:-False}'" == "True" && /^regex/ || ! /^regex/' | xargs pip install
 
-  # custom things specific to whylog
-  - if [ -z "$SCA" ]; then python setup.py develop; else echo skip; fi
-
-
 before_script:
   - pip freeze
   # Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
@@ -165,8 +161,8 @@ script:
   # nosetests
   - if [ -z "$SCA" ]; then python setup.py nosetests; else echo skip; fi
 
-  # SCA
   - |
+        # yapf
         if [ -n "$SCA" ]; then
             if [ -n "$TRAVIS_COMMIT_RANGE" ]; then
                 echo "using commit range: $TRAVIS_COMMIT_RANGE"
@@ -187,3 +183,16 @@ script:
   - if [ -n "$SCA" ]; then grep -r 'isinstance\(' . && exit 1 || true; else echo skip; fi  # very non-pythonic
   - if [ -n "$SCA" ]; then grep -r --extended-regex '\b(all|any)\(\[' . && exit 1 || true; else echo skip; fi  # a list is unnecesarily allocated where a generator expression could have been used
   - if [ -n "$SCA" ]; then grep -r '\_\_metaclass\_\_' . && exit 1 || true; else echo skip; fi  # bad metaclass declaration: use six
+
+  # package installation
+  - |
+        if [ -z "$SCA" ]; then
+            if [ -n "$OS_X_PYTHON_VERSION" ]; then
+                # install action fails on osx for unknown reason
+                python setup.py develop
+            else
+                python setup.py install
+            fi
+        else
+            echo skip
+        fi
