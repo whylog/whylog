@@ -15,7 +15,7 @@ EMPTY_FROZEN_DICT = frozendict()
 @six.add_metaclass(ABCMeta)
 class AbstractLogReader(object):
     @abstractmethod
-    def get_causes(self, front_input):
+    def get_causes(self, front_input, tmp_assign_to_log_type=EMPTY_FROZEN_DICT):
         pass
 
     @abstractmethod
