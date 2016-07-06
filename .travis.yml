@@ -158,6 +158,7 @@ install:
             pip install coverage
             if [ -n "$CODACY_PROJECT_TOKEN" ]; then pip install codacy-coverage; fi
             if [ -n "$COVERALLS_REPO_TOKEN" ]; then pip install coveralls; fi
+            if [ -n "$CODECOV_TOKEN" ]; then wget https://codecov.io/bash -O codecov.sh && chmod +x codecov.sh; fi
         fi
 
 before_script:
@@ -213,3 +214,4 @@ script:
 after_success:
   - if [ "$MODE" == 'coverage' -a -n "$CODACY_PROJECT_TOKEN" ]; then python-codacy-coverage -r coverage.xml; else echo skip; fi
   - if [ "$MODE" == 'coverage' -a -n "$COVERALLS_REPO_TOKEN" ]; then coveralls; else echo skip; fi
+  - if [ "$MODE" == 'coverage' -a -n "$CODECOV_TOKEN" ]; then ./codecov.sh -X gcov -X coveragepy; else echo skip; fi
