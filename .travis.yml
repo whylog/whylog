@@ -152,15 +152,24 @@ install:
   # installing regex on jython fails (jython can't compile the native extension), this awk filter prevents it
   - cat requirements*.txt | awk \"${JYTHON:-False}'" == "True" && /^regex/ || ! /^regex/' | xargs pip install
 
+  # coverage has additional requirements
+  - if [ "$MODE" == 'coverage' ]; then pip install coverage; else echo skip; fi
+
 before_script:
   - pip freeze
   # Before runing the test case, we need to make jython run some code as in first run it can put something on stdout
   - if [ -n "$JYTHON" ]; then python -c "print ''"; else echo skip; fi
 
 script:
-  # nosetests
-  - if [ -z "$MODE" ]; then python setup.py nosetests; else echo skip; fi
-
+  - |
+        # nosetests
+        if [ -z "$MODE" ]; then
+            python setup.py nosetests
+        elif [ "$MODE" == 'coverage' ]; then
+            python setup.py nosetests --with-coverage --cover-xml --cover-package "$(python setup.py --name)" --cover-branches
+        else
+            echo skip
+        fi
   - |
         # yapf
         if [ "$MODE" == 'SCA' ]; then
