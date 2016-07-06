@@ -44,6 +44,10 @@ matrix:
     - python: 3.5
       env: MODE=SCA
 
+    # coverage
+    - python: 3.5
+      env: MODE=coverage
+
     # Travis CI doesn't support OSX python builds officially,
     # but that won't stop us
     - python: 2.7
