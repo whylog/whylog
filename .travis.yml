@@ -157,6 +157,7 @@ install:
         if [ "$MODE" == 'coverage' ]; then
             pip install coverage
             if [ -n "$CODACY_PROJECT_TOKEN" ]; then pip install codacy-coverage; fi
+            if [ -n "$COVERALLS_REPO_TOKEN" ]; then pip install coveralls; fi
         fi
 
 before_script:
@@ -211,3 +212,4 @@ script:
         fi
 after_success:
   - if [ "$MODE" == 'coverage' -a -n "$CODACY_PROJECT_TOKEN" ]; then python-codacy-coverage -r coverage.xml; else echo skip; fi
+  - if [ "$MODE" == 'coverage' -a -n "$COVERALLS_REPO_TOKEN" ]; then coveralls; else echo skip; fi
