@@ -152,8 +152,12 @@ install:
   # installing regex on jython fails (jython can't compile the native extension), this awk filter prevents it
   - cat requirements*.txt | awk \"${JYTHON:-False}'" == "True" && /^regex/ || ! /^regex/' | xargs pip install
 
-  # coverage has additional requirements
-  - if [ "$MODE" == 'coverage' ]; then pip install coverage; else echo skip; fi
+  - |
+        # coverage has additional requirements
+        if [ "$MODE" == 'coverage' ]; then
+            pip install coverage
+            if [ -n "$CODACY_PROJECT_TOKEN" ]; then pip install codacy-coverage; fi
+        fi
 
 before_script:
   - pip freeze
@@ -205,3 +209,5 @@ script:
                 python setup.py install
             fi
         fi
+after_success:
+  - if [ "$MODE" == 'coverage' -a -n "$CODACY_PROJECT_TOKEN" ]; then python-codacy-coverage -r coverage.xml; else echo skip; fi
