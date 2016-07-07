@@ -5,26 +5,7 @@ Auxilary methods for Span
 import six
 
 from whylog.converters import ConverterType
-from whylog.exceptions import WhylogError
-
-
-class SpanConstructorParamsError(WhylogError):
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
-
-    def __str__(self):
-        return 'Wrong Span constructor params. Should be: %s < %s' % (self.start, self.end)
-
-
-class UnableToCreatePatternError(WhylogError):
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
-
-    def __str__(self):
-        return 'No pattern or pattern creator in Span constructor for span in (%s, %s)' % \
-               (self.start, self.end)
+from .exceptions import SpanConstructorParamsError, UnableToCreatePatternError
 
 
 class Span(object):

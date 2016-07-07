@@ -7,6 +7,7 @@ class LogReaderError(WhylogError):
 
 class NoLogTypeError(LogReaderError):
     def __init__(self, front_input):
+        super(NoLogTypeError, self).__init__()
         self._front_input = front_input
 
     def __str__(self):
@@ -21,6 +22,7 @@ class EmptyFile(LogReaderError):
 
 class OffsetBiggerThanFileSize(LogReaderError):
     def __init__(self, offset):
+        super(OffsetBiggerThanFileSize, self).__init__()
         self.offset = offset
 
     def __str__(self):

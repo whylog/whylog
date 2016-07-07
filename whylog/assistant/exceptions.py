@@ -41,3 +41,24 @@ class UnsupportedAssistantError(WhylogAssistantError):
 
     def __str__(self):
         return 'This whylog version do not handle %s. Please upgrade Whylog' % self.assistant_class_name
+
+
+class SpanConstructorParamsError(WhylogError):
+    def __init__(self, start, end):
+        super(SpanConstructorParamsError, self).__init__()
+        self.start = start
+        self.end = end
+
+    def __str__(self):
+        return 'Wrong Span constructor params. Should be: %s < %s' % (self.start, self.end)
+
+
+class UnableToCreatePatternError(WhylogError):
+    def __init__(self, start, end):
+        super(UnableToCreatePatternError, self).__init__()
+        self.start = start
+        self.end = end
+
+    def __str__(self):
+        return 'No pattern or pattern creator in Span constructor for span in (%s, %s)' % \
+               (self.start, self.end)
