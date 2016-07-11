@@ -1,4 +1,3 @@
-import os.path
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from os import SEEK_SET
@@ -36,15 +35,6 @@ class BacktrackSearcher(AbstractSearcher):
         self._file_path = file_path
         self._investigation_step = investigation_step
         self._super_parser = super_parser
-
-    def _deduce_offset(self):
-        """
-        returns offset of the line with the specified time
-        """
-        for line in self._reverse_from_offset(os.path.getsize(self._file_path)):
-            line_content, line_offset = line
-            if self._investigation_step.is_line_in_search_range(line_content):
-                return line_offset + len(line_content) + 1
 
     def _find_left(self, opened_file):
         left = 0

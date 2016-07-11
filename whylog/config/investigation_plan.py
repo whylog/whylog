@@ -41,10 +41,6 @@ class InvestigationStep(object):
         self._parser_subset = parser_subset
         self._search_ranges = search_ranges
 
-    def is_line_in_search_range(self, super_parser_groups):
-        #TODO: delete this deprecated method
-        return True
-
     def compare_with_bound(self, bound, super_parser_groups):
         """
         Basing on super_parser_groups extracted from line, returns information
