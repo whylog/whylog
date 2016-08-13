@@ -1,4 +1,4 @@
-frozendict
+frozendict==0.6
 python-dateutil
 pyyaml
 regex
