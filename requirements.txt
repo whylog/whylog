@@ -1,5 +1,5 @@
 frozendict==0.6
 python-dateutil
-pyyaml
+pyyaml>=3.12
 regex
 six>=1.10
