@@ -110,11 +110,10 @@ class AbstractConstraint(object):
         return cls.MIN_GROUPS_COUNT, cls.MAX_GROUPS_COUNT
 
     @abstractmethod
-    def verify(self, group_contents, param_dict):
+    def verify(self, group_contents):
         """
         Verifies constraint for given params in param_dict and groups contents.
 
-        :param param_dict: dict of additional params of constraint
         :param groups: list of groups contents,
 
         For LogReader and Teacher verification.
@@ -151,7 +150,82 @@ class AbstractConstraint(object):
         return self._validate_params() + self._validate_groups()
 
 
-class TimeConstraint(AbstractConstraint):
+class ValueDeltaConstraint(AbstractConstraint):
+    """
+    Value delta between values must be greater than 'min_delta' and lower than 'max_delta'
+    """
+
+    TYPE = ConstraintType.VALUE_DELTA
+
+    MAX_GROUPS_COUNT = 2
+
+    MIN_DELTA = 'min_delta'
+    MAX_DELTA = 'max_delta'
+
+    PARAMS = {MIN_DELTA: ConverterType.TO_FLOAT, MAX_DELTA: ConverterType.TO_FLOAT}
+
+    @classmethod
+    def convert(cls, value):
+        return float(value)
+
+    def __init__(self, groups=None, param_dict=None, params_checking=True):
+        super(ValueDeltaConstraint, self).__init__(groups, param_dict, params_checking)
+        if not params_checking:
+            param_min_delta = self.params.get(self.MIN_DELTA)
+            param_max_delta = self.params.get(self.MAX_DELTA)
+            assert param_min_delta is not None or param_max_delta is not None
+            if param_min_delta is not None and param_max_delta is not None:
+                self.verify = self._verify_both
+                self._min_delta = self.convert(param_min_delta)
+                self._max_delta = self.convert(param_max_delta)
+            elif param_max_delta is not None:
+                self.verify = self._verify_max
+                self._max_delta = self.convert(param_max_delta)
+            elif param_min_delta is not None:
+                self.verify = self._verify_min
+                self._min_delta = self.convert(param_min_delta)
+
+    def _verify_min(self, group_contents):
+        first_value, second_value = group_contents
+        return second_value - first_value >= self._min_delta
+
+    def _verify_max(self, group_contents):
+        first_value, second_value = group_contents
+        return second_value - first_value <= self._max_delta
+
+    def _verify_both(self, group_contents):
+        first_value, second_value = group_contents
+        return self._max_delta >= second_value - first_value >= self._min_delta
+
+    # TODO add parametr ordered
+    def _verify_ordered_min(self, group_contents):
+        first_value, second_value = group_contents
+        return abs(second_value - first_value) >= self._min_delta
+
+    def _verify_ordered_max(self, group_contents):
+        first_value, second_value = group_contents
+        return abs(second_value - first_value) <= self._max_delta
+
+    def _verify_ordered_both(self, group_contents):
+        first_value, second_value = group_contents
+        return self._max_delta >= abs(second_value - first_value) >= self._min_delta
+
+    def verify(self, group_contents):
+        pass
+
+    def _validate_params(self):
+        problems = super(ValueDeltaConstraint, self)._validate_params()
+        param_min_delta = self.params.get(self.MIN_DELTA)
+        param_max_delta = self.params.get(self.MAX_DELTA)
+        if param_min_delta is None and param_max_delta is None:
+            problems.append(NoTimeDeltasProblem(self.MIN_DELTA, self.MAX_DELTA))
+        if param_min_delta is not None and param_max_delta is not None:
+            if param_min_delta > param_max_delta:
+                problems.append(MinGreaterThatMaxProblem())
+        return problems
+
+
+class TimeConstraint(ValueDeltaConstraint):
     """
     Time delta between two dates must be greater or equal to 'min_delta'
     and lower or equal to 'max_delta'
@@ -165,55 +239,9 @@ class TimeConstraint(AbstractConstraint):
 
     TYPE = ConstraintType.TIME_DELTA
 
-    MAX_GROUPS_COUNT = 2
-
-    MIN_DELTA = 'min_delta'
-    MAX_DELTA = 'max_delta'
-
-    PARAMS = {MIN_DELTA: ConverterType.TO_FLOAT, MAX_DELTA: ConverterType.TO_FLOAT}
-
-    def __init__(self, groups=None, param_dict=None, params_checking=True):
-        super(TimeConstraint, self).__init__(groups, param_dict, params_checking)
-        if not params_checking:
-            param_min_delta = self.params.get(self.MIN_DELTA)
-            param_max_delta = self.params.get(self.MAX_DELTA)
-            assert param_min_delta is not None or param_max_delta is not None
-            if param_min_delta is not None and param_max_delta is not None:
-                self.verify = self._verify_both
-                self._min_delta = datetime.timedelta(seconds=param_min_delta)
-                self._max_delta = datetime.timedelta(seconds=param_max_delta)
-            elif param_max_delta is not None:
-                self.verify = self._verify_max
-                self._max_delta = datetime.timedelta(seconds=param_max_delta)
-            elif param_min_delta is not None:
-                self.verify = self._verify_min
-                self._min_delta = datetime.timedelta(seconds=param_min_delta)
-
-    def _verify_min(self, group_contents, param_dict):
-        earlier_date, later_date = group_contents
-        return later_date - earlier_date >= self._min_delta
-
-    def _verify_max(self, group_contents, param_dict):
-        earlier_date, later_date = group_contents
-        return later_date - earlier_date <= self._max_delta
-
-    def _verify_both(self, group_contents, param_dict):
-        earlier_date, later_date = group_contents
-        return self._max_delta >= later_date - earlier_date >= self._min_delta
-
-    def verify(self, group_contents, param_dict):
-        pass
-
-    def _validate_params(self):
-        problems = super(TimeConstraint, self)._validate_params()
-        param_min_delta = self.params.get(self.MIN_DELTA)
-        param_max_delta = self.params.get(self.MAX_DELTA)
-        if param_min_delta is None and param_max_delta is None:
-            problems.append(NoTimeDeltasProblem(self.MIN_DELTA, self.MAX_DELTA))
-        if param_min_delta is not None and param_max_delta is not None:
-            if param_min_delta > param_max_delta:
-                problems.append(MinGreaterThatMaxProblem())
-        return problems
+    @classmethod
+    def convert(cls, value):
+        return datetime.timedelta(seconds=value)
 
 
 class IdenticalConstraint(AbstractConstraint):
@@ -227,7 +255,7 @@ class IdenticalConstraint(AbstractConstraint):
 
     PARAMS = {}
 
-    def verify(self, group_contents, param_dict):
+    def verify(self, group_contents):
         """
         I.e:
         - verify(['comp1', 'comp1', 'comp1'], {}) returns True
@@ -246,21 +274,23 @@ class DifferentConstraint(AbstractConstraint):
     PARAM_VALUE = "value"
     PARAMS = {PARAM_VALUE: ConverterType.TO_STRING}
 
-    def verify(self, group_contents, param_dict):
-        param = param_dict.get(self.PARAM_VALUE)
-        if param:
-            return len(set(itertools.chain(group_contents, [param]))) == len(group_contents) + 1
+    def __init__(self, groups=None, param_dict=None, params_checking=True):
+        super(DifferentConstraint, self).__init__(groups, param_dict, params_checking)
+        param_dict = param_dict or {}
+        self.diff_value = param_dict.get(self.PARAM_VALUE)
+
+    def verify(self, group_contents):
+        if self.diff_value:
+            # I'm not sure if it is correct implementation.
+            return len(set(itertools.chain(group_contents, [self.diff_value]))
+                      ) == len(group_contents) + 1
         else:
             return len(set(group_contents)) == len(group_contents)
-
-
-class ValueDeltaConstraint(AbstractConstraint):
-    """
-    Value delta between values must be greater than 'min_delta' and lower than 'max_delta'
-    """
 
 
 class HeteroConstraint(AbstractConstraint):
     """
     A number of groups must be identical, the rest must be different.
     """
+
+    TYPE = ConstraintType.HETERO
