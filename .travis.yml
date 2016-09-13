@@ -24,6 +24,12 @@ branches:
     - master
 
 matrix:
+  # / on 2016-09-12 build queue for OS-X was close to an hour \
+  allow_failures:
+    - os: osx
+  fast_finish: true
+  # \ on 2016-09-12 build queue for OS-X was close to an hour /
+
   include:
     # jython
     - python: 2.7
@@ -58,7 +64,6 @@ matrix:
       os: osx
       language: generic
       env: OS_X_PYTHON_VERSION=python3
-
 
 cache:
   - pip
